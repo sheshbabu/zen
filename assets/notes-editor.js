@@ -31,7 +31,7 @@ class Editor {
         this.tagsEditor = new TagsEditor(this.noteId, this.containerEl.querySelector('.notes-editor-tags'));
 
         this.textareaEl.addEventListener('input', () => {
-            this.textareaEl.style.height = `${this.textareaEl.scrollHeight}px`;
+            this.textareaEl.style.height = `${this.textareaEl.scrollHeight + 32}px`;
         });
 
         this.buttonEl.addEventListener('click', (e) => {
@@ -109,7 +109,7 @@ class Editor {
             this.editorEl.classList.add('is-editable');
             this.titleEl.setAttribute('contenteditable', true);
             this.textareaEl.style.height = 'auto'; // Reset the height
-            this.textareaEl.style.height = `${this.textareaEl.scrollHeight}px`;
+            this.textareaEl.style.height = `${this.textareaEl.scrollHeight + 32}px`;
             this.textareaEl.focus();
             this.buttonEl.innerHTML = 'Done';
         }
@@ -150,7 +150,10 @@ class Editor {
 
         const reader = new FileReader();
         reader.addEventListener('load', e => {
-            this.imagePreview.innerHTML = `<img src="${e.target.result}">`;
+            // this.imagePreview.innerHTML = `<img src="${e.target.result}">`;
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            this.imagePreview.appendChild(img);
         });
         reader.readAsDataURL(file);
         this.uploadImage(file);

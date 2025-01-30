@@ -24,9 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('paste', (e) => {
         const items = e.clipboardData.items;
 
-        // Ignore if it's a normal text paste
-        // If a image is copied from a website, it will show up here as multiple items
-        if (items.length === 1 && items[0].kind === 'string') {
+        // Ignore if it doesn't contain any images
+        if (Array.from(items).every(item => item.type.indexOf('image') === -1)) {
             return;
         }
 

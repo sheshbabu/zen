@@ -27,7 +27,8 @@
         }
         
         .notes-editor-image-attachment-preview {
-            display: block;
+            display: flex;
+            overflow-x: scroll;
             img {
                 max-height: 400px;
                 box-shadow: var(--shadow-2);
