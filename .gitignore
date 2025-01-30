@@ -1,0 +1,5 @@
+*.db
+*.db-shm
+*.db-wal
+*.bak
+tmp

@@ -1,0 +1,7 @@
+{{define "tags_suggestion"}}
+    <li>
+    {{range .}}
+        <span class="dropdown-option" data-value="{{.TagID}}" data-name="{{.Name}}">{{.Name}}</span>
+    {{end}}
+    </li>
+{{end}}

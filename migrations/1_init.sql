@@ -1,0 +1,26 @@
+CREATE TABLE IF NOT EXISTS notes (
+    note_id     INTEGER PRIMARY KEY AUTOINCREMENT,
+    title       TEXT NOT NULL,
+    content     TEXT NOT NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at  TIMESTAMP DEFAULT NULL,
+    archived_at TIMESTAMP DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS tags (
+    tag_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+    name        TEXT NOT NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at  TIMESTAMP DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS note_tags (
+    note_id     INTEGER NOT NULL,
+    tag_id      INTEGER NOT NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (note_id, tag_id),
+    FOREIGN KEY (note_id) REFERENCES notes (note_id),
+    FOREIGN KEY (tag_id)  REFERENCES tags (tag_id)
+);

@@ -1,0 +1,20 @@
+{{define "notes_editor"}}
+    <div class="notes-editor {{if eq .IsNewNote true}}is-editable{{end}}" data-note-id="{{.SelectedNote.NoteID}}">
+        <div class="notes-editor-header">
+            <div class="notes-editor-title" {{if eq .IsNewNote true}}contenteditable="true" {{end}}>{{.SelectedNote.Title}}</div>
+            <div class="notes-editor-toolbar">
+                <button class="button-container">
+                    <a class="button">{{if eq .IsNewNote true}}Done{{else}}Edit{{end}}</a>
+                </button>
+            </div>
+        </div>
+        {{template "notes_editor_tags" .SelectedNote.Tags}}
+        <div class="notes-editor-content">
+            <textarea class="notes-editor-textarea" placeholder="write here..." spellcheck="false">{{.SelectedNote.Content}}</textarea>
+            <div class="notes-editor-rendered"></div>
+        </div>
+        {{if and (eq .IsNewNote false) (eq .SelectedNote.Title "") (eq .SelectedNote.Content "")}}
+            <div class="notes-editor-empty-text">Empty note</div>
+        {{end}}
+    </div>
+{{end}}

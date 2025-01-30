@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+    {{template "head" "Zen"}}
+
+    <body>
+        <div class="sidebar-container">
+            {{template "sidebar" .Tags}}
+        </div>
+        <div class="notes-list-container">
+            {{template "notes_list" .NotesList}}
+        </div>
+        <div class="notes-editor-container">
+            {{template "notes_editor" .Editor}}
+        </div>
+    </body>
+
+</html>
