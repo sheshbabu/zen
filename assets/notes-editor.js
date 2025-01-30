@@ -20,6 +20,8 @@ class Editor {
         this.textareaEl = this.containerEl.querySelector('.notes-editor-textarea');
         this.renderedEl = this.containerEl.querySelector('.notes-editor-rendered');
         this.buttonEl = this.containerEl.querySelector('.notes-editor-toolbar a');
+        this.imagePreview = this.containerEl.querySelector('.notes-editor-image-attachment-preview');
+        this.imageDropzone = this.containerEl.querySelector('.notes-editor-image-dropzone');
 
         this.noteId = this.containerEl.firstElementChild.dataset.noteId;
         if (this.noteId === "" || this.noteId === "0") {
@@ -35,6 +37,27 @@ class Editor {
         this.buttonEl.addEventListener('click', (e) => {
             e.preventDefault();
             this.toggleEditMode();
+        });
+
+        this.imageDropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.imageDropzone.classList.add('dragover');
+        });
+
+        this.imageDropzone.addEventListener('dragleave', () => {
+            this.imageDropzone.classList.remove('dragover');
+        });
+
+        this.imageDropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.imageDropzone.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            for (let file of files) {
+                if (file.type.startsWith('image/')) {
+                    this.handleImageAttach(file);
+                }
+            }
         });
     }
 
@@ -76,7 +99,7 @@ class Editor {
     }
 
     toggleEditMode() {
-        if (this.editorEl.classList.contains('is-editable')) {
+        if (this.isEditable()) {
             this.editorEl.classList.remove('is-editable');
             this.titleEl.setAttribute('contenteditable', false);
             this.renderMarkdown();
@@ -114,6 +137,50 @@ class Editor {
         };
 
         htmx.ajax(method, path, context);
+    }
+
+    isEditable() {
+        return this.editorEl.classList.contains('is-editable');
+    }
+
+    handleImageAttach(file) {
+        if (!this.isEditable()) {
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.addEventListener('load', e => {
+            this.imagePreview.innerHTML = `<img src="${e.target.result}">`;
+        });
+        reader.readAsDataURL(file);
+        this.uploadImage(file);
+    }
+
+    async uploadImage(file) {
+        const formData = new FormData();
+        formData.append('image', file);
+        const res = await fetch('/images/', {
+            method: 'POST',
+            body: formData,
+            redirect: 'follow'
+        });
+        const result = await res.json();
+        const imageUrl = `![](/images/${result.filename})`;
+        this.insertAtCursor(imageUrl);
+    }
+
+    insertAtCursor(text) {
+        const startPos = this.textareaEl.selectionStart;
+        const endPos = this.textareaEl.selectionEnd;
+        const beforeText = this.textareaEl.value.substring(0, startPos);
+        const afterText = this.textareaEl.value.substring(endPos);
+
+        this.textareaEl.value = beforeText + text + afterText;
+
+        const newPosition = startPos + text.length;
+        this.textareaEl.selectionStart = newPosition;
+        this.textareaEl.selectionEnd = newPosition;
+        this.textareaEl.focus();
     }
 }
 
@@ -279,7 +346,7 @@ class TagsEditor {
             addNewTagOption.classList.add('dropdown-option');
             addNewTagOption.dataset.tagId = -1;
             addNewTagOption.dataset.tagName = query;
-            addNewTagOption.textContent = `Add new tag: "${query}"`;
+            addNewTagOption.textContent = `Add "${query}"`;
             this.suggestionsListEl.appendChild(addNewTagOption);
         }
 

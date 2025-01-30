@@ -3,3 +3,4 @@
 *.db-wal
 *.bak
 tmp
+images

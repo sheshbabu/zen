@@ -8,6 +8,7 @@ import (
 	"strings"
 	"zen/commons/sqlite"
 	"zen/commons/templates"
+	"zen/features/images"
 	"zen/features/notes"
 	"zen/features/tags"
 )
@@ -28,6 +29,10 @@ func main() {
 			os.Exit(1)
 		}
 	}()
+
+	if err := os.MkdirAll("images", 0755); err != nil {
+		panic(err)
+	}
 
 	sqlite.NewDB()
 	defer sqlite.DB.Close()
@@ -66,6 +71,9 @@ func newRouter() *http.ServeMux {
 
 	mux.HandleFunc("PUT /notes/{note_id}/tags", tags.HandleUpdateNoteTags)
 
+	mux.HandleFunc("GET /images/", HandleUploadedImages)
+	mux.HandleFunc("POST /images/", images.HandleUploadImage)
+
 	return mux
 }
 
@@ -75,4 +83,8 @@ func handleStaticAssets(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.FileServer(http.FS(assets)).ServeHTTP(w, r)
+}
+
+func HandleUploadedImages(w http.ResponseWriter, r *http.Request) {
+	http.StripPrefix("/images/", http.FileServer(http.Dir("images"))).ServeHTTP(w, r)
 }

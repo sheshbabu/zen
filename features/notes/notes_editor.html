@@ -9,6 +9,10 @@
             </div>
         </div>
         {{template "notes_editor_tags" .SelectedNote.Tags}}
+        <div class="notes-editor-image-dropzone">
+            Drag and drop images here...
+        </div>
+        <div class="notes-editor-image-attachment-preview"></div>
         <div class="notes-editor-content">
             <textarea class="notes-editor-textarea" placeholder="write here..." spellcheck="false">{{.SelectedNote.Content}}</textarea>
             <div class="notes-editor-rendered"></div>
