@@ -28,13 +28,17 @@
         
         .notes-editor-image-attachment-preview {
             display: flex;
-            overflow-x: scroll;
+            overflow-x: auto;
             img {
                 max-height: 400px;
                 box-shadow: var(--shadow-2);
                 padding: 8px;
                 margin: 16px 0;
                 border-radius: 4px;
+            }
+
+            &::-webkit-scrollbar {
+                display: none;
             }
         }
 
