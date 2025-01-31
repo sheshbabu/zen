@@ -30,6 +30,10 @@ func main() {
 		}
 	}()
 
+	path := os.Getenv("IMAGES_FOLDER")
+	if path == "" {
+		path = "./images"
+	}
 	if err := os.MkdirAll("images", 0755); err != nil {
 		panic(err)
 	}

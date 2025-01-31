@@ -14,6 +14,9 @@ FROM debian:bookworm-slim
 COPY --from=builder /app/zen /zen
 
 VOLUME /data
+VOLUME /images
+
 ENV DATA_FOLDER=/data
+ENV IMAGES_FOLDER=/images
 
 CMD ["/zen"]
