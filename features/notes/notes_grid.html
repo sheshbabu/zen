@@ -2,8 +2,10 @@
     <div class="notes-grid-fragment" hx-get={{.RefreshLink}} hx-trigger="note_changed from:body" hx-swap="outerHTML">
         {{template "notes_list_toolbar"}}
         <div class="notes-grid">
+        <!-- <div class="notes-grid board"> -->
             {{range .Notes}}
                 <div class="notes-grid-item">
+                <!-- <div class="notes-grid-item is-draggable"> -->
                     <a href="/notes/{{.NoteID}}" hx-get="/notes/{{.NoteID}}" hx-push-url="/notes/{{.NoteID}}" hx-trigger="click"
                         hx-target=".notes-editor-container" hx-swap="innerHTML">
                         {{if ne .Title ""}}

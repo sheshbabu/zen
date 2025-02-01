@@ -135,6 +135,7 @@ body {
     display: flex;
     padding: 8px;
     margin-top: 6px;
+    margin-left: 4px;
 
     svg.lucide {
         cursor: pointer;
@@ -231,6 +232,15 @@ body {
         grid-template-columns: repeat(auto-fill, 200px);
         gap: 20px;
         padding: 20px;
+        padding-top: 0;
+
+        &.board {
+            display: block;
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            padding: 0;
+        }
 
         .notes-grid-item {
             height: 300px;
@@ -239,9 +249,36 @@ body {
             transition-duration: 500ms;
             box-shadow: var(--shadow-3);
             border-radius: 4px;
-            padding: 16px;
+            padding: 8px;
             border: 1px solid var(--neutral-100);
             background-color: #fff;
+
+            &.is-draggable {
+                max-height: 300px;
+                height: auto;
+                display: inline-block;
+                width: 200px;
+                position: absolute;
+                user-select: all;
+                -webkit-user-select: all;
+                -moz-user-select: all;
+                -ms-user-select: all;
+                cursor: move;
+                transition: transform 0.1s;
+
+                * {
+                    user-select: none;
+                    -webkit-user-select: none;
+                    -moz-user-select: none;
+                    -ms-user-select: none;
+                    cursor: move;
+                    pointer-events: none;
+                }
+    
+                &.is-dragging {
+                    opacity: 0.5;
+                }
+            }
 
             &:hover {
                 box-shadow: var(--shadow-4);

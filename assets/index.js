@@ -1,4 +1,5 @@
 import Editor from "./notes-editor.js";
+import Board from "./board.js";
 
 let editor = null;
 const editorContainerEl = document.querySelector('.notes-editor-container');
@@ -17,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initEditor();
     initNotesGrid();
+    initBoard();
 })
 
 function initEditor() {
@@ -39,6 +41,15 @@ function initNotesGrid() {
     notesListContainerEl.addEventListener('htmx:afterSwap', () => renderNotesGrid());
     renderNotesGrid()
 }
+
+function initBoard() {
+    const boardEl = document.querySelector('.notes-grid.board');
+    if (boardEl) {
+        new Board(boardEl);
+    }
+    renderNotesGrid()
+}
+
 
 function renderNotesGrid() {
     document.querySelectorAll(".notes-grid-item-content").forEach((el) => {
