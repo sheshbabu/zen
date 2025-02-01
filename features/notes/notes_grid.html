@@ -1,19 +1,21 @@
 {{define "notes_grid"}}
-    {{template "notes_list_toolbar"}}
-    <div class="notes-grid" hx-get={{.RefreshLink}} hx-trigger="note_changed from:body" hx-swap="outerHTML">
-        {{range .Notes}}
-            <div class="notes-grid-item">
-                <a href="/notes/{{.NoteID}}" hx-get="/notes/{{.NoteID}}" hx-push-url="/notes/{{.NoteID}}" hx-trigger="click"
-                    hx-target=".notes-editor-container" hx-swap="innerHTML">
-                    {{if ne .Title ""}}
-                        <div class="notes-grid-item-title">{{.Title}}</div>
-                    {{end}}
-                    <div class="notes-grid-item-content" data-content="{{.Snippet}}"></div>
-                </a>
-            </div>
-        {{end}}
-        {{if not .Notes}}
-            <div class="notes-list-empty-text">No notes found</div>
-        {{end}}
+    <div class="notes-grid-fragment" hx-get={{.RefreshLink}} hx-trigger="note_changed from:body" hx-swap="outerHTML">
+        {{template "notes_list_toolbar"}}
+        <div class="notes-grid">
+            {{range .Notes}}
+                <div class="notes-grid-item">
+                    <a href="/notes/{{.NoteID}}" hx-get="/notes/{{.NoteID}}" hx-push-url="/notes/{{.NoteID}}" hx-trigger="click"
+                        hx-target=".notes-editor-container" hx-swap="innerHTML">
+                        {{if ne .Title ""}}
+                            <div class="notes-grid-item-title">{{.Title}}</div>
+                        {{end}}
+                        <div class="notes-grid-item-content" data-content="{{.Snippet}}"></div>
+                    </a>
+                </div>
+            {{end}}
+            {{if not .Notes}}
+                <div class="notes-list-empty-text">No notes found</div>
+            {{end}}
+        </div>
     </div>
 {{end}}

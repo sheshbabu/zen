@@ -177,7 +177,8 @@
     }
 
     img {
-        max-width: 700px;
+        width: auto;
+        max-width: 100%;
     }
 
     h1,
@@ -247,12 +248,5 @@
         margin-top: 24px;
         margin-bottom: 24px;
         border: 1px solid var(--neutral-100);
-    }
-}
-
-.notes-grid-item-content {
-    img {
-        width: auto;
-        max-width: 100%;
     }
 }

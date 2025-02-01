@@ -39,6 +39,7 @@
     --shadow-2: rgba(0, 0, 0, 0.10) 0px 1px 3px 0px, rgba(0, 0, 0, 0.10) 0px 1px 3px 0px;    
     --shadow-3: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;   /* tailwind #37 https://getcssscan.com/css-box-shadow-examples */
     --shadow-4: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px; /* tailwind #38 https://getcssscan.com/css-box-shadow-examples */
+    --shadow-5: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px; /* tailwind #40 https://getcssscan.com/css-box-shadow-examples */
 }
 
 * {
@@ -56,6 +57,7 @@ body {
     color: #444; /* https://uxmovement.com/content/why-you-should-never-use-pure-black-for-text-or-backgrounds/ */
     margin: 0 auto;
     height: 100vh;
+    position: relative; /* for floating editor */
 }
 
 .sidebar-container {
@@ -169,7 +171,7 @@ body {
     }
 
     &.grid {
-        width: 460px;
+        width: 100%;
         background-color: var(--neutral-50);
     }
 
@@ -275,19 +277,59 @@ body {
 
 .notes-editor-container {
     flex: 1;
-    overflow: auto;
     padding: 24px;
     border-left: 1px solid var(--neutral-100);
     
+    overflow: auto;
     &::-webkit-scrollbar {
         display: none;
     }
+
+    &.is-floating {
+        position: absolute;
+        background-color: #fff;
+        top: 10px;
+        right: 10px;
+        bottom: 10px;
+        width: 600px;
+        overflow-y: auto;
+        border: 1px solid var(--neutral-100);
+        box-shadow: var(--shadow-4);
+    }
+
+    &.is-hidden {
+        display: none;
+    }
+
+    .notes-editor-toolbar {
+        display: flex;
+        flex-direction: row-reverse;
+
+        svg.lucide {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            margin: 8px;
+            margin-right: 0;
+            transition-property: stroke;
+            transition-duration: 500ms;
+    
+            rect,
+            path {
+                stroke: var(--neutral-500);
+                stroke-width: 1.5;
+            }
+    
+            &:hover {
+                rect,
+                path {
+                    stroke: var(--neutral-900);
+                }
+            }
+        }
+    }
 }
 
-.notes-editor-toolbar {
-    display: flex;
-    flex-direction: row-reverse;
-}
 
 .button-container {
     display: flex;

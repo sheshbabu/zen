@@ -20,6 +20,7 @@ type Note struct {
 type Editor struct {
 	SelectedNote Note
 	IsNewNote    bool
+	IsHidden     bool
 }
 
 type NotesList struct {

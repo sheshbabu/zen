@@ -73,16 +73,16 @@ function renderMarkdown(text) {
 
 function setListViewPreference(view) {
     document.cookie = `listViewPreference=${view}; path=/; max-age=31536000`;
-    let listViewFragmentUrl = new URL(location.href);
-    if (listViewFragmentUrl.pathname === '/') {
-        listViewFragmentUrl.pathname = '/notes';
-    }
-    htmx.ajax("GET", listViewFragmentUrl.href, { target: '.notes-list-container' });
-    if (view === 'grid') {
-        notesListContainerEl.classList.add('grid');
-    } else {
-        notesListContainerEl.classList.remove('grid');
-    }
+    const listViewFragmentUrl = "/notes/" + window.location.search;
+    htmx.ajax("GET", listViewFragmentUrl, { target: '.notes-list-container' }).then(() => {
+        if (view === 'grid') {
+            notesListContainerEl.classList.add('grid');
+            editor.hide();
+        } else {
+            notesListContainerEl.classList.remove('grid');
+            editor.showPinned();
+        }
+    });
 }
 
 window.zen = {};

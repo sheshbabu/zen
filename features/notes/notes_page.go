@@ -24,6 +24,7 @@ func renderNotesPage(w http.ResponseWriter, allTags []tags.Tag, allNotes []Note,
 		Editor: Editor{
 			SelectedNote: selectedNote,
 			IsNewNote:    isNewNote,
+			IsHidden:     viewPreference == "grid",
 		},
 	}
 

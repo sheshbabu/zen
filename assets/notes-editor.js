@@ -19,7 +19,9 @@ class Editor {
         this.titleEl = this.containerEl.querySelector('.notes-editor-title');
         this.textareaEl = this.containerEl.querySelector('.notes-editor-textarea');
         this.renderedEl = this.containerEl.querySelector('.notes-editor-rendered');
-        this.buttonEl = this.containerEl.querySelector('.notes-editor-toolbar a');
+        this.editButtonEl = this.containerEl.querySelector('.notes-editor-toolbar-button-edit');
+        this.doneButtonEl = this.containerEl.querySelector('.notes-editor-toolbar-button-done');
+        this.hideButtonEl = this.containerEl.querySelector('.notes-editor-toolbar-button-hide');
         this.imagePreview = this.containerEl.querySelector('.notes-editor-image-attachment-preview');
         this.imageDropzone = this.containerEl.querySelector('.notes-editor-image-dropzone');
 
@@ -27,6 +29,21 @@ class Editor {
         if (this.noteId === "" || this.noteId === "0") {
             this.noteId = null;
         }
+
+        if (this.isFloating()) {
+            this.hideButtonEl.style.display = 'block';
+        } else {
+            this.hideButtonEl.style.display = 'none';
+        }
+
+        if (this.isEditable()) {
+            this.editButtonEl.style.display = 'none';
+            this.doneButtonEl.style.display = 'block';
+        } else {
+            this.editButtonEl.style.display = 'block';
+            this.doneButtonEl.style.display = 'none';
+        }
+
 
         this.tagsEditor = new TagsEditor(this.noteId, this.containerEl.querySelector('.notes-editor-tags'));
 
@@ -51,9 +68,19 @@ class Editor {
             this.textareaEl.style.height = `${this.textareaEl.scrollHeight + 32}px`;
         });
 
-        this.buttonEl.addEventListener('click', (e) => {
+        this.editButtonEl.addEventListener('click', (e) => {
             e.preventDefault();
-            this.toggleEditMode();
+            this.enableEditMode();
+        });
+
+        this.doneButtonEl.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.disableEditMode();
+        });
+
+        this.hideButtonEl.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.hide();
         });
 
         this.imageDropzone.addEventListener('dragover', (e) => {
@@ -82,6 +109,10 @@ class Editor {
         this.bindEvents();
         this.renderMarkdown();
 
+        if (this.isHidden()) {
+            this.showFloating();
+        }
+
         if (e.detail.target.classList.contains("notes-editor-container")) {
             this.titleEl.focus();
         } else if (e.detail.target.classList.contains("notes-editor-tags")) {
@@ -95,19 +126,49 @@ class Editor {
 
     toggleEditMode() {
         if (this.isEditable()) {
-            this.editorEl.classList.remove('is-editable');
-            this.titleEl.setAttribute('contenteditable', false);
-            this.renderMarkdown();
-            this.buttonEl.innerHTML = 'Edit';
-            this.saveNote();
+            this.disableEditMode();
         } else {
+            this.enableEditMode();
+        }
+    }
+
+    enableEditMode() {
+        if (!this.isEditable()) {
             this.editorEl.classList.add('is-editable');
             this.titleEl.setAttribute('contenteditable', true);
+            this.doneButtonEl.style.display = 'block';
+            this.editButtonEl.style.display = 'none';
             this.textareaEl.style.height = 'auto'; // Reset the height
             this.textareaEl.style.height = `${this.textareaEl.scrollHeight + 32}px`;
             this.textareaEl.focus();
-            this.buttonEl.innerHTML = 'Done';
         }
+    }
+
+    disableEditMode() {
+        if (this.isEditable()) {
+            this.editorEl.classList.remove('is-editable');
+            this.titleEl.setAttribute('contenteditable', false);
+            this.doneButtonEl.style.display = 'none';
+            this.editButtonEl.style.display = 'block';
+            this.renderMarkdown();
+            this.saveNote();
+        }
+    }
+
+    hide() {
+        this.containerEl.classList.add('is-hidden');
+    }
+
+    showFloating() {
+        this.containerEl.classList.remove('is-hidden');
+        this.containerEl.classList.add('is-floating');
+        this.hideButtonEl.style.display = 'block';
+    }
+
+    showPinned() {
+        this.containerEl.classList.remove('is-hidden');
+        this.containerEl.classList.remove('is-floating');
+        this.hideButtonEl.style.display = 'none';
     }
 
     saveNote() {
@@ -129,6 +190,14 @@ class Editor {
 
     isEditable() {
         return this.editorEl.classList.contains('is-editable');
+    }
+
+    isHidden() {
+        return this.containerEl.classList.contains('is-hidden');
+    }
+
+    isFloating() {
+        return this.containerEl.classList.contains('is-floating');
     }
 
     handleImageAttach(file) {
