@@ -204,6 +204,9 @@
         background-color: var(--neutral-50);
         border-radius: 4px;
         overflow: scroll;
+        &::-webkit-scrollbar {
+            display: none;
+        }
 
         code {
             background-color: unset;
