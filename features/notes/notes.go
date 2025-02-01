@@ -85,7 +85,6 @@ func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
 
 	if len(allNotes) == 0 {
 		allTags := []tags.Tag{}
-		isNewNote = true
 		renderNotesPage(w, allTags, allNotes, selectedNote, isNewNote)
 		return
 	}
@@ -93,7 +92,7 @@ func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
 	if selectedNoteIDStr == "new" {
 		selectedNote, err = CreateEmptyNote()
 		if err != nil {
-			err = fmt.Errorf("error retrieving note: %w", err)
+			err = fmt.Errorf("error creating empty note: %w", err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}

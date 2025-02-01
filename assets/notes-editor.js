@@ -30,6 +30,23 @@ class Editor {
 
         this.tagsEditor = new TagsEditor(this.noteId, this.containerEl.querySelector('.notes-editor-tags'));
 
+        this.editorEl.addEventListener('paste', (e) => {
+            const items = e.clipboardData.items;
+
+            // Ignore if it doesn't contain any images
+            if (Array.from(items).every(item => item.type.indexOf('image') === -1)) {
+                return;
+            }
+
+            e.preventDefault();
+            for (let item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    const file = item.getAsFile();
+                    this.handleImageAttach(file);
+                }
+            }
+        });
+
         this.textareaEl.addEventListener('input', () => {
             this.textareaEl.style.height = `${this.textareaEl.scrollHeight + 32}px`;
         });
@@ -116,7 +133,6 @@ class Editor {
     }
 
     newNote() {
-        console.log('new note');
         htmx.ajax("GET", "/notes/new", {
             target: this.containerEl
         });
@@ -150,7 +166,6 @@ class Editor {
 
         const reader = new FileReader();
         reader.addEventListener('load', e => {
-            // this.imagePreview.innerHTML = `<img src="${e.target.result}">`;
             const img = document.createElement('img');
             img.src = e.target.result;
             this.imagePreview.appendChild(img);
@@ -204,9 +219,6 @@ class TagsEditor {
 
     bindEvents() {
         this.inputEl.addEventListener('keyup', (e) => {
-            console.log(e.key);
-            console.log(this.inputEl.value);
-
             if (e.key === "ArrowDown") {
                 const oldSelectedTagEl = this.selectedTagEl;
                 if (this.selectedTagEl === null) {
