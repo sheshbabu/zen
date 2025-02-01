@@ -73,7 +73,11 @@ function renderMarkdown(text) {
 
 function setListViewPreference(view) {
     document.cookie = `listViewPreference=${view}; path=/; max-age=31536000`;
-    htmx.ajax("GET", "/notes", { target: '.notes-list-container' });
+    let listViewFragmentUrl = new URL(location.href);
+    if (listViewFragmentUrl.pathname === '/') {
+        listViewFragmentUrl.pathname = '/notes';
+    }
+    htmx.ajax("GET", listViewFragmentUrl.href, { target: '.notes-list-container' });
     if (view === 'grid') {
         notesListContainerEl.classList.add('grid');
     } else {

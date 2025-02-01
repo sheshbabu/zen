@@ -145,7 +145,7 @@ func GetNotesByTagID(tagID int) ([]Note, error) {
 			n.note_id,
 			n.title,
 			n.content,
-			SUBSTR(n.content, 0, 100) AS snippet,
+			SUBSTR(n.content, 0, 500) AS snippet,
 			n.updated_at
 		FROM
 			notes n

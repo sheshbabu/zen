@@ -160,7 +160,7 @@ body {
 
 .notes-list-container {
     width: 280px;
-    transition-property: width, background-color;
+    transition-property: background-color;
     transition-duration: 500ms;
 
     overflow-y: auto;
