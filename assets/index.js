@@ -2,6 +2,7 @@ import Editor from "./notes-editor.js";
 
 let editor = null;
 const editorContainerEl = document.querySelector('.notes-editor-container');
+const notesListContainerEl = document.querySelector('.notes-list-container');
 
 document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keyup', (e) => {
@@ -14,8 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-
     initEditor();
+    initNotesGrid();
 })
 
 function initEditor() {
@@ -33,3 +34,53 @@ function initEditor() {
         }
     });
 }
+
+function initNotesGrid() {
+    notesListContainerEl.addEventListener('htmx:afterSwap', () => renderNotesGrid());
+    renderNotesGrid()
+}
+
+function renderNotesGrid() {
+    document.querySelectorAll(".notes-grid-item-content").forEach((el) => {
+        el.innerHTML = renderMarkdown(el.dataset.content);
+    });
+}
+
+function renderMarkdown(text) {
+    const md = window.markdownit({
+        linkify: true,
+        breaks: true,
+        highlight: function (str, lang) {
+            if (lang && window.hljs.getLanguage(lang)) {
+                try {
+                    return window.hljs.highlight(lang, str).value;
+                } catch (__) { }
+            }
+            return '';
+        }
+    });
+    // https://github.com/markdown-it/markdown-it/blob/master/docs/architecture.md#renderer
+    var defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
+        return self.renderToken(tokens, idx, options);
+    };
+    md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
+        tokens[idx].attrSet('target', '_blank');
+        return defaultRender(tokens, idx, options, env, self);
+    };
+
+    return md.render(text);
+}
+
+function setListViewPreference(view) {
+    document.cookie = `listViewPreference=${view}; path=/; max-age=31536000`;
+    htmx.ajax("GET", "/notes", { target: '.notes-list-container' });
+    if (view === 'grid') {
+        notesListContainerEl.classList.add('grid');
+    } else {
+        notesListContainerEl.classList.remove('grid');
+    }
+}
+
+window.zen = {};
+window.zen.renderMarkdown = renderMarkdown;
+window.zen.setListViewPreference = setListViewPreference;

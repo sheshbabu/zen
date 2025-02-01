@@ -90,29 +90,7 @@ class Editor {
     }
 
     renderMarkdown() {
-        const md = window.markdownit({
-            linkify: true,
-            breaks: true,
-            highlight: function (str, lang) {
-                if (lang && window.hljs.getLanguage(lang)) {
-                    try {
-                        return window.hljs.highlight(lang, str).value;
-                    } catch (__) { }
-                }
-                return '';
-            }
-        });
-
-        // https://github.com/markdown-it/markdown-it/blob/master/docs/architecture.md#renderer
-        var defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
-            return self.renderToken(tokens, idx, options);
-        };
-        md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
-            tokens[idx].attrSet('target', '_blank');
-            return defaultRender(tokens, idx, options, env, self);
-        };
-
-        this.renderedEl.innerHTML = md.render(this.textareaEl.value);
+        this.renderedEl.innerHTML = window.zen.renderMarkdown(this.textareaEl.value);
     }
 
     toggleEditMode() {
@@ -130,12 +108,6 @@ class Editor {
             this.textareaEl.focus();
             this.buttonEl.innerHTML = 'Done';
         }
-    }
-
-    newNote() {
-        htmx.ajax("GET", "/notes/new", {
-            target: this.containerEl
-        });
     }
 
     saveNote() {

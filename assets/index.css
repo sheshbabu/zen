@@ -36,7 +36,9 @@
 
     /* elevation */
     --shadow-1: rgba(0, 0, 0, 0.01) 0px 1px 3px 0px, rgba(0, 0, 0, 0.10) 0px 1px 3px 0px;
-    --shadow-2: rgba(0, 0, 0, 0.10) 0px 1px 3px 0px, rgba(0, 0, 0, 0.10) 0px 1px 3px 0px;
+    --shadow-2: rgba(0, 0, 0, 0.10) 0px 1px 3px 0px, rgba(0, 0, 0, 0.10) 0px 1px 3px 0px;    
+    --shadow-3: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;   /* tailwind #37 https://getcssscan.com/css-box-shadow-examples */
+    --shadow-4: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px; /* tailwind #38 https://getcssscan.com/css-box-shadow-examples */
 }
 
 * {
@@ -59,7 +61,7 @@ body {
 .sidebar-container {
     width: 220px;
     padding: 16px 0;
-    background: var(--neutral-50);
+    background-color: var(--neutral-50);
 
     .sidebar-button {
         display: flex;
@@ -75,6 +77,7 @@ body {
             color: var(--neutral-900);
 
             svg.lucide {
+                rect,
                 path {
                     stroke: var(--neutral-900);
                 }
@@ -86,6 +89,7 @@ body {
             height: 36px;
             padding: 8px;
     
+            rect,
             path {
                 stroke: var(--neutral-500);
                 stroke-width: 1.5;
@@ -125,12 +129,48 @@ body {
     }
 }
 
+.notes-list-toolbar {
+    display: flex;
+    padding: 8px;
+    margin-top: 6px;
+
+    svg.lucide {
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+        margin: 8px;
+        margin-right: 0;
+        transition-property: stroke;
+        transition-duration: 500ms;
+
+        rect,
+        path {
+            stroke: var(--neutral-500);
+            stroke-width: 1.5;
+        }
+
+        &:hover {
+            rect,
+            path {
+                stroke: var(--neutral-900);
+            }
+        }
+    }
+}
+
 .notes-list-container {
     width: 280px;
+    transition-property: width, background-color;
+    transition-duration: 500ms;
+
     overflow-y: auto;
-    
     &::-webkit-scrollbar {
         display: none;
+    }
+
+    &.grid {
+        width: 460px;
+        background-color: var(--neutral-50);
     }
 
     .notes-list-title {
@@ -179,6 +219,44 @@ body {
                     display: flex;
                     gap: 4px;
                     margin-left: 8px;
+                }
+            }
+        }
+    }
+
+    .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 200px);
+        gap: 20px;
+        padding: 20px;
+
+        .notes-grid-item {
+            height: 300px;
+            overflow: hidden;
+            transition-property: box-shadow;
+            transition-duration: 500ms;
+            box-shadow: var(--shadow-3);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--neutral-100);
+            background-color: #fff;
+
+            &:hover {
+                box-shadow: var(--shadow-4);
+            }
+
+            a {
+                display: block;
+                text-decoration: none;
+                color: inherit;
+                zoom: 0.7;
+
+                .notes-grid-item-title {
+                    font: var(--h4);
+
+                    &.untitled {
+                        color: var(--neutral-400);
+                    }
                 }
             }
         }

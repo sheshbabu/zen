@@ -1,4 +1,5 @@
 {{define "notes_list"}}
+    {{template "notes_list_toolbar"}}
     <div class="notes-list" hx-get={{.RefreshLink}} hx-trigger="note_changed from:body" hx-swap="outerHTML">
         <!-- <div class="notes-list-title">{{.Title}}</div> -->
         {{range .Notes}}

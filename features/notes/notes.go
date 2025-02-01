@@ -23,9 +23,10 @@ type Editor struct {
 }
 
 type NotesList struct {
-	Title       string
-	Notes       []Note
-	RefreshLink string
+	Title          string
+	Notes          []Note
+	RefreshLink    string
+	ViewPreference string
 }
 
 const NOTES_LIMIT = 100
@@ -52,6 +53,12 @@ func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	isNewNote := false
+	viewPreference := "list"
+
+	cookie, err := r.Cookie("listViewPreference")
+	if err == nil {
+		viewPreference = cookie.Value
+	}
 
 	if tagIDStr == "" {
 		allNotes, err = GetAllNotes(NOTES_LIMIT, 0)
@@ -91,7 +98,7 @@ func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(allNotes) == 0 {
-		renderNotesPage(w, allTags, allNotes, selectedNote, isNewNote)
+		renderNotesPage(w, allTags, allNotes, selectedNote, isNewNote, viewPreference)
 		return
 	}
 
@@ -124,7 +131,7 @@ func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	renderNotesPage(w, allTags, allNotes, selectedNote, isNewNote)
+	renderNotesPage(w, allTags, allNotes, selectedNote, isNewNote, viewPreference)
 }
 
 func HandleCreateNote(w http.ResponseWriter, r *http.Request) {
@@ -244,6 +251,12 @@ func HandleNotesListFragment(w http.ResponseWriter, r *http.Request) {
 
 	title := "Notes"
 	fragmentSelfRefreshLink := "/notes"
+	viewPreference := "list"
+
+	cookie, err := r.Cookie("listViewPreference")
+	if err == nil {
+		viewPreference = cookie.Value
+	}
 
 	tagIDStr := r.URL.Query().Get("tag_id")
 
@@ -287,5 +300,5 @@ func HandleNotesListFragment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	renderNotesListFragment(w, allNotes, title, fragmentSelfRefreshLink)
+	renderNotesListFragment(w, allNotes, title, fragmentSelfRefreshLink, viewPreference)
 }

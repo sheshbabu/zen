@@ -6,9 +6,15 @@
         <div class="sidebar-container">
             {{template "sidebar" .Tags}}
         </div>
-        <div class="notes-list-container">
-            {{template "notes_list" .NotesList}}
-        </div>
+        {{if eq .NotesList.ViewPreference "list"}}
+            <div class="notes-list-container" >
+                {{template "notes_list" .NotesList}}
+            </div>
+        {{else}}
+            <div class="notes-list-container grid">
+                {{template "notes_grid" .NotesList}}
+            </div>
+        {{end}}
         <div class="notes-editor-container">
             {{template "notes_editor" .Editor}}
         </div>

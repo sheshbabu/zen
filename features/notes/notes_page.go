@@ -12,13 +12,14 @@ type templateData struct {
 	Editor    Editor
 }
 
-func renderNotesPage(w http.ResponseWriter, allTags []tags.Tag, allNotes []Note, selectedNote Note, isNewNote bool) {
+func renderNotesPage(w http.ResponseWriter, allTags []tags.Tag, allNotes []Note, selectedNote Note, isNewNote bool, viewPreference string) {
 	tmplData := templateData{
 		Tags: allTags,
 		NotesList: NotesList{
-			Title:       "Notes",
-			Notes:       allNotes,
-			RefreshLink: "/notes",
+			Title:          "Notes",
+			Notes:          allNotes,
+			RefreshLink:    "/notes",
+			ViewPreference: viewPreference,
 		},
 		Editor: Editor{
 			SelectedNote: selectedNote,

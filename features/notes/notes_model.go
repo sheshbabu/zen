@@ -13,7 +13,7 @@ func GetAllNotes(limit int, offset int) ([]Note, error) {
 			note_id,
 			title,
 			content,
-			SUBSTR(content, 0, 100) AS snippet,
+			SUBSTR(content, 0, 500) AS snippet,
 			updated_at
 		FROM
 			notes
@@ -54,7 +54,7 @@ func GetNoteByID(noteID int) (Note, error) {
 			note_id,
 			title,
 			content,
-			SUBSTR(content, 0, 100) AS snippet,
+			SUBSTR(content, 0, 500) AS snippet,
 			updated_at
 		FROM
 			notes
@@ -94,7 +94,7 @@ func CreateNote(note Note) (Note, error) {
 			note_id,
 			title,
 			content,
-			SUBSTR(content, 0, 100) AS snippet,
+			SUBSTR(content, 0, 500) AS snippet,
 			updated_at
 	`
 
@@ -123,7 +123,7 @@ func UpdateNote(note Note) (Note, error) {
 			note_id,
 			title,
 			content,
-			SUBSTR(content, 0, 100) AS snippet,
+			SUBSTR(content, 0, 500) AS snippet,
 			updated_at
 	`
 
