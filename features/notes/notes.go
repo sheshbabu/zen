@@ -83,8 +83,14 @@ func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	allTags, err := tags.GetAllTags()
+	if err != nil {
+		err = fmt.Errorf("error retrieving tags: %w", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	if len(allNotes) == 0 {
-		allTags := []tags.Tag{}
 		renderNotesPage(w, allTags, allNotes, selectedNote, isNewNote)
 		return
 	}
@@ -116,13 +122,6 @@ func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-	}
-
-	allTags, err := tags.GetAllTags()
-	if err != nil {
-		err = fmt.Errorf("error retrieving tags: %w", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	renderNotesPage(w, allTags, allNotes, selectedNote, isNewNote)
