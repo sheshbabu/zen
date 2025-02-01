@@ -34,6 +34,13 @@ function initEditor() {
             editor.toggleEditMode();
             return
         }
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            if (editor.isFloating()) {
+                editor.hide();
+            }
+            return
+        }
     });
 }
 
