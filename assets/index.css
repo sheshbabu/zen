@@ -339,13 +339,8 @@ body {
     font-weight: 500;
     color: var(--neutral-400);
     font-size: 14px;
-    cursor: pointer;
     transition-property: background-color;
     transition-duration: 500ms;
-
-    &:hover {
-        background-color: var(--neutral-200);
-    }
 
     svg {
         height: 14px;

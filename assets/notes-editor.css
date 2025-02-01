@@ -1,8 +1,16 @@
 .notes-editor {
     &.is-editable {
         .notes-editor-tags {
-            svg {
-                display: inline-block;
+            .tag {
+                cursor: pointer;
+
+                &:hover {
+                    background-color: var(--neutral-200);
+                }
+
+                svg {
+                    display: inline-block;
+                }
             }
         }
 
