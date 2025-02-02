@@ -316,6 +316,10 @@ body {
     flex: 1;
     padding: 24px;
     border-left: 1px solid var(--neutral-100);
+    transition-property: opacity, transform;
+    transition-duration: 300ms;
+    opacity: 1;
+    transform: translateX(0);
     
     overflow: auto;
     &::-webkit-scrollbar {
@@ -335,12 +339,14 @@ body {
     }
 
     &.is-hidden {
-        display: none;
+        opacity: 0;
+        transform: translateX(100%);
     }
 
     .notes-editor-toolbar {
         display: flex;
         flex-direction: row-reverse;
+        align-items: center;
 
         svg.lucide {
             cursor: pointer;
@@ -362,6 +368,11 @@ body {
                 path {
                     stroke: var(--neutral-900);
                 }
+            }
+
+            &.notes-editor-toolbar-button-hide {
+                width: 24px;
+                height: 24px;
             }
         }
     }

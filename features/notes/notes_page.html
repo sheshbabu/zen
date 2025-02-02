@@ -15,7 +15,7 @@
                 {{template "notes_grid" .NotesList}}
             </div>
         {{end}}
-        <div class="notes-editor-container {{if eq .Editor.IsHidden true}}is-hidden{{end}}">
+        <div class="notes-editor-container {{if eq .Editor.IsHidden true}}is-hidden is-floating{{end}}">
             {{template "notes_editor" .Editor}}
         </div>
     </body>
