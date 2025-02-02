@@ -3,18 +3,22 @@ package notes
 import (
 	"net/http"
 	"zen/commons/templates"
+	"zen/features/focus"
 	"zen/features/tags"
 )
 
 type templateData struct {
-	Tags      []tags.Tag
+	Sidebar   Sidebar
 	NotesList NotesList
 	Editor    Editor
 }
 
-func renderNotesPage(w http.ResponseWriter, allTags []tags.Tag, allNotes []Note, selectedNote Note, isNewNote bool, viewPreference string) {
+func renderNotesPage(w http.ResponseWriter, allTags []tags.Tag, allNotes []Note, allFocusModes []focus.FocusMode, selectedNote Note, isNewNote bool, viewPreference string) {
 	tmplData := templateData{
-		Tags: allTags,
+		Sidebar: Sidebar{
+			FocusModes: allFocusModes,
+			Tags:       allTags,
+		},
 		NotesList: NotesList{
 			Title:          "Notes",
 			Notes:          allNotes,

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"zen/commons/sqlite"
 	"zen/commons/templates"
+	"zen/features/focus"
 	"zen/features/images"
 	"zen/features/notes"
 	"zen/features/tags"
@@ -77,6 +78,11 @@ func newRouter() *http.ServeMux {
 
 	mux.HandleFunc("GET /images/", HandleUploadedImages)
 	mux.HandleFunc("POST /images/", images.HandleUploadImage)
+
+	mux.HandleFunc("GET /focus/{focus_id}", focus.HandleFocusDialog)
+	// mux.HandleFunc("GET /focus/{focus_id}/tags", focus.HandleUpdateFocusTags)
+	// mux.HandleFunc("PUT /focus/{focus_id}", focus.HandleUpdateFocus)
+	// mux.HandleFunc("POST /focus/{focus_id}", focus.HandleCreateFocus)
 
 	return mux
 }

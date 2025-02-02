@@ -4,7 +4,7 @@
 
     <body>
         <div class="sidebar-container">
-            {{template "sidebar" .Tags}}
+            {{template "sidebar" .Sidebar}}
         </div>
         {{if eq .NotesList.ViewPreference "list"}}
             <div class="notes-list-container" >
@@ -18,6 +18,8 @@
         <div class="notes-editor-container {{if eq .Editor.IsHidden true}}is-hidden is-floating{{end}}">
             {{template "notes_editor" .Editor}}
         </div>
+
+        <div class="dialog-container"></div>
     </body>
 
 </html>

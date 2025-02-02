@@ -1,4 +1,4 @@
-class Editor {
+export class Editor {
     noteId = null;
     tagsEditor = null;
 
@@ -45,7 +45,7 @@ class Editor {
         }
 
 
-        this.tagsEditor = new TagsEditor(this.noteId, this.containerEl.querySelector('.notes-editor-tags'));
+        this.tagsEditor = new TagsEditor(this.noteId, null, this.containerEl.querySelector('.notes-editor-tags'));
 
         this.editorEl.addEventListener('paste', (e) => {
             const items = e.clipboardData.items;
@@ -243,12 +243,13 @@ class Editor {
     }
 }
 
-class TagsEditor {
+export class TagsEditor {
     currentTagIds = [];
     selectedTagEl = null;
 
-    constructor(noteId, containerEl) {
+    constructor(noteId, focusId, containerEl) {
         this.noteId = noteId;
+        this.focusId = focusId;
         this.containerEl = containerEl;
         this.inputEl = containerEl.querySelector(".notes-editor-tags-input")
         this.suggestionsListEl = containerEl.querySelector(".dropdown-menu li");
@@ -335,7 +336,14 @@ class TagsEditor {
     removeTag(tagId) {
         this.currentTagIds = this.currentTagIds.filter(id => id !== parseInt(tagId, 10));
 
-        htmx.ajax("PUT", `/notes/${this.noteId}/tags`, {
+        let url = ""
+        if (this.focusId) {
+            url = `/focus/${this.focusId}/tags`;
+        } else if (this.noteId) {
+            url = `/notes/${this.noteId}/tags`;
+        }
+
+        htmx.ajax("PUT", url, {
             target: this.containerEl,
             swap: "outerHTML",
             values: {
@@ -345,7 +353,7 @@ class TagsEditor {
     }
 
     addTag(tagId) {
-        if (tagId === "-1") {
+        if (tagId === "-1" && this.noteId !== null) {
             htmx.ajax("POST", "/tags/", {
                 target: this.containerEl,
                 swap: "outerHTML",
@@ -362,7 +370,14 @@ class TagsEditor {
 
         this.currentTagIds.push(tagId);
 
-        htmx.ajax("PUT", `/notes/${this.noteId}/tags`, {
+        let url = ""
+        if (this.focusId) {
+            url = `/focus/${this.focusId}/tags`;
+        } else if (this.noteId) {
+            url = `/notes/${this.noteId}/tags`;
+        }
+
+        htmx.ajax("PUT", url, {
             target: this.containerEl,
             swap: "outerHTML",
             values: {
@@ -397,7 +412,8 @@ class TagsEditor {
             option.textContent = tag.name;
             this.suggestionsListEl.appendChild(option);
         }
-        if (tags.length === 0) {
+
+        if (tags.length === 0 && this.noteId !== null) {
             const addNewTagOption = document.createElement('span');
             addNewTagOption.classList.add('dropdown-option');
             addNewTagOption.dataset.tagId = -1;
@@ -418,5 +434,3 @@ class TagsEditor {
         });
     }
 }
-
-export default Editor

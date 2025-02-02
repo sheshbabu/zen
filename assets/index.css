@@ -19,6 +19,7 @@
     --neutral-700 : #404040;
     --neutral-800 : #262626;
     --neutral-900 : #171717;
+    --red-600: #DC2626;
 
     /* typography */
     --font-scale: 1.125; /* Major Second */
@@ -33,6 +34,13 @@
     --p1:   normal 1rem/1.5     var(--font-family); /* https://m3.material.io/styles/typography/applying-type */
     --sm:   normal 0.889rem/1.4 var(--font-family); /* 1rem / var(--font-scale) */
     --code: normal 0.889rem/1.4 var(--font-family-code);
+
+    /* spacing */
+    /* https://medium.com/dwarves-design/the-principle-of-spacing-in-ui-design-part-1-3354d0d65e51 */
+    --spacing-xs: 6px;
+    --spacing-sm: 12px;
+    --spacing-md: 24px;
+    --spacing-lg: 48px;
 
     /* elevation */
     --shadow-1: rgba(0, 0, 0, 0.01) 0px 1px 3px 0px, rgba(0, 0, 0, 0.10) 0px 1px 3px 0px;
@@ -62,8 +70,13 @@ body {
 
 .sidebar-container {
     width: 220px;
-    padding: 16px 0;
+    padding: 14px 0;
     background-color: var(--neutral-50);
+
+    .sidebar-focus-switcher {
+        padding: 8px;
+        padding-top: 0;
+    }
 
     .sidebar-button {
         display: flex;
@@ -389,10 +402,10 @@ body {
 
 .button {
     display: flex;
-    height: 32px;
+    height: 36px;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
+    padding: 0 8px;
     border-radius: 6px;
     border: 1px solid var(--neutral-200);
     overflow: hidden;
@@ -401,14 +414,34 @@ body {
     transition-duration: 500ms;
     text-decoration: none;
     box-shadow: var(--shadow-1);
+    background-color: #fff;
 
     &:hover {
         background-color: var(--neutral-100);
         cursor: pointer;
     }
 
-    &:has(svg) {
-        padding-right: 0;
+    svg.lucide {
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+        margin: 8px;
+        margin-right: 0;
+        transition-property: stroke;
+        transition-duration: 500ms;
+
+        rect,
+        path {
+            stroke: var(--neutral-500);
+            stroke-width: 2;
+        }
+
+        &:hover {
+            rect,
+            path {
+                stroke: var(--neutral-900);
+            }
+        }
     }
 
     &:active {
@@ -515,5 +548,71 @@ body {
         width: 14px;
         margin-left: 4px;
         display: none;
+    }
+}
+
+.input-container {
+    margin-top: var(--spacing-md);
+
+    input,
+    textarea {
+        height: 44px;
+        border-radius: 4px;
+        border: 1px solid var(--neutral-200);
+        padding: 8px;
+        margin-top: var(--spacing-xs);
+        min-width: 320px;
+        outline: none;
+
+        &.error {
+            border: 1px solid var(--red-600);
+            color: var(--neutral-900);
+        }
+    }
+
+    textarea {
+        width: 100%;
+        height: 300px;
+        font: var(--sm);
+        font-family: monospace;
+        resize: none;
+        tab-size: 4;
+        field-sizing: content; /* https://developer.mozilla.org/en-US/docs/Web/CSS/field-sizing#browser_compatibility */
+    }
+
+    .hint {
+        color: var(--neutral-400);
+        font: var(--sm);
+    }
+
+    .error {
+        color: var(--red-600);
+        font: var(--sm);
+    }
+}
+
+.focus-dialog-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    backdrop-filter: blur(2px);
+
+    .focus-dialog {
+        height: 400px;
+        width: 600px;
+        background-color: #fff;
+        padding: 16px;
+        border: 1px solid var(--neutral-100);
+        border-radius: 4px;
+        box-shadow: var(--shadow-5);
+
+        .notes-editor-tags-input {
+            display: inline-block;
+        }
     }
 }

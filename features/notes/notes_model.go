@@ -178,3 +178,46 @@ func GetNotesByTagID(tagID int) ([]Note, error) {
 
 	return notes, nil
 }
+
+func GetNotesByFocusModeID(focusModeID int) ([]Note, error) {
+	var notes []Note
+	query := `
+		SELECT
+			n.note_id,
+			n.title,
+			n.content,
+			SUBSTR(n.content, 0, 500) AS snippet,
+			n.updated_at
+		FROM
+			focus_mode_tags fmt
+		JOIN
+			note_tags nt ON fmt.tag_id = nt.tag_id
+		JOIN
+			notes n ON nt.note_id = n.note_id
+		WHERE
+			fmt.focus_mode_id = ?
+		ORDER BY
+			n.updated_at DESC
+	`
+
+	rows, err := sqlite.DB.Query(query, focusModeID)
+	if err != nil {
+		err = fmt.Errorf("error retrieving notes by focus mode ID: %w", err)
+		slog.Error(err.Error())
+		return notes, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var note Note
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt)
+		if err != nil {
+			err = fmt.Errorf("error scanning note by focus mode ID: %w", err)
+			slog.Error(err.Error())
+			return notes, err
+		}
+		notes = append(notes, note)
+	}
+
+	return notes, nil
+}

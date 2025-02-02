@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"zen/features/focus"
 	"zen/features/tags"
 )
 
@@ -30,11 +31,17 @@ type NotesList struct {
 	ViewPreference string
 }
 
+type Sidebar struct {
+	FocusModes []focus.FocusMode
+	Tags       []tags.Tag
+}
+
 const NOTES_LIMIT = 100
 
 func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
 	selectedNoteIDStr := r.PathValue("note_id")
 	tagIDStr := r.URL.Query().Get("tag_id")
+	focusModeIDStr := r.URL.Query().Get("focus_id")
 
 	if r.Header.Get("HX-Request") == "true" {
 		// Editor Fragment
@@ -51,24 +58,36 @@ func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
 
 	var selectedNote Note
 	var allNotes []Note
+	var allTags []tags.Tag
+	var allFocusModes []focus.FocusMode
 	var err error
 
 	isNewNote := false
 	viewPreference := "list"
+	focusModeID := 0
+
+	if focusModeIDStr != "" && focusModeIDStr != "0" {
+		focusModeID, err = strconv.Atoi(focusModeIDStr)
+		if err != nil {
+			err = fmt.Errorf("error parsing focus mode ID: %w", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
 
 	cookie, err := r.Cookie("listViewPreference")
 	if err == nil {
 		viewPreference = cookie.Value
 	}
 
-	if tagIDStr == "" {
+	if focusModeID == 0 && tagIDStr == "" {
 		allNotes, err = GetAllNotes(NOTES_LIMIT, 0)
 		if err != nil {
 			err = fmt.Errorf("error retrieving notes: %w", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-	} else {
+	} else if tagIDStr != "" {
 		tagID, err := strconv.Atoi(tagIDStr)
 		if err != nil {
 			err = fmt.Errorf("error parsing tag ID: %w", err)
@@ -77,6 +96,20 @@ func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
 		}
 
 		allNotes, err = GetNotesByTagID(tagID)
+		if err != nil {
+			err = fmt.Errorf("error retrieving notes: %w", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else if focusModeID != 0 && tagIDStr == "" {
+		err = focus.UpdateFocusMode(focusModeID)
+		if err != nil {
+			err = fmt.Errorf("error updating focus mode: %w", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		allNotes, err = GetNotesByFocusModeID(focusModeID)
 		if err != nil {
 			err = fmt.Errorf("error retrieving notes: %w", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -91,15 +124,31 @@ func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	allTags, err := tags.GetAllTags()
+	if focusModeID == 0 {
+		allTags, err = tags.GetAllTags()
+		if err != nil {
+			err = fmt.Errorf("error retrieving tags: %w", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		allTags, err = tags.GetTagsByFocusModeID(focusModeID)
+		if err != nil {
+			err = fmt.Errorf("error retrieving tags: %w", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	allFocusModes, err = focus.GetAllFocusModes()
 	if err != nil {
-		err = fmt.Errorf("error retrieving tags: %w", err)
+		err = fmt.Errorf("error retrieving focus modes: %w", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if len(allNotes) == 0 {
-		renderNotesPage(w, allTags, allNotes, selectedNote, isNewNote, viewPreference)
+		renderNotesPage(w, allTags, allNotes, allFocusModes, selectedNote, isNewNote, viewPreference)
 		return
 	}
 
@@ -132,7 +181,7 @@ func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	renderNotesPage(w, allTags, allNotes, selectedNote, isNewNote, viewPreference)
+	renderNotesPage(w, allTags, allNotes, allFocusModes, selectedNote, isNewNote, viewPreference)
 }
 
 func HandleCreateNote(w http.ResponseWriter, r *http.Request) {

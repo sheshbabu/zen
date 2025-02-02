@@ -1,5 +1,7 @@
-import Editor from "./notes-editor.js";
+import {Editor, TagsEditor} from "./notes-editor.js";
 import Board from "./board.js";
+
+window.zen = {};
 
 let editor = null;
 const editorContainerEl = document.querySelector('.notes-editor-container');
@@ -19,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initEditor();
     initNotesGrid();
     initBoard();
+
+    new FocusSwitcher(document.querySelector('.sidebar-focus-switcher'))
 })
 
 function initEditor() {
@@ -103,6 +107,56 @@ function setListViewPreference(view) {
     });
 }
 
-window.zen = {};
+class FocusSwitcher {
+    constructor(containerEl) {
+        this.containerEl = containerEl;
+        this.buttonEL = this.containerEl.querySelector('.dropdown-button.button');
+        this.suggestionsContainerEl = this.containerEl.querySelector(".dropdown-container");
+        this.dialogContainerEl = document.querySelector('.dialog-container');
+        this.dialogContainerEl.addEventListener('htmx:afterSwap', e => this.handleUpdate(e));
+
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        this.buttonEL.addEventListener('click', () => {
+            if (this.isSuggestionsOpen()) {
+                this.closeSuggestions();
+            } else {
+                this.openSuggestions();
+            }
+        });
+        this.suggestionsContainerEl.querySelectorAll('li').forEach(el => {
+            el.addEventListener('click', (e) => {
+                this.handleOptionClick(e.currentTarget);
+            });
+        });
+    }
+
+    handleUpdate() {
+        this.focusDialog
+        this.tagsEditor = new TagsEditor(null, null, this.dialogContainerEl.querySelector('.notes-editor-tags'));
+    }
+
+    closeSuggestions() {
+        this.suggestionsContainerEl.classList.remove('open');
+    }
+
+    openSuggestions() {
+        this.suggestionsContainerEl.classList.add('open');
+    }
+
+    isSuggestionsOpen() {
+        return this.suggestionsContainerEl.classList.contains('open');
+    }
+
+    handleOptionClick(optionEl) {
+        this.closeSuggestions();
+        if (optionEl.textContent === 'Add new...') {
+            htmx.ajax("GET", "/focus/new", { target: document.querySelector('.dialog-container') });
+        }
+    }
+}
+
 window.zen.renderMarkdown = renderMarkdown;
 window.zen.setListViewPreference = setListViewPreference;
