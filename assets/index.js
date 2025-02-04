@@ -30,7 +30,9 @@ function initEditor() {
         return;
     }
 
-    editor = new Editor(editorContainerEl);
+    if (editor === null) {
+        editor = new Editor(editorContainerEl);
+    }
 
     document.addEventListener('keydown', (e) => {
         if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
