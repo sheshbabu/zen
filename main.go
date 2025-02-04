@@ -73,6 +73,7 @@ func newRouter() *http.ServeMux {
 
 	mux.HandleFunc("GET /tags/", tags.HandleTags)
 	mux.HandleFunc("POST /tags/", tags.HandleCreateTag)
+	mux.HandleFunc("DELETE /tags/{tag_id}", tags.HandleDeleteTag)
 
 	mux.HandleFunc("PUT /notes/{note_id}/tags", tags.HandleUpdateNoteTags)
 

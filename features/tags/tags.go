@@ -112,3 +112,22 @@ func HandleSidebarTagsListFragment(w http.ResponseWriter) {
 
 	renderSidebarTagsListFragment(w, allTags)
 }
+
+func HandleDeleteTag(w http.ResponseWriter, r *http.Request) {
+	tagIDStr := r.PathValue("tag_id")
+	tagID, err := strconv.Atoi(tagIDStr)
+	if err != nil {
+		err = fmt.Errorf("error parsing request: %w", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = DeleteTag(tagID)
+	if err != nil {
+		err = fmt.Errorf("error deleting tag: %w", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("HX-Trigger", "note_changed")
+}

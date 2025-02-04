@@ -179,3 +179,21 @@ func GetTagByID(tagID int) (Tag, error) {
 
 	return tag, nil
 }
+
+func DeleteTag(tagID int) error {
+	query := `
+		DELETE FROM
+			tags
+		WHERE
+			tag_id = ?
+	`
+
+	_, err := sqlite.DB.Exec(query, tagID)
+	if err != nil {
+		err = fmt.Errorf("error deleting tag: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
