@@ -18,6 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Navigate forward
+    document.body.addEventListener('htmx:afterSettle', (event) => {
+        handleUrlChange(window.location.pathname);
+    });
+    
+    // Navigate back
+    document.body.addEventListener('htmx:historyRestore', (event) => {
+        handleUrlChange(event.detail.path);
+    });
+
     initEditor();
     initNotesGrid();
     initBoard();
@@ -63,6 +73,21 @@ function initBoard() {
     renderNotesGrid()
 }
 
+function handleUrlChange(path) {
+    let page = document.querySelectorAll("[data-page]")[0].dataset.page;
+    const query = new URLSearchParams(window.location.search);
+    if (query.has('tag_id')) {
+        page = 'tags';
+    } else if (/\/notes\/\d+/.test(path)) {
+        page = 'editor';
+    } else if (path === "/" || path === "/notes") {
+        page = 'notes';
+    }
+    console.log(page, path, window.location.search);
+    Array.from(document.querySelectorAll("[data-page]")).forEach((el) => {
+        el.dataset.page = page;
+    });
+}
 
 function renderNotesGrid() {
     document.querySelectorAll(".notes-grid-item-content").forEach((el) => {

@@ -39,18 +39,25 @@ type Sidebar struct {
 const NOTES_LIMIT = 100
 
 func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
+	// Used for responsive design in server-side rendering
+	page := "notes" // "editor", "tags", "search"
+
 	selectedNoteIDStr := r.PathValue("note_id")
 	tagIDStr := r.URL.Query().Get("tag_id")
 	focusModeIDStr := r.URL.Query().Get("focus_id")
 
+	if selectedNoteIDStr != "" {
+		page = "editor"
+	} else if r.URL.Path == "/notes" || r.URL.Path == "/notes/" {
+		page = "notes"
+	}
+
 	if r.Header.Get("HX-Request") == "true" {
-		// Editor Fragment
-		if selectedNoteIDStr != "" {
+		if page == "editor" {
 			HandleNoteEditorFragment(w, r)
 			return
 		}
-		// List Fragment
-		if r.URL.Path == "/notes" || r.URL.Path == "/notes/" {
+		if page == "notes" {
 			HandleNotesListFragment(w, r)
 			return
 		}
@@ -148,7 +155,7 @@ func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(allNotes) == 0 {
-		renderNotesPage(w, allTags, allNotes, allFocusModes, selectedNote, isNewNote, viewPreference)
+		renderNotesPage(w, allTags, allNotes, allFocusModes, selectedNote, isNewNote, viewPreference, page)
 		return
 	}
 
@@ -181,7 +188,7 @@ func HandleNotesPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	renderNotesPage(w, allTags, allNotes, allFocusModes, selectedNote, isNewNote, viewPreference)
+	renderNotesPage(w, allTags, allNotes, allFocusModes, selectedNote, isNewNote, viewPreference, page)
 }
 
 func HandleCreateNote(w http.ResponseWriter, r *http.Request) {

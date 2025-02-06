@@ -8,13 +8,15 @@ import (
 )
 
 type templateData struct {
+	Page      string
 	Sidebar   Sidebar
 	NotesList NotesList
 	Editor    Editor
 }
 
-func renderNotesPage(w http.ResponseWriter, allTags []tags.Tag, allNotes []Note, allFocusModes []focus.FocusMode, selectedNote Note, isNewNote bool, viewPreference string) {
+func renderNotesPage(w http.ResponseWriter, allTags []tags.Tag, allNotes []Note, allFocusModes []focus.FocusMode, selectedNote Note, isNewNote bool, viewPreference string, page string) {
 	tmplData := templateData{
+		Page: page,
 		Sidebar: Sidebar{
 			FocusModes: allFocusModes,
 			Tags:       allTags,

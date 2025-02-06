@@ -68,6 +68,33 @@ body {
     position: relative; /* for floating editor */
 }
 
+@media screen and (max-width: 948px) {
+    .sidebar-container {
+        display: none;
+    }
+
+    .notes-list-container,
+    .notes-grid-container {
+        &[data-page="notes"] {
+            width: 100%;
+        }
+
+        &:not([data-page="notes"]) {
+            display: none;
+        }
+    }
+
+    .notes-editor-container {
+        &[data-page="editor"] {
+            width: 100%;
+        }
+
+        &:not([data-page="editor"]) {
+            display: none;
+        }
+    }
+}
+
 .sidebar-container {
     width: 220px;
     padding: 14px 0;
