@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
-	"strings"
 	"zen/commons/sqlite"
 	"zen/commons/templates"
 	"zen/features/focus"
@@ -89,10 +88,6 @@ func newRouter() *http.ServeMux {
 }
 
 func handleStaticAssets(w http.ResponseWriter, r *http.Request) {
-	if strings.HasPrefix(r.URL.Path, "/assets") {
-		w.Header().Set("Cache-Control", "public, max-age=31536000") // 1 year
-	}
-
 	http.FileServer(http.FS(assets)).ServeHTTP(w, r)
 }
 
