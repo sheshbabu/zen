@@ -91,7 +91,8 @@
         outline: none;
         border-bottom: 1px solid var(--neutral-200);
         padding-bottom: 4px;
-        min-width: 400px;
+        width: 100%;
+        margin-right: 16px;
     }
 }
 
