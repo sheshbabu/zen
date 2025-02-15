@@ -1,4 +1,5 @@
 <p align="center">
+  <img width="256" src="assets/android-chrome-512x512.png">
   <h1 align="center">Zen</h1>
   <p align="center">Minimal Notes App</p>
 </p>
