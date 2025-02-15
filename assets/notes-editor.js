@@ -65,7 +65,10 @@ export class Editor {
         });
 
         this.textareaEl.addEventListener('input', () => {
-            this.textareaEl.style.height = `${this.textareaEl.scrollHeight + 32}px`;
+            // scrollHeight is height of content and padding
+            // It doesn't include border, margin, or scrollbar
+            // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight
+            this.textareaEl.style.height = `${this.textareaEl.scrollHeight + 2}px`;
         });
 
         this.editButtonEl.addEventListener('click', (e) => {
@@ -139,7 +142,7 @@ export class Editor {
             this.doneButtonEl.style.display = 'block';
             this.editButtonEl.style.display = 'none';
             this.textareaEl.style.height = 'auto'; // Reset the height
-            this.textareaEl.style.height = `${this.textareaEl.scrollHeight + 32}px`;
+            this.textareaEl.style.height = `${this.textareaEl.scrollHeight + 2}px`;
             this.textareaEl.focus();
         }
     }
