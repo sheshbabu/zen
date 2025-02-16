@@ -77,6 +77,7 @@ body {
     .notes-grid-container {
         &[data-page="notes"] {
             width: 100%;
+            margin-bottom: 60px;
         }
 
         &:not([data-page="notes"]) {
@@ -87,6 +88,7 @@ body {
     .notes-editor-container {
         &[data-page="editor"] {
             width: 100%;
+            margin-bottom: 60px;
         }
 
         &:not([data-page="editor"]) {
@@ -168,6 +170,42 @@ body {
                 color: var(--neutral-600);
             }
         }
+    }
+}
+
+.mobile-navbar-container {
+    display: none;
+    position: absolute;
+    bottom: 16px;
+    width: 100%;
+
+    .mobile-navbar {
+        display: flex;
+        justify-content: space-around;
+        padding: 8px;
+        border-radius: 30px;
+        background-color: #fff;
+        box-shadow: var(--shadow-4);
+        margin: 0 8px;
+
+        .mobile-navbar-button {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--neutral-900);
+
+            svg.lucide {
+                width: 36px;
+                height: 36px;
+                padding: 8px;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 948px) {
+    .mobile-navbar-container {
+        display: block;
     }
 }
 
