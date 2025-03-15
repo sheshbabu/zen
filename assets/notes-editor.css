@@ -152,15 +152,7 @@
         font: var(--h5);
     }
 
-    h4 {
-        font: var(--h6);
-    }
-
-    h5 {
-        font: var(--h6);
-    }
-
-    h6 {
+    h4, h5, h6 {
         font: var(--h6);
     }
 
@@ -182,12 +174,7 @@
         max-width: 100%;
     }
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
+    h1, h2, h3, h4, h5, h6 {
         padding: 3px 0;
         margin-top: 24px;
     }
@@ -236,9 +223,7 @@
         margin: 24px 0;
     }
 
-    table,
-    th,
-    td {
+    table, th, td {
         border: 1px solid var(--neutral-200);
         padding: 5px 15px;
         width: fit-content;
