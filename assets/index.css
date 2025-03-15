@@ -48,6 +48,10 @@
     --shadow-3: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;   /* tailwind #37 https://getcssscan.com/css-box-shadow-examples */
     --shadow-4: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px; /* tailwind #38 https://getcssscan.com/css-box-shadow-examples */
     --shadow-5: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px; /* tailwind #40 https://getcssscan.com/css-box-shadow-examples */
+    --shadow-6: rgba(0, 0, 0, 0.1) 0px -10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px; /* inverse of 4 */
+
+    /* globals */
+    --mobile-navbar-height: 60px;
 }
 
 * {
@@ -94,12 +98,12 @@ body {
     .notes-grid-container {
         &[data-page="notes"] {
             width: 100%;
-            height: calc(100% - 80px);
+            height: calc(100% - var(--mobile-navbar-height));
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            bottom: 80px;
+            bottom: var(--mobile-navbar-height);
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -112,12 +116,12 @@ body {
     .notes-editor-container {
         &[data-page="editor"] {
             width: 100%;
-            height: calc(100% - 80px);
+            height: calc(100% - var(--mobile-navbar-height));
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            bottom: 80px;
+            bottom: var(--mobile-navbar-height);
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -211,7 +215,7 @@ body {
     left: 0;
     right: 0;
     width: 100%;
-    height: 80px;
+    height: var(--mobile-navbar-height);
     z-index: 2;
     background-color: transparent;
     padding-bottom: env(safe-area-inset-bottom, 0);
@@ -220,10 +224,8 @@ body {
         display: flex;
         justify-content: space-around;
         padding: 8px;
-        border-radius: 30px;
         background-color: #fff;
-        box-shadow: var(--shadow-4);
-        margin: 0 8px 8px 8px;
+        box-shadow: var(--shadow-6);
 
         .mobile-navbar-button {
             display: flex;
