@@ -52,6 +52,7 @@
 
     /* globals */
     --mobile-navbar-height: 60px;
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 * {
@@ -98,12 +99,12 @@ body {
     .notes-grid-container {
         &[data-page="notes"] {
             width: 100%;
-            height: calc(100% - var(--mobile-navbar-height));
+            height: calc(100% - (var(--mobile-navbar-height) + var(--safe-area-bottom)));
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            bottom: var(--mobile-navbar-height);
+            bottom: calc(var(--mobile-navbar-height) + var(--safe-area-bottom));
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -116,12 +117,12 @@ body {
     .notes-editor-container {
         &[data-page="editor"] {
             width: 100%;
-            height: calc(100% - var(--mobile-navbar-height));
+            height: calc(100% - (var(--mobile-navbar-height) + var(--safe-area-bottom)));
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            bottom: var(--mobile-navbar-height);
+            bottom: calc(var(--mobile-navbar-height) + var(--safe-area-bottom));
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -215,15 +216,16 @@ body {
     left: 0;
     right: 0;
     width: 100%;
-    height: var(--mobile-navbar-height);
+    height: calc(var(--mobile-navbar-height) + var(--safe-area-bottom));
     z-index: 2;
     background-color: transparent;
-    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding-bottom: var(--safe-area-bottom);
 
     .mobile-navbar {
         display: flex;
         justify-content: space-around;
         padding: 8px;
+        height: var(--mobile-navbar-height);
         background-color: #fff;
         box-shadow: var(--shadow-6);
 
