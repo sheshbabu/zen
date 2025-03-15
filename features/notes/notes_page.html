@@ -3,20 +3,22 @@
     {{template "head" "Zen"}}
 
     <body>
-        <div class="sidebar-container" data-page="{{.Page}}">
-            {{template "sidebar" .Sidebar}}
-        </div>
-        {{if eq .NotesList.ViewPreference "list"}}
-            <div class="notes-list-container" data-page="{{.Page}}">
-                {{template "notes_list" .NotesList}}
+        <div class="page-container">
+            <div class="sidebar-container" data-page="{{.Page}}">
+                {{template "sidebar" .Sidebar}}
             </div>
-        {{else}}
-            <div class="notes-list-container grid" data-page="{{.Page}}">
-                {{template "notes_grid" .NotesList}}
+            {{if eq .NotesList.ViewPreference "list"}}
+                <div class="notes-list-container" data-page="{{.Page}}">
+                    {{template "notes_list" .NotesList}}
+                </div>
+            {{else}}
+                <div class="notes-list-container grid" data-page="{{.Page}}">
+                    {{template "notes_grid" .NotesList}}
+                </div>
+            {{end}}
+            <div class="notes-editor-container {{if eq .Editor.IsHidden true}}is-hidden is-floating{{end}}" data-page="{{.Page}}">
+                {{template "notes_editor" .Editor}}
             </div>
-        {{end}}
-        <div class="notes-editor-container {{if eq .Editor.IsHidden true}}is-hidden is-floating{{end}}" data-page="{{.Page}}">
-            {{template "notes_editor" .Editor}}
         </div>
 
         <div class="mobile-navbar-container">
@@ -52,5 +54,4 @@
 
         <div class="dialog-container"></div>
     </body>
-
 </html>
