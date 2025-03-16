@@ -48,7 +48,7 @@
     --shadow-3: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;   /* tailwind #37 https://getcssscan.com/css-box-shadow-examples */
     --shadow-4: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px; /* tailwind #38 https://getcssscan.com/css-box-shadow-examples */
     --shadow-5: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px; /* tailwind #40 https://getcssscan.com/css-box-shadow-examples */
-    --shadow-6: rgba(0, 0, 0, 0.1) 0px -10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px; /* inverse of 4 */
+    --shadow-6: rgba(0, 0, 0, 0.1) 0px -10px 15px -3px;
 
     /* globals */
     --mobile-navbar-height: 60px;
