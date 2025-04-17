@@ -157,6 +157,7 @@ body {
             color: var(--neutral-900);
 
             svg.lucide {
+                circle,
                 rect,
                 path {
                     stroke: var(--neutral-900);
@@ -169,6 +170,7 @@ body {
             height: 36px;
             padding: 8px;
     
+            circle,
             rect,
             path {
                 stroke: var(--neutral-500);
@@ -647,6 +649,7 @@ body {
     align-items: center;
     background-color: var(--neutral-100);
     padding: 4px 8px;
+    margin-right: 4px;
     border-radius: 4px;
     font-weight: 500;
     color: var(--neutral-400);

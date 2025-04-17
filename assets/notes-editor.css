@@ -167,6 +167,8 @@
 
     a {
         color: var(--neutral-500);
+        text-decoration: none;
+        border-bottom: 1px dashed var(--neutral-500);
     }
 
     img {
@@ -215,6 +217,15 @@
 
     ul {
         padding-left: 20px;
+    }
+
+    ul > li > ul {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    li > ul > li {
+        padding-bottom: 0;
     }
 
     table {
