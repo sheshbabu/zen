@@ -22,7 +22,13 @@ $ make dev
 
 Run the application in watch mode
 
-Install [air](https://github.com/air-verse/air)
+Install [air](https://github.com/air-verse/air) and [esbuild](https://esbuild.github.io)
+
+```shell
+$ go install github.com/air-verse/air@latest
+$ go install github.com/evanw/esbuild/cmd/esbuild@latest
+```
+
 ```shell
 $ make watch
 ```
@@ -31,3 +37,7 @@ $ make watch
 ### Schema Migrations
 * Create new migration file under `./migrations`
 * Use the format `<version>_<title>.sql`
+
+
+### Thanks
+* [Standalone Preact Builder](https://standalonepreact.satge.net)

@@ -7,7 +7,8 @@ import (
 )
 
 func GetAllNotes(limit int, offset int) ([]Note, error) {
-	var notes []Note
+	notes := []Note{}
+
 	query := `
 		SELECT
 			note_id,
@@ -85,6 +86,16 @@ func CreateEmptyNote() (Note, error) {
 }
 
 func CreateNote(note Note) (Note, error) {
+	tx, err := sqlite.DB.Begin()
+
+	if err != nil {
+		err = fmt.Errorf("error starting transaction: %w", err)
+		slog.Error(err.Error())
+		return note, err
+	}
+
+	defer tx.Rollback()
+
 	query := `
 		INSERT INTO
 			notes (title, content)
@@ -98,8 +109,51 @@ func CreateNote(note Note) (Note, error) {
 			updated_at
 	`
 
-	row := sqlite.DB.QueryRow(query, note.Title, note.Content)
-	err := row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt)
+	row := tx.QueryRow(query, note.Title, note.Content)
+	err = row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt)
+	if err != nil {
+		err = fmt.Errorf("error creating note: %w", err)
+		slog.Error(err.Error())
+		return note, err
+	}
+
+	for _, tag := range note.Tags {
+		if tag.TagID == -1 {
+			query = `
+				INSERT INTO
+					tags (name)
+				VALUES
+					(?)
+				RETURNING
+					tag_id,
+					name
+			`
+
+			row := tx.QueryRow(query, tag.Name)
+			err := row.Scan(&tag.TagID, &tag.Name)
+			if err != nil {
+				err = fmt.Errorf("error creating tag: %w", err)
+				slog.Error(err.Error())
+				return note, err
+			}
+		}
+
+		query := `
+			INSERT INTO
+				note_tags (note_id, tag_id)
+			VALUES
+				(?, ?)
+		`
+		_, err := tx.Exec(query, note.NoteID, tag.TagID)
+		if err != nil {
+			err = fmt.Errorf("error adding tags to note: %w", err)
+			slog.Error(err.Error())
+			return note, err
+		}
+	}
+
+	err = tx.Commit()
+
 	if err != nil {
 		err = fmt.Errorf("error creating note: %w", err)
 		slog.Error(err.Error())
@@ -110,6 +164,16 @@ func CreateNote(note Note) (Note, error) {
 }
 
 func UpdateNote(note Note) (Note, error) {
+	tx, err := sqlite.DB.Begin()
+
+	if err != nil {
+		err = fmt.Errorf("error starting transaction: %w", err)
+		slog.Error(err.Error())
+		return note, err
+	}
+
+	defer tx.Rollback()
+
 	query := `
 		UPDATE
 			notes
@@ -127,8 +191,65 @@ func UpdateNote(note Note) (Note, error) {
 			updated_at
 	`
 
-	row := sqlite.DB.QueryRow(query, note.Title, note.Content, note.NoteID)
-	err := row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt)
+	row := tx.QueryRow(query, note.Title, note.Content, note.NoteID)
+	err = row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt)
+	if err != nil {
+		err = fmt.Errorf("error updating note: %w", err)
+		slog.Error(err.Error())
+		return note, err
+	}
+
+	query = `
+		DELETE FROM
+			note_tags
+		WHERE
+			note_id = ?
+	`
+
+	_, err = tx.Exec(query, note.NoteID)
+	if err != nil {
+		err = fmt.Errorf("error deleting tags: %w", err)
+		slog.Error(err.Error())
+		return note, err
+	}
+
+	for _, tag := range note.Tags {
+		if tag.TagID == -1 {
+			query = `
+				INSERT INTO
+					tags (name)
+				VALUES
+					(?)
+				RETURNING
+					tag_id,
+					name
+			`
+
+			row := tx.QueryRow(query, tag.Name)
+			err := row.Scan(&tag.TagID, &tag.Name)
+			if err != nil {
+				err = fmt.Errorf("error creating tag: %w", err)
+				slog.Error(err.Error())
+				return note, err
+			}
+		}
+
+		query := `
+			INSERT INTO
+				note_tags (note_id, tag_id)
+			VALUES
+				(?, ?)
+		`
+		_, err := tx.Exec(query, note.NoteID, tag.TagID)
+		if err != nil {
+			err = fmt.Errorf("error adding tags to note: %w", err)
+			slog.Error(err.Error())
+			return note, err
+		}
+	}
+
+	err = tx.Commit()
+
 	if err != nil {
 		err = fmt.Errorf("error updating note: %w", err)
 		slog.Error(err.Error())

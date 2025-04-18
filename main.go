@@ -5,9 +5,9 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strings"
 	"zen/commons/sqlite"
 	"zen/commons/templates"
-	"zen/features/focus"
 	"zen/features/images"
 	"zen/features/notes"
 	"zen/features/tags"
@@ -63,32 +63,58 @@ func newRouter() *http.ServeMux {
 
 	mux.HandleFunc("GET /assets/", handleStaticAssets)
 
-	mux.HandleFunc("GET /", notes.HandleNotesPage)
-	mux.HandleFunc("GET /notes/", notes.HandleNotesPage)
-	mux.HandleFunc("GET /notes/{note_id}", notes.HandleNotesPage)
+	// mux.HandleFunc("GET /", notes.HandleNotesPage)
+	// mux.HandleFunc("GET /notes/", notes.HandleNotesPage)
+	// mux.HandleFunc("GET /notes/{note_id}", notes.HandleNotesPage)
 
-	mux.HandleFunc("PUT /notes/{note_id}", notes.HandleUpdateNote)
-	mux.HandleFunc("POST /notes/", notes.HandleCreateNote)
+	// mux.HandleFunc("PUT /notes/{note_id}", notes.HandleUpdateNote)
+	// mux.HandleFunc("POST /notes/", notes.HandleCreateNote)
 
-	mux.HandleFunc("GET /tags/", tags.HandleTags)
-	mux.HandleFunc("POST /tags/", tags.HandleCreateTag)
-	mux.HandleFunc("DELETE /tags/{tag_id}", tags.HandleDeleteTag)
+	// mux.HandleFunc("GET /tags/", tags.HandleTags)
+	// mux.HandleFunc("POST /tags/", tags.HandleCreateTag)
+	// mux.HandleFunc("DELETE /tags/{tag_id}", tags.HandleDeleteTag)
 
-	mux.HandleFunc("PUT /notes/{note_id}/tags", tags.HandleUpdateNoteTags)
+	// mux.HandleFunc("PUT /notes/{note_id}/tags", tags.HandleUpdateNoteTags)
 
 	mux.HandleFunc("GET /images/", HandleUploadedImages)
-	mux.HandleFunc("POST /images/", images.HandleUploadImage)
+	// mux.HandleFunc("POST /images/", images.HandleUploadImage)
 
-	mux.HandleFunc("GET /focus/{focus_id}", focus.HandleFocusDialog)
+	// mux.HandleFunc("GET /focus/{focus_id}", focus.HandleFocusDialog)
 	// mux.HandleFunc("GET /focus/{focus_id}/tags", focus.HandleUpdateFocusTags)
 	// mux.HandleFunc("PUT /focus/{focus_id}", focus.HandleUpdateFocus)
 	// mux.HandleFunc("POST /focus/{focus_id}", focus.HandleCreateFocus)
+
+	mux.HandleFunc("GET /api/notes", notes.HandleGetNotes)
+	mux.HandleFunc("GET /api/notes/{note_id}", notes.HandleGetNote)
+	mux.HandleFunc("PUT /api/notes/{note_id}", notes.HandleUpdateNoteV2)
+	mux.HandleFunc("POST /api/notes/", notes.HandleCreateNoteV2)
+
+	mux.HandleFunc("GET /api/tags", tags.HandleGetTags)
+	mux.HandleFunc("POST /api/tags", tags.HandleCreateTagV2)
+	mux.HandleFunc("DELETE /api/tags/{tag_id}", tags.HandleDeleteTagV2)
+
+	mux.HandleFunc("GET /api/focus/", notes.HandleGetAllFocusModesV2)
+
+	mux.HandleFunc("POST /api/images/", images.HandleUploadImage)
+
+	mux.HandleFunc("GET /", handleStaticAssets)
 
 	return mux
 }
 
 func handleStaticAssets(w http.ResponseWriter, r *http.Request) {
-	http.FileServer(http.FS(assets)).ServeHTTP(w, r)
+	fs := http.FS(assets)
+
+	if os.Getenv("DEV_MODE") == "true" {
+		fs = http.Dir("./assets")
+	}
+
+	if strings.HasPrefix(r.URL.Path, "/assets/") {
+		http.StripPrefix("/assets/", http.FileServer(fs)).ServeHTTP(w, r)
+		return
+	}
+
+	http.StripPrefix("/", http.FileServer(fs)).ServeHTTP(w, r)
 }
 
 func HandleUploadedImages(w http.ResponseWriter, r *http.Request) {
