@@ -60,12 +60,12 @@ export default function NotesPage({ noteId }) {
 
     if (selectedTagId) {
       promise = ApiClient.getNotesByTagId(selectedTagId);
-    // } else if (selectedFocusId) {
-    //   promise = ApiClient.getNotesByFocusId(selectedFocusId);
+      // } else if (selectedFocusId) {
+      //   promise = ApiClient.getNotesByFocusId(selectedFocusId);
     } else {
       promise = ApiClient.getAllNotes();
     }
-    
+
     promise
       .then(notes => {
         setNotes(notes);
@@ -95,6 +95,12 @@ export default function NotesPage({ noteId }) {
       });
   }
 
+  // Update notes, tags, and focus modes when a note is saved
+  function handleNoteSave() {
+    refreshNotes();
+    refreshTags();
+  }
+
   function handleViewChange(newView) {
     setSelectedView(newView);
   }
@@ -104,7 +110,7 @@ export default function NotesPage({ noteId }) {
     editorClassName = "notes-editor-container";
   } else if (selectedView === "grid") {
     listClassName = "notes-list-container grid";
-    
+
     if (noteId === undefined) {
       editorClassName = "notes-editor-container is-hidden";
     } else {
@@ -123,7 +129,7 @@ export default function NotesPage({ noteId }) {
       </div>
 
       <div className={editorClassName} data-page={noteId === undefined ? "notes" : "editor"}>
-        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.NoteID} isFloating={noteId !== undefined && selectedView === "grid"} />
+        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.NoteID} isFloating={noteId !== undefined && selectedView === "grid"} onSave={handleNoteSave} />
       </div>
 
       <MobileNavbar />

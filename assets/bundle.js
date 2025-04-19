@@ -1295,7 +1295,7 @@
   }
 
   // commons/components/NotesEditor.jsx
-  function NotesEditor({ selectedNote, isNewNote, isFloating }) {
+  function NotesEditor({ selectedNote, isNewNote, isFloating, onSave }) {
     if (!isNewNote && selectedNote === null) {
       return null;
     }
@@ -1359,6 +1359,7 @@
         if (isNewNote) {
           navigateTo(`/${note2.NoteID}`);
         }
+        onSave();
       }).catch((e) => {
         console.error("Error saving note:", e);
       });
@@ -1628,6 +1629,10 @@
         console.error("Error loading focus modes:", error);
       });
     }
+    function handleNoteSave() {
+      refreshNotes();
+      refreshTags();
+    }
     function handleViewChange(newView) {
       setSelectedView(newView);
     }
@@ -1642,7 +1647,7 @@
         editorClassName = "notes-editor-container is-floating";
       }
     }
-    return /* @__PURE__ */ dt("div", { className: "page-container" }, /* @__PURE__ */ dt("div", { className: "sidebar-container" }, /* @__PURE__ */ dt(Sidebar, { focusModes, tags })), /* @__PURE__ */ dt("div", { className: listClassName, "data-page": noteId === void 0 ? "notes" : "editor" }, /* @__PURE__ */ dt(NotesList, { notes, view: selectedView, onViewChange: handleViewChange })), /* @__PURE__ */ dt("div", { className: editorClassName, "data-page": noteId === void 0 ? "notes" : "editor" }, /* @__PURE__ */ dt(NotesEditor, { selectedNote, isNewNote: noteId === "new", key: selectedNote?.NoteID, isFloating: noteId !== void 0 && selectedView === "grid" })), /* @__PURE__ */ dt(MobileNavbar, null), /* @__PURE__ */ dt("div", { className: "dialog-container" }));
+    return /* @__PURE__ */ dt("div", { className: "page-container" }, /* @__PURE__ */ dt("div", { className: "sidebar-container" }, /* @__PURE__ */ dt(Sidebar, { focusModes, tags })), /* @__PURE__ */ dt("div", { className: listClassName, "data-page": noteId === void 0 ? "notes" : "editor" }, /* @__PURE__ */ dt(NotesList, { notes, view: selectedView, onViewChange: handleViewChange })), /* @__PURE__ */ dt("div", { className: editorClassName, "data-page": noteId === void 0 ? "notes" : "editor" }, /* @__PURE__ */ dt(NotesEditor, { selectedNote, isNewNote: noteId === "new", key: selectedNote?.NoteID, isFloating: noteId !== void 0 && selectedView === "grid", onSave: handleNoteSave })), /* @__PURE__ */ dt(MobileNavbar, null), /* @__PURE__ */ dt("div", { className: "dialog-container" }));
   }
 
   // index.js

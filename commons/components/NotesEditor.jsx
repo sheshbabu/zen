@@ -4,7 +4,7 @@ import NotesEditorTags from './NotesEditorTags.jsx';
 import renderMarkdown from '../utils/renderMarkdown.js';
 import navigateTo from '../utils/navigateTo.js';
 
-export default function NotesEditor({ selectedNote, isNewNote, isFloating }) {
+export default function NotesEditor({ selectedNote, isNewNote, isFloating, onSave }) {
   if (!isNewNote && selectedNote === null) {
     return null;
   }
@@ -88,6 +88,8 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating }) {
         if (isNewNote) {
           navigateTo(`/${note.NoteID}`);
         }
+
+        onSave();
       })
       .catch(e => {
         console.error('Error saving note:', e);
