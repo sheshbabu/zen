@@ -964,14 +964,40 @@
   }
   var SidebarTagsList_default = SidebarTagsList;
 
-  // commons/components/Sidebar.jsx
-  function Sidebar() {
+  // commons/components/FocusDialog.jsx
+  function FocusDialog({ onCloseClick }) {
+    return /* @__PURE__ */ dt("div", { class: "focus-dialog-container" }, /* @__PURE__ */ dt("div", { class: "focus-dialog" }, /* @__PURE__ */ dt(CloseIcon, { className: "notes-editor-toolbar-button-close", onClick: onCloseClick })));
+  }
+  var CloseIcon = ({ className, onClick }) => /* @__PURE__ */ dt("svg", { onClick, xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: `lucide lucide-x ${className}` }, /* @__PURE__ */ dt("path", { d: "M18 6 6 18" }), /* @__PURE__ */ dt("path", { d: "m6 6 12 12" }));
+
+  // commons/components/FocusSwitcher.jsx
+  function FocusSwitcher() {
     const { appContext } = useAppContext();
-    const { focusModes, tags } = appContext;
-    return /* @__PURE__ */ dt("div", null, /* @__PURE__ */ dt("div", { className: "sidebar-focus-switcher" }, /* @__PURE__ */ dt("div", { className: "dropdown-button button" }, "All Notes", /* @__PURE__ */ dt(ArrowDownIcon, null)), /* @__PURE__ */ dt("div", { className: "dropdown-container" }, /* @__PURE__ */ dt("ul", { className: "dropdown-menu" }, focusModes?.map((mode) => /* @__PURE__ */ dt("li", { className: "dropdown-option" }, mode.Name)), /* @__PURE__ */ dt("li", { className: "dropdown-option" }, "Add new...")))), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/new" }, /* @__PURE__ */ dt(NewNoteIcon, null), "New"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(NotesIcon, null), "Notes"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(BoardIcon, null), "Boards"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(SearchIcon, null), "Search"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(SettingsIcon, null), "Settings"), /* @__PURE__ */ dt("div", { className: "sidebar-section" }, /* @__PURE__ */ dt(SidebarTagsList_default, { tags })));
+    const { focusModes } = appContext;
+    const [isDropdownOpen, setIsDropdownOpen] = Qt(false);
+    function handleDropdownClick() {
+      setIsDropdownOpen((prevIsDropdownOpen) => !prevIsDropdownOpen);
+    }
+    function handleAddNewClick() {
+      setIsDropdownOpen(false);
+      ye(/* @__PURE__ */ dt(FocusDialog, { onCloseClick: handleFocusDialogCloseClick }), document.querySelector(".dialog-container"));
+    }
+    function handleFocusDialogCloseClick() {
+      ye(null, document.querySelector(".dialog-container"));
+    }
+    const items = focusModes.map((mode) => /* @__PURE__ */ dt("li", { className: "dropdown-option" }, mode.Name));
+    items.push(/* @__PURE__ */ dt("li", { className: "dropdown-option", onClick: handleAddNewClick }, "Add new..."));
+    return /* @__PURE__ */ dt("div", { className: "sidebar-focus-switcher" }, /* @__PURE__ */ dt("div", { className: "dropdown-button button", onClick: handleDropdownClick }, "All Notes", /* @__PURE__ */ dt(ArrowDownIcon, null)), /* @__PURE__ */ dt("div", { className: `dropdown-container ${isDropdownOpen ? "open" : ""}` }, /* @__PURE__ */ dt("ul", { className: "dropdown-menu" }, items)));
   }
   function ArrowDownIcon() {
     return /* @__PURE__ */ dt("svg", { xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: "lucide lucide-chevron-down" }, /* @__PURE__ */ dt("path", { d: "m6 9 6 6 6-6" }));
+  }
+
+  // commons/components/Sidebar.jsx
+  function Sidebar() {
+    const { appContext } = useAppContext();
+    const { tags } = appContext;
+    return /* @__PURE__ */ dt("div", null, /* @__PURE__ */ dt(FocusSwitcher, null), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/new" }, /* @__PURE__ */ dt(NewNoteIcon, null), "New"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(NotesIcon, null), "Notes"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(BoardIcon, null), "Boards"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(SearchIcon, null), "Search"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(SettingsIcon, null), "Settings"), /* @__PURE__ */ dt("div", { className: "sidebar-section" }, /* @__PURE__ */ dt(SidebarTagsList_default, { tags })));
   }
   function NewNoteIcon() {
     return /* @__PURE__ */ dt(
@@ -1077,7 +1103,6 @@
       /* @__PURE__ */ dt("circle", { cx: "12", cy: "12", r: "3" })
     );
   }
-  var Sidebar_default = Sidebar;
 
   // commons/components/NotesListToolbar.jsx
   function NotesListToolbar({ onListViewClick, onGridViewClick }) {
@@ -1492,7 +1517,7 @@
     const actions = [];
     if (isFloating) {
       actions.push(
-        /* @__PURE__ */ dt(CloseIcon, { className: "notes-editor-toolbar-button-close", onClick: () => window.history.back() })
+        /* @__PURE__ */ dt(CloseIcon2, { className: "notes-editor-toolbar-button-close", onClick: onCloseClick })
       );
     }
     if (isEditable) {
@@ -1506,7 +1531,7 @@
     }
     return /* @__PURE__ */ dt("div", { className: "notes-editor-toolbar" }, actions);
   }
-  var CloseIcon = ({ className, onClick }) => /* @__PURE__ */ dt("svg", { onClick, xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: `lucide lucide-x ${className}` }, /* @__PURE__ */ dt("path", { d: "M18 6 6 18" }), /* @__PURE__ */ dt("path", { d: "m6 6 12 12" }));
+  var CloseIcon2 = ({ className, onClick }) => /* @__PURE__ */ dt("svg", { onClick, xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: `lucide lucide-x ${className}` }, /* @__PURE__ */ dt("path", { d: "M18 6 6 18" }), /* @__PURE__ */ dt("path", { d: "m6 6 12 12" }));
   var CheckIcon = ({ className, onClick }) => /* @__PURE__ */ dt("svg", { onClick, xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: `lucide lucide-file-check ${className}` }, /* @__PURE__ */ dt("path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" }), /* @__PURE__ */ dt("path", { d: "M14 2v4a2 2 0 0 0 2 2h4" }), /* @__PURE__ */ dt("path", { d: "m9 15 2 2 4-4" }));
   var PencilIcon = ({ className, onClick }) => /* @__PURE__ */ dt("svg", { onClick, xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: `lucide lucide-pencil-line ${className}` }, /* @__PURE__ */ dt("path", { d: "M12 20h9" }), /* @__PURE__ */ dt("path", { d: "M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z" }), /* @__PURE__ */ dt("path", { d: "m15 5 3 3" }));
 
@@ -1648,7 +1673,7 @@
         editorClassName = "notes-editor-container is-floating";
       }
     }
-    return /* @__PURE__ */ dt("div", { className: "page-container" }, /* @__PURE__ */ dt("div", { className: "sidebar-container" }, /* @__PURE__ */ dt(Sidebar_default, { focusModes, tags })), /* @__PURE__ */ dt("div", { className: listClassName, "data-page": noteId === void 0 ? "notes" : "editor" }, /* @__PURE__ */ dt(NotesList, { notes, view: selectedView, onViewChange: handleViewChange })), /* @__PURE__ */ dt("div", { className: editorClassName, "data-page": noteId === void 0 ? "notes" : "editor" }, /* @__PURE__ */ dt(NotesEditor, { selectedNote, isNewNote: noteId === "new", key: selectedNote?.NoteID, isFloating: noteId !== void 0 && selectedView === "grid" })), /* @__PURE__ */ dt(MobileNavbar, null), /* @__PURE__ */ dt("div", { className: "dialog-container" }));
+    return /* @__PURE__ */ dt("div", { className: "page-container" }, /* @__PURE__ */ dt("div", { className: "sidebar-container" }, /* @__PURE__ */ dt(Sidebar, { focusModes, tags })), /* @__PURE__ */ dt("div", { className: listClassName, "data-page": noteId === void 0 ? "notes" : "editor" }, /* @__PURE__ */ dt(NotesList, { notes, view: selectedView, onViewChange: handleViewChange })), /* @__PURE__ */ dt("div", { className: editorClassName, "data-page": noteId === void 0 ? "notes" : "editor" }, /* @__PURE__ */ dt(NotesEditor, { selectedNote, isNewNote: noteId === "new", key: selectedNote?.NoteID, isFloating: noteId !== void 0 && selectedView === "grid" })), /* @__PURE__ */ dt(MobileNavbar, null), /* @__PURE__ */ dt("div", { className: "dialog-container" }));
   }
 
   // index.js

@@ -2,28 +2,15 @@ import { h } from '../../dependencies/preact.esm.js';
 import { useAppContext } from '../../AppContext.jsx';
 import SidebarTagsList from './SidebarTagsList.jsx';
 import Link from './Link.jsx';
+import FocusSwitcher from './FocusSwitcher.jsx';
 
-function Sidebar() {
+export default function Sidebar() {
   const { appContext } = useAppContext();
-  const { focusModes, tags } = appContext;
+  const { tags } = appContext;
 
   return (
     <div>
-
-      <div className="sidebar-focus-switcher">
-        <div className="dropdown-button button">
-          All Notes
-          <ArrowDownIcon />
-        </div>
-        <div className="dropdown-container">
-          <ul className="dropdown-menu">
-            {focusModes?.map(mode => (
-              <li className="dropdown-option">{mode.Name}</li>
-            ))}
-            <li className="dropdown-option">Add new...</li>
-          </ul>
-        </div>
-      </div>
+      <FocusSwitcher/>
 
       <Link className="sidebar-button" to="/new">
         <NewNoteIcon />
@@ -50,14 +37,6 @@ function Sidebar() {
         <SidebarTagsList tags={tags} />
       </div>
     </div>
-  );
-}
-
-function ArrowDownIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-down">
-      <path d="m6 9 6 6 6-6" />
-    </svg>
   );
 }
 
@@ -115,5 +94,3 @@ function SettingsIcon() {
     </svg>
   );
 }
-
-export default Sidebar;

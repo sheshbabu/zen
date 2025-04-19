@@ -242,7 +242,7 @@ function Toolbar({ isEditable, isFloating, onSaveClick, onEditClick, onCloseClic
 
   if (isFloating) {
     actions.push(
-      <CloseIcon className="notes-editor-toolbar-button-close" onClick={() => window.history.back()} />
+      <CloseIcon className="notes-editor-toolbar-button-close" onClick={onCloseClick} />
     );
   }
 
