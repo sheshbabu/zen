@@ -86,7 +86,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onSav
         setAttachments([]); // reset
 
         if (isNewNote) {
-          navigateTo(`/${note.NoteID}`);
+          navigateTo(`/${note.NoteID}`, true);
         }
 
         onSave();
@@ -156,7 +156,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onSav
   }
 
   function handleCloseClick() {
-    navigateTo("/");
+    navigateTo("/", true);
   }
 
   function uploadImage(file) {

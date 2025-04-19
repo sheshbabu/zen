@@ -1,10 +1,10 @@
 import { h } from '../../dependencies/preact.esm.js';
 import navigateTo from '../utils/navigateTo.js';
 
-export default function Link({ to, children, className }) {
+export default function Link({ to, shouldPreserveSearchParams, children, className }) {
   const handleClick = (event) => {
     event.preventDefault();
-    navigateTo(to);
+    navigateTo(to, shouldPreserveSearchParams);
   };
 
   return (

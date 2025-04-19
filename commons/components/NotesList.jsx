@@ -37,7 +37,7 @@ function NotesListItem({ note }) {
 
   return (
     <div className="notes-list-item">
-      <Link to={link}>
+      <Link to={link} shouldPreserveSearchParams>
         {title}
         <div className="notes-list-item-subcontainer">
           <div className="notes-list-item-subtext">{updatedAt}</div>
@@ -58,7 +58,7 @@ function NotesGridItem({ note }) {
 
   return (
     <div className="notes-grid-item">
-      <Link to={link}>
+      <Link to={link} shouldPreserveSearchParams>
         {title}
         <div className="notes-grid-item-content"  dangerouslySetInnerHTML={{ __html: renderMarkdown(note.Snippet) }}/>
       </Link>

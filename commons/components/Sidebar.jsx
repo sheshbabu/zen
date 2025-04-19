@@ -8,7 +8,7 @@ export default function Sidebar({ focusModes, tags }) {
     <div>
       <FocusSwitcher focusModes={focusModes}/>
 
-      <Link className="sidebar-button" to="/notes/new">
+      <Link className="sidebar-button" to="/notes/new" shouldPreserveSearchParams>
         <NewNoteIcon />
         New
       </Link>

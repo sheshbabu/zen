@@ -13,7 +13,7 @@ export default function MobileNavbar() {
           <SearchIcon />
           Search
         </Link>
-        <Link className="mobile-navbar-button" to="/notes/new">
+        <Link className="mobile-navbar-button" to="/notes/new" shouldPreserveSearchParams>
           <NewIcon />
           New
         </Link>
