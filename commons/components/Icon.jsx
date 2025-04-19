@@ -86,28 +86,26 @@ export function GridViewIcon() {
 
 export function CloseIcon({ className, onClick }) {
   return (
-    <svg onClick={onClick} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-x ${className}`}>
-      <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+    <svg onClick={onClick} xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-x ${className}`}>
+      <path d="M18 6 6 18"/>
+      <path d="m6 6 12 12"/>
     </svg>
   );
 }
 
 export function CheckIcon({ className, onClick }) {
   return (
-    <svg onClick={onClick} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-file-check ${className}`}>
-      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
-      <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-      <path d="m9 15 2 2 4-4" />
+    <svg onClick={onClick} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-file-check ${className}`}>
+      <path d="M20 6 9 17l-5-5"/>
     </svg>
   );
 }
 
 export function PencilIcon({ className, onClick }) {
   return (
-    <svg onClick={onClick} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-pencil-line ${className}`}>
-      <path d="M12 20h9" />
-      <path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z" />
-      <path d="m15 5 3 3" />
+    <svg onClick={onClick} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-pencil-line ${className}`}>
+      <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>
+      <path d="m15 5 4 4"/>
     </svg>
   );
 }
@@ -115,7 +113,7 @@ export function PencilIcon({ className, onClick }) {
 export function RemoveIcon({ onClick }) {
   return (
     <svg onClick={onClick} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-minus">
+      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-circle-minus">
       <circle cx="12" cy="12" r="10" />
       <path d="M8 12h8" />
     </svg>
