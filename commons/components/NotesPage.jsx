@@ -13,10 +13,14 @@ export default function NotesPage({ noteId }) {
 
   const [notes, setNotes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
+  const [selectedView, setSelectedView] = useState("list"); // "list" || "grid"
 
   const searchParams = useSearchParams();
   const selectedTagId = searchParams.get("tag_id");
   const selectedFocusId = searchParams.get("focus_id");
+
+  let listClassName = "notes-list-container";
+  let editorClassName = "notes-editor-container";
 
   useEffect(() => {
     let promise = null;
@@ -63,18 +67,35 @@ export default function NotesPage({ noteId }) {
 
   }, [noteId, notes]);
 
+  function handleViewChange(newView) {
+    setSelectedView(newView);
+  }
+
+  if (selectedView === "list") {
+    listClassName = "notes-list-container"
+    editorClassName = "notes-editor-container";
+  } else if (selectedView === "grid") {
+    listClassName = "notes-list-container grid";
+    
+    if (noteId === undefined) {
+      editorClassName = "notes-editor-container is-hidden";
+    } else {
+      editorClassName = "notes-editor-container is-floating";
+    }
+  }
+
   return (
     <div className="page-container">
       <div className="sidebar-container">
         <Sidebar focusModes={focusModes} tags={tags} />
       </div>
 
-      <div className="notes-list-container" data-page={noteId === undefined ? "notes" : "editor"}>
-        <NotesList notes={notes} />
+      <div className={listClassName} data-page={noteId === undefined ? "notes" : "editor"}>
+        <NotesList notes={notes} view={selectedView} onViewChange={handleViewChange}/>
       </div>
 
-      <div className="notes-editor-container" data-page={noteId === undefined ? "notes" : "editor"}>
-        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.NoteID}/>
+      <div className={editorClassName} data-page={noteId === undefined ? "notes" : "editor"}>
+        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.NoteID} isFloating={noteId !== undefined && selectedView === "grid"} />
       </div>
 
       <MobileNavbar />

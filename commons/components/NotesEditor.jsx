@@ -1,8 +1,9 @@
 import { h, useState, useRef, useEffect } from '../../dependencies/preact.esm.js';
 import ApiClient from '../http/ApiClient.js';
 import NotesEditorTags from './NotesEditorTags.jsx';
+import renderMarkdown from '../utils/renderMarkdown.js';
 
-export default function NotesEditor({ selectedNote, isNewNote }) {
+export default function NotesEditor({ selectedNote, isNewNote, isFloating }) {
   if (!isNewNote && selectedNote === null) {
     return null;
   }
@@ -31,6 +32,13 @@ export default function NotesEditor({ selectedNote, isNewNote }) {
           handleSaveClick();
         } else {
           handleEditClick();
+        }
+      }
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (isFloating) {
+          handleCloseClick();
         }
       }
     }
@@ -145,6 +153,11 @@ export default function NotesEditor({ selectedNote, isNewNote }) {
     }
   }
 
+  function handleCloseClick() {
+    window.history.pushState({}, "", "/");
+    window.dispatchEvent(new PopStateEvent("navigate"));
+  }
+
   function uploadImage(file) {
     const formData = new FormData();
     formData.append('image', file);
@@ -210,7 +223,7 @@ export default function NotesEditor({ selectedNote, isNewNote }) {
     <div className={`notes-editor ${isEditable ? "is-editable" : ""}`} tabIndex="0" onPaste={handlePaste}>
       <div className="notes-editor-header">
         <div className="notes-editor-title" contentEditable={isEditable} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
-        <Toolbar isEditable={isEditable} onSaveClick={handleSaveClick} onEditClick={handleEditClick} />
+        <Toolbar isEditable={isEditable} isFloating={isFloating} onSaveClick={handleSaveClick} onEditClick={handleEditClick} onCloseClick={handleCloseClick} />
       </div>
       <NotesEditorTags tags={tags} isEditable={isEditable} onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
       <div className={`notes-editor-image-dropzone ${isDraggingOver ? "dragover" : ""}`} onDrop={handleImageDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}>
@@ -224,47 +237,28 @@ export default function NotesEditor({ selectedNote, isNewNote }) {
   );
 }
 
-function Toolbar({ isEditable, onSaveClick, onEditClick }) {
+function Toolbar({ isEditable, isFloating, onSaveClick, onEditClick, onCloseClick }) {
+  const actions = []
+
+  if (isFloating) {
+    actions.push(
+      <CloseIcon className="notes-editor-toolbar-button-close" onClick={() => window.history.back()} />
+    );
+  }
+
   if (isEditable) {
-    return (
-      <div className="notes-editor-toolbar">
-        <CheckIcon className="notes-editor-toolbar-button-done" onClick={onSaveClick} />
-      </div>
+    actions.push(
+      <CheckIcon className="notes-editor-toolbar-button-done" onClick={onSaveClick} />
+    );
+  } else {
+    actions.push(
+      <PencilIcon className="notes-editor-toolbar-button-edit" onClick={onEditClick} />
     );
   }
 
   return (
-    <div className="notes-editor-toolbar">
-      <PencilIcon className="notes-editor-toolbar-button-edit" onClick={onEditClick} />
-    </div>
+    <div className="notes-editor-toolbar">{actions}</div>
   );
-}
-
-
-// TODO: move this to a separate file
-function renderMarkdown(text) {
-  const md = window.markdownit({
-    linkify: true,
-    breaks: true,
-    highlight: function (str, lang) {
-      if (lang && window.hljs.getLanguage(lang)) {
-        try {
-          return window.hljs.highlight(lang, str).value;
-        } catch (__) { }
-      }
-      return '';
-    }
-  });
-  // https://github.com/markdown-it/markdown-it/blob/master/docs/architecture.md#renderer
-  var defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
-    return self.renderToken(tokens, idx, options);
-  };
-  md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
-    tokens[idx].attrSet('target', '_blank');
-    return defaultRender(tokens, idx, options, env, self);
-  };
-
-  return md.render(text);
 }
 
 const CloseIcon = ({ className, onClick }) => (

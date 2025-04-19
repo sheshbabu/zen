@@ -1,19 +1,12 @@
 import { h } from '../../dependencies/preact.esm.js';
 
-function NotesListToolbar() {
-  const setListViewPreference = (view) => {
-    document.cookie = `listViewPreference=${view}; path=/; max-age=31536000`;
-    if (window.zen) {
-      window.zen.setListViewPreference(view);
-    }
-  };
-
+export default function NotesListToolbar({ onListViewClick, onGridViewClick }) {
   return (
     <div className="notes-list-toolbar">
-      <div onClick={() => setListViewPreference('list')}>
+      <div onClick={() => onListViewClick()}>
         <ListViewIcon />
       </div>
-      <div onClick={() => setListViewPreference('grid')}>
+      <div onClick={() => onGridViewClick()}>
         <GridViewIcon />
       </div>
     </div>
@@ -62,5 +55,3 @@ function GridViewIcon() {
     </svg>
   );
 }
-
-export default NotesListToolbar;

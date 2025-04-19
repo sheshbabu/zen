@@ -1,14 +1,23 @@
 import { h } from '../../dependencies/preact.esm.js';
 import NotesListToolbar from './NotesListToolbar.jsx';
 import Link from './Link.jsx';
+import renderMarkdown from '../utils/renderMarkdown.js';
 
-export default function NotesList({ notes = [] }) {
-  const items = notes.map(note => <NotesListItem note={note} key={note.NoteID} />);
+export default function NotesList({ notes = [], view, onViewChange }) {
+  let containerClassName = "notes-list-fragment";
+  let listClassName = "notes-list";
+  let items = notes.map(note => <NotesListItem note={note} key={note.NoteID} />);
+
+  if (view === "grid") {
+    containerClassName = "notes-grid-fragment";
+    listClassName = "notes-grid";
+    items = notes.map(note => <NotesGridItem note={note} key={note.NoteID} />);
+  }
 
   return (
-    <div className="notes-list-fragment">
-      <NotesListToolbar />
-      <div className="notes-list">
+    <div className={containerClassName}>
+      <NotesListToolbar onListViewClick={() => onViewChange("list")} onGridViewClick={() => onViewChange("grid")}/>
+      <div className={listClassName}>
         {items}
         <EmptyList notes={notes} />
       </div>
@@ -39,6 +48,24 @@ function NotesListItem({ note }) {
   );
 }
 
+function NotesGridItem({ note }) {
+  const link = `/${note.NoteID}`;
+  let title = <div className="notes-grid-item-title">{note.Title}</div>
+
+  if (note.Title === "") {
+    title = null;
+  }
+
+  return (
+    <div className="notes-grid-item">
+      <Link to={link}>
+        {title}
+        <div className="notes-grid-item-content"  dangerouslySetInnerHTML={{ __html: renderMarkdown(note.Snippet) }}/>
+      </Link>
+    </div>
+  );
+}
+
 function EmptyList({ notes }) {
   if (notes.length > 0) {
     return null;
@@ -46,5 +73,3 @@ function EmptyList({ notes }) {
 
   return <div className="notes-list-empty-text">No notes found</div>
 }
-
-
