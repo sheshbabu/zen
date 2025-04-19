@@ -1,8 +1,8 @@
-import { h, useState, useRef, useEffect } from '../../dependencies/preact.esm.js';
-import ApiClient from '../http/ApiClient.js';
-import NotesEditorTags from './NotesEditorTags.jsx';
-import renderMarkdown from '../utils/renderMarkdown.js';
-import navigateTo from '../utils/navigateTo.js';
+import { h, useState, useRef, useEffect } from "../../assets/preact.esm.js"
+import ApiClient from '../../commons/http/ApiClient.js';
+import NotesEditorTags from "../tags/NotesEditorTags.jsx";
+import renderMarkdown from '../../commons/utils/renderMarkdown.js';
+import navigateTo from '../../commons/utils/navigateTo.js';
 
 export default function NotesEditor({ selectedNote, isNewNote, isFloating, onSave }) {
   if (!isNewNote && selectedNote === null) {

@@ -1,7 +1,7 @@
-import { h } from '../../dependencies/preact.esm.js';
+import { h } from "../../assets/preact.esm.js"
 import NotesListToolbar from './NotesListToolbar.jsx';
-import Link from './Link.jsx';
-import renderMarkdown from '../utils/renderMarkdown.js';
+import Link from '../../commons/components/Link.jsx';
+import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 
 export default function NotesList({ notes = [], view, onViewChange }) {
   let containerClassName = "notes-list-fragment";

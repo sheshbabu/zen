@@ -1,4 +1,4 @@
-import { h, useState, render } from '../../dependencies/preact.esm.js';
+import { h, useState, render } from "../../assets/preact.esm.js"
 import FocusDialog from './FocusDialog.jsx';
 
 export default function FocusSwitcher({ focusModes }) {

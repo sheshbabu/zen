@@ -1,10 +1,10 @@
-import { h, useState, useEffect } from '../../dependencies/preact.esm.js';
-import Sidebar from './Sidebar.jsx';
+import { h, useState, useEffect } from "../../assets/preact.esm.js"
+import Sidebar from '../../commons/components/Sidebar.jsx';
 import NotesList from './NotesList.jsx';
 import NotesEditor from './NotesEditor.jsx';
-import MobileNavbar from './MobileNavbar.jsx';
-import ApiClient from "../http/ApiClient.js";
-import useSearchParams from "./useSearchParams.jsx";
+import MobileNavbar from '../../commons/components/MobileNavbar.jsx';
+import ApiClient from "../../commons/http/ApiClient.js";
+import useSearchParams from "../../commons/components/useSearchParams.jsx";
 
 export default function NotesPage({ noteId }) {
   const [notes, setNotes] = useState([]);

@@ -1,4 +1,4 @@
-import { h, useState, useEffect } from '../../dependencies/preact.esm.js';
+import { h, useState, useEffect } from '../../assets/preact.esm.js';
 
 export default function useSearchParams() {
   const [searchParams, setSearchParams] = useState(new URLSearchParams(window.location.search));

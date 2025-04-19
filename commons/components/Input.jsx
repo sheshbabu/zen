@@ -1,4 +1,4 @@
-import { h } from '../../dependencies/preact.esm.js';
+import { h } from '../../assets/preact.esm.js';
 
 export default function Input({ id, label, type, placeholder, value, hint, error, isDisabled }) {
   return (

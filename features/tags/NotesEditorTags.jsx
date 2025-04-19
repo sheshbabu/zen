@@ -1,5 +1,5 @@
-import { h, Fragment, useState } from '../../dependencies/preact.esm.js';
-import ApiClient from '../http/ApiClient.js';
+import { h, Fragment, useState } from "../../assets/preact.esm.js"
+import ApiClient from '../../commons/http/ApiClient.js';
 
 export default function NotesEditorTags({ tags, isEditable, onAddTag, onRemoveTag }) {
   const [query, setQuery] = useState("");

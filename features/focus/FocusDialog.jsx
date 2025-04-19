@@ -1,5 +1,5 @@
-import { h } from '../../dependencies/preact.esm.js';
-import Input from './Input.jsx';
+import { h } from "../../assets/preact.esm.js"
+import Input from "../../commons/components/Input.jsx";
 
 export default function FocusDialog({ onCloseClick }) {
   return (

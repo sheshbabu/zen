@@ -1,7 +1,7 @@
-import { h, render } from './dependencies/preact.esm.js';
+import { h, render } from './assets/preact.esm.js';
 import Router from './commons/components/Router.jsx';
 import Route from './commons/components/Route.jsx';
-import NotesPage from './commons/components/NotesPage.jsx';
+import NotesPage from "./features/notes/NotesPage.jsx";
 import navigateTo from './commons/utils/navigateTo.js';
 
 document.addEventListener('DOMContentLoaded', () => {

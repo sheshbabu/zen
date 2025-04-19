@@ -1,7 +1,7 @@
-import { h } from '../../dependencies/preact.esm.js';
-import SidebarTagsList from './SidebarTagsList.jsx';
+import { h } from "../../assets/preact.esm.js"
 import Link from './Link.jsx';
-import FocusSwitcher from './FocusSwitcher.jsx';
+import SidebarTagsList from "../../features/tags/SidebarTagsList.jsx";
+import FocusSwitcher from "../../features/focus/FocusSwitcher.jsx";
 
 export default function Sidebar({ focusModes, tags }) {
   return (

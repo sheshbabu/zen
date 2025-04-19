@@ -1,4 +1,4 @@
-import { h } from '../../dependencies/preact.esm.js';
+import { h } from '../../assets/preact.esm.js';
 import navigateTo from '../utils/navigateTo.js';
 
 export default function Link({ to, shouldPreserveSearchParams, children, className }) {

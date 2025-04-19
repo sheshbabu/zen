@@ -1,5 +1,5 @@
-import { h } from '../../dependencies/preact.esm.js';
-import Link from "./Link.jsx"
+import { h } from "../../assets/preact.esm.js"
+import Link from "../../commons/components/Link.jsx"
 
 function SidebarTagsList({ tags = [] }) {
   return (

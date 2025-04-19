@@ -1,4 +1,4 @@
-import { h } from '../../dependencies/preact.esm.js';
+import { h } from '../../assets/preact.esm.js';
 import Link from './Link.jsx';
 
 export default function MobileNavbar() {

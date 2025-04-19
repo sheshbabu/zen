@@ -1,4 +1,4 @@
-import { h, useEffect, useState } from '../../dependencies/preact.esm.js';
+import { h, useEffect, useState } from '../../assets/preact.esm.js';
 
 export default function Router({ children }) {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
