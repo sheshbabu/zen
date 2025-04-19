@@ -74,17 +74,6 @@ func GetNoteByID(noteID int) (Note, error) {
 	return note, nil
 }
 
-func CreateEmptyNote() (Note, error) {
-	note, err := CreateNote(Note{})
-	if err != nil {
-		err = fmt.Errorf("error creating empty note: %w", err)
-		slog.Error(err.Error())
-		return note, err
-	}
-
-	return note, nil
-}
-
 func CreateNote(note Note) (Note, error) {
 	tx, err := sqlite.DB.Begin()
 

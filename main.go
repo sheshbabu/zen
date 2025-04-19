@@ -56,21 +56,21 @@ func main() {
 func newRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /api/notes", notes.HandleGetNotes)
-	mux.HandleFunc("GET /api/notes/{note_id}", notes.HandleGetNote)
-	mux.HandleFunc("PUT /api/notes/{note_id}", notes.HandleUpdateNote)
+	mux.HandleFunc("GET /api/notes/", notes.HandleGetNotes)
+	mux.HandleFunc("GET /api/notes/{note_id}/", notes.HandleGetNote)
+	mux.HandleFunc("PUT /api/notes/{note_id}/", notes.HandleUpdateNote)
 	mux.HandleFunc("POST /api/notes/", notes.HandleCreateNote)
 
-	mux.HandleFunc("GET /api/tags", tags.HandleGetTags)
-	mux.HandleFunc("POST /api/tags", tags.HandleCreateTag)
-	mux.HandleFunc("DELETE /api/tags/{tag_id}", tags.HandleDeleteTag)
+	mux.HandleFunc("GET /api/tags/", tags.HandleGetTags)
+	mux.HandleFunc("POST /api/tags/", tags.HandleCreateTag)
+	mux.HandleFunc("DELETE /api/tags/{tag_id}/", tags.HandleDeleteTag)
 
 	mux.HandleFunc("GET /api/focus/", focus.HandleGetAllFocusModes)
 
 	mux.HandleFunc("POST /api/images/", images.HandleUploadImage)
 
 	mux.HandleFunc("GET /assets/", handleStaticAssets)
-	mux.HandleFunc("GET /images/", HandleUploadedImages)
+	mux.HandleFunc("GET /images/", handleUploadedImages)
 	mux.HandleFunc("GET /", handleStaticAssets)
 
 	return mux
@@ -91,6 +91,6 @@ func handleStaticAssets(w http.ResponseWriter, r *http.Request) {
 	http.StripPrefix("/", http.FileServer(fs)).ServeHTTP(w, r)
 }
 
-func HandleUploadedImages(w http.ResponseWriter, r *http.Request) {
+func handleUploadedImages(w http.ResponseWriter, r *http.Request) {
 	http.StripPrefix("/images/", http.FileServer(http.Dir("images"))).ServeHTTP(w, r)
 }
