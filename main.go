@@ -7,14 +7,11 @@ import (
 	"os"
 	"strings"
 	"zen/commons/sqlite"
-	"zen/commons/templates"
+	"zen/features/focus"
 	"zen/features/images"
 	"zen/features/notes"
 	"zen/features/tags"
 )
-
-//go:embed all:commons all:features
-var resources embed.FS
 
 //go:embed assets/*
 var assets embed.FS
@@ -43,8 +40,6 @@ func main() {
 
 	sqlite.Migrate(migrations)
 
-	templates.NewTemplates(resources)
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -61,42 +56,21 @@ func main() {
 func newRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /assets/", handleStaticAssets)
-
-	// mux.HandleFunc("GET /", notes.HandleNotesPage)
-	// mux.HandleFunc("GET /notes/", notes.HandleNotesPage)
-	// mux.HandleFunc("GET /notes/{note_id}", notes.HandleNotesPage)
-
-	// mux.HandleFunc("PUT /notes/{note_id}", notes.HandleUpdateNote)
-	// mux.HandleFunc("POST /notes/", notes.HandleCreateNote)
-
-	// mux.HandleFunc("GET /tags/", tags.HandleTags)
-	// mux.HandleFunc("POST /tags/", tags.HandleCreateTag)
-	// mux.HandleFunc("DELETE /tags/{tag_id}", tags.HandleDeleteTag)
-
-	// mux.HandleFunc("PUT /notes/{note_id}/tags", tags.HandleUpdateNoteTags)
-
-	mux.HandleFunc("GET /images/", HandleUploadedImages)
-	// mux.HandleFunc("POST /images/", images.HandleUploadImage)
-
-	// mux.HandleFunc("GET /focus/{focus_id}", focus.HandleFocusDialog)
-	// mux.HandleFunc("GET /focus/{focus_id}/tags", focus.HandleUpdateFocusTags)
-	// mux.HandleFunc("PUT /focus/{focus_id}", focus.HandleUpdateFocus)
-	// mux.HandleFunc("POST /focus/{focus_id}", focus.HandleCreateFocus)
-
 	mux.HandleFunc("GET /api/notes", notes.HandleGetNotes)
 	mux.HandleFunc("GET /api/notes/{note_id}", notes.HandleGetNote)
-	mux.HandleFunc("PUT /api/notes/{note_id}", notes.HandleUpdateNoteV2)
-	mux.HandleFunc("POST /api/notes/", notes.HandleCreateNoteV2)
+	mux.HandleFunc("PUT /api/notes/{note_id}", notes.HandleUpdateNote)
+	mux.HandleFunc("POST /api/notes/", notes.HandleCreateNote)
 
 	mux.HandleFunc("GET /api/tags", tags.HandleGetTags)
-	mux.HandleFunc("POST /api/tags", tags.HandleCreateTagV2)
-	mux.HandleFunc("DELETE /api/tags/{tag_id}", tags.HandleDeleteTagV2)
+	mux.HandleFunc("POST /api/tags", tags.HandleCreateTag)
+	mux.HandleFunc("DELETE /api/tags/{tag_id}", tags.HandleDeleteTag)
 
-	mux.HandleFunc("GET /api/focus/", notes.HandleGetAllFocusModesV2)
+	mux.HandleFunc("GET /api/focus/", focus.HandleGetAllFocusModesV2)
 
 	mux.HandleFunc("POST /api/images/", images.HandleUploadImage)
 
+	mux.HandleFunc("GET /assets/", handleStaticAssets)
+	mux.HandleFunc("GET /images/", HandleUploadedImages)
 	mux.HandleFunc("GET /", handleStaticAssets)
 
 	return mux
