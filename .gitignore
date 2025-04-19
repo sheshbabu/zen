@@ -4,3 +4,4 @@
 *.bak
 /tmp
 /images
+/assets/bundle.js
