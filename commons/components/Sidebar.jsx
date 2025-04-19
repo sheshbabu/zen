@@ -8,11 +8,11 @@ export default function Sidebar({ focusModes, tags }) {
     <div>
       <FocusSwitcher focusModes={focusModes}/>
 
-      <Link className="sidebar-button" to="/new">
+      <Link className="sidebar-button" to="/notes/new">
         <NewNoteIcon />
         New
       </Link>
-      <Link className="sidebar-button" to="/">
+      <Link className="sidebar-button" to="/notes/">
         <NotesIcon />
         Notes
       </Link>

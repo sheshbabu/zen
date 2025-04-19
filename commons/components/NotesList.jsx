@@ -26,7 +26,7 @@ export default function NotesList({ notes = [], view, onViewChange }) {
 }
 
 function NotesListItem({ note }) {
-  const link = `/${note.NoteID}`;
+  const link = `/notes/${note.NoteID}`;
   const updatedAt = new Date(note.UpdatedAt).toISOString().split('T')[0].replace(/-/g, '/');
   const tags = note.Tags?.map(tag => <div className="notes-list-item-subtext" key={tag.name}>{tag.name}</div>);
   let title = <div className="notes-list-item-title">{note.Title}</div>
@@ -49,7 +49,7 @@ function NotesListItem({ note }) {
 }
 
 function NotesGridItem({ note }) {
-  const link = `/${note.NoteID}`;
+  const link = `/notes/${note.NoteID}`;
   let title = <div className="notes-grid-item-title">{note.Title}</div>
 
   if (note.Title === "") {

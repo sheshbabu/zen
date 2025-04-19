@@ -23,7 +23,8 @@ function App() {
   return (
     <Router>
       <Route path="/" component={NotesPage} />
-      <Route path="/:noteId" component={NotesPage} />
+      <Route path="/notes/" component={NotesPage} />
+      <Route path="/notes/:noteId" component={NotesPage} />
     </Router>
   );
 }

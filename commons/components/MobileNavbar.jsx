@@ -5,15 +5,15 @@ export default function MobileNavbar() {
   return (
     <div className="mobile-navbar-container">
       <div className="mobile-navbar">
-        <Link className="mobile-navbar-button" to="/">
+        <Link className="mobile-navbar-button" to="/notes/">
           <NotesIcon />
           Notes
         </Link>
-        <Link className="mobile-navbar-button" to="/">
+        <Link className="mobile-navbar-button" to="/notes/">
           <SearchIcon />
           Search
         </Link>
-        <Link className="mobile-navbar-button" to="/new">
+        <Link className="mobile-navbar-button" to="/notes/new">
           <NewIcon />
           New
         </Link>

@@ -6,7 +6,7 @@ function SidebarTagsList({ tags = [] }) {
     <div>
       <div className="sidebar-section-title">Tags</div>
       {tags.map(tag => (
-        <Link key={tag.tag_id} to={`/?tag_id=${tag.tag_id}`}>{tag.name}</Link>
+        <Link key={tag.tag_id} to={`/notes/?tag_id=${tag.tag_id}`}>{tag.name}</Link>
       ))}
     </div>
   );

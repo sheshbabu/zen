@@ -857,7 +857,7 @@
 
   // commons/components/SidebarTagsList.jsx
   function SidebarTagsList({ tags = [] }) {
-    return /* @__PURE__ */ dt("div", null, /* @__PURE__ */ dt("div", { className: "sidebar-section-title" }, "Tags"), tags.map((tag) => /* @__PURE__ */ dt(Link, { key: tag.tag_id, to: `/?tag_id=${tag.tag_id}` }, tag.name)));
+    return /* @__PURE__ */ dt("div", null, /* @__PURE__ */ dt("div", { className: "sidebar-section-title" }, "Tags"), tags.map((tag) => /* @__PURE__ */ dt(Link, { key: tag.tag_id, to: `/notes/?tag_id=${tag.tag_id}` }, tag.name)));
   }
   var SidebarTagsList_default = SidebarTagsList;
 
@@ -890,7 +890,7 @@
 
   // commons/components/Sidebar.jsx
   function Sidebar({ focusModes, tags }) {
-    return /* @__PURE__ */ dt("div", null, /* @__PURE__ */ dt(FocusSwitcher, { focusModes }), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/new" }, /* @__PURE__ */ dt(NewNoteIcon, null), "New"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(NotesIcon, null), "Notes"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(BoardIcon, null), "Boards"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(SearchIcon, null), "Search"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(SettingsIcon, null), "Settings"), /* @__PURE__ */ dt("div", { className: "sidebar-section" }, /* @__PURE__ */ dt(SidebarTagsList_default, { tags })));
+    return /* @__PURE__ */ dt("div", null, /* @__PURE__ */ dt(FocusSwitcher, { focusModes }), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/notes/new" }, /* @__PURE__ */ dt(NewNoteIcon, null), "New"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/notes/" }, /* @__PURE__ */ dt(NotesIcon, null), "Notes"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(BoardIcon, null), "Boards"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(SearchIcon, null), "Search"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(SettingsIcon, null), "Settings"), /* @__PURE__ */ dt("div", { className: "sidebar-section" }, /* @__PURE__ */ dt(SidebarTagsList_default, { tags })));
   }
   function NewNoteIcon() {
     return /* @__PURE__ */ dt(
@@ -1081,7 +1081,7 @@
     return /* @__PURE__ */ dt("div", { className: containerClassName }, /* @__PURE__ */ dt(NotesListToolbar, { onListViewClick: () => onViewChange("list"), onGridViewClick: () => onViewChange("grid") }), /* @__PURE__ */ dt("div", { className: listClassName }, items, /* @__PURE__ */ dt(EmptyList, { notes })));
   }
   function NotesListItem({ note }) {
-    const link = `/${note.NoteID}`;
+    const link = `/notes/${note.NoteID}`;
     const updatedAt = new Date(note.UpdatedAt).toISOString().split("T")[0].replace(/-/g, "/");
     const tags = note.Tags?.map((tag) => /* @__PURE__ */ dt("div", { className: "notes-list-item-subtext", key: tag.name }, tag.name));
     let title = /* @__PURE__ */ dt("div", { className: "notes-list-item-title" }, note.Title);
@@ -1091,7 +1091,7 @@
     return /* @__PURE__ */ dt("div", { className: "notes-list-item" }, /* @__PURE__ */ dt(Link, { to: link }, title, /* @__PURE__ */ dt("div", { className: "notes-list-item-subcontainer" }, /* @__PURE__ */ dt("div", { className: "notes-list-item-subtext" }, updatedAt), /* @__PURE__ */ dt("div", { className: "notes-list-item-tags" }, tags))));
   }
   function NotesGridItem({ note }) {
-    const link = `/${note.NoteID}`;
+    const link = `/notes/${note.NoteID}`;
     let title = /* @__PURE__ */ dt("div", { className: "notes-grid-item-title" }, note.Title);
     if (note.Title === "") {
       title = null;
@@ -1485,7 +1485,7 @@
 
   // commons/components/MobileNavbar.jsx
   function MobileNavbar() {
-    return /* @__PURE__ */ dt("div", { className: "mobile-navbar-container" }, /* @__PURE__ */ dt("div", { className: "mobile-navbar" }, /* @__PURE__ */ dt(Link, { className: "mobile-navbar-button", to: "/" }, /* @__PURE__ */ dt(NotesIcon2, null), "Notes"), /* @__PURE__ */ dt(Link, { className: "mobile-navbar-button", to: "/" }, /* @__PURE__ */ dt(SearchIcon2, null), "Search"), /* @__PURE__ */ dt(Link, { className: "mobile-navbar-button", to: "/new" }, /* @__PURE__ */ dt(NewIcon, null), "New")));
+    return /* @__PURE__ */ dt("div", { className: "mobile-navbar-container" }, /* @__PURE__ */ dt("div", { className: "mobile-navbar" }, /* @__PURE__ */ dt(Link, { className: "mobile-navbar-button", to: "/notes/" }, /* @__PURE__ */ dt(NotesIcon2, null), "Notes"), /* @__PURE__ */ dt(Link, { className: "mobile-navbar-button", to: "/notes/" }, /* @__PURE__ */ dt(SearchIcon2, null), "Search"), /* @__PURE__ */ dt(Link, { className: "mobile-navbar-button", to: "/notes/new" }, /* @__PURE__ */ dt(NewIcon, null), "New")));
   }
   function NotesIcon2() {
     return /* @__PURE__ */ dt(
@@ -1665,6 +1665,6 @@
     }
   });
   function App() {
-    return /* @__PURE__ */ dt(Router, null, /* @__PURE__ */ dt(Route, { path: "/", component: NotesPage }), /* @__PURE__ */ dt(Route, { path: "/:noteId", component: NotesPage }));
+    return /* @__PURE__ */ dt(Router, null, /* @__PURE__ */ dt(Route, { path: "/", component: NotesPage }), /* @__PURE__ */ dt(Route, { path: "/notes/", component: NotesPage }), /* @__PURE__ */ dt(Route, { path: "/notes/:noteId", component: NotesPage }));
   }
 })();
