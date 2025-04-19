@@ -1,5 +1,4 @@
 import { h, useState, useEffect } from '../../dependencies/preact.esm.js';
-import { useAppContext } from '../../AppContext.jsx';
 import Sidebar from './Sidebar.jsx';
 import NotesList from './NotesList.jsx';
 import NotesEditor from './NotesEditor.jsx';
@@ -8,10 +7,9 @@ import ApiClient from "../http/ApiClient.js";
 import useSearchParams from "./useSearchParams.jsx";
 
 export default function NotesPage({ noteId }) {
-  const { appContext } = useAppContext();
-  const { focusModes, tags } = appContext;
-
   const [notes, setNotes] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [focusModes, setFocusModes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
   const [selectedView, setSelectedView] = useState("list"); // "list" || "grid"
 
@@ -23,23 +21,13 @@ export default function NotesPage({ noteId }) {
   let editorClassName = "notes-editor-container";
 
   useEffect(() => {
-    let promise = null;
+    refreshNotes();
+    refreshTags();
+    refreshFocusModes();
+  }, []);
 
-    if (selectedTagId) {
-      promise = ApiClient.getNotesByTagId(selectedTagId);
-    // } else if (selectedFocusId) {
-    //   promise = ApiClient.getNotesByFocusId(selectedFocusId);
-    } else {
-      promise = ApiClient.getAllNotes();
-    }
-    
-    promise
-      .then(notes => {
-        setNotes(notes);
-      })
-      .catch(error => {
-        console.error('Error loading notes:', error);
-      });
+  useEffect(() => {
+    refreshNotes();
   }, [selectedTagId, selectedFocusId]);
 
   // TODO: Move this to NotesEditor
@@ -66,6 +54,46 @@ export default function NotesPage({ noteId }) {
     }
 
   }, [noteId, notes]);
+
+  function refreshNotes() {
+    let promise = null;
+
+    if (selectedTagId) {
+      promise = ApiClient.getNotesByTagId(selectedTagId);
+    // } else if (selectedFocusId) {
+    //   promise = ApiClient.getNotesByFocusId(selectedFocusId);
+    } else {
+      promise = ApiClient.getAllNotes();
+    }
+    
+    promise
+      .then(notes => {
+        setNotes(notes);
+      })
+      .catch(error => {
+        console.error('Error loading notes:', error);
+      });
+  }
+
+  function refreshTags() {
+    ApiClient.getAllTags()
+      .then(tags => {
+        setTags(tags);
+      })
+      .catch(error => {
+        console.error('Error loading tags:', error);
+      });
+  }
+
+  function refreshFocusModes() {
+    ApiClient.getAllFocusModes()
+      .then(focusModes => {
+        setFocusModes(focusModes);
+      })
+      .catch(error => {
+        console.error('Error loading focus modes:', error);
+      });
+  }
 
   function handleViewChange(newView) {
     setSelectedView(newView);

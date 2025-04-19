@@ -1,16 +1,12 @@
 import { h } from '../../dependencies/preact.esm.js';
-import { useAppContext } from '../../AppContext.jsx';
 import SidebarTagsList from './SidebarTagsList.jsx';
 import Link from './Link.jsx';
 import FocusSwitcher from './FocusSwitcher.jsx';
 
-export default function Sidebar() {
-  const { appContext } = useAppContext();
-  const { tags } = appContext;
-
+export default function Sidebar({ focusModes, tags }) {
   return (
     <div>
-      <FocusSwitcher/>
+      <FocusSwitcher focusModes={focusModes}/>
 
       <Link className="sidebar-button" to="/new">
         <NewNoteIcon />

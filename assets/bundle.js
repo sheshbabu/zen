@@ -239,29 +239,6 @@
     var i, _, r, o;
     t == document && (t = document.documentElement), p.__ && p.__(e, t), _ = (i = typeof n == "function") ? null : n && n.__k || t.__k, r = [], o = [], mt(t, e = (!i && n || t).__k = dt(O, null, [e]), _ || I, I, t.namespaceURI, !i && n ? [n] : _ ? null : t.firstChild ? Z.call(t.childNodes) : null, r, !i && n ? n : _ ? _.__e : t.firstChild, i, o), Rt(r, e, o);
   }
-  function ge(e, t) {
-    var n = { __c: t = "__cC" + Tt++, __: e, Consumer: function(i, _) {
-      return i.children(_);
-    }, Provider: function(i) {
-      var _, r;
-      return this.getChildContext || (_ = /* @__PURE__ */ new Set(), (r = {})[t] = this, this.getChildContext = function() {
-        return r;
-      }, this.componentWillUnmount = function() {
-        _ = null;
-      }, this.shouldComponentUpdate = function(o) {
-        this.props.value !== o.value && _.forEach(function(f) {
-          f.__e = true, at(f);
-        });
-      }, this.sub = function(o) {
-        _.add(o);
-        var f = o.componentWillUnmount;
-        o.componentWillUnmount = function() {
-          _ && _.delete(o), f && f.call(o);
-        };
-      }), i.children;
-    } };
-    return n.Provider.__ = n.Consumer.contextType = n;
-  }
   Z = Mt.slice, p = { __e: function(e, t, n, i) {
     for (var _, r, o; t = t.__; ) if ((_ = t.__c) && !_.__) try {
       if ((r = _.constructor) && r.getDerivedStateFromError != null && (_.setState(r.getDerivedStateFromError(e)), o = _.__d), _.componentDidCatch != null && (_.componentDidCatch(e, i || {}), o = _.__d), o) return _.__E = _;
@@ -346,10 +323,6 @@
   function F(e, t) {
     var n = A(C++, 7);
     return kt(n.__H, t) && (n.__ = e(), n.__H = t, n.__h = e), n.__;
-  }
-  function ke(e) {
-    var t = v.context[e.__c], n = A(C++, 9);
-    return n.c = e, t ? (n.__ == null && (n.__ = true, t.sub(v)), t.props.value) : e.__;
   }
   function Ce() {
     for (var e; e = Kt.shift(); ) if (e.__P && e.__H) try {
@@ -822,87 +795,6 @@
   }
   var Ye = ae.bind(dt);
 
-  // AppContext.jsx
-  var defaultAppContext = {
-    focusModes: [],
-    tags: [],
-    notes: []
-  };
-  var AppContext = ge(null);
-  function AppProvider({ children }) {
-    const [appContext, setAppContext] = Qt(defaultAppContext);
-    const updateAppContext = (newState) => {
-      setAppContext((prevState) => ({
-        ...prevState,
-        ...newState
-      }));
-    };
-    return /* @__PURE__ */ dt(AppContext.Provider, { value: { appContext, updateAppContext } }, children);
-  }
-  var useAppContext = () => {
-    const context = ke(AppContext);
-    if (!context) {
-      throw new Error("useAppContext must be used within an AppProvider");
-    }
-    return context;
-  };
-
-  // commons/http/ApiClient.js
-  async function request(method, url, payload) {
-    const options = {
-      method,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    };
-    const response = await fetch(url, options);
-    return await response.json();
-  }
-  async function getAllFocusModes() {
-    return await request("GET", "/api/focus");
-  }
-  async function createFocusMode() {
-    return await request("POST", "/api/focus/new");
-  }
-  async function getAllNotes() {
-    return await request("GET", "/api/notes");
-  }
-  async function getNoteById(noteId) {
-    return await request("GET", `/api/notes/${noteId}`);
-  }
-  async function getNotesByTagId(tagId) {
-    return await request("GET", `/api/notes?tag_id=${tagId}`);
-  }
-  async function createNote(note) {
-    return await request("POST", "/api/notes/", note);
-  }
-  async function updateNote(noteId, note) {
-    return await request("PUT", `/api/notes/${noteId}`, note);
-  }
-  async function getAllTags() {
-    return await request("GET", "/api/tags");
-  }
-  async function searchTags(query) {
-    return await request("GET", `/api/tags?query=${query}`);
-  }
-  async function uploadImage(formData) {
-    return await request("POST", "/api/images/", formData);
-  }
-  var ApiClient_default = {
-    request,
-    getAllFocusModes,
-    createFocusMode,
-    getAllNotes,
-    getNoteById,
-    getNotesByTagId,
-    createNote,
-    updateNote,
-    getAllTags,
-    searchTags,
-    uploadImage
-  };
-
   // commons/components/Router.jsx
   function Router({ children }) {
     const [currentPath, setCurrentPath] = Qt(window.location.pathname);
@@ -976,9 +868,7 @@
   var CloseIcon = ({ className, onClick }) => /* @__PURE__ */ dt("svg", { onClick, xmlns: "http://www.w3.org/2000/svg", width: "24", height: "24", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", className: `lucide lucide-x ${className}` }, /* @__PURE__ */ dt("path", { d: "M18 6 6 18" }), /* @__PURE__ */ dt("path", { d: "m6 6 12 12" }));
 
   // commons/components/FocusSwitcher.jsx
-  function FocusSwitcher() {
-    const { appContext } = useAppContext();
-    const { focusModes } = appContext;
+  function FocusSwitcher({ focusModes }) {
     const [isDropdownOpen, setIsDropdownOpen] = Qt(false);
     function handleDropdownClick() {
       setIsDropdownOpen((prevIsDropdownOpen) => !prevIsDropdownOpen);
@@ -999,10 +889,8 @@
   }
 
   // commons/components/Sidebar.jsx
-  function Sidebar() {
-    const { appContext } = useAppContext();
-    const { tags } = appContext;
-    return /* @__PURE__ */ dt("div", null, /* @__PURE__ */ dt(FocusSwitcher, null), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/new" }, /* @__PURE__ */ dt(NewNoteIcon, null), "New"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(NotesIcon, null), "Notes"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(BoardIcon, null), "Boards"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(SearchIcon, null), "Search"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(SettingsIcon, null), "Settings"), /* @__PURE__ */ dt("div", { className: "sidebar-section" }, /* @__PURE__ */ dt(SidebarTagsList_default, { tags })));
+  function Sidebar({ focusModes, tags }) {
+    return /* @__PURE__ */ dt("div", null, /* @__PURE__ */ dt(FocusSwitcher, { focusModes }), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/new" }, /* @__PURE__ */ dt(NewNoteIcon, null), "New"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(NotesIcon, null), "Notes"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(BoardIcon, null), "Boards"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(SearchIcon, null), "Search"), /* @__PURE__ */ dt(Link, { className: "sidebar-button", to: "/" }, /* @__PURE__ */ dt(SettingsIcon, null), "Settings"), /* @__PURE__ */ dt("div", { className: "sidebar-section" }, /* @__PURE__ */ dt(SidebarTagsList_default, { tags })));
   }
   function NewNoteIcon() {
     return /* @__PURE__ */ dt(
@@ -1216,6 +1104,62 @@
     }
     return /* @__PURE__ */ dt("div", { className: "notes-list-empty-text" }, "No notes found");
   }
+
+  // commons/http/ApiClient.js
+  async function request(method, url, payload) {
+    const options = {
+      method,
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    };
+    const response = await fetch(url, options);
+    return await response.json();
+  }
+  async function getAllFocusModes() {
+    return await request("GET", "/api/focus");
+  }
+  async function createFocusMode() {
+    return await request("POST", "/api/focus/new");
+  }
+  async function getAllNotes() {
+    return await request("GET", "/api/notes");
+  }
+  async function getNoteById(noteId) {
+    return await request("GET", `/api/notes/${noteId}`);
+  }
+  async function getNotesByTagId(tagId) {
+    return await request("GET", `/api/notes?tag_id=${tagId}`);
+  }
+  async function createNote(note) {
+    return await request("POST", "/api/notes/", note);
+  }
+  async function updateNote(noteId, note) {
+    return await request("PUT", `/api/notes/${noteId}`, note);
+  }
+  async function getAllTags() {
+    return await request("GET", "/api/tags");
+  }
+  async function searchTags(query) {
+    return await request("GET", `/api/tags?query=${query}`);
+  }
+  async function uploadImage(formData) {
+    return await request("POST", "/api/images/", formData);
+  }
+  var ApiClient_default = {
+    request,
+    getAllFocusModes,
+    createFocusMode,
+    getAllNotes,
+    getNoteById,
+    getNotesByTagId,
+    createNote,
+    updateNote,
+    getAllTags,
+    searchTags,
+    uploadImage
+  };
 
   // commons/components/NotesEditorTags.jsx
   function NotesEditorTags({ tags, isEditable, onAddTag, onRemoveTag }) {
@@ -1621,9 +1565,9 @@
 
   // commons/components/NotesPage.jsx
   function NotesPage({ noteId }) {
-    const { appContext } = useAppContext();
-    const { focusModes, tags } = appContext;
     const [notes, setNotes] = Qt([]);
+    const [tags, setTags] = Qt([]);
+    const [focusModes, setFocusModes] = Qt([]);
     const [selectedNote, setSelectedNote] = Qt(null);
     const [selectedView, setSelectedView] = Qt("list");
     const searchParams = useSearchParams();
@@ -1632,17 +1576,12 @@
     let listClassName = "notes-list-container";
     let editorClassName = "notes-editor-container";
     wt(() => {
-      let promise = null;
-      if (selectedTagId) {
-        promise = ApiClient_default.getNotesByTagId(selectedTagId);
-      } else {
-        promise = ApiClient_default.getAllNotes();
-      }
-      promise.then((notes2) => {
-        setNotes(notes2);
-      }).catch((error) => {
-        console.error("Error loading notes:", error);
-      });
+      refreshNotes();
+      refreshTags();
+      refreshFocusModes();
+    }, []);
+    wt(() => {
+      refreshNotes();
     }, [selectedTagId, selectedFocusId]);
     wt(() => {
       if (noteId === "new") {
@@ -1662,6 +1601,33 @@
         });
       }
     }, [noteId, notes]);
+    function refreshNotes() {
+      let promise = null;
+      if (selectedTagId) {
+        promise = ApiClient_default.getNotesByTagId(selectedTagId);
+      } else {
+        promise = ApiClient_default.getAllNotes();
+      }
+      promise.then((notes2) => {
+        setNotes(notes2);
+      }).catch((error) => {
+        console.error("Error loading notes:", error);
+      });
+    }
+    function refreshTags() {
+      ApiClient_default.getAllTags().then((tags2) => {
+        setTags(tags2);
+      }).catch((error) => {
+        console.error("Error loading tags:", error);
+      });
+    }
+    function refreshFocusModes() {
+      ApiClient_default.getAllFocusModes().then((focusModes2) => {
+        setFocusModes(focusModes2);
+      }).catch((error) => {
+        console.error("Error loading focus modes:", error);
+      });
+    }
     function handleViewChange(newView) {
       setSelectedView(newView);
     }
@@ -1682,7 +1648,7 @@
   // index.js
   document.addEventListener("DOMContentLoaded", () => {
     ye(
-      /* @__PURE__ */ dt(AppProvider, null, /* @__PURE__ */ dt(App, null)),
+      /* @__PURE__ */ dt(App, null),
       document.body
     );
   });
@@ -1694,14 +1660,6 @@
     }
   });
   function App() {
-    const { updateAppContext } = useAppContext();
-    wt(() => {
-      Promise.all([ApiClient_default.getAllFocusModes(), ApiClient_default.getAllTags()]).then(([focusModes, tags]) => {
-        updateAppContext({ focusModes, tags });
-      }).catch((error) => {
-        console.error("Error loading initial data:", error);
-      });
-    }, []);
     return /* @__PURE__ */ dt(Router, null, /* @__PURE__ */ dt(Route, { path: "/", component: NotesPage }), /* @__PURE__ */ dt(Route, { path: "/:noteId", component: NotesPage }));
   }
 })();

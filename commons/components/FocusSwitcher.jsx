@@ -1,11 +1,7 @@
 import { h, useState, render } from '../../dependencies/preact.esm.js';
-import { useAppContext } from '../../AppContext.jsx';
 import FocusDialog from './FocusDialog.jsx';
 
-export default function FocusSwitcher() {
-  const { appContext } = useAppContext();
-  const { focusModes } = appContext;
-
+export default function FocusSwitcher({ focusModes }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   function handleDropdownClick() {
