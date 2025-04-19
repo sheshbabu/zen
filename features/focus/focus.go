@@ -12,7 +12,7 @@ type FocusMode struct {
 	LastUsedAt  time.Time
 }
 
-func HandleGetAllFocusModesV2(w http.ResponseWriter, r *http.Request) {
+func HandleGetAllFocusModes(w http.ResponseWriter, r *http.Request) {
 	allFocusModes, err := GetAllFocusModes()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

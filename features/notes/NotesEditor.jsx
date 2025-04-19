@@ -3,6 +3,7 @@ import ApiClient from '../../commons/http/ApiClient.js';
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
+import { CloseIcon, CheckIcon, PencilIcon } from "../../commons/components/Icon.jsx";
 
 export default function NotesEditor({ selectedNote, isNewNote, isFloating, onSave }) {
   if (!isNewNote && selectedNote === null) {
@@ -262,24 +263,4 @@ function Toolbar({ isEditable, isFloating, onSaveClick, onEditClick, onCloseClic
   );
 }
 
-const CloseIcon = ({ className, onClick }) => (
-  <svg onClick={onClick} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-x ${className}`}>
-    <path d="M18 6 6 18" /><path d="m6 6 12 12" />
-  </svg>
-);
 
-const CheckIcon = ({ className, onClick }) => (
-  <svg onClick={onClick} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-file-check ${className}`}>
-    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
-    <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-    <path d="m9 15 2 2 4-4" />
-  </svg>
-);
-
-const PencilIcon = ({ className, onClick }) => (
-  <svg onClick={onClick} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-pencil-line ${className}`}>
-    <path d="M12 20h9" />
-    <path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z" />
-    <path d="m15 5 3 3" />
-  </svg>
-);

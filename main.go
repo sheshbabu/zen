@@ -65,7 +65,7 @@ func newRouter() *http.ServeMux {
 	mux.HandleFunc("POST /api/tags", tags.HandleCreateTag)
 	mux.HandleFunc("DELETE /api/tags/{tag_id}", tags.HandleDeleteTag)
 
-	mux.HandleFunc("GET /api/focus/", focus.HandleGetAllFocusModesV2)
+	mux.HandleFunc("GET /api/focus/", focus.HandleGetAllFocusModes)
 
 	mux.HandleFunc("POST /api/images/", images.HandleUploadImage)
 
