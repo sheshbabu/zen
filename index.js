@@ -4,6 +4,7 @@ import ApiClient from "./commons/http/ApiClient.js";
 import Router from './commons/components/Router.jsx';
 import Route from './commons/components/Route.jsx';
 import NotesPage from './commons/components/NotesPage.jsx';
+import navigateTo from './commons/utils/navigateTo.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   render(
@@ -17,8 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener("keyup", e => {
   if (e.ctrlKey && e.key === 'n') {
     e.preventDefault();
-    window.history.pushState({}, "", "/new");
-    window.dispatchEvent(new PopStateEvent("navigate"));
+    navigateTo("/new");
     return;
   }
 });

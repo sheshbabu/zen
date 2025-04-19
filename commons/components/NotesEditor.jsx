@@ -2,6 +2,7 @@ import { h, useState, useRef, useEffect } from '../../dependencies/preact.esm.js
 import ApiClient from '../http/ApiClient.js';
 import NotesEditorTags from './NotesEditorTags.jsx';
 import renderMarkdown from '../utils/renderMarkdown.js';
+import navigateTo from '../utils/navigateTo.js';
 
 export default function NotesEditor({ selectedNote, isNewNote, isFloating }) {
   if (!isNewNote && selectedNote === null) {
@@ -85,8 +86,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating }) {
         setAttachments([]); // reset
 
         if (isNewNote) {
-          window.history.pushState({}, "", `/${note.NoteID}`);
-          window.dispatchEvent(new PopStateEvent("navigate"));
+          navigateTo(`/${note.NoteID}`);
         }
       })
       .catch(e => {
@@ -154,8 +154,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating }) {
   }
 
   function handleCloseClick() {
-    window.history.pushState({}, "", "/");
-    window.dispatchEvent(new PopStateEvent("navigate"));
+    navigateTo("/");
   }
 
   function uploadImage(file) {

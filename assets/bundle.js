@@ -948,12 +948,17 @@
     return null;
   }
 
+  // commons/utils/navigateTo.js
+  function navigateTo(path) {
+    window.history.pushState({}, "", path);
+    window.dispatchEvent(new PopStateEvent("navigate"));
+  }
+
   // commons/components/Link.jsx
   function Link({ to, children, className }) {
     const handleClick = (event) => {
       event.preventDefault();
-      window.history.pushState({}, "", to);
-      window.dispatchEvent(new PopStateEvent("navigate"));
+      navigateTo(to);
     };
     return /* @__PURE__ */ dt("a", { href: to, onClick: handleClick, className }, children);
   }
@@ -1408,8 +1413,7 @@
         setIsEditable(false);
         setAttachments([]);
         if (isNewNote) {
-          window.history.pushState({}, "", `/${note2.NoteID}`);
-          window.dispatchEvent(new PopStateEvent("navigate"));
+          navigateTo(`/${note2.NoteID}`);
         }
       }).catch((e) => {
         console.error("Error saving note:", e);
@@ -1462,8 +1466,7 @@
       }
     }
     function handleCloseClick() {
-      window.history.pushState({}, "", "/");
-      window.dispatchEvent(new PopStateEvent("navigate"));
+      navigateTo("/");
     }
     function uploadImage2(file) {
       const formData = new FormData();
@@ -1686,8 +1689,7 @@
   document.addEventListener("keyup", (e) => {
     if (e.ctrlKey && e.key === "n") {
       e.preventDefault();
-      window.history.pushState({}, "", "/new");
-      window.dispatchEvent(new PopStateEvent("navigate"));
+      navigateTo("/new");
       return;
     }
   });
