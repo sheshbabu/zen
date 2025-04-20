@@ -11,6 +11,7 @@ import (
 	"zen/features/focus"
 	"zen/features/images"
 	"zen/features/notes"
+	"zen/features/search"
 	"zen/features/tags"
 )
 
@@ -70,6 +71,8 @@ func newRouter() *http.ServeMux {
 	mux.HandleFunc("GET /api/focus/", focus.HandleGetAllFocusModes)
 
 	mux.HandleFunc("POST /api/images/", images.HandleUploadImage)
+
+	mux.HandleFunc(("GET /api/search/"), search.HandleSearch)
 
 	mux.HandleFunc("GET /assets/", handleStaticAssets)
 	mux.HandleFunc("GET /images/", handleUploadedImages)

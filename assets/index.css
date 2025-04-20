@@ -772,3 +772,29 @@ body {
 .note-delete-modal {
     width: 400px;
 }
+
+.search-modal {
+    width: 600px;
+
+    input {
+        border: 0;
+        outline: 0;
+        width: 100%;
+        height: 40px;
+        padding-left: 10px;
+    }
+
+    .search-result-item {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        padding: 10px;
+        border-top: 1px solid var(--neutral-100);
+        cursor: pointer;
+        transition: background-color 0.5s;
+
+        &:hover {
+            background-color: var(--neutral-100);
+        }
+    }
+}

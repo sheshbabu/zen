@@ -3,6 +3,7 @@ import Router from './commons/components/Router.jsx';
 import Route from './commons/components/Route.jsx';
 import NotesPage from "./features/notes/NotesPage.jsx";
 import navigateTo from './commons/utils/navigateTo.js';
+import SearchMenu from './features/search/SearchMenu.jsx';
 
 document.addEventListener('DOMContentLoaded', () => {
   render(
@@ -16,6 +17,11 @@ document.addEventListener("keyup", e => {
     e.preventDefault();
     navigateTo("/notes/new");
     return;
+  }
+
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    render(<SearchMenu />, document.querySelector('.modal-root'));
   }
 });
 

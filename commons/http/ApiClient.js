@@ -73,7 +73,11 @@ async function uploadImage(formData) {
   return await request('POST', '/api/images/', formData);
 }
 
+// Search
 
+async function search(query) {
+  return await request('GET', `/api/search?query=${query}`);
+}
 
 export default {
   request,
@@ -87,5 +91,6 @@ export default {
   deleteNote,
   getAllTags,
   searchTags,
-  uploadImage
+  uploadImage,
+  search
 };

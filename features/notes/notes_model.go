@@ -383,3 +383,45 @@ func GetNotesByFocusModeID(focusModeID int) ([]Note, error) {
 
 	return notes, nil
 }
+
+func SearchNotes(term string, limit int) ([]Note, error) {
+	notes := []Note{}
+
+	query := `
+		SELECT
+			note_id,
+			title,
+			content,
+			SUBSTR(content, 0, 500) AS snippet,
+			updated_at
+		FROM
+			notes
+		WHERE
+			title LIKE ? OR content LIKE ?
+		ORDER BY
+			updated_at DESC
+		LIMIT
+			?
+	`
+
+	rows, err := sqlite.DB.Query(query, "%"+term+"%", "%"+term+"%", limit)
+	if err != nil {
+		err = fmt.Errorf("error retrieving notes: %w", err)
+		slog.Error(err.Error())
+		return notes, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var note Note
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt)
+		if err != nil {
+			err = fmt.Errorf("error scanning note: %w", err)
+			slog.Error(err.Error())
+			return notes, err
+		}
+		notes = append(notes, note)
+	}
+
+	return notes, nil
+}

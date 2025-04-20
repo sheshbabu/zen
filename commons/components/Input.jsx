@@ -1,6 +1,6 @@
 import { h } from '../../assets/preact.esm.js';
 
-export default function Input({ id, label, type, placeholder, value, hint, error, isDisabled }) {
+export default function Input({ id, label, type, placeholder, value, hint, error, isDisabled, onChange }) {
   return (
     <div className="input-container">
       <label htmlFor={id}>{label}</label>
@@ -14,6 +14,7 @@ export default function Input({ id, label, type, placeholder, value, hint, error
         className={error ? "error" : ""}
         disabled={isDisabled}
         value={value || ""}
+        onChange={onChange}
       />
       <br />
       {error && <div className="error">{error}</div>}

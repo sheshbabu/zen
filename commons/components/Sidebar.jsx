@@ -1,10 +1,15 @@
-import { h } from "../../assets/preact.esm.js"
+import { h, render } from "../../assets/preact.esm.js"
 import Link from './Link.jsx';
 import SidebarTagsList from "../../features/tags/SidebarTagsList.jsx";
 import FocusSwitcher from "../../features/focus/FocusSwitcher.jsx";
+import SearchMenu from "../../features/search/SearchMenu.jsx";
 import { NotesIcon, SearchIcon, NewIcon, BoardIcon, SettingsIcon } from "./Icon.jsx"
 
 export default function Sidebar({ focusModes, tags }) {
+  function handleSearchClick() {
+    render(<SearchMenu />, document.querySelector('.modal-root'));
+  }
+
   return (
     <div>
       <FocusSwitcher focusModes={focusModes}/>
@@ -21,10 +26,10 @@ export default function Sidebar({ focusModes, tags }) {
         <BoardIcon />
         Boards
       </Link>
-      <Link className="sidebar-button" to="/">
+      <div className="sidebar-button" onClick={handleSearchClick}>
         <SearchIcon />
         Search
-      </Link>
+      </div>
       <Link className="sidebar-button" to="/">
         <SettingsIcon />
         Settings
