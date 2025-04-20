@@ -1,7 +1,7 @@
 import { h, render, useEffect, useState, useRef } from "../../assets/preact.esm.js"
-import Link from "../../commons/components/Link.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
+import { SearchIcon, NoteIcon } from "../../commons/components/Icon.jsx";
 
 export default function SearchMenu() {
   const [query, setQuery] = useState("");
@@ -96,14 +96,17 @@ export default function SearchMenu() {
   return (
     <div className="modal-backdrop-container">
       <div className="modal-content-container search-modal">
-        <input
-          type="text"
-          placeholder="Search..."
-          ref={inputRef}
-          value={query}
-          onInput={handleChange}
-          onKeyUp={handleKeyUp}
-        />
+        <div className="search-input-container">
+          <SearchIcon />
+          <input
+            type="text"
+            placeholder="Search..."
+            ref={inputRef}
+            value={query}
+            onInput={handleChange}
+            onKeyUp={handleKeyUp}
+          />
+        </div>
         {items}
       </div>
     </div>
@@ -113,7 +116,11 @@ export default function SearchMenu() {
 function SearchResultItem({ item, isSelected, onClick }) {
   return (
     <div className={`search-result-item ${isSelected ? "is-selected" : ""}`} onClick={onClick}>
-      <p>{item.Title}</p>
+      <NoteIcon />
+      <div className="search-result-item-content">
+        <p className="title">{item.Title}</p>
+        <p className="subtitle">{item.Snippet}</p>
+      </div>
     </div>
   );
 }
