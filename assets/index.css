@@ -757,6 +757,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
+    z-index: 2;
     backdrop-filter: blur(2px);
     background-color: rgba(0, 0, 0, 0.8);
 
@@ -868,6 +869,21 @@ body {
                 height: 20px;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 948px) {
+    .search-modal {
+        width: 100%;
+        margin-top: 0;
+
+        .search-result-item {
+            .search-result-item-content {
+                .subtitle {
+                    width: 300px;
+                }
             }
         }
     }
