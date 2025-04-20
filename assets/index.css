@@ -752,9 +752,6 @@ body {
 }
 
 .modal-backdrop-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     position: absolute;
     top: 0;
     left: 0;
@@ -762,6 +759,12 @@ body {
     bottom: 0;
     backdrop-filter: blur(2px);
     background-color: rgba(0, 0, 0, 0.8);
+
+    &.is-centered {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 .modal-content-container {
@@ -806,6 +809,8 @@ body {
 
 .search-modal {
     width: 600px;
+    margin: auto;
+    margin-top: 20vh;
 
     .search-input-container {
         display: flex;

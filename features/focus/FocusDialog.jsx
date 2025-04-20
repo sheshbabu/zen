@@ -4,7 +4,7 @@ import { CloseIcon } from "../../commons/components/Icon.jsx";
 
 export default function FocusDialog({ onCloseClick }) {
   return (
-    <div class="modal-backdrop-container">
+    <div class="modal-backdrop-container is-centered">
       <div class="modal-content-container focus-dialog">
         <div className="modal-content">
           <CloseIcon className="notes-editor-toolbar-button-close" onClick={onCloseClick} />
