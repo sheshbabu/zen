@@ -134,7 +134,7 @@ export default function NotesPage({ noteId }) {
 
       <MobileNavbar />
 
-      <div className="dialog-container"></div>
+      <div className="modal-root"></div>
     </div>
   );
 }

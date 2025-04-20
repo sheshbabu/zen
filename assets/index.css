@@ -524,6 +524,7 @@ body {
     border: 1px solid var(--neutral-200);
     overflow: hidden;
     font: var(--sm);
+    font-weight: 600;
     transition-property: background-color, box-shadow;
     transition-duration: 500ms;
     text-decoration: none;
@@ -720,7 +721,7 @@ body {
     }
 }
 
-.focus-dialog-container {
+.modal-backdrop-container {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -730,18 +731,44 @@ body {
     right: 0;
     bottom: 0;
     backdrop-filter: blur(2px);
+}
 
-    .focus-dialog {
-        height: 400px;
-        width: 600px;
-        background-color: #fff;
-        padding: 16px;
-        border: 1px solid var(--neutral-100);
-        border-radius: 4px;
-        box-shadow: var(--shadow-5);
+.modal-content-container {
+    background-color: #fff;
+    border: 1px solid var(--neutral-100);
+    border-radius: 4px;
+    box-shadow: var(--shadow-5);
 
-        .notes-editor-tags-input {
-            display: inline-block;
-        }
+    .modal-title {
+        font-weight: 600;
     }
+
+    .modal-content {
+        padding: 16px;
+    }
+}
+
+.model-footer-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+    padding: 16px;
+    background-color: var(--neutral-50);
+
+    .button {
+        margin-left: 8px;
+    }
+}
+
+.focus-dialog {
+    height: 400px;
+    width: 600px;
+
+    .notes-editor-tags-input {
+        display: inline-block;
+    }
+}
+
+.delete-confirmation-modal {
+    width: 400px;
 }

@@ -1,8 +1,9 @@
-import { h, useState, useRef, useEffect } from "../../assets/preact.esm.js"
+import { h, render, useState, useRef, useEffect } from "../../assets/preact.esm.js"
 import ApiClient from '../../commons/http/ApiClient.js';
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
+import DeleteConfirmationModal from "../../commons/components/DeleteConfirmationModal.jsx";
 
 export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange }) {
   if (!isNewNote && selectedNote === null) {
@@ -160,14 +161,23 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }
 
   function handleDeleteClick() {
+    render(<DeleteConfirmationModal onDeleteClick={handleDeleteConfirmClick} onCloseClick={handleDeleteCloseClick} />, document.querySelector('.modal-root'));
+  }
+
+  function handleDeleteConfirmClick() {
     ApiClient.deleteNote(selectedNote.NoteID)
       .then(() => {
+        handleDeleteCloseClick();
         navigateTo("/", true);
         onChange();
       })
       .catch(e => {
         console.error('Error deleting note:', e);
       });
+  }
+
+  function handleDeleteCloseClick() {
+    render(null, document.querySelector('.modal-root'));
   }
 
   function uploadImage(file) {
@@ -235,7 +245,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     <div className={`notes-editor ${isEditable ? "is-editable" : ""}`} tabIndex="0" onPaste={handlePaste}>
       <div className="notes-editor-header">
         <div className="notes-editor-title" contentEditable={isEditable} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
-        <Toolbar isEditable={isEditable} isFloating={isFloating} onSaveClick={handleSaveClick} onEditClick={handleEditClick} onCloseClick={handleCloseClick} onDeleteClick={handleDeleteClick}/>
+        <Toolbar isEditable={isEditable} isFloating={isFloating} onSaveClick={handleSaveClick} onEditClick={handleEditClick} onCloseClick={handleCloseClick} onDeleteClick={handleDeleteClick} />
       </div>
       <NotesEditorTags tags={tags} isEditable={isEditable} onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
       <div className={`notes-editor-image-dropzone ${isDraggingOver ? "dragover" : ""}`} onDrop={handleImageDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}>
