@@ -6,6 +6,8 @@ import navigateTo from "../../commons/utils/navigateTo.js";
 export default function SearchMenu() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
+
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -39,10 +41,40 @@ export default function SearchMenu() {
     ApiClient.search(value)
       .then(response => {
         setResults(response.notes);
+        if (response.notes.length > 0) {
+          setSelectedItem(response.notes[0]);
+        }
       })
       .catch(error => {
         console.error("Error searching:", error);
       });
+  }
+
+  function handleKeyUp(e) {
+    if (e.key === "ArrowDown") {
+      const nextIndex = results.indexOf(selectedItem) + 1;
+      if (nextIndex < results.length) {
+        setSelectedItem(results[nextIndex]);
+      } else {
+        setSelectedItem(results[0]);
+      }
+      return;
+    }
+
+    if (e.key === "ArrowUp") {
+      const prevIndex = results.indexOf(selectedItem) - 1;
+      if (prevIndex >= 0) {
+        setSelectedItem(results[prevIndex]);
+      } else {
+        setSelectedItem(results[results.length - 1]);
+      }
+      return;
+    }
+
+    if (e.key === 'Enter' && selectedItem) {
+      handleResultClick(selectedItem);
+      return;
+    }
   }
 
   function closeModal() {
@@ -54,7 +86,12 @@ export default function SearchMenu() {
     closeModal();
   }
 
-  const items = results.map((item, index) => <SearchResultItem key={index} item={item} onClick={e => handleResultClick(item)}/>);
+  const items = results.map((item, index) => {
+    const isSelected = item.NoteID === selectedItem?.NoteID;
+    return (
+      <SearchResultItem key={index} item={item} isSelected={isSelected} onClick={e => handleResultClick(item)} />
+    )
+  });
 
   return (
     <div className="modal-backdrop-container">
@@ -65,6 +102,7 @@ export default function SearchMenu() {
           ref={inputRef}
           value={query}
           onInput={handleChange}
+          onKeyUp={handleKeyUp}
         />
         {items}
       </div>
@@ -72,9 +110,9 @@ export default function SearchMenu() {
   );
 }
 
-function SearchResultItem({ item, onClick }) {
+function SearchResultItem({ item, isSelected, onClick }) {
   return (
-    <div className="search-result-item" onClick={onClick}>
+    <div className={`search-result-item ${isSelected ? "is-selected" : ""}`} onClick={onClick}>
       <p>{item.Title}</p>
     </div>
   );

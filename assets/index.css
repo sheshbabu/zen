@@ -793,7 +793,8 @@ body {
         cursor: pointer;
         transition: background-color 0.5s;
 
-        &:hover {
+        &:hover,
+        &.is-selected {
             background-color: var(--neutral-100);
         }
     }
