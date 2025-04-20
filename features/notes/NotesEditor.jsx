@@ -3,7 +3,7 @@ import ApiClient from '../../commons/http/ApiClient.js';
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
-import DeleteConfirmationModal from "../../commons/components/DeleteConfirmationModal.jsx";
+import NoteDeleteModal from './NoteDeleteModal.jsx';
 
 export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange }) {
   if (!isNewNote && selectedNote === null) {
@@ -161,7 +161,12 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }
 
   function handleDeleteClick() {
-    render(<DeleteConfirmationModal onDeleteClick={handleDeleteConfirmClick} onCloseClick={handleDeleteCloseClick} />, document.querySelector('.modal-root'));
+    render(
+      <NoteDeleteModal
+        onDeleteClick={handleDeleteConfirmClick}
+        onCloseClick={handleDeleteCloseClick}
+      />,
+      document.querySelector('.modal-root'));
   }
 
   function handleDeleteConfirmClick() {
