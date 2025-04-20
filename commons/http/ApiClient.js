@@ -1,11 +1,15 @@
 async function request(method, url, payload) {
   const options = {
     method: method,
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
+    headers: {}
   };
+
+  if (payload instanceof FormData) {
+    options.body = payload;
+  } else if (payload) {
+    options.headers['Content-Type'] = 'application/json';
+    options.body = JSON.stringify(payload);
+  }
 
   const response = await fetch(url, options);
   const type = response.headers.get('content-type');

@@ -87,7 +87,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         setAttachments([]); // reset
 
         if (isNewNote) {
-          navigateTo(`/${note.NoteID}`, true);
+          navigateTo(`/notes/${note.NoteID}`, true);
         }
 
         onChange();
