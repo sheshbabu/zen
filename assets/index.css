@@ -858,9 +858,11 @@ body {
             
             .subtitle {
                 font: var(--sm);
-                max-width: 600px;
+                max-width: 500px;
                 overflow: hidden;
                 height: 20px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
         }
     }
