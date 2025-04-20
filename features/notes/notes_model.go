@@ -299,7 +299,8 @@ func DeleteNote(noteID int) error {
 }
 
 func GetNotesByTagID(tagID int) ([]Note, error) {
-	var notes []Note
+	notes := []Note{}
+
 	query := `
 		SELECT
 			n.note_id,
@@ -340,7 +341,8 @@ func GetNotesByTagID(tagID int) ([]Note, error) {
 }
 
 func GetNotesByFocusModeID(focusModeID int) ([]Note, error) {
-	var notes []Note
+	notes := []Note{}
+
 	query := `
 		SELECT
 			n.note_id,
