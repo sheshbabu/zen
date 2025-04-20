@@ -8,7 +8,17 @@ async function request(method, url, payload) {
   };
 
   const response = await fetch(url, options);
-  return await response.json();
+  const type = response.headers.get('content-type');
+
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+  
+  if (type?.includes('application/json')) {
+    return await response.json();
+  }
+
+  return null;
 }
 
 // Focus Modes
@@ -43,6 +53,10 @@ async function updateNote(noteId, note) {
   return await request('PUT', `/api/notes/${noteId}`, note);
 }
 
+async function deleteNote(noteId) {
+  return await request('DELETE', `/api/notes/${noteId}`);
+}
+
 // Tags
 
 async function getAllTags() {
@@ -70,6 +84,7 @@ export default {
   getNotesByTagId,
   createNote,
   updateNote,
+  deleteNote,
   getAllTags,
   searchTags,
   uploadImage
