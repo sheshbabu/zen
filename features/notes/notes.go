@@ -153,3 +153,20 @@ func HandleUpdateNote(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(note)
 }
+
+func HandleDeleteNote(w http.ResponseWriter, r *http.Request) {
+	noteIDStr := r.PathValue("note_id")
+	noteID, err := strconv.Atoi(noteIDStr)
+	if err != nil {
+		http.Error(w, "Invalid note ID", http.StatusBadRequest)
+		return
+	}
+
+	err = DeleteNote(noteID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

@@ -248,6 +248,56 @@ func UpdateNote(note Note) (Note, error) {
 	return note, nil
 }
 
+func DeleteNote(noteID int) error {
+	tx, err := sqlite.DB.Begin()
+
+	if err != nil {
+		err = fmt.Errorf("error starting transaction: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	defer tx.Rollback()
+
+	query := `
+		DELETE FROM
+			note_tags
+		WHERE
+			note_id = ?
+	`
+
+	_, err = tx.Exec(query, noteID)
+	if err != nil {
+		err = fmt.Errorf("error deleting tags: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	query = `
+		DELETE FROM
+			notes
+		WHERE
+			note_id = ?
+	`
+
+	_, err = tx.Exec(query, noteID)
+	if err != nil {
+		err = fmt.Errorf("error deleting note: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	err = tx.Commit()
+
+	if err != nil {
+		err = fmt.Errorf("error deleting note: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
 func GetNotesByTagID(tagID int) ([]Note, error) {
 	var notes []Note
 	query := `

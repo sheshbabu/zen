@@ -95,8 +95,8 @@ export default function NotesPage({ noteId }) {
       });
   }
 
-  // Update notes, tags, and focus modes when a note is saved
-  function handleNoteSave() {
+  // Update notes, tags, and focus modes when a note is created/updated/deleted
+  function handleNoteChange() {
     refreshNotes();
     refreshTags();
   }
@@ -129,7 +129,7 @@ export default function NotesPage({ noteId }) {
       </div>
 
       <div className={editorClassName} data-page={noteId === undefined ? "notes" : "editor"}>
-        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.NoteID} isFloating={noteId !== undefined && selectedView === "grid"} onSave={handleNoteSave} />
+        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.NoteID} isFloating={noteId !== undefined && selectedView === "grid"} onChange={handleNoteChange} />
       </div>
 
       <MobileNavbar />

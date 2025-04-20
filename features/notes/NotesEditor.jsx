@@ -4,7 +4,7 @@ import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 
-export default function NotesEditor({ selectedNote, isNewNote, isFloating, onSave }) {
+export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange }) {
   if (!isNewNote && selectedNote === null) {
     return null;
   }
@@ -89,7 +89,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onSav
           navigateTo(`/${note.NoteID}`, true);
         }
 
-        onSave();
+        onChange();
       })
       .catch(e => {
         console.error('Error saving note:', e);
@@ -159,6 +159,17 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onSav
     navigateTo("/", true);
   }
 
+  function handleDeleteClick() {
+    ApiClient.deleteNote(selectedNote.NoteID)
+      .then(() => {
+        navigateTo("/", true);
+        onChange();
+      })
+      .catch(e => {
+        console.error('Error deleting note:', e);
+      });
+  }
+
   function uploadImage(file) {
     const formData = new FormData();
     formData.append('image', file);
@@ -224,7 +235,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onSav
     <div className={`notes-editor ${isEditable ? "is-editable" : ""}`} tabIndex="0" onPaste={handlePaste}>
       <div className="notes-editor-header">
         <div className="notes-editor-title" contentEditable={isEditable} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
-        <Toolbar isEditable={isEditable} isFloating={isFloating} onSaveClick={handleSaveClick} onEditClick={handleEditClick} onCloseClick={handleCloseClick} />
+        <Toolbar isEditable={isEditable} isFloating={isFloating} onSaveClick={handleSaveClick} onEditClick={handleEditClick} onCloseClick={handleCloseClick} onDeleteClick={handleDeleteClick}/>
       </div>
       <NotesEditorTags tags={tags} isEditable={isEditable} onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
       <div className={`notes-editor-image-dropzone ${isDraggingOver ? "dragover" : ""}`} onDrop={handleImageDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}>
@@ -238,7 +249,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onSav
   );
 }
 
-function Toolbar({ isEditable, isFloating, onSaveClick, onEditClick, onCloseClick }) {
+function Toolbar({ isEditable, isFloating, onSaveClick, onEditClick, onCloseClick, onDeleteClick }) {
   const actions = []
 
   if (isFloating) {
@@ -254,6 +265,9 @@ function Toolbar({ isEditable, isFloating, onSaveClick, onEditClick, onCloseClic
   } else {
     actions.push(
       <div className="ghost-button" onClick={onEditClick}>Edit</div>
+    );
+    actions.push(
+      <div className="ghost-button" onClick={onDeleteClick}>Delete</div>
     );
   }
 
