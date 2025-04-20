@@ -242,6 +242,13 @@ body {
                 width: 36px;
                 height: 36px;
                 padding: 8px;
+
+                circle,
+                rect,
+                path {
+                    stroke: var(--neutral-500);
+                    stroke-width: 2.5;
+                }
             }
         }
     }
@@ -268,6 +275,7 @@ body {
         transition-property: stroke;
         transition-duration: 500ms;
 
+        circle,
         rect,
         path {
             stroke: var(--neutral-500);
@@ -484,6 +492,7 @@ body {
             transition-property: stroke;
             transition-duration: 500ms;
     
+            circle,
             rect,
             path {
                 stroke: var(--neutral-500);
@@ -545,6 +554,7 @@ body {
         transition-property: stroke;
         transition-duration: 500ms;
 
+        circle,
         rect,
         path {
             stroke: var(--neutral-500);
