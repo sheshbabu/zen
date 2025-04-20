@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener("keyup", e => {
   if (e.ctrlKey && e.key === 'n') {
     e.preventDefault();
-    navigateTo("/new");
+    navigateTo("/notes/new");
     return;
   }
 });
