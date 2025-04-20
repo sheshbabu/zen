@@ -172,6 +172,7 @@ body {
             color: var(--neutral-900);
 
             svg.lucide {
+
                 circle,
                 rect,
                 path {
@@ -840,35 +841,40 @@ body {
         }
     }
 
-    .search-result-item {
-        display: flex;
-        align-items: center;
-        text-decoration: none;
-        color: inherit;
-        padding: 10px;
-        border-top: 1px solid var(--neutral-100);
-        cursor: pointer;
-        transition: background-color 0.5s;
+    .search-results-container {
+        max-height: 400px;
+        overflow-y: scroll;
 
-        &:hover,
-        &.is-selected {
-            background-color: var(--neutral-100);
-        }
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            padding: 10px;
+            border-top: 1px solid var(--neutral-100);
+            cursor: pointer;
+            transition: background-color 0.5s;
 
-        .search-result-item-content {
-            padding-left: 10px;
-
-            .title {
-                font-weight: 600;
+            &:hover,
+            &.is-selected {
+                background-color: var(--neutral-100);
             }
-            
-            .subtitle {
-                font: var(--sm);
-                max-width: 500px;
-                overflow: hidden;
-                height: 20px;
-                text-overflow: ellipsis;
-                white-space: nowrap;
+
+            .search-result-item-content {
+                padding-left: 10px;
+
+                .title {
+                    font-weight: 600;
+                }
+
+                .subtitle {
+                    font: var(--sm);
+                    max-width: 500px;
+                    overflow: hidden;
+                    height: 20px;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
             }
         }
     }
@@ -879,12 +885,17 @@ body {
         width: 100%;
         margin-top: 0;
 
-        .search-result-item {
-            .search-result-item-content {
-                .subtitle {
-                    width: 300px;
+        .search-results-container {
+            max-height: 90vh;
+
+            .search-result-item {
+                .search-result-item-content {
+                    .subtitle {
+                        width: 300px;
+                    }
                 }
             }
         }
+
     }
 }

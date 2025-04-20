@@ -26,10 +26,10 @@ export default function SearchMenu() {
     }
 
     ApiClient.search(value)
-      .then(response => {
-        setResults(response.notes);
-        if (response.notes.length > 0) {
-          setSelectedItem(response.notes[0]);
+      .then(notes => {
+        setResults(notes);
+        if (notes.length > 0) {
+          setSelectedItem(notes[0]);
         }
       })
       .catch(error => {
@@ -94,7 +94,9 @@ export default function SearchMenu() {
             onKeyUp={handleKeyUp}
           />
         </div>
-        {items}
+        <div className="search-results-container">
+          {items}
+        </div>
       </div>
     </div>
   );
