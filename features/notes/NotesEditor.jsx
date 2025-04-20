@@ -3,7 +3,6 @@ import ApiClient from '../../commons/http/ApiClient.js';
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
-import { CloseIcon, CheckIcon, PencilIcon } from "../../commons/components/Icon.jsx";
 
 export default function NotesEditor({ selectedNote, isNewNote, isFloating, onSave }) {
   if (!isNewNote && selectedNote === null) {
@@ -244,17 +243,17 @@ function Toolbar({ isEditable, isFloating, onSaveClick, onEditClick, onCloseClic
 
   if (isFloating) {
     actions.push(
-      <CloseIcon className="notes-editor-toolbar-button-close" onClick={onCloseClick} />
+      <div className="ghost-button" onClick={onCloseClick}>Close</div>
     );
   }
 
   if (isEditable) {
     actions.push(
-      <CheckIcon className="notes-editor-toolbar-button-done" onClick={onSaveClick} />
+      <div className="ghost-button" onClick={onSaveClick}>Save</div>
     );
   } else {
     actions.push(
-      <PencilIcon className="notes-editor-toolbar-button-edit" onClick={onEditClick} />
+      <div className="ghost-button" onClick={onEditClick}>Edit</div>
     );
   }
 

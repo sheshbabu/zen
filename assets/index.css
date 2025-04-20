@@ -583,6 +583,20 @@ body {
     }
 }
 
+.ghost-button {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 4px 10px;
+    font: var(--sm);
+    font-weight: 600;
+    transition: background-color 0.5s;
+
+    &:hover {
+        background-color: var(--neutral-100);
+    }
+}
+
 .dropdown-container {
     position: relative;
     max-width: 200px;
