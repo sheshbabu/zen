@@ -2,10 +2,11 @@ package main
 
 import (
 	"embed"
+	"fmt"
+	"io/fs"
 	"log/slog"
 	"net/http"
 	"os"
-	"strings"
 	"zen/commons/sqlite"
 	"zen/features/focus"
 	"zen/features/images"
@@ -71,24 +72,50 @@ func newRouter() *http.ServeMux {
 
 	mux.HandleFunc("GET /assets/", handleStaticAssets)
 	mux.HandleFunc("GET /images/", handleUploadedImages)
-	mux.HandleFunc("GET /", handleStaticAssets)
+	mux.HandleFunc("GET /", handleRoot)
 
 	return mux
 }
 
-func handleStaticAssets(w http.ResponseWriter, r *http.Request) {
-	fs := http.FS(assets)
+func handleRoot(w http.ResponseWriter, r *http.Request) {
+	var indexPage []byte
+	var err error
 
 	if os.Getenv("DEV_MODE") == "true" {
-		fs = http.Dir("./assets")
+		indexPage, err = os.ReadFile("./assets/index.html")
+	} else {
+		indexPage, err = assets.ReadFile("assets/index.html")
 	}
 
-	if strings.HasPrefix(r.URL.Path, "/assets/") {
-		http.StripPrefix("/assets/", http.FileServer(fs)).ServeHTTP(w, r)
+	if err != nil {
+		err = fmt.Errorf("error reading index.html: %w", err)
+		slog.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	http.StripPrefix("/", http.FileServer(fs)).ServeHTTP(w, r)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(indexPage)
+}
+
+func handleStaticAssets(w http.ResponseWriter, r *http.Request) {
+	var fsys http.FileSystem
+
+	if os.Getenv("DEV_MODE") == "true" {
+		fsys = http.Dir("./assets")
+	} else {
+		subtree, err := fs.Sub(assets, "assets")
+		if err != nil {
+			err = fmt.Errorf("error reading assets subtree: %w", err)
+			slog.Error(err.Error())
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		fsys = http.FS(subtree)
+	}
+
+	http.StripPrefix("/assets/", http.FileServer(fsys)).ServeHTTP(w, r)
 }
 
 func handleUploadedImages(w http.ResponseWriter, r *http.Request) {
