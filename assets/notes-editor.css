@@ -1,4 +1,6 @@
 .notes-editor {
+    outline: none;
+
     &.is-editable {
         .notes-editor-tags {
             .tag {

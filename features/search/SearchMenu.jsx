@@ -11,22 +11,9 @@ export default function SearchMenu() {
   const inputRef = useRef(null);
 
   useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        closeModal();
-      }
-    }
-
     if (inputRef.current) {
       inputRef.current.focus();
     }
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
   }, []);
 
   function handleChange(e) {

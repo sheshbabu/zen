@@ -23,6 +23,13 @@ document.addEventListener("keydown", e => {
     e.preventDefault();
     render(<SearchMenu />, document.querySelector('.modal-root'));
   }
+
+  if (e.key === 'Escape') {
+    if (document.querySelector('.modal-root').firstChild) {
+      e.preventDefault();
+      render(null, document.querySelector('.modal-root'));
+    }
+  }
 });
 
 function App() {
