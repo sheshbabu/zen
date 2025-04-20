@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   );
 });
 
-document.addEventListener("keyup", e => {
+document.addEventListener("keydown", e => {
   if (e.ctrlKey && e.key === 'n') {
     e.preventDefault();
     navigateTo("/notes/new");
