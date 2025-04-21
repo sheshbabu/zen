@@ -73,6 +73,12 @@ export default function SearchMenu() {
     closeModal();
   }
 
+  function handleBackdropClick(e) {
+    if (e.target.classList.contains("modal-backdrop-container")) {
+      closeModal();
+    }
+  }
+
   const items = results.map((item, index) => {
     const isSelected = item.NoteID === selectedItem?.NoteID;
     return (
@@ -81,7 +87,7 @@ export default function SearchMenu() {
   });
 
   return (
-    <div className="modal-backdrop-container">
+    <div className="modal-backdrop-container" onClick={handleBackdropClick}>
       <div className="modal-content-container search-modal">
         <div className="search-input-container">
           <SearchIcon />
