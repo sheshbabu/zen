@@ -31,8 +31,8 @@ async function getAllFocusModes() {
   return await request('GET', '/api/focus');
 }
 
-async function createFocusMode() {
-  return await request('POST', '/api/focus/new');
+async function createFocusMode(focusMode) {
+  return await request('POST', '/api/focus/new', focusMode);
 }
 
 // Notes

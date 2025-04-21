@@ -1,9 +1,10 @@
-import { h, render, useEffect, useState } from "../../assets/preact.esm.js"
+import { h, render, useState } from "../../assets/preact.esm.js"
 import Input from "../../commons/components/Input.jsx";
 import { CloseIcon } from "../../commons/components/Icon.jsx";
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
+import ApiClient from "../../commons/http/ApiClient.js";
 
-export default function FocusDialog() {
+export default function FocusCreateModal() {
   const [name, setName] = useState("");
   const [tags, setTags] = useState([]);
 
@@ -25,7 +26,20 @@ export default function FocusDialog() {
     setTags((prevTags) => prevTags.filter(t => t.tag_id !== tag.tag_id));
   }
 
-  function handleCreateClick() {}
+  function handleCreateClick() {
+    const focusMode = {
+      Name: name,
+      Tags: tags
+    };
+
+    ApiClient.createFocusMode(focusMode)
+      .then(() => {
+        closeModal();
+      })
+      .catch((error) => {
+        console.error("Error creating focus mode:", error);
+      });
+  }
 
   function closeModal() {
     render(null, document.querySelector('.modal-root'));

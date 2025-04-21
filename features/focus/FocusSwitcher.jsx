@@ -1,5 +1,5 @@
 import { h, useState, render } from "../../assets/preact.esm.js"
-import FocusDialog from './FocusDialog.jsx';
+import FocusCreateModal from './FocusCreateModal.jsx';
 import { ArrowDownIcon } from "../../commons/components/Icon.jsx";
 
 export default function FocusSwitcher({ focusModes }) {
@@ -11,7 +11,7 @@ export default function FocusSwitcher({ focusModes }) {
 
   function handleAddNewClick() {
     setIsDropdownOpen(false);
-    render(<FocusDialog/>, document.querySelector('.modal-root'));
+    render(<FocusCreateModal/>, document.querySelector('.modal-root'));
   }
 
   const items = focusModes.map(mode => <li className="dropdown-option">{mode.Name}</li>);
