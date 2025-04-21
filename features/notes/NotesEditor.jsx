@@ -28,7 +28,9 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     }
 
     function handleKeyDown(e) {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      const isTextAreaFocused = document.activeElement.className == "notes-editor-textarea";
+
+      if (!isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.key === 'Enter') {
         e.preventDefault();
         if (isEditable) {
           handleSaveClick();
@@ -53,6 +55,10 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }, []);
 
   useEffect(() => {
+    handleTextAreaHeight();
+  }, [content, isEditable]);
+
+  function handleTextAreaHeight() {
     if (textareaRef.current === null) {
       return;
     }
@@ -64,7 +70,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     // It doesn't include border, margin, or scrollbar
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight
     textarea.style.height = `${textarea.scrollHeight + 2}px`;
-  }, [content, isEditable]);
+  }
 
   function handleSaveClick() {
     const note = {
@@ -225,7 +231,8 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         spellCheck="false"
         ref={textareaRef}
         value={content}
-        onInput={e => setContent(e.target.value)}
+        onInput={handleTextAreaHeight}
+        onBlur={e => setContent(e.target.value)}
       />
     );
   } else if (title === "" && content === "") {
