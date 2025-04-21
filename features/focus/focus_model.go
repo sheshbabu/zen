@@ -1,15 +1,18 @@
 package focus
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"time"
 	"zen/commons/sqlite"
+	"zen/features/tags"
 )
 
 var defaultFocusMode = FocusMode{
 	FocusModeID: 0,
 	Name:        "All Notes",
+	Tags:        nil,
 	LastUsedAt:  time.Now(),
 }
 
@@ -20,13 +23,23 @@ func GetAllFocusModes() ([]FocusMode, error) {
 
 	query := `
 		SELECT
-			focus_mode_id,
-			name,
-			last_used_at
+			fm.focus_mode_id,
+			fm.name,
+            COALESCE(
+                JSON_GROUP_ARRAY(JSON_OBJECT(
+					'tag_id', t.tag_id,
+					'name', t.name
+				)), '[]'
+            ) as tags_json,
+			fm.last_used_at
 		FROM
-			focus_modes
+			focus_modes fm
+			LEFT JOIN focus_mode_tags fmt ON fm.focus_mode_id = fmt.focus_mode_id
+			LEFT JOIN tags t ON fmt.tag_id = t.tag_id
+		GROUP BY
+            fm.focus_mode_id, fm.name, fm.last_used_at
 		ORDER BY
-			last_used_at DESC
+			fm.last_used_at DESC
 	`
 
 	rows, err := sqlite.DB.Query(query)
@@ -39,16 +52,67 @@ func GetAllFocusModes() ([]FocusMode, error) {
 
 	for rows.Next() {
 		var focusMode FocusMode
-		err = rows.Scan(&focusMode.FocusModeID, &focusMode.Name, &focusMode.LastUsedAt)
+		var tagsJSON string
+		err = rows.Scan(&focusMode.FocusModeID, &focusMode.Name, &tagsJSON, &focusMode.LastUsedAt)
 		if err != nil {
 			err = fmt.Errorf("error scanning focus mode: %w", err)
 			slog.Error(err.Error())
 			return focusModes, err
 		}
+		err = json.Unmarshal([]byte(tagsJSON), &focusMode.Tags)
+		if err != nil {
+			err = fmt.Errorf("error unmarshaling tags for focus mode %d: %w", focusMode.FocusModeID, err)
+			slog.Error(err.Error())
+			focusMode.Tags = []tags.Tag{}
+		}
 		focusModes = append(focusModes, focusMode)
 	}
 
 	return focusModes, nil
+}
+
+func GetFocusModeByID(focusModeID int) (FocusMode, error) {
+	var focusMode FocusMode
+	var tagsJSON string
+
+	query := `
+		SELECT
+			fm.focus_mode_id,
+			fm.name,
+            COALESCE(
+                JSON_GROUP_ARRAY(JSON_OBJECT(
+					'tag_id', t.tag_id,
+					'name', t.name
+				)), '[]'
+            ) as tags_json,
+			fm.last_used_at
+		FROM
+			focus_modes fm
+			LEFT JOIN focus_mode_tags fmt ON fm.focus_mode_id = fmt.focus_mode_id
+			LEFT JOIN tags t ON fmt.tag_id = t.tag_id
+		WHERE
+			fm.focus_mode_id = ?
+		GROUP BY
+            fm.focus_mode_id, fm.name, fm.last_used_at
+		ORDER BY
+			fm.last_used_at DESC
+	`
+
+	err := sqlite.DB.QueryRow(query, focusModeID).Scan(&focusMode.FocusModeID, &focusMode.Name, &tagsJSON, &focusMode.LastUsedAt)
+	if err != nil {
+		err = fmt.Errorf("error retrieving focus mode: %w", err)
+		slog.Error(err.Error())
+		return focusMode, err
+	}
+
+	err = json.Unmarshal([]byte(tagsJSON), &focusMode.Tags)
+	if err != nil {
+		err = fmt.Errorf("error unmarshaling tags for focus mode %d: %w", focusMode.FocusModeID, err)
+		slog.Error(err.Error())
+		focusMode.Tags = []tags.Tag{}
+	}
+
+	return focusMode, nil
 }
 
 func UpdateFocusMode(focusModeID int) error {
@@ -87,28 +151,4 @@ func CreateFocusMode(name string) error {
 	}
 
 	return nil
-}
-
-func GetFocusModeByID(focusModeID int) (FocusMode, error) {
-	var focusMode FocusMode
-
-	query := `
-		SELECT
-			focus_mode_id,
-			name,
-			last_used_at
-		FROM
-			focus_modes
-		WHERE
-			focus_mode_id = ?
-	`
-
-	err := sqlite.DB.QueryRow(query, focusModeID).Scan(&focusMode.FocusModeID, &focusMode.Name, &focusMode.LastUsedAt)
-	if err != nil {
-		err = fmt.Errorf("error retrieving focus mode: %w", err)
-		slog.Error(err.Error())
-		return focusMode, err
-	}
-
-	return focusMode, nil
 }

@@ -66,8 +66,8 @@ export default function NotesPage({ noteId }) {
 
     if (selectedTagId) {
       promise = ApiClient.getNotesByTagId(selectedTagId);
-      // } else if (selectedFocusId) {
-      //   promise = ApiClient.getNotesByFocusId(selectedFocusId);
+    } else if (selectedFocusId) {
+      promise = ApiClient.getNotesByFocusId(selectedFocusId);
     } else {
       promise = ApiClient.getAllNotes();
     }
@@ -131,7 +131,7 @@ export default function NotesPage({ noteId }) {
       </div>
 
       <div className={listClassName} data-page={noteId === undefined ? "notes" : "editor"}>
-        <NotesList notes={notes} view={selectedView} onViewChange={handleViewChange}/>
+        <NotesList notes={notes} view={selectedView} onViewChange={handleViewChange} />
       </div>
 
       <div className={editorClassName} data-page={noteId === undefined ? "notes" : "editor"}>

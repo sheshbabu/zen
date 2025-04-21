@@ -49,6 +49,10 @@ async function getNotesByTagId(tagId) {
   return await request('GET', `/api/notes?tag_id=${tagId}`);
 }
 
+async function getNotesByFocusId(focusId) {
+  return await request('GET', `/api/notes?focus_id=${focusId}`);
+}
+
 async function createNote(note) {
   return await request('POST', '/api/notes/', note);
 }
@@ -90,6 +94,7 @@ export default {
   getAllNotes,
   getNoteById,
   getNotesByTagId,
+  getNotesByFocusId,
   createNote,
   updateNote,
   deleteNote,

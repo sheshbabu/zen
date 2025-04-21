@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+	"zen/features/tags"
 )
 
 type FocusMode struct {
 	FocusModeID int
 	Name        string
+	Tags        []tags.Tag
 	LastUsedAt  time.Time
 }
 
