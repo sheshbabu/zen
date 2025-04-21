@@ -17,6 +17,8 @@ export default function NotesPage({ noteId }) {
   const selectedTagId = searchParams.get("tag_id");
   const selectedFocusId = searchParams.get("focus_id");
 
+  const isMobile = window.matchMedia("(max-width: 600px)").matches;
+
   let listClassName = "notes-list-container";
   let editorClassName = "notes-editor-container";
 
@@ -37,9 +39,13 @@ export default function NotesPage({ noteId }) {
       return;
     }
 
-    if (noteId === undefined && notes.length > 0) {
-      setSelectedNote(notes[0]);
-      return;
+    if (noteId === undefined) {
+      // Automatically select first note in desktop mode
+      if (!isMobile && notes.length > 0) {
+        setSelectedNote(notes[0]);
+        return;
+      }
+      setSelectedNote(null);
     }
 
     if (noteId !== undefined) {
