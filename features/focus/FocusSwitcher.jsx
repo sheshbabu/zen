@@ -6,7 +6,7 @@ import useSearchParams from "../../commons/components/useSearchParams.jsx";
 
 export default function FocusSwitcher({ focusModes }) {
   if (focusModes.length === 0) {
-    return null;
+    focusModes = [{ FocusModeID: 0, Name: "All Notes" }];
   }
 
   const [selectedFocusMode, setSelectedFocusMode] = useState(focusModes[0]);
