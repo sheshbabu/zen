@@ -2,7 +2,7 @@ import { h } from '../../assets/preact.esm.js';
 
 export default function Input({ id, label, type, placeholder, value, hint, error, isDisabled, onChange }) {
   return (
-    <div className="input-container">
+    <div className="input-container form-field-container">
       <label htmlFor={id}>{label}</label>
       <br />
       {hint && <div className="hint">{hint}</div>}

@@ -22,26 +22,26 @@
     --red-600: #DC2626;
 
     /* typography */
-    --font-scale: 1.125;
     /* Major Second */
+    --font-scale: 1.125;
     --font-family: ui-sans-serif, system-ui, sans-serif;
     --font-family-code: ui-monospace, monospace;
-    --h1: bold 2.027rem/1.2 var(--font-family);
     /* 1rem * pow(var(--font-scale), 6) */
-    --h2: bold 1.802rem/1.2 var(--font-family);
+    --h1: bold 2.027rem/1.2 var(--font-family);
     /* 1rem * pow(var(--font-scale), 5) */
-    --h3: bold 1.602rem/1.2 var(--font-family);
+    --h2: bold 1.802rem/1.2 var(--font-family);
     /* 1rem * pow(var(--font-scale), 4) */
-    --h4: bold 1.424rem/1.2 var(--font-family);
+    --h3: bold 1.602rem/1.2 var(--font-family);
     /* 1rem * pow(var(--font-scale), 3) */
-    --h5: bold 1.266rem/1.2 var(--font-family);
+    --h4: bold 1.424rem/1.2 var(--font-family);
     /* 1rem * pow(var(--font-scale), 2) */
-    --h6: bold 1.125rem/1.2 var(--font-family);
+    --h5: bold 1.266rem/1.2 var(--font-family);
     /* 1rem * pow(var(--font-scale), 1) */
-    --p1: normal 1rem/1.5 var(--font-family);
+    --h6: bold 1.125rem/1.2 var(--font-family);
     /* https://m3.material.io/styles/typography/applying-type */
-    --sm: normal 0.889rem/1.4 var(--font-family);
+    --p1: normal 1rem/1.5 var(--font-family);
     /* 1rem / var(--font-scale) */
+    --sm: normal 0.889rem/1.4 var(--font-family);
     --code: normal 0.889rem/1.4 var(--font-family-code);
 
     /* spacing */
@@ -54,12 +54,12 @@
     /* elevation */
     --shadow-1: rgba(0, 0, 0, 0.01) 0px 1px 3px 0px, rgba(0, 0, 0, 0.10) 0px 1px 3px 0px;
     --shadow-2: rgba(0, 0, 0, 0.10) 0px 1px 3px 0px, rgba(0, 0, 0, 0.10) 0px 1px 3px 0px;
-    --shadow-3: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
     /* tailwind #37 https://getcssscan.com/css-box-shadow-examples */
-    --shadow-4: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+    --shadow-3: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
     /* tailwind #38 https://getcssscan.com/css-box-shadow-examples */
-    --shadow-5: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
+    --shadow-4: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
     /* tailwind #40 https://getcssscan.com/css-box-shadow-examples */
+    --shadow-5: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
     --shadow-6: rgba(0, 0, 0, 0.1) 0px -10px 15px -3px;
 
     /* globals */
@@ -73,8 +73,8 @@
 }
 
 html {
-    font-size: 16px;
     /* 1rem */
+    font-size: 16px;
     height: 100%;
     overflow: hidden;
     margin: 0;
@@ -89,10 +89,10 @@ html {
 body {
     display: flex;
     font: var(--p1);
-    color: #444;
     /* https://uxmovement.com/content/why-you-should-never-use-pure-black-for-text-or-backgrounds/ */
-    position: relative;
+    color: #444;
     /* for floating editor */
+    position: relative;
     height: 100%;
     overflow: hidden;
     margin: 0;
@@ -172,7 +172,6 @@ body {
             color: var(--neutral-900);
 
             svg.lucide {
-
                 circle,
                 rect,
                 path {
@@ -278,7 +277,7 @@ body {
 
 .notes-list-toolbar {
     display: flex;
-    padding: 8px;
+    padding: 8px 0;
     margin-top: 6px;
     margin-left: 4px;
 
@@ -470,6 +469,7 @@ body {
     opacity: 1;
     transform: translateX(0);
     overflow-y: auto;
+    word-wrap: break-word;
     max-height: 100%;
     -webkit-overflow-scrolling: touch;
 
@@ -646,8 +646,8 @@ body {
         display: none;
         background-color: white;
         z-index: 1;
-        max-height: 198px;
         /* 5.5 items * 36px of option height */
+        max-height: 198px;
         overflow: scroll;
         border-radius: 4px;
 
@@ -737,8 +737,8 @@ body {
         font-family: monospace;
         resize: none;
         tab-size: 4;
-        field-sizing: content;
         /* https://developer.mozilla.org/en-US/docs/Web/CSS/field-sizing#browser_compatibility */
+        field-sizing: content;
     }
 
     .hint {
@@ -749,6 +749,14 @@ body {
     .error {
         color: var(--red-600);
         font: var(--sm);
+    }
+}
+
+.form-field-container {
+    margin-top: var(--spacing-md);
+
+    label {
+        font-weight: 600;
     }
 }
 
@@ -784,6 +792,25 @@ body {
     }
 }
 
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    svg {
+        width: 36px;
+        height: 36px;
+        padding: 8px;
+
+        circle,
+        rect,
+        path {
+            stroke: var(--neutral-500);
+            stroke-width: 2.5;
+        }
+    }
+}
+
 .model-footer-container {
     display: flex;
     justify-content: flex-end;
@@ -797,8 +824,13 @@ body {
 }
 
 .focus-dialog {
-    height: 400px;
     width: 600px;
+
+    p {
+        font: var(--sm);
+        margin-top: 4px;
+        color: var(--neutral-500);
+    }
 
     .notes-editor-tags-input {
         display: inline-block;
@@ -845,6 +877,10 @@ body {
         max-height: 400px;
         overflow-y: scroll;
 
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
         .search-result-item {
             display: flex;
             align-items: center;
@@ -884,6 +920,7 @@ body {
     .search-modal {
         width: 100%;
         margin-top: 0;
+        border-radius: 0;
 
         .search-results-container {
             max-height: 90vh;

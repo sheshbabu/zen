@@ -11,11 +11,7 @@ export default function FocusSwitcher({ focusModes }) {
 
   function handleAddNewClick() {
     setIsDropdownOpen(false);
-    render(<FocusDialog onCloseClick={handleFocusDialogCloseClick} />, document.querySelector('.modal-root'));
-  }
-
-  function handleFocusDialogCloseClick() {
-    render(null, document.querySelector('.modal-root'));
+    render(<FocusDialog/>, document.querySelector('.modal-root'));
   }
 
   const items = focusModes.map(mode => <li className="dropdown-option">{mode.Name}</li>);
