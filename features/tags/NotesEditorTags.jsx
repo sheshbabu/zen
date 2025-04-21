@@ -47,10 +47,6 @@ export default function NotesEditorTags({ tags, isEditable, onAddTag, onRemoveTa
     }
 
     if (e.key === 'Backspace' && value === "") {
-      const lastTag = tags[tags.length - 1];
-      if (lastTag) {
-        onRemoveTag(lastTag);
-      }
       closeSuggestions(e);
       return;
     }
