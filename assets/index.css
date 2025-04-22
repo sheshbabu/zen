@@ -679,9 +679,14 @@ body {
         &:hover,
         &.is-selected {
             background-color: var(--neutral-50);
+
+            svg.lucide {
+                display: block;
+            }
         }
 
         svg.lucide {
+            display: none;
             width: 24px;
             height: 24px;
             padding: 4px;

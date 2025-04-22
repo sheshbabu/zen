@@ -55,7 +55,7 @@ export default function FocusSwitcher({ focusModes }) {
       </li>
     )
   });
-  items.push(<li className="dropdown-option" onClick={handleAddNewClick}>Add new...<NewIcon/></li>);
+  items.push(<li className="dropdown-option" onClick={handleAddNewClick}>Add new...</li>);
 
   return (
     <div className="sidebar-focus-switcher">
