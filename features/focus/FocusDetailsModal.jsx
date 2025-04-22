@@ -3,8 +3,9 @@ import Input from "../../commons/components/Input.jsx";
 import { CloseIcon } from "../../commons/components/Icon.jsx";
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
+import navigateTo from "../../commons/utils/navigateTo.js";
 
-export default function FocusCreateModal() {
+export default function FocusDetailsModal() {
   const [name, setName] = useState("");
   const [tags, setTags] = useState([]);
 
@@ -33,8 +34,9 @@ export default function FocusCreateModal() {
     };
 
     ApiClient.createFocusMode(focusMode)
-      .then(() => {
+      .then(newFocusMode => {
         closeModal();
+        navigateTo(`/notes/?focus_id=${newFocusMode.focus_mode_id}`);
       })
       .catch((error) => {
         console.error("Error creating focus mode:", error);

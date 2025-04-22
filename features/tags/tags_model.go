@@ -40,7 +40,7 @@ func GetAllTags() ([]Tag, error) {
 	return tags, nil
 }
 
-func GetTagsByName(name string) ([]Tag, error) {
+func SearchTags(term string) ([]Tag, error) {
 	tags := []Tag{}
 	query := `
 		SELECT
@@ -52,7 +52,7 @@ func GetTagsByName(name string) ([]Tag, error) {
 			name LIKE '%' || ? || '%'
 	`
 
-	rows, err := sqlite.DB.Query(query, name)
+	rows, err := sqlite.DB.Query(query, term)
 	if err != nil {
 		err = fmt.Errorf("error retrieving tags: %w", err)
 		slog.Error(err.Error())
@@ -110,29 +110,6 @@ func GetTagsByFocusModeID(focusModeID int) ([]Tag, error) {
 	return tags, nil
 }
 
-func CreateTag(name string) (Tag, error) {
-	tag := Tag{}
-	query := `
-		INSERT INTO
-			tags (name)
-		VALUES
-			(?)
-		RETURNING
-			tag_id,
-			name
-	`
-
-	row := sqlite.DB.QueryRow(query, name)
-	err := row.Scan(&tag.TagID, &tag.Name)
-	if err != nil {
-		err = fmt.Errorf("error creating tag: %w", err)
-		slog.Error(err.Error())
-		return tag, err
-	}
-
-	return tag, nil
-}
-
 func UpdateTag(tag Tag) (Tag, error) {
 	query := `
 		UPDATE
@@ -150,29 +127,6 @@ func UpdateTag(tag Tag) (Tag, error) {
 	err := row.Scan(&tag.TagID, &tag.Name)
 	if err != nil {
 		err = fmt.Errorf("error updating tag: %w", err)
-		slog.Error(err.Error())
-		return tag, err
-	}
-
-	return tag, nil
-}
-
-func GetTagByID(tagID int) (Tag, error) {
-	var tag Tag
-	query := `
-		SELECT
-			tag_id,
-			name
-		FROM
-			tags
-		WHERE
-			tag_id = ?
-	`
-
-	row := sqlite.DB.QueryRow(query, tagID)
-	err := row.Scan(&tag.TagID, &tag.Name)
-	if err != nil {
-		err = fmt.Errorf("error retrieving tag: %w", err)
 		slog.Error(err.Error())
 		return tag, err
 	}

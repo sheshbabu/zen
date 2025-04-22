@@ -1,9 +1,11 @@
 package notes
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"zen/commons/sqlite"
+	"zen/features/tags"
 )
 
 func GetAllNotes(limit int, offset int) ([]Note, error) {
@@ -11,15 +13,27 @@ func GetAllNotes(limit int, offset int) ([]Note, error) {
 
 	query := `
 		SELECT
-			note_id,
-			title,
-			content,
-			SUBSTR(content, 0, 500) AS snippet,
-			updated_at
+			n.note_id,
+			n.title,
+			n.content,
+			SUBSTR(n.content, 0, 500) AS snippet,
+			n.updated_at,
+			COALESCE(
+                JSON_GROUP_ARRAY(JSON_OBJECT(
+					'tag_id', t.tag_id,
+					'name', t.name
+				)), '[]'
+            ) as tags_json
 		FROM
-			notes
+			notes n
+		LEFT JOIN
+			note_tags nt ON n.note_id = nt.note_id
+		LEFT JOIN
+			tags t ON nt.tag_id = t.tag_id
+		GROUP BY
+            n.note_id
 		ORDER BY
-			updated_at DESC
+			n.updated_at DESC
 		LIMIT
 			?
 		OFFSET
@@ -36,11 +50,18 @@ func GetAllNotes(limit int, offset int) ([]Note, error) {
 
 	for rows.Next() {
 		var note Note
-		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt)
+		var tagsJSON string
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON)
 		if err != nil {
 			err = fmt.Errorf("error scanning note: %w", err)
 			slog.Error(err.Error())
 			return notes, err
+		}
+		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+		if err != nil {
+			err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+			slog.Error(err.Error())
+			note.Tags = []tags.Tag{}
 		}
 		notes = append(notes, note)
 	}
@@ -50,25 +71,43 @@ func GetAllNotes(limit int, offset int) ([]Note, error) {
 
 func GetNoteByID(noteID int) (Note, error) {
 	var note Note
+	var tagsJSON string
+
 	query := `
 		SELECT
-			note_id,
-			title,
-			content,
+			n.note_id,
+			n.title,
+			n.content,
 			SUBSTR(content, 0, 500) AS snippet,
-			updated_at
+			n.updated_at,
+			COALESCE(
+                JSON_GROUP_ARRAY(JSON_OBJECT(
+					'tag_id', t.tag_id,
+					'name', t.name
+				)), '[]'
+            ) as tags_json
 		FROM
-			notes
+			notes n
+		LEFT JOIN
+			note_tags nt ON n.note_id = nt.note_id
+		LEFT JOIN
+			tags t ON nt.tag_id = t.tag_id
 		WHERE
-			note_id = ?
+			n.note_id = ?
 	`
 
 	row := sqlite.DB.QueryRow(query, noteID)
-	err := row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt)
+	err := row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON)
 	if err != nil {
 		err = fmt.Errorf("error retrieving note: %w", err)
 		slog.Error(err.Error())
 		return note, err
+	}
+	err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+	if err != nil {
+		err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+		slog.Error(err.Error())
+		note.Tags = []tags.Tag{}
 	}
 
 	return note, nil
@@ -139,6 +178,38 @@ func CreateNote(note Note) (Note, error) {
 			slog.Error(err.Error())
 			return note, err
 		}
+	}
+
+	var tagsJSON string
+	query = `
+		SELECT
+			COALESCE(
+				JSON_GROUP_ARRAY(JSON_OBJECT(
+					'tag_id', t.tag_id,
+					'name', t.name
+				)), '[]'
+			) as tags_json
+		FROM
+			note_tags nt
+		LEFT JOIN
+			tags t ON nt.tag_id = t.tag_id
+		WHERE
+			nt.note_id = ?
+		GROUP BY
+			nt.note_id
+	`
+	row = tx.QueryRow(query, note.NoteID)
+	err = row.Scan(&tagsJSON)
+	if err != nil {
+		err = fmt.Errorf("error retrieving tags for note %d: %w", note.NoteID, err)
+		slog.Error(err.Error())
+		note.Tags = []tags.Tag{}
+	}
+	err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+	if err != nil {
+		err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+		slog.Error(err.Error())
+		note.Tags = []tags.Tag{}
 	}
 
 	err = tx.Commit()
@@ -237,6 +308,38 @@ func UpdateNote(note Note) (Note, error) {
 		}
 	}
 
+	var tagsJSON string
+	query = `
+		SELECT
+			COALESCE(
+				JSON_GROUP_ARRAY(JSON_OBJECT(
+					'tag_id', t.tag_id,
+					'name', t.name
+				)), '[]'
+			) as tags_json
+		FROM
+			note_tags nt
+		LEFT JOIN
+			tags t ON nt.tag_id = t.tag_id
+		WHERE
+			nt.note_id = ?
+		GROUP BY
+			nt.note_id
+	`
+	row = tx.QueryRow(query, note.NoteID)
+	err = row.Scan(&tagsJSON)
+	if err != nil {
+		err = fmt.Errorf("error retrieving tags for note %d: %w", note.NoteID, err)
+		slog.Error(err.Error())
+		note.Tags = []tags.Tag{}
+	}
+	err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+	if err != nil {
+		err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+		slog.Error(err.Error())
+		note.Tags = []tags.Tag{}
+	}
+
 	err = tx.Commit()
 
 	if err != nil {
@@ -307,13 +410,23 @@ func GetNotesByTagID(tagID int) ([]Note, error) {
 			n.title,
 			n.content,
 			SUBSTR(n.content, 0, 500) AS snippet,
-			n.updated_at
+			n.updated_at,
+			COALESCE(
+                JSON_GROUP_ARRAY(JSON_OBJECT(
+					'tag_id', t.tag_id,
+					'name', t.name
+				)), '[]'
+            ) as tags_json
 		FROM
 			notes n
-		JOIN
+		LEFT JOIN
 			note_tags nt ON n.note_id = nt.note_id
+		LEFT JOIN
+			tags t ON nt.tag_id = t.tag_id
 		WHERE
 			nt.tag_id = ?
+		GROUP BY
+            n.note_id
 		ORDER BY
 			n.updated_at DESC
 	`
@@ -328,11 +441,18 @@ func GetNotesByTagID(tagID int) ([]Note, error) {
 
 	for rows.Next() {
 		var note Note
-		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt)
+		var tagsJSON string
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON)
 		if err != nil {
 			err = fmt.Errorf("error scanning note: %w", err)
 			slog.Error(err.Error())
 			return notes, err
+		}
+		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+		if err != nil {
+			err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+			slog.Error(err.Error())
+			note.Tags = []tags.Tag{}
 		}
 		notes = append(notes, note)
 	}
@@ -349,15 +469,25 @@ func GetNotesByFocusModeID(focusModeID int) ([]Note, error) {
 			n.title,
 			n.content,
 			SUBSTR(n.content, 0, 500) AS snippet,
-			n.updated_at
+			n.updated_at,
+			COALESCE(
+                JSON_GROUP_ARRAY(JSON_OBJECT(
+					'tag_id', t.tag_id,
+					'name', t.name
+				)), '[]'
+            ) as tags_json
 		FROM
 			focus_mode_tags fmt
 		JOIN
 			note_tags nt ON fmt.tag_id = nt.tag_id
 		JOIN
 			notes n ON nt.note_id = n.note_id
+		JOIN
+			tags t ON nt.tag_id = t.tag_id
 		WHERE
 			fmt.focus_mode_id = ?
+		GROUP BY
+            n.note_id
 		ORDER BY
 			n.updated_at DESC
 	`
@@ -372,11 +502,18 @@ func GetNotesByFocusModeID(focusModeID int) ([]Note, error) {
 
 	for rows.Next() {
 		var note Note
-		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt)
+		var tagsJSON string
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON)
 		if err != nil {
 			err = fmt.Errorf("error scanning note by focus mode ID: %w", err)
 			slog.Error(err.Error())
 			return notes, err
+		}
+		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+		if err != nil {
+			err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+			slog.Error(err.Error())
+			note.Tags = []tags.Tag{}
 		}
 		notes = append(notes, note)
 	}

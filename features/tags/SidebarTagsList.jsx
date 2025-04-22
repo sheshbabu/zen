@@ -1,7 +1,7 @@
 import { h } from "../../assets/preact.esm.js"
 import Link from "../../commons/components/Link.jsx"
 
-function SidebarTagsList({ tags = [] }) {
+export default function SidebarTagsList({ tags = [] }) {
   return (
     <div>
       <div className="sidebar-section-title">Tags</div>
@@ -11,5 +11,3 @@ function SidebarTagsList({ tags = [] }) {
     </div>
   );
 }
-
-export default SidebarTagsList;

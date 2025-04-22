@@ -135,17 +135,53 @@ func UpdateFocusMode(focusModeID int) error {
 	return nil
 }
 
-func CreateFocusMode(name string) error {
+func CreateFocusMode(focusMode *FocusMode) error {
+	tx, err := sqlite.DB.Begin()
+
+	if err != nil {
+		err = fmt.Errorf("error starting transaction: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	defer tx.Rollback()
+
 	query := `
 		INSERT INTO
 			focus_modes (name, last_used_at)
 		VALUES
 			(?, CURRENT_TIMESTAMP)
+		RETURNING
+			focus_mode_id
 	`
 
-	_, err := sqlite.DB.Exec(query, name)
+	row := tx.QueryRow(query, focusMode.Name)
+	err = row.Scan(&focusMode.FocusModeID)
 	if err != nil {
 		err = fmt.Errorf("error creating focus mode: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	for _, tag := range focusMode.Tags {
+		query = `
+			INSERT INTO
+				focus_mode_tags (focus_mode_id, tag_id)
+			VALUES
+				(?, ?)
+		`
+
+		_, err = tx.Exec(query, focusMode.FocusModeID, tag.TagID)
+		if err != nil {
+			err = fmt.Errorf("error associating tag with focus mode: %w", err)
+			slog.Error(err.Error())
+			return err
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("error committing transaction: %w", err)
 		slog.Error(err.Error())
 		return err
 	}

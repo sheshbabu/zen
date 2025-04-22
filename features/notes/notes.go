@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-	"zen/features/focus"
 	"zen/features/tags"
 )
 
@@ -18,24 +17,6 @@ type Note struct {
 	Tags      []tags.Tag
 }
 
-type Editor struct {
-	SelectedNote Note
-	IsNewNote    bool
-	IsHidden     bool
-}
-
-type NotesList struct {
-	Title          string
-	Notes          []Note
-	RefreshLink    string
-	ViewPreference string
-}
-
-type Sidebar struct {
-	FocusModes []focus.FocusMode
-	Tags       []tags.Tag
-}
-
 const NOTES_LIMIT = 100
 
 func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
@@ -44,9 +25,19 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 
 	tagIDStr := r.URL.Query().Get("tag_id")
 	focusModeIDStr := r.URL.Query().Get("focus_id")
+
+	tagID := 0
 	focusModeID := 0
 
-	if focusModeIDStr != "" && focusModeIDStr != "0" {
+	if tagIDStr != "" {
+		tagID, err = strconv.Atoi(tagIDStr)
+		if err != nil {
+			http.Error(w, "Invalid tag ID", http.StatusBadRequest)
+			return
+		}
+	}
+
+	if focusModeIDStr != "" {
 		focusModeID, err = strconv.Atoi(focusModeIDStr)
 		if err != nil {
 			http.Error(w, "Invalid focus mode ID", http.StatusBadRequest)
@@ -54,25 +45,14 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if focusModeID == 0 && tagIDStr == "" {
+	if focusModeID == 0 && tagID == 0 {
 		allNotes, err = GetAllNotes(NOTES_LIMIT, 0)
-	} else if tagIDStr != "" {
-		tagID, err := strconv.Atoi(tagIDStr)
-		if err != nil {
-			http.Error(w, "Invalid tag ID", http.StatusBadRequest)
-			return
-		}
+	} else if tagID != 0 {
 		allNotes, err = GetNotesByTagID(tagID)
-	} else {
+	} else if focusModeID != 0 {
 		allNotes, err = GetNotesByFocusModeID(focusModeID)
 	}
 
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	err = assignTagsToNotes(allNotes)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -91,12 +71,6 @@ func HandleGetNote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	note, err := GetNoteByID(noteID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	note.Tags, err = tags.GetNoteTags(note.NoteID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -139,12 +113,6 @@ func HandleUpdateNote(w http.ResponseWriter, r *http.Request) {
 	noteInput.NoteID = noteID
 
 	note, err := UpdateNote(noteInput)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	note.Tags, err = tags.GetNoteTags(note.NoteID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

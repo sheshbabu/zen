@@ -185,6 +185,7 @@ body {
             height: 36px;
             padding: 8px;
 
+            line,
             circle,
             rect,
             path {
@@ -789,6 +790,12 @@ body {
 
     .modal-content {
         padding: 16px;
+
+        p {
+            font: var(--sm);
+            margin-top: 4px;
+            color: var(--neutral-500);
+        }
     }
 }
 
@@ -825,12 +832,6 @@ body {
 
 .focus-dialog {
     width: 600px;
-
-    p {
-        font: var(--sm);
-        margin-top: 4px;
-        color: var(--neutral-500);
-    }
 
     .notes-editor-tags-input {
         display: inline-block;
