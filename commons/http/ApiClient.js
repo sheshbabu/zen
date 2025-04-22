@@ -35,6 +35,10 @@ async function createFocusMode(focusMode) {
   return await request('POST', '/api/focus/new', focusMode);
 }
 
+async function updateFocusMode(focusMode) {
+  return await request('PUT', `/api/focus/${focusMode.focus_mode_id}`, focusMode);
+}
+
 // Notes
 
 async function getAllNotes() {
@@ -91,6 +95,7 @@ export default {
   request,
   getAllFocusModes,
   createFocusMode,
+  updateFocusMode,
   getAllNotes,
   getNoteById,
   getNotesByTagId,

@@ -5,9 +5,12 @@ import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 
-export default function FocusDetailsModal() {
-  const [name, setName] = useState("");
-  const [tags, setTags] = useState([]);
+export default function FocusDetailsModal({ mode, focusMode }) {
+  const [name, setName] = useState(focusMode ? focusMode.name : "");
+  const [tags, setTags] = useState(focusMode ? focusMode.tags : []);
+
+  let title = "Create Focus";
+  let buttonName = "Create";
 
   function handleBackdropClick(e) {
     if (e.target.classList.contains("modal-backdrop-container")) {
@@ -28,15 +31,26 @@ export default function FocusDetailsModal() {
   }
 
   function handleCreateClick() {
-    const focusMode = {
+    let promise = null;
+
+    const payload = {
       Name: name,
       Tags: tags
     };
 
-    ApiClient.createFocusMode(focusMode)
+    if (mode === "edit") {
+      payload.focus_mode_id = focusMode.focus_mode_id;
+      promise = ApiClient.updateFocusMode(payload);
+    } else {
+      promise = ApiClient.createFocusMode(payload);
+    }
+
+    promise
       .then(newFocusMode => {
         closeModal();
-        navigateTo(`/notes/?focus_id=${newFocusMode.focus_mode_id}`);
+        if (mode === "create") {
+          navigateTo(`/notes/?focus_id=${newFocusMode.focus_mode_id}`);
+        }
       })
       .catch((error) => {
         console.error("Error creating focus mode:", error);
@@ -47,16 +61,21 @@ export default function FocusDetailsModal() {
     render(null, document.querySelector('.modal-root'));
   }
 
+  if (mode === "edit") {
+    title = "Edit Focus";
+    buttonName = "Update";
+  }
+
   return (
     <div class="modal-backdrop-container is-centered" onClick={handleBackdropClick}>
       <div class="modal-content-container focus-dialog">
         <div className="modal-content">
           <div className="modal-header">
-            <h3 className="modal-title">Create Focus</h3>
+            <h3 className="modal-title">{title}</h3>
             <CloseIcon className="notes-editor-toolbar-button-close" onClick={closeModal} />
           </div>
           <p>Define your Focus to concentrate on what matters most. Add tags to view only the relevant notes for this topic and work without distraction.</p>
-          <Input id="focus-name" label="Focus Name" type="text" placeholder="Name your Focus" value={name} hint="" error="" isDisabled={false} onChange={handleNameChange}/>
+          <Input id="focus-name" label="Focus Name" type="text" placeholder="Name your Focus" value={name} hint="" error="" isDisabled={false} onChange={handleNameChange} />
           <div className="form-field-container">
             <label htmlFor="focus-tags">Tags</label>
             <NotesEditorTags tags={tags} isEditable onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
@@ -64,7 +83,7 @@ export default function FocusDetailsModal() {
         </div>
         <div className="model-footer-container">
           <div className="button" onClick={closeModal}>Cancel</div>
-          <div className="button primary" onClick={handleCreateClick}>Create</div>
+          <div className="button primary" onClick={handleCreateClick}>{buttonName}</div>
         </div>
       </div>
     </div>

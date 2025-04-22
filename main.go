@@ -69,6 +69,7 @@ func newRouter() *http.ServeMux {
 
 	mux.HandleFunc("GET /api/focus/", focus.HandleGetAllFocusModes)
 	mux.HandleFunc("POST /api/focus/", focus.HandleCreateFocusMode)
+	mux.HandleFunc("PUT /api/focus/{focus_id}/", focus.HandleUpdateFocusMode)
 
 	mux.HandleFunc("POST /api/images/", images.HandleUploadImage)
 

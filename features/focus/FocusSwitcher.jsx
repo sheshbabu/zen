@@ -1,6 +1,6 @@
 import { h, render, useEffect, useState } from "../../assets/preact.esm.js"
 import FocusDetailsModal from './FocusDetailsModal.jsx';
-import { ArrowDownIcon } from "../../commons/components/Icon.jsx";
+import { ArrowDownIcon, PencilIcon, NewIcon } from "../../commons/components/Icon.jsx";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import useSearchParams from "../../commons/components/useSearchParams.jsx";
 
@@ -34,11 +34,28 @@ export default function FocusSwitcher({ focusModes }) {
 
   function handleAddNewClick() {
     setIsDropdownOpen(false);
-    render(<FocusDetailsModal />, document.querySelector('.modal-root'));
+    render(<FocusDetailsModal mode="create"/>, document.querySelector('.modal-root'));
   }
 
-  const items = focusModes.map(focusMode => <li className="dropdown-option" onClick={() => handleFocusModeClick(focusMode)}>{focusMode.name}</li>);
-  items.push(<li className="dropdown-option" onClick={handleAddNewClick}>Add new...</li>);
+  function handleEditClick(e, focusMode) {
+    e.stopPropagation();
+    setIsDropdownOpen(false);
+    render(<FocusDetailsModal mode="edit" focusMode={focusMode}/>, document.querySelector('.modal-root'));
+  }
+
+  const items = focusModes.map(focusMode => {
+    let editIcon = null;
+    if (focusMode.focus_mode_id !== 0) {
+      editIcon = <PencilIcon onClick={e => handleEditClick(e, focusMode)}/>
+    }
+    return (
+      <li key={focusMode.focus_mode_id} className="dropdown-option" onClick={() => handleFocusModeClick(focusMode)}>
+        {focusMode.name}
+        {editIcon}
+      </li>
+    )
+  });
+  items.push(<li className="dropdown-option" onClick={handleAddNewClick}>Add new...<NewIcon/></li>);
 
   return (
     <div className="sidebar-focus-switcher">

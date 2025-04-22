@@ -41,3 +41,20 @@ func HandleCreateFocusMode(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(focusMode)
 }
+
+func HandleUpdateFocusMode(w http.ResponseWriter, r *http.Request) {
+	var focusMode FocusMode
+	if err := json.NewDecoder(r.Body).Decode(&focusMode); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := UpdateFocusMode(&focusMode); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(focusMode)
+}

@@ -658,6 +658,8 @@ body {
     }
 
     .dropdown-option {
+        display: flex;
+        justify-content: space-between;
         font: var(--sm);
         padding-left: 12px;
         height: 36px;
@@ -677,6 +679,21 @@ body {
         &:hover,
         &.is-selected {
             background-color: var(--neutral-50);
+        }
+
+        svg.lucide {
+            width: 24px;
+            height: 24px;
+            padding: 4px;
+            margin-right: 8px;
+
+            line,
+            circle,
+            rect,
+            path {
+                stroke: var(--neutral-500);
+                stroke-width: 2;
+            }
         }
     }
 

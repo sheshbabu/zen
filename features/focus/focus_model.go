@@ -115,19 +115,68 @@ func GetFocusModeByID(focusModeID int) (FocusMode, error) {
 	return focusMode, nil
 }
 
-func UpdateFocusMode(focusModeID int) error {
+func UpdateFocusMode(focusMode *FocusMode) error {
+	fmt.Println("Updating focus mode:", focusMode)
+	tx, err := sqlite.DB.Begin()
+
+	if err != nil {
+		err = fmt.Errorf("error starting transaction: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	defer tx.Rollback()
+
 	query := `
 		UPDATE
 			focus_modes
 		SET
+			name = ?,
 			last_used_at = CURRENT_TIMESTAMP
 		WHERE
 			focus_mode_id = ?
 	`
 
-	_, err := sqlite.DB.Exec(query, focusModeID)
+	_, err = tx.Exec(query, focusMode.Name, focusMode.FocusModeID)
 	if err != nil {
 		err = fmt.Errorf("error updating focus mode: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	query = `
+		DELETE FROM
+			focus_mode_tags
+		WHERE
+			focus_mode_id = ?
+	`
+
+	_, err = tx.Exec(query, focusMode.FocusModeID)
+	if err != nil {
+		err = fmt.Errorf("error deleting old tags for focus mode: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	for _, tag := range focusMode.Tags {
+		query = `
+			INSERT INTO
+				focus_mode_tags (focus_mode_id, tag_id)
+			VALUES
+				(?, ?)
+		`
+
+		_, err = tx.Exec(query, focusMode.FocusModeID, tag.TagID)
+		if err != nil {
+			err = fmt.Errorf("error associating tag with focus mode: %w", err)
+			slog.Error(err.Error())
+			return err
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("error committing transaction: %w", err)
 		slog.Error(err.Error())
 		return err
 	}
