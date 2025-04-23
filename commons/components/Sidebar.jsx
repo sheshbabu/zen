@@ -10,6 +10,10 @@ export default function Sidebar({ focusModes, tags }) {
     render(<SearchMenu />, document.querySelector('.modal-root'));
   }
 
+  const currentSearchParams = new URLSearchParams(window.location.search);
+  const focusId = currentSearchParams.get("focus_id");
+  const notesLink = focusId ? `/notes/?focus_id=${focusId}` : "/notes/";
+
   return (
     <div>
       <FocusSwitcher focusModes={focusModes} />
@@ -22,7 +26,7 @@ export default function Sidebar({ focusModes, tags }) {
         <SearchIcon />
         Search
       </div>
-      <Link className="sidebar-button" to="/notes/">
+      <Link className="sidebar-button" to={notesLink}>
         <NotesIcon />
         Notes
       </Link>
@@ -34,11 +38,11 @@ export default function Sidebar({ focusModes, tags }) {
         <SettingsIcon />
         Settings
       </Link> */}
-      <div className="sidebar-button" to="/archives" shouldPreserveSearchParams>
+      <div className="sidebar-button" activeClassName="is-active" to="/archives" shouldPreserveSearchParams>
         <ArchiveIcon />
         Archives
       </div>
-      <div className="sidebar-button" to="/trash" shouldPreserveSearchParams>
+      <div className="sidebar-button" activeClassName="is-active" to="/trash" shouldPreserveSearchParams>
         <TrashIcon />
         Trash
       </div>

@@ -36,15 +36,13 @@ function NotesListItem({ note }) {
   }
 
   return (
-    <div className="notes-list-item">
-      <Link to={link} shouldPreserveSearchParams>
+      <Link to={link} className="notes-list-item" activeClassName="is-active" shouldPreserveSearchParams>
         {title}
         <div className="notes-list-item-subcontainer">
           <div className="notes-list-item-subtext">{updatedAt}</div>
           <div className="notes-list-item-tags">{tags}</div>
         </div>
       </Link>
-    </div>
   );
 }
 

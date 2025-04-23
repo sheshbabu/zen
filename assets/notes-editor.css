@@ -2,24 +2,6 @@
     outline: none;
 
     &.is-editable {
-        .notes-editor-tags {
-            .tag {
-                cursor: pointer;
-
-                &:hover {
-                    background-color: var(--neutral-200);
-                }
-
-                svg {
-                    display: inline-block;
-                }
-            }
-        }
-
-        .notes-editor-tags-input {
-            display: inline-block;
-        }
-
         .notes-editor-image-dropzone {
             display: block;
             border: 1px dashed var(--neutral-300);
@@ -103,7 +85,6 @@
 }
 
 .notes-editor-tags-input {
-    display: none;
     border: none;
     padding: 8px;
     padding-left: 0;

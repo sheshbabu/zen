@@ -168,10 +168,12 @@ body {
         transition-property: color, stroke;
         transition-duration: 500ms;
 
-        &:hover {
+        &:hover,
+        &.is-active {
             color: var(--neutral-900);
 
             svg.lucide {
+
                 circle,
                 rect,
                 path {
@@ -209,7 +211,7 @@ body {
             margin-bottom: 4px;
         }
 
-        a {
+        a.sidebar-tag-link {
             display: flex;
             padding: 4px 0;
             cursor: pointer;
@@ -220,7 +222,8 @@ body {
             transition-property: color;
             transition-duration: 500ms;
 
-            &:hover {
+            &:hover,
+            &.is-active {
                 color: var(--neutral-600);
             }
         }
@@ -331,47 +334,45 @@ body {
         font-weight: normal;
     }
 
-    .notes-list-item {
+    a.notes-list-item {
+        display: block;
+        padding: 16px;
+        border-bottom: 1px solid var(--neutral-100);
+        text-decoration: none;
+        color: inherit;
         transition-property: background-color;
         transition-duration: 500ms;
 
-        &:hover {
+        &:hover,
+        &.is-active {
             background-color: var(--neutral-50);
         }
 
-        a {
-            display: block;
-            padding: 16px;
-            border-bottom: 1px solid var(--neutral-100);
-            text-decoration: none;
-            color: inherit;
+        .notes-list-item-title {
+            font-weight: 500;
 
-            .notes-list-item-title {
-                font-weight: 500;
+            &.untitled {
+                color: var(--neutral-400);
+            }
+        }
 
-                &.untitled {
-                    color: var(--neutral-400);
-                }
+        .notes-list-item-subcontainer {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            overflow: hidden;
+            margin-top: 4px;
+
+            .notes-list-item-subtext {
+                font: var(--sm);
+                color: var(--neutral-400);
+                align-content: end;
             }
 
-            .notes-list-item-subcontainer {
+            .notes-list-item-tags {
                 display: flex;
-                justify-content: space-between;
-                width: 100%;
-                overflow: hidden;
-                margin-top: 4px;
-
-                .notes-list-item-subtext {
-                    font: var(--sm);
-                    color: var(--neutral-400);
-                    align-content: end;
-                }
-
-                .notes-list-item-tags {
-                    display: flex;
-                    gap: 4px;
-                    margin-left: 8px;
-                }
+                gap: 4px;
+                margin-left: 8px;
             }
         }
     }
@@ -505,7 +506,6 @@ body {
             cursor: pointer;
             width: 20px;
             height: 20px;
-            margin: 8px;
             margin-right: 0;
             transition-property: stroke;
             transition-duration: 500ms;
@@ -642,7 +642,7 @@ body {
         padding: 0;
         top: 4px;
         position: absolute;
-        width: 100%;
+        min-width: 100%;
         box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
         display: none;
         background-color: white;
@@ -716,21 +716,27 @@ body {
 .tag {
     display: inline-flex;
     align-items: center;
-    background-color: var(--neutral-100);
     padding: 4px 8px;
     margin-right: 4px;
     border-radius: 4px;
     font-weight: 500;
     color: var(--neutral-400);
+    background-color: var(--neutral-100);
     font-size: 14px;
-    transition-property: background-color;
+    transition-property: color, background-color;
     transition-duration: 500ms;
+    cursor: pointer;
+    text-decoration: none;
 
     svg {
         height: 14px;
         width: 14px;
         margin-left: 4px;
-        display: none;
+    }
+
+    &:hover {
+        color: var(--neutral-500);
+        background-color: var(--neutral-200);
     }
 }
 
