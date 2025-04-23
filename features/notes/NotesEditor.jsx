@@ -4,6 +4,7 @@ import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
+import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
 
 export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange }) {
   if (!isNewNote && selectedNote === null) {
@@ -259,7 +260,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         <div className="notes-editor-title" contentEditable={isEditable} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
         <Toolbar isEditable={isEditable} isFloating={isFloating} onSaveClick={handleSaveClick} onEditClick={handleEditClick} onCloseClick={handleCloseClick} onDeleteClick={handleDeleteClick} />
       </div>
-      <NotesEditorTags tags={tags} isEditable={isEditable} onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
+      <NotesEditorTags tags={tags} isEditable={isEditable} canCreateTag onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
       <div className={`notes-editor-image-dropzone ${isDraggingOver ? "dragover" : ""}`} onDrop={handleImageDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}>
         Drag and drop images here...
       </div>
@@ -272,7 +273,8 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
 }
 
 function Toolbar({ isEditable, isFloating, onSaveClick, onEditClick, onCloseClick, onDeleteClick }) {
-  const actions = []
+  const actions = [];
+  const menuActions = [];
 
   if (isFloating) {
     actions.push(
@@ -288,13 +290,16 @@ function Toolbar({ isEditable, isFloating, onSaveClick, onEditClick, onCloseClic
     actions.push(
       <div className="ghost-button" onClick={onEditClick}>Edit</div>
     );
-    actions.push(
-      <div className="ghost-button" onClick={onDeleteClick}>Delete</div>
+    menuActions.push(
+      <div style="width: 80px;" onClick={onDeleteClick}>Delete</div>
     );
   }
 
   return (
-    <div className="notes-editor-toolbar">{actions}</div>
+    <div className="notes-editor-toolbar">
+      {actions}
+      <DropdownMenu actions={menuActions} />
+    </div>
   );
 }
 
