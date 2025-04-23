@@ -1,8 +1,9 @@
 import { h, Fragment, useState } from "../../assets/preact.esm.js"
 import ApiClient from '../../commons/http/ApiClient.js';
 import { RemoveIcon } from "../../commons/components/Icon.jsx";
+import Link from "../../commons/components/Link.jsx";
 
-export default function NotesEditorTags({ tags, isEditable, onAddTag, onRemoveTag }) {
+export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddTag, onRemoveTag }) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [selectedTag, setSelectedTag] = useState(null);
@@ -61,7 +62,7 @@ export default function NotesEditorTags({ tags, isEditable, onAddTag, onRemoveTa
         const existingTagIds = tags.map(tag => tag.tag_id);
         const filteredTags = tagSuggestions.filter(tag => !existingTagIds.includes(tag.tag_id));
 
-        if (tagSuggestions.length === 0 && value.trim() !== "") {
+        if (canCreateTag && tagSuggestions.length === 0 && value.trim() !== "") {
           filteredTags.push({ tag_id: -1, name: `Add "${value}"` });
         }
 
@@ -86,7 +87,7 @@ export default function NotesEditorTags({ tags, isEditable, onAddTag, onRemoveTa
     setSelectedTag(null);
   }
 
-  const tagItems = tags?.map(tag => <TagItem key={tag.tag_id} tag={tag} onRemoveTag={() => onRemoveTag(tag)} />);
+  const tagItems = tags?.map(tag => <TagItem key={tag.tag_id} isEditable={isEditable} tag={tag} onRemoveTag={() => onRemoveTag(tag)} />);
 
   return (
     <div className="notes-editor-tags">
@@ -104,12 +105,20 @@ export default function NotesEditorTags({ tags, isEditable, onAddTag, onRemoveTa
   );
 }
 
-function TagItem({ tag, onRemoveTag }) {
+function TagItem({ tag, isEditable, onRemoveTag }) {
+  if (isEditable) {
+    return (
+      <div className="tag" key={tag.tag_id}>
+        {tag.name}
+        <RemoveIcon onClick={onRemoveTag} />
+      </div>
+    );
+  }
+
   return (
-    <div className="tag" key={tag.tag_id}>
+    <Link className="tag" key={tag.tag_id} to={`/notes/?tag_id=${tag.tag_id}`} shouldPreserveSearchParams>
       {tag.name}
-      <RemoveIcon onClick={onRemoveTag} />
-    </div>
+    </Link>
   );
 }
 

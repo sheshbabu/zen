@@ -78,7 +78,7 @@ export default function FocusDetailsModal({ mode, focusMode }) {
           <Input id="focus-name" label="Focus Name" type="text" placeholder="Name your Focus" value={name} hint="" error="" isDisabled={false} onChange={handleNameChange} />
           <div className="form-field-container">
             <label htmlFor="focus-tags">Tags</label>
-            <NotesEditorTags tags={tags} isEditable onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
+            <NotesEditorTags tags={tags} isEditable canCreateTag={false} onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
           </div>
         </div>
         <div className="model-footer-container">
