@@ -1,8 +1,14 @@
 export default function navigateTo(path, shouldPreserveSearchParams) {
   if (shouldPreserveSearchParams) {
     const currentUrl = new URL(window.location.href);
-    const searchParams = currentUrl.search;
-    path += searchParams;
+    const newUrl = new URL(path, currentUrl.origin);
+
+    for (const [key, value] of currentUrl.searchParams.entries()) {
+      if (!newUrl.searchParams.has(key)) {
+        newUrl.searchParams.set(key, value);
+      }
+    }
+    path = newUrl.pathname + newUrl.search;
   }
 
   window.history.pushState({}, "", path);
