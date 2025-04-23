@@ -6,7 +6,7 @@ import useSearchParams from "../../commons/components/useSearchParams.jsx";
 
 export default function FocusSwitcher({ focusModes }) {
   if (focusModes.length === 0) {
-    focusModes = [{ focus_mode_id: 0, name: "All Notes" }];
+    focusModes = [{ focus_mode_id: 0, name: "Everything" }];
   }
 
   const [selectedFocusMode, setSelectedFocusMode] = useState(focusModes[0]);
@@ -17,7 +17,7 @@ export default function FocusSwitcher({ focusModes }) {
 
   useEffect(() => {
     setSelectedFocusMode(focusModes.find(focusMode => focusMode.focus_mode_id === parseInt(selectedFocusId, 10)) || focusModes[0]);
-  }, [selectedFocusId]);
+  }, [selectedFocusId, focusModes]);
 
   function handleDropdownClick() {
     setIsDropdownOpen(prevIsDropdownOpen => !prevIsDropdownOpen);

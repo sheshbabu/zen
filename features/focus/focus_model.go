@@ -11,7 +11,7 @@ import (
 
 var defaultFocusMode = FocusMode{
 	FocusModeID: 0,
-	Name:        "All Notes",
+	Name:        "Everything",
 	Tags:        nil,
 	LastUsedAt:  time.Now(),
 }
