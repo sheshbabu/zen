@@ -2,6 +2,7 @@ import { h } from "../../assets/preact.esm.js"
 import NotesListToolbar from './NotesListToolbar.jsx';
 import Link from '../../commons/components/Link.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
+import formatDate from '../../commons/utils/formatDate.js';
 
 export default function NotesList({ notes = [], view, onViewChange }) {
   let containerClassName = "notes-list-fragment";
@@ -27,7 +28,7 @@ export default function NotesList({ notes = [], view, onViewChange }) {
 
 function NotesListItem({ note }) {
   const link = `/notes/${note.NoteID}`;
-  const updatedAt = new Date(note.UpdatedAt).toISOString().split('T')[0].replace(/-/g, '/');
+  const updatedAt = formatDate(new Date(note.UpdatedAt))
   const tags = note.Tags?.map(tag => <div className="notes-list-item-subtext" key={tag.name}>{tag.name}</div>);
   let title = <div className="notes-list-item-title">{note.Title}</div>
 
@@ -39,7 +40,7 @@ function NotesListItem({ note }) {
       <Link to={link} className="notes-list-item" activeClassName="is-active" shouldPreserveSearchParams>
         {title}
         <div className="notes-list-item-subcontainer">
-          <div className="notes-list-item-subtext">{updatedAt}</div>
+          <div className="notes-list-item-subtext" title={note.UpdatedAt}>{updatedAt}</div>
           <div className="notes-list-item-tags">{tags}</div>
         </div>
       </Link>
