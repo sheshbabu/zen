@@ -15,7 +15,7 @@ func GetAllTags() ([]Tag, error) {
 		FROM
 			tags
 		ORDER BY
-			tag_id DESC
+			tag_id ASC
 	`
 
 	rows, err := sqlite.DB.Query(query)
@@ -86,6 +86,8 @@ func GetTagsByFocusModeID(focusModeID int) ([]Tag, error) {
 			focus_mode_tags f ON t.tag_id = f.tag_id
 		WHERE
 			f.focus_mode_id = ?
+		ORDER BY
+			t.tag_id ASC
 	`
 
 	rows, err := sqlite.DB.Query(query, focusModeID)

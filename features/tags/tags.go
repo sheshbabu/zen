@@ -12,9 +12,29 @@ type Tag struct {
 }
 
 func HandleGetTags(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query().Get("query")
+	var tags []Tag
+	var err error
 
-	tags, err := SearchTags(query)
+	query := r.URL.Query().Get("query")
+	focusModeIDStr := r.URL.Query().Get("focus_id")
+
+	focusModeID := 0
+	if focusModeIDStr != "" {
+		focusModeID, err = strconv.Atoi(focusModeIDStr)
+		if err != nil {
+			http.Error(w, "Invalid focus mode ID", http.StatusBadRequest)
+			return
+		}
+	}
+
+	if focusModeID != 0 {
+		tags, err = GetTagsByFocusModeID(focusModeID)
+	} else if query != "" {
+		tags, err = SearchTags(query)
+	} else {
+		tags, err = GetAllTags()
+	}
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
