@@ -412,21 +412,25 @@ func GetNotesByTagID(tagID int) ([]Note, error) {
 			SUBSTR(n.content, 0, 500) AS snippet,
 			n.updated_at,
 			COALESCE(
-                JSON_GROUP_ARRAY(JSON_OBJECT(
-					'tag_id', t.tag_id,
-					'name', t.name
+				JSON_GROUP_ARRAY(JSON_OBJECT(
+					'tag_id', t2.tag_id,
+					'name', t2.name
 				)), '[]'
-            ) as tags_json
+			) as tags_json
 		FROM
 			notes n
-		LEFT JOIN
+		INNER JOIN
 			note_tags nt ON n.note_id = nt.note_id
-		LEFT JOIN
+		INNER JOIN
 			tags t ON nt.tag_id = t.tag_id
+		LEFT JOIN
+			note_tags nt2 ON n.note_id = nt2.note_id
+		LEFT JOIN
+			tags t2 ON nt2.tag_id = t2.tag_id
 		WHERE
-			nt.tag_id = ?
+			t.tag_id = ?
 		GROUP BY
-            n.note_id
+			n.note_id
 		ORDER BY
 			n.updated_at DESC
 	`
