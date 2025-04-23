@@ -30,6 +30,7 @@ export default function NotesPage({ noteId }) {
 
   useEffect(() => {
     refreshNotes();
+    refreshTags();
   }, [selectedTagId, selectedFocusId]);
 
   // TODO: Move this to NotesEditor
@@ -82,9 +83,17 @@ export default function NotesPage({ noteId }) {
   }
 
   function refreshTags() {
-    ApiClient.getAllTags()
-      .then(tags => {
-        setTags(tags);
+    let promise = null;
+
+    if (selectedFocusId) {
+      promise = ApiClient.getTagsByFocusId(selectedFocusId);
+    } else {
+      promise = ApiClient.getAllTags();
+    }
+
+    promise
+      .then(newTags => {
+        setTags(newTags);
       })
       .catch(error => {
         console.error('Error loading tags:', error);

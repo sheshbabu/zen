@@ -75,6 +75,10 @@ async function getAllTags() {
   return await request('GET', '/api/tags');
 }
 
+async function getTagsByFocusId(focusId) {
+  return await request('GET', `/api/tags?focus_id=${focusId}`);
+}
+
 async function searchTags(query) {
   return await request('GET', `/api/tags?query=${query}`);
 }
@@ -104,6 +108,7 @@ export default {
   updateNote,
   deleteNote,
   getAllTags,
+  getTagsByFocusId,
   searchTags,
   uploadImage,
   search
