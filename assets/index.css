@@ -127,11 +127,6 @@ body {
         &:not([data-page="notes"]) {
             display: none;
         }
-
-        /* Make it into single column card view */
-        .notes-grid {
-            grid-template-columns: repeat(auto-fill, 100%);
-        }
     }
 
     .notes-editor-container {
@@ -486,6 +481,15 @@ body {
         justify-content: center;
         align-items: center;
         margin-top: 64px;
+    }
+}
+
+@media screen and (max-width: 948px) {
+    .notes-list-container {
+        .notes-grid {
+            /* Make it into single column card view */
+            grid-template-columns: repeat(auto-fill, 100%);
+        }
     }
 }
 
