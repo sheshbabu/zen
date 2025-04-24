@@ -49,6 +49,7 @@ function NotesListItem({ note }) {
 
 function NotesGridItem({ note }) {
   const link = `/notes/${note.NoteID}`;
+  const tags = note.Tags?.map(tag => <div className="tag" key={tag.name}>{tag.name}</div>);
   let title = <div className="notes-grid-item-title">{note.Title}</div>
 
   if (note.Title === "") {
@@ -60,6 +61,7 @@ function NotesGridItem({ note }) {
       {title}
       <div className="notes-grid-item-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(note.Snippet) }} />
       <span class="notes-grid-item-gradient"></span>
+      <div className="notes-grid-item-tags">{tags}</div>
     </Link>
   );
 }
