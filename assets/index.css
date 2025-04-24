@@ -149,7 +149,7 @@ body {
 }
 
 .sidebar-container {
-    width: 220px;
+    min-width: 220px;
     padding: 14px 0;
     background-color: var(--neutral-50);
 
@@ -379,10 +379,11 @@ body {
 
     .notes-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
         gap: 20px;
         padding: 20px;
         padding-top: 0;
+        padding-left: 10px;
 
         &.board {
             display: block;
@@ -393,15 +394,38 @@ body {
         }
 
         .notes-grid-item {
+            position: relative;
             height: 300px;
             overflow: hidden;
             transition-property: box-shadow;
             transition-duration: 500ms;
-            box-shadow: var(--shadow-3);
-            border-radius: 4px;
-            padding: 8px;
+            box-shadow: var(--shadow-2);
+            border-radius: 8px;
+            padding: 20px;
             border: 1px solid var(--neutral-100);
             background-color: #fff;
+            display: block;
+            text-decoration: none;
+            color: inherit;
+
+            .notes-grid-item-title {
+                font: var(--h4);
+                margin-bottom: 12px;
+
+                &.untitled {
+                    color: var(--neutral-400);
+                }
+            }
+
+            .notes-grid-item-gradient {
+                display: block;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 300px;
+                background: linear-gradient(180deg, transparent 50%, #fff 100%);
+            }
 
             &.is-draggable {
                 max-height: 300px;
@@ -432,21 +456,6 @@ body {
 
             &:hover {
                 box-shadow: var(--shadow-4);
-            }
-
-            a {
-                display: block;
-                text-decoration: none;
-                color: inherit;
-                zoom: 0.7;
-
-                .notes-grid-item-title {
-                    font: var(--h4);
-
-                    &.untitled {
-                        color: var(--neutral-400);
-                    }
-                }
             }
         }
     }

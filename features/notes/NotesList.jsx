@@ -17,7 +17,7 @@ export default function NotesList({ notes = [], view, onViewChange }) {
 
   return (
     <div className={containerClassName}>
-      <NotesListToolbar onListViewClick={() => onViewChange("list")} onGridViewClick={() => onViewChange("grid")}/>
+      <NotesListToolbar onListViewClick={() => onViewChange("list")} onGridViewClick={() => onViewChange("grid")} />
       <div className={listClassName}>
         {items}
         <EmptyList notes={notes} />
@@ -37,13 +37,13 @@ function NotesListItem({ note }) {
   }
 
   return (
-      <Link to={link} className="notes-list-item" activeClassName="is-active" shouldPreserveSearchParams>
-        {title}
-        <div className="notes-list-item-subcontainer">
-          <div className="notes-list-item-subtext" title={note.UpdatedAt}>{updatedAt}</div>
-          <div className="notes-list-item-tags">{tags}</div>
-        </div>
-      </Link>
+    <Link to={link} className="notes-list-item" activeClassName="is-active" shouldPreserveSearchParams>
+      {title}
+      <div className="notes-list-item-subcontainer">
+        <div className="notes-list-item-subtext" title={note.UpdatedAt}>{updatedAt}</div>
+        <div className="notes-list-item-tags">{tags}</div>
+      </div>
+    </Link>
   );
 }
 
@@ -56,12 +56,11 @@ function NotesGridItem({ note }) {
   }
 
   return (
-    <div className="notes-grid-item">
-      <Link to={link} shouldPreserveSearchParams>
-        {title}
-        <div className="notes-grid-item-content"  dangerouslySetInnerHTML={{ __html: renderMarkdown(note.Snippet) }}/>
-      </Link>
-    </div>
+    <Link className="notes-grid-item" to={link} shouldPreserveSearchParams>
+      {title}
+      <div className="notes-grid-item-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(note.Snippet) }} />
+      <span class="notes-grid-item-gradient"></span>
+    </Link>
   );
 }
 
