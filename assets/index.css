@@ -127,6 +127,11 @@ body {
         &:not([data-page="notes"]) {
             display: none;
         }
+
+        /* Make it into single column card view */
+        .notes-grid {
+            grid-template-columns: repeat(auto-fill, 100%);
+        }
     }
 
     .notes-editor-container {
