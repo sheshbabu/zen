@@ -418,7 +418,6 @@ body {
             }
 
             .notes-grid-item-content {
-                max-height: 175px;
                 overflow: hidden;
             }
 
@@ -434,7 +433,11 @@ body {
 
             .notes-grid-item-tags {
                 position: absolute;
-                bottom: 20px;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 20px;
+                background: linear-gradient(180deg, transparent 0%, #fff 20%);
             }
 
             &.is-draggable {
