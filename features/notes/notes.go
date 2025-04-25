@@ -8,6 +8,11 @@ import (
 	"zen/features/tags"
 )
 
+type ResponseEnvelope struct {
+	Notes []Note `json:"notes"`
+	Total int    `json:"total"`
+}
+
 type Note struct {
 	NoteID    int
 	Title     string
@@ -17,17 +22,26 @@ type Note struct {
 	Tags      []tags.Tag
 }
 
-const NOTES_LIMIT = 100
-
 func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 	var allNotes []Note
 	var err error
+	var total int
 
+	pageStr := r.URL.Query().Get("page")
 	tagIDStr := r.URL.Query().Get("tag_id")
 	focusModeIDStr := r.URL.Query().Get("focus_id")
 
+	page := 1
 	tagID := 0
 	focusModeID := 0
+
+	if pageStr != "" {
+		page, err = strconv.Atoi(pageStr)
+		if err != nil {
+			http.Error(w, "Invalid page number", http.StatusBadRequest)
+			return
+		}
+	}
 
 	if tagIDStr != "" {
 		tagID, err = strconv.Atoi(tagIDStr)
@@ -46,11 +60,11 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if focusModeID == 0 && tagID == 0 {
-		allNotes, err = GetAllNotes(NOTES_LIMIT, 0)
+		allNotes, total, err = GetAllNotes(page)
 	} else if tagID != 0 {
-		allNotes, err = GetNotesByTagID(tagID)
+		allNotes, total, err = GetNotesByTagID(tagID, page)
 	} else if focusModeID != 0 {
-		allNotes, err = GetNotesByFocusModeID(focusModeID)
+		allNotes, total, err = GetNotesByFocusModeID(focusModeID, page)
 	}
 
 	if err != nil {
@@ -58,8 +72,13 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	response := ResponseEnvelope{
+		Notes: allNotes,
+		Total: total,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(allNotes)
+	json.NewEncoder(w).Encode(response)
 }
 
 func HandleGetNote(w http.ResponseWriter, r *http.Request) {

@@ -4,7 +4,7 @@ import Link from '../../commons/components/Link.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import formatDate from '../../commons/utils/formatDate.js';
 
-export default function NotesList({ notes = [], view, onViewChange }) {
+export default function NotesList({ notes = [], total, view, onViewChange, onLoadMoreClick }) {
   let containerClassName = "notes-list-fragment";
   let listClassName = "notes-list";
   let items = notes.map(note => <NotesListItem note={note} key={note.NoteID} />);
@@ -20,6 +20,7 @@ export default function NotesList({ notes = [], view, onViewChange }) {
       <NotesListToolbar onListViewClick={() => onViewChange("list")} onGridViewClick={() => onViewChange("grid")} />
       <div className={listClassName}>
         {items}
+        <LoadMoreButton notes={notes} total={total} onLoadMoreClick={onLoadMoreClick}/>
         <EmptyList notes={notes} />
       </div>
     </div>
@@ -63,6 +64,18 @@ function NotesGridItem({ note }) {
       <div className="notes-grid-item-tags">{tags}</div>
     </Link>
   );
+}
+
+function LoadMoreButton({ notes, total, onLoadMoreClick }) {
+  if (notes.length === 0) {
+    return null;
+  }
+
+  if (notes.length === total) {
+    return null;
+  }
+
+  return <div className="notes-list-load-more-button" onClick={onLoadMoreClick}>Load more</div>
 }
 
 function EmptyList({ notes }) {

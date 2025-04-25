@@ -8,8 +8,12 @@ import (
 	"zen/features/tags"
 )
 
-func GetAllNotes(limit int, offset int) ([]Note, error) {
+const NOTES_LIMIT = 100
+
+func GetAllNotes(page int) ([]Note, int, error) {
 	notes := []Note{}
+	total := 0
+	offset := (page - 1) * NOTES_LIMIT
 
 	query := `
 		SELECT
@@ -23,7 +27,8 @@ func GetAllNotes(limit int, offset int) ([]Note, error) {
 					'tag_id', t.tag_id,
 					'name', t.name
 				)), '[]'
-            ) as tags_json
+            ) as tags_json,
+			COUNT(*) OVER() as total_count
 		FROM
 			notes n
 		LEFT JOIN
@@ -40,22 +45,22 @@ func GetAllNotes(limit int, offset int) ([]Note, error) {
 			?
 	`
 
-	rows, err := sqlite.DB.Query(query, limit, offset)
+	rows, err := sqlite.DB.Query(query, NOTES_LIMIT, offset)
 	if err != nil {
 		err = fmt.Errorf("error retrieving notes: %w", err)
 		slog.Error(err.Error())
-		return notes, err
+		return notes, total, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var note Note
 		var tagsJSON string
-		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON)
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON, &total)
 		if err != nil {
 			err = fmt.Errorf("error scanning note: %w", err)
 			slog.Error(err.Error())
-			return notes, err
+			return notes, total, err
 		}
 		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
 		if err != nil {
@@ -66,7 +71,7 @@ func GetAllNotes(limit int, offset int) ([]Note, error) {
 		notes = append(notes, note)
 	}
 
-	return notes, nil
+	return notes, total, nil
 }
 
 func GetNoteByID(noteID int) (Note, error) {
@@ -401,8 +406,10 @@ func DeleteNote(noteID int) error {
 	return nil
 }
 
-func GetNotesByTagID(tagID int) ([]Note, error) {
+func GetNotesByTagID(tagID int, page int) ([]Note, int, error) {
 	notes := []Note{}
+	total := 0
+	offset := (page - 1) * NOTES_LIMIT
 
 	query := `
 		SELECT
@@ -416,7 +423,8 @@ func GetNotesByTagID(tagID int) ([]Note, error) {
 					'tag_id', t2.tag_id,
 					'name', t2.name
 				)), '[]'
-			) as tags_json
+			) as tags_json,
+			COUNT(*) OVER() as total_count
 		FROM
 			notes n
 		INNER JOIN
@@ -433,24 +441,28 @@ func GetNotesByTagID(tagID int) ([]Note, error) {
 			n.note_id
 		ORDER BY
 			n.updated_at DESC
+		LIMIT
+			?
+		OFFSET
+			?
 	`
 
-	rows, err := sqlite.DB.Query(query, tagID)
+	rows, err := sqlite.DB.Query(query, tagID, NOTES_LIMIT, offset)
 	if err != nil {
 		err = fmt.Errorf("error retrieving notes: %w", err)
 		slog.Error(err.Error())
-		return notes, err
+		return notes, total, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var note Note
 		var tagsJSON string
-		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON)
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON, &total)
 		if err != nil {
 			err = fmt.Errorf("error scanning note: %w", err)
 			slog.Error(err.Error())
-			return notes, err
+			return notes, total, err
 		}
 		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
 		if err != nil {
@@ -461,11 +473,13 @@ func GetNotesByTagID(tagID int) ([]Note, error) {
 		notes = append(notes, note)
 	}
 
-	return notes, nil
+	return notes, total, nil
 }
 
-func GetNotesByFocusModeID(focusModeID int) ([]Note, error) {
+func GetNotesByFocusModeID(focusModeID int, page int) ([]Note, int, error) {
 	notes := []Note{}
+	total := 0
+	offset := (page - 1) * NOTES_LIMIT
 
 	query := `
 		SELECT
@@ -479,7 +493,8 @@ func GetNotesByFocusModeID(focusModeID int) ([]Note, error) {
 					'tag_id', t.tag_id,
 					'name', t.name
 				)), '[]'
-            ) as tags_json
+            ) as tags_json,
+			COUNT(*) OVER() as total_count
 		FROM
 			focus_mode_tags fmt
 		JOIN
@@ -494,24 +509,28 @@ func GetNotesByFocusModeID(focusModeID int) ([]Note, error) {
             n.note_id
 		ORDER BY
 			n.updated_at DESC
+		LIMIT
+			?
+		OFFSET
+			?
 	`
 
-	rows, err := sqlite.DB.Query(query, focusModeID)
+	rows, err := sqlite.DB.Query(query, focusModeID, NOTES_LIMIT, offset)
 	if err != nil {
 		err = fmt.Errorf("error retrieving notes by focus mode ID: %w", err)
 		slog.Error(err.Error())
-		return notes, err
+		return notes, total, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var note Note
 		var tagsJSON string
-		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON)
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON, &total)
 		if err != nil {
 			err = fmt.Errorf("error scanning note by focus mode ID: %w", err)
 			slog.Error(err.Error())
-			return notes, err
+			return notes, total, err
 		}
 		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
 		if err != nil {
@@ -522,7 +541,7 @@ func GetNotesByFocusModeID(focusModeID int) ([]Note, error) {
 		notes = append(notes, note)
 	}
 
-	return notes, nil
+	return notes, total, nil
 }
 
 func SearchNotes(term string, limit int) ([]Note, error) {

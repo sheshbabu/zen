@@ -473,6 +473,20 @@ body {
         }
     }
 
+    .notes-list-load-more-button {
+        font: var(--sm);
+        color: var(--neutral-400);
+        display: flex;
+        justify-content: center;
+        padding: 36px 0;
+        cursor: pointer;
+        transition: color 0.5s;
+
+        &:hover {
+            color: var(--neutral-600);
+        }
+    }
+
     .notes-list-empty-text {
         font: var(--sm);
         padding: 16px;

@@ -8,6 +8,8 @@ import useSearchParams from "../../commons/components/useSearchParams.jsx";
 
 export default function NotesPage({ noteId }) {
   const [notes, setNotes] = useState([]);
+  const [notesTotal, setNotesTotal] = useState(0);
+  const [notesPageNumber, setNotesPageNumber] = useState(1);
   const [tags, setTags] = useState([]);
   const [focusModes, setFocusModes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
@@ -29,9 +31,18 @@ export default function NotesPage({ noteId }) {
   }, []);
 
   useEffect(() => {
+    // Reset to avoid showing incorrect notes
+    setNotesPageNumber(1);
+    setNotes([]);
+    setSelectedNote(null);
+
     refreshNotes();
     refreshTags();
   }, [selectedTagId, selectedFocusId]);
+
+  useEffect(() => {
+    refreshNotes();
+  }, [notesPageNumber]);
 
   // TODO: Move this to NotesEditor
   useEffect(() => {
@@ -66,16 +77,21 @@ export default function NotesPage({ noteId }) {
     let promise = null;
 
     if (selectedTagId) {
-      promise = ApiClient.getNotesByTagId(selectedTagId);
+      promise = ApiClient.getNotesByTagId(selectedTagId, notesPageNumber);
     } else if (selectedFocusId) {
-      promise = ApiClient.getNotesByFocusId(selectedFocusId);
+      promise = ApiClient.getNotesByFocusId(selectedFocusId, notesPageNumber);
     } else {
-      promise = ApiClient.getAllNotes();
+      promise = ApiClient.getAllNotes(notesPageNumber);
     }
 
     promise
-      .then(notes => {
-        setNotes(notes);
+      .then(res => {
+        if (notesPageNumber > 1) {
+          setNotes(prevNotes => [...prevNotes, ...res.notes]);
+        } else {
+          setNotes(res.notes);
+        }
+        setNotesTotal(res.total);
       })
       .catch(error => {
         console.error('Error loading notes:', error);
@@ -120,6 +136,10 @@ export default function NotesPage({ noteId }) {
     setSelectedView(newView);
   }
 
+  function handleLoadMoreClick() {
+    setNotesPageNumber(notesPageNumber + 1);
+  }
+
   if (selectedView === "list") {
     listClassName = "notes-list-container"
     editorClassName = "notes-editor-container";
@@ -140,7 +160,7 @@ export default function NotesPage({ noteId }) {
       </div>
 
       <div className={listClassName} data-page={noteId === undefined ? "notes" : "editor"}>
-        <NotesList notes={notes} view={selectedView} onViewChange={handleViewChange} />
+        <NotesList notes={notes} total={notesTotal} view={selectedView} onViewChange={handleViewChange} onLoadMoreClick={handleLoadMoreClick} />
       </div>
 
       <div className={editorClassName} data-page={noteId === undefined ? "notes" : "editor"}>

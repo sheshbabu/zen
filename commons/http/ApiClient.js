@@ -41,20 +41,20 @@ async function updateFocusMode(focusMode) {
 
 // Notes
 
-async function getAllNotes() {
-  return await request('GET', '/api/notes');
+async function getAllNotes(pageNumber) {
+  return await request('GET', `/api/notes/?page=${pageNumber}`);
 }
 
 async function getNoteById(noteId) {
   return await request('GET', `/api/notes/${noteId}`);
 }
 
-async function getNotesByTagId(tagId) {
-  return await request('GET', `/api/notes?tag_id=${tagId}`);
+async function getNotesByTagId(tagId, pageNumber) {
+  return await request('GET', `/api/notes?tag_id=${tagId}&page=${pageNumber}`);
 }
 
-async function getNotesByFocusId(focusId) {
-  return await request('GET', `/api/notes?focus_id=${focusId}`);
+async function getNotesByFocusId(focusId, pageNumber) {
+  return await request('GET', `/api/notes?focus_id=${focusId}&page=${pageNumber}`);
 }
 
 async function createNote(note) {
