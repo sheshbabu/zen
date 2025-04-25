@@ -3,6 +3,7 @@ import navigateTo from '../utils/navigateTo.js';
 
 export default function Link({ to, shouldPreserveSearchParams, children, className = "", activeClassName = "" }) {
   function handleClick(event) {
+    event.stopPropagation();
     event.preventDefault();
     navigateTo(to, shouldPreserveSearchParams);
   }
