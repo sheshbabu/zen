@@ -128,7 +128,7 @@ export default function NotesPage({ noteId }) {
 
     if (noteId === undefined) {
       editorClassName = "notes-editor-container is-hidden";
-    } else {
+    } else if (!isMobile) {
       editorClassName = "notes-editor-container is-floating";
     }
   }
