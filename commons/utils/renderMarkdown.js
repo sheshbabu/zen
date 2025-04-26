@@ -1,3 +1,6 @@
+import mark from "../../assets/markdown-it-mark.mjs";
+import tasks from "../../assets/markdown-it-task-lists.js";
+
 export default function renderMarkdown(text) {
   const md = window.markdownit({
     linkify: true,
@@ -10,7 +13,10 @@ export default function renderMarkdown(text) {
       }
       return '';
     }
-  });
+  })
+  .use(mark)
+  .use(tasks);
+
   // https://github.com/markdown-it/markdown-it/blob/master/docs/architecture.md#renderer
   var defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
     return self.renderToken(tokens, idx, options);
