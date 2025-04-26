@@ -74,17 +74,7 @@ export default function NotesPage({ noteId }) {
   }, [noteId, notes]);
 
   function refreshNotes() {
-    let promise = null;
-
-    if (selectedTagId) {
-      promise = ApiClient.getNotesByTagId(selectedTagId, notesPageNumber);
-    } else if (selectedFocusId) {
-      promise = ApiClient.getNotesByFocusId(selectedFocusId, notesPageNumber);
-    } else {
-      promise = ApiClient.getAllNotes(notesPageNumber);
-    }
-
-    promise
+    ApiClient.getNotes(selectedTagId, selectedFocusId, notesPageNumber)
       .then(res => {
         if (notesPageNumber > 1) {
           setNotes(prevNotes => [...prevNotes, ...res.notes]);
@@ -99,15 +89,7 @@ export default function NotesPage({ noteId }) {
   }
 
   function refreshTags() {
-    let promise = null;
-
-    if (selectedFocusId) {
-      promise = ApiClient.getTagsByFocusId(selectedFocusId);
-    } else {
-      promise = ApiClient.getAllTags();
-    }
-
-    promise
+    ApiClient.getTags(selectedFocusId)
       .then(newTags => {
         setTags(newTags);
       })
@@ -117,7 +99,7 @@ export default function NotesPage({ noteId }) {
   }
 
   function refreshFocusModes() {
-    ApiClient.getAllFocusModes()
+    ApiClient.getFocusModes()
       .then(focusModes => {
         setFocusModes(focusModes);
       })

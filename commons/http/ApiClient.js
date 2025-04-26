@@ -27,7 +27,7 @@ async function request(method, url, payload) {
 
 // Focus Modes
 
-async function getAllFocusModes() {
+async function getFocusModes() {
   return await request('GET', '/api/focus');
 }
 
@@ -41,20 +41,29 @@ async function updateFocusMode(focusMode) {
 
 // Notes
 
-async function getAllNotes(pageNumber) {
-  return await request('GET', `/api/notes/?page=${pageNumber}`);
+async function getNotes(tagId, focusId, page) {
+  let url = "/api/notes/";
+  const params = new URLSearchParams();
+
+  if (tagId) {
+    params.append('tag_id', tagId);
+  } else if (focusId) {
+    params.append('focus_id', focusId);
+  }
+
+  if (page) {
+    params.append('page', page);
+  }
+
+  if (params.toString()) {
+    url += '?' + params.toString();
+  }
+
+  return await request('GET', url);
 }
 
 async function getNoteById(noteId) {
   return await request('GET', `/api/notes/${noteId}`);
-}
-
-async function getNotesByTagId(tagId, pageNumber) {
-  return await request('GET', `/api/notes?tag_id=${tagId}&page=${pageNumber}`);
-}
-
-async function getNotesByFocusId(focusId, pageNumber) {
-  return await request('GET', `/api/notes?focus_id=${focusId}&page=${pageNumber}`);
 }
 
 async function createNote(note) {
@@ -71,12 +80,14 @@ async function deleteNote(noteId) {
 
 // Tags
 
-async function getAllTags() {
-  return await request('GET', '/api/tags');
-}
+async function getTags(focusId) {
+  let url = "/api/tags";
 
-async function getTagsByFocusId(focusId) {
-  return await request('GET', `/api/tags?focus_id=${focusId}`);
+  if (focusId) {
+    url += `?focus_id=${focusId}`;
+  }
+
+  return await request('GET', url);
 }
 
 async function searchTags(query) {
@@ -97,18 +108,15 @@ async function search(query) {
 
 export default {
   request,
-  getAllFocusModes,
+  getFocusModes,
   createFocusMode,
   updateFocusMode,
-  getAllNotes,
+  getNotes,
   getNoteById,
-  getNotesByTagId,
-  getNotesByFocusId,
   createNote,
   updateNote,
   deleteNote,
-  getAllTags,
-  getTagsByFocusId,
+  getTags,
   searchTags,
   uploadImage,
   search
