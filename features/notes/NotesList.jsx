@@ -30,7 +30,7 @@ export default function NotesList({ notes = [], total, view, onViewChange, onLoa
 function NotesListItem({ note }) {
   const link = `/notes/${note.NoteID}`;
   const updatedAt = formatDate(new Date(note.UpdatedAt))
-  const tags = note.Tags?.map(tag => <div className="notes-list-item-subtext" key={tag.name}>{tag.name}</div>);
+  const tags = note.Tags?.map(tag => <div className="notes-list-item-tag" key={tag.name}>{tag.name}</div>);
   let title = <div className="notes-list-item-title">{note.Title}</div>
 
   if (note.Title === "") {

@@ -364,7 +364,8 @@ body {
             overflow: hidden;
             margin-top: 4px;
 
-            .notes-list-item-subtext {
+            .notes-list-item-subtext,
+            .notes-list-item-tag {
                 font: var(--sm);
                 color: var(--neutral-400);
                 align-content: end;
