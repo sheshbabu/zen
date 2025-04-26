@@ -10,12 +10,17 @@ func GetAllTags() ([]Tag, error) {
 	var tags []Tag
 	query := `
 		SELECT
-			tag_id,
-			name
+			t.tag_id,
+			t.name,
+			COUNT(nt.note_id) AS note_count
 		FROM
-			tags
+			tags t
+		LEFT JOIN
+			note_tags nt ON t.tag_id = nt.tag_id
+		GROUP BY
+			t.tag_id, t.name
 		ORDER BY
-			tag_id ASC
+			note_count DESC
 	`
 
 	rows, err := sqlite.DB.Query(query)
