@@ -34,15 +34,15 @@ function NotesListItem({ note }) {
   let title = <div className="notes-list-item-title">{note.Title}</div>
 
   if (note.Title === "") {
-    title = <div className="notes-list-item-title untitled">Untitled</div>
+    title = <div className="notes-list-item-title untitled">&nbsp;</div>
   }
 
   return (
     <Link to={link} className="notes-list-item" activeClassName="is-active" shouldPreserveSearchParams>
       {title}
       <div className="notes-list-item-subcontainer">
-        <div className="notes-list-item-subtext" title={note.UpdatedAt}>{updatedAt}</div>
         <div className="notes-list-item-tags">{tags}</div>
+        <div className="notes-list-item-subtext" title={note.UpdatedAt}>{updatedAt}</div>
       </div>
     </Link>
   );

@@ -353,7 +353,7 @@ body {
             font-weight: 500;
 
             &.untitled {
-                color: var(--neutral-400);
+                color: var(--neutral-300);
             }
         }
 
@@ -368,12 +368,16 @@ body {
                 font: var(--sm);
                 color: var(--neutral-400);
                 align-content: end;
+                white-space: nowrap;
             }
 
             .notes-list-item-tags {
                 display: flex;
                 gap: 4px;
-                margin-left: 8px;
+                margin-right: 24px;
+                width: 190px;
+                overflow: hidden;
+                white-space: nowrap;
             }
         }
     }
