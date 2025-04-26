@@ -1,3 +1,5 @@
+// https://github.com/markdown-it/markdown-it-mark
+
 export default function ins_plugin (md) {
     // Insert each marker as a separate text token, and add it to delimiter list
     //
