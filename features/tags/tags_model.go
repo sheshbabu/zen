@@ -91,13 +91,18 @@ func GetTagsByFocusModeID(focusModeID int) ([]Tag, error) {
 	query := `
 		SELECT
 			t.tag_id,
-			t.name
+			t.name,
+			COUNT(nt.note_id) AS note_count
 		FROM
 			tags t
+		LEFT JOIN
+			note_tags nt ON t.tag_id = nt.tag_id
 		JOIN
 			focus_mode_tags f ON t.tag_id = f.tag_id
 		WHERE
 			f.focus_mode_id = ?
+		GROUP BY
+			t.tag_id, t.name
 		ORDER BY
 			t.tag_id ASC
 	`
@@ -112,7 +117,8 @@ func GetTagsByFocusModeID(focusModeID int) ([]Tag, error) {
 
 	for rows.Next() {
 		var tag Tag
-		err = rows.Scan(&tag.TagID, &tag.Name)
+		var count int
+		err = rows.Scan(&tag.TagID, &tag.Name, &count)
 		if err != nil {
 			err = fmt.Errorf("error scanning tag: %w", err)
 			slog.Error(err.Error())
