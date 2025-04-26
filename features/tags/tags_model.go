@@ -50,9 +50,15 @@ func SearchTags(term string) ([]Tag, error) {
 			tags
 		WHERE
 			name LIKE '%' || ? || '%'
+		-- Boosting rows starting with the search term
+		ORDER BY 
+			CASE
+				WHEN name LIKE ? || '%' THEN 1
+				ELSE 2
+			END
 	`
 
-	rows, err := sqlite.DB.Query(query, term)
+	rows, err := sqlite.DB.Query(query, term, term)
 	if err != nil {
 		err = fmt.Errorf("error retrieving tags: %w", err)
 		slog.Error(err.Error())
