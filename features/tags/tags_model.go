@@ -33,7 +33,8 @@ func GetAllTags() ([]Tag, error) {
 
 	for rows.Next() {
 		var tag Tag
-		err = rows.Scan(&tag.TagID, &tag.Name)
+		var count int
+		err = rows.Scan(&tag.TagID, &tag.Name, &count)
 		if err != nil {
 			err = fmt.Errorf("error scanning tag: %w", err)
 			slog.Error(err.Error())
