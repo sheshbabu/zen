@@ -3,7 +3,7 @@ import Link from './Link.jsx';
 import SidebarTagsList from "../../features/tags/SidebarTagsList.jsx";
 import FocusSwitcher from "../../features/focus/FocusSwitcher.jsx";
 import SearchMenu from "../../features/search/SearchMenu.jsx";
-import { NotesIcon, SearchIcon, NewIcon, ArchiveIcon, TrashIcon, BoardIcon, SettingsIcon } from "./Icon.jsx"
+import { NotesIcon, SearchIcon, NewIcon, ArchiveIcon, TrashIcon, BoardIcon, SettingsIcon, TemplatesIcon } from "./Icon.jsx"
 
 export default function Sidebar({ focusModes, tags }) {
   function handleSearchClick() {
@@ -37,7 +37,11 @@ export default function Sidebar({ focusModes, tags }) {
       <Link className="sidebar-button" to="/">
         <SettingsIcon />
         Settings
-      </Link> */}
+      </Link>
+      <div className="sidebar-button" activeClassName="is-active" to="/archives" shouldPreserveSearchParams>
+        <TemplatesIcon />
+        Templates
+      </div>*/}
       <div className="sidebar-button" activeClassName="is-active" to="/archives" shouldPreserveSearchParams>
         <ArchiveIcon />
         Archives
