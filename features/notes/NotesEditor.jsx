@@ -28,26 +28,6 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       titleRef.current.focus();
     }
 
-    function handleKeyDown(e) {
-      const isTextAreaFocused = document.activeElement.className == "notes-editor-textarea";
-
-      if (!isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-        e.preventDefault();
-        if (isEditable) {
-          handleSaveClick();
-        } else {
-          handleEditClick();
-        }
-      }
-
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        if (isFloating) {
-          handleCloseClick();
-        }
-      }
-    }
-
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {
@@ -58,6 +38,31 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   useEffect(() => {
     handleTextAreaHeight();
   }, [content, isEditable]);
+
+  function handleKeyDown(e) {
+    const isTextAreaFocused = document.activeElement.className == "notes-editor-textarea";
+
+    if (!isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      if (isEditable) {
+        handleSaveClick();
+      } else {
+        handleEditClick();
+      }
+    }
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      if (isFloating) {
+        handleCloseClick();
+      }
+    }
+
+    if (isTextAreaFocused && e.key === 'Tab') {
+      e.preventDefault();
+      insertAtCursor('  ');
+    }
+  }
 
   function handleTextAreaHeight() {
     if (textareaRef.current === null) {
