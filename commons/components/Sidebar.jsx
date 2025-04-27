@@ -1,4 +1,4 @@
-import { h, render } from "../../assets/preact.esm.js"
+import { h, render, Fragment } from "../../assets/preact.esm.js"
 import Link from './Link.jsx';
 import SidebarTagsList from "../../features/tags/SidebarTagsList.jsx";
 import FocusSwitcher from "../../features/focus/FocusSwitcher.jsx";
@@ -15,22 +15,23 @@ export default function Sidebar({ focusModes, tags }) {
   const notesLink = focusId ? `/notes/?focus_id=${focusId}` : "/notes/";
 
   return (
-    <div>
-      <FocusSwitcher focusModes={focusModes} />
+    <Fragment>
+      <div className="sidebar-fixed">
+        <FocusSwitcher focusModes={focusModes} />
 
-      <Link className="sidebar-button" to="/notes/new" shouldPreserveSearchParams>
-        <NewIcon />
-        New
-      </Link>
-      <div className="sidebar-button" onClick={handleSearchClick}>
-        <SearchIcon />
-        Search
-      </div>
-      <Link className="sidebar-button" to={notesLink}>
-        <NotesIcon />
-        Notes
-      </Link>
-      {/* <Link className="sidebar-button" to="/">
+        <Link className="sidebar-button" to="/notes/new" shouldPreserveSearchParams>
+          <NewIcon />
+          New
+        </Link>
+        <div className="sidebar-button" onClick={handleSearchClick}>
+          <SearchIcon />
+          Search
+        </div>
+        <Link className="sidebar-button" to={notesLink}>
+          <NotesIcon />
+          Notes
+        </Link>
+        {/* <Link className="sidebar-button" to="/">
         <BoardIcon />
         Boards
       </Link>
@@ -42,19 +43,21 @@ export default function Sidebar({ focusModes, tags }) {
         <TemplatesIcon />
         Templates
       </div>*/}
-      <div className="sidebar-button" activeClassName="is-active" to="/archives" shouldPreserveSearchParams>
-        <ArchiveIcon />
-        Archives
+        <div className="sidebar-button" activeClassName="is-active" to="/archives" shouldPreserveSearchParams>
+          <ArchiveIcon />
+          Archives
+        </div>
+        <div className="sidebar-button" activeClassName="is-active" to="/trash" shouldPreserveSearchParams>
+          <TrashIcon />
+          Trash
+        </div>
       </div>
-      <div className="sidebar-button" activeClassName="is-active" to="/trash" shouldPreserveSearchParams>
-        <TrashIcon />
-        Trash
-      </div>
-      
 
-      <div className="sidebar-section">
-        <SidebarTagsList tags={tags} />
+      <div className="sidebar-scrollable">
+        <div className="sidebar-section">
+          <SidebarTagsList tags={tags} />
+        </div>
       </div>
-    </div>
+    </Fragment>
   );
 }

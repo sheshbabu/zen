@@ -108,10 +108,6 @@ body {
 }
 
 @media screen and (max-width: 948px) {
-    .sidebar-container {
-        display: none;
-    }
-
     .notes-list-container,
     .notes-grid-container {
         &[data-page="notes"] {
@@ -154,6 +150,23 @@ body {
     min-width: 220px;
     padding: 14px 0;
     background-color: var(--neutral-50);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .sidebar-fixed {
+        flex-shrink: 0;
+    }
+    
+    .sidebar-scrollable {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
 
     .sidebar-focus-switcher {
         padding: 8px;
@@ -257,6 +270,12 @@ body {
                 }
             }
         }
+    }
+}
+
+@media screen and (max-width: 948px) {
+    .sidebar-container {
+        display: none;
     }
 }
 
