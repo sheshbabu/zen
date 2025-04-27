@@ -130,7 +130,7 @@ func GetTagsByFocusModeID(focusModeID int) ([]Tag, error) {
 	return tags, nil
 }
 
-func UpdateTag(tag Tag) (Tag, error) {
+func UpdateTag(tag Tag) error {
 	query := `
 		UPDATE
 			tags
@@ -138,31 +138,31 @@ func UpdateTag(tag Tag) (Tag, error) {
 			name = ?
 		WHERE
 			tag_id = ?
-		RETURNING
-			tag_id,
-			name
 	`
 
-	row := sqlite.DB.QueryRow(query, tag.Name, tag.TagID)
-	err := row.Scan(&tag.TagID, &tag.Name)
+	_, err := sqlite.DB.Exec(query, tag.Name, tag.TagID)
 	if err != nil {
 		err = fmt.Errorf("error updating tag: %w", err)
 		slog.Error(err.Error())
-		return tag, err
+		return err
 	}
-
-	return tag, nil
+	return nil
 }
 
 func DeleteTag(tagID int) error {
 	query := `
 		DELETE FROM
+			note_tags
+		WHERE
+			tag_id = ?;
+
+		DELETE FROM
 			tags
 		WHERE
-			tag_id = ?
+			tag_id = ?;
 	`
 
-	_, err := sqlite.DB.Exec(query, tagID)
+	_, err := sqlite.DB.Exec(query, tagID, tagID)
 	if err != nil {
 		err = fmt.Errorf("error deleting tag: %w", err)
 		slog.Error(err.Error())

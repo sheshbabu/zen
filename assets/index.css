@@ -20,6 +20,7 @@
     --neutral-800: #262626;
     --neutral-900: #171717;
     --red-600: #DC2626;
+    --red-700 : #B91C1C;
     --yellow-100: #FEF9C3;
 
     /* typography */
@@ -214,6 +215,7 @@ body {
 
         a.sidebar-tag-link {
             display: flex;
+            justify-content: space-between;
             padding: 4px 0;
             cursor: pointer;
             text-decoration: none;
@@ -226,6 +228,33 @@ body {
             &:hover,
             &.is-active {
                 color: var(--neutral-600);
+            }
+
+            &:hover {
+                svg.lucide {
+                    display: block;
+                }
+            }
+
+            svg.lucide {
+                display: none;
+                width: 20px;
+                height: 20px;
+                padding: 4px;
+                transition: background-color 0.5s;
+
+                line,
+                circle,
+                rect,
+                path {
+                    stroke: var(--neutral-600);
+                    stroke-width: 2;
+                }
+
+                &:hover {
+                    background-color: var(--neutral-200);
+                    border-radius: 4px;
+                }
             }
         }
     }
@@ -354,6 +383,8 @@ body {
 
             &.untitled {
                 color: var(--neutral-300);
+                white-space: nowrap;
+                overflow: hidden;
             }
         }
 
@@ -655,7 +686,22 @@ body {
         }
 
         &:hover {
-            background-color: var(--neutral-400);
+            background-color: var(--neutral-700);
+        }
+    }
+
+    &.danger {
+        background-color: var(--red-600);
+        color: white;
+
+        svg.icon {
+            path {
+                stroke: white;
+            }
+        }
+
+        &:hover {
+            background-color: var(--red-700);
         }
     }
 
@@ -677,6 +723,10 @@ body {
     &:hover {
         background-color: var(--neutral-100);
     }
+}
+
+.button-group {
+    display: flex;
 }
 
 .dropdown-container {
@@ -899,17 +949,23 @@ body {
 
 .model-footer-container {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     margin-top: 16px;
     padding: 16px;
+    padding-left: 8px;
     background-color: var(--neutral-50);
+
+    &.right-aligned {
+        justify-content: flex-end;
+    }
 
     .button {
         margin-left: 8px;
     }
 }
 
-.focus-dialog {
+.focus-dialog,
+.tag-dialog {
     width: 600px;
 
     .notes-editor-tags-input {

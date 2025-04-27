@@ -81,7 +81,7 @@ export default function FocusDetailsModal({ mode, focusMode }) {
             <NotesEditorTags tags={tags} isEditable canCreateTag={false} onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
           </div>
         </div>
-        <div className="model-footer-container">
+        <div className="model-footer-container right-aligned">
           <div className="button" onClick={closeModal}>Cancel</div>
           <div className="button primary" onClick={handleCreateClick}>{buttonName}</div>
         </div>

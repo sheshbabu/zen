@@ -94,6 +94,14 @@ async function searchTags(query) {
   return await request('GET', `/api/tags?query=${query}`);
 }
 
+async function updateTag(tag) {
+  return await request('PUT', `/api/tags/${tag.tag_id}`, tag);
+}
+
+async function deleteTag(tagId) {
+  return await request('DELETE', `/api/tags/${tagId}`);
+}
+
 // Images
 
 async function uploadImage(formData) {
@@ -118,6 +126,8 @@ export default {
   deleteNote,
   getTags,
   searchTags,
+  updateTag,
+  deleteTag,
   uploadImage,
   search
 };

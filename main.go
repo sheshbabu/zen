@@ -65,6 +65,7 @@ func newRouter() *http.ServeMux {
 	mux.HandleFunc("DELETE /api/notes/{note_id}/", notes.HandleDeleteNote)
 
 	mux.HandleFunc("GET /api/tags/", tags.HandleGetTags)
+	mux.HandleFunc("PUT /api/tags/", tags.HandleUpdateTag)
 	mux.HandleFunc("DELETE /api/tags/{tag_id}/", tags.HandleDeleteTag)
 
 	mux.HandleFunc("GET /api/focus/", focus.HandleGetAllFocusModes)

@@ -10,9 +10,9 @@ export default function NoteDeleteModal({ onDeleteClick, onCloseClick }) {
           </div>
           <p>This note will be moved to the Trash and permanently deleted after 30 days.</p>
         </div>
-        <div className="model-footer-container">
+        <div className="model-footer-container right-aligned">
           <div className="button" onClick={onCloseClick}>Cancel</div>
-          <div className="button primary" onClick={onDeleteClick}>Delete</div>
+          <div className="button danger" onClick={onDeleteClick}>Delete</div>
         </div>
       </div>
     </div>

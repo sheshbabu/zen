@@ -44,6 +44,21 @@ func HandleGetTags(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(tags)
 }
 
+func HandleUpdateTag(w http.ResponseWriter, r *http.Request) {
+	var tag Tag
+	if err := json.NewDecoder(r.Body).Decode(&tag); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if err := UpdateTag(tag); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func HandleDeleteTag(w http.ResponseWriter, r *http.Request) {
 	tagIDStr := r.PathValue("tag_id")
 	tagID, err := strconv.Atoi(tagIDStr)
