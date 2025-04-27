@@ -9,8 +9,7 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddT
   const [selectedTag, setSelectedTag] = useState(null);
 
   function handleKeyUp(e) {
-    const value = e.target.value; // setState is async
-    setQuery(value);
+    const value = e.target.value;
 
     if (e.key === "ArrowDown") {
       const nextIndex = suggestions.indexOf(selectedTag) + 1;
@@ -56,6 +55,11 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddT
       setSuggestions([]);
       return;
     }
+  }
+
+  function handleInput(e) {
+    const value = e.target.value;
+    setQuery(value);
 
     ApiClient.searchTags(value)
       .then(tagSuggestions => {
@@ -98,6 +102,7 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddT
         suggestions={suggestions}
         selectedTag={selectedTag}
         onKeyUp={handleKeyUp}
+        onInput={handleInput}
         onSuggestionClick={handleSuggestionClick}
         onAddNewTagClick={handleAddNewTagClick}
       />
@@ -122,7 +127,7 @@ function TagItem({ tag, isEditable, onRemoveTag }) {
   );
 }
 
-function TagSearch({ query, isEditable, suggestions, selectedTag, onKeyUp, onSuggestionClick, onAddNewTagClick }) {
+function TagSearch({ query, isEditable, suggestions, selectedTag, onKeyUp, onSuggestionClick, onAddNewTagClick, onInput }) {
   if (!isEditable) {
     return null;
   }
@@ -146,6 +151,7 @@ function TagSearch({ query, isEditable, suggestions, selectedTag, onKeyUp, onSug
         autoComplete="off"
         value={query}
         onKeyUp={onKeyUp}
+        onInput={onInput}
       />
       <div className={`dropdown-container ${suggestions.length ? 'open' : ''}`}>
         <ul className="dropdown-menu">
