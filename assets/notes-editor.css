@@ -86,13 +86,15 @@
 
 .notes-editor-tags-input {
     border: none;
-    padding: 8px;
-    padding-left: 0;
+    padding: 2px 8px;
     border-radius: 4px;
     outline: none;
     font-weight: 500;
     color: var(--neutral-400);
     font-size: 14px;
+    border: 1px dashed var(--neutral-300);
+    border-radius: 4px;
+    width: 100px;
 }
 
 .notes-editor-image-dropzone,
