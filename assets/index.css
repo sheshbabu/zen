@@ -807,17 +807,23 @@ body {
 
         svg.lucide {
             display: none;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             padding: 4px;
             margin-right: 8px;
+            transition: background-color 0.5s;
 
             line,
             circle,
             rect,
             path {
-                stroke: var(--neutral-500);
+                stroke: var(--neutral-600);
                 stroke-width: 2;
+            }
+
+            &:hover {
+                background-color: var(--neutral-200);
+                border-radius: 4px;
             }
         }
     }
@@ -956,6 +962,7 @@ body {
         width: 36px;
         height: 36px;
         padding: 8px;
+        cursor: pointer;
 
         circle,
         rect,
