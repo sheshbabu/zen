@@ -62,6 +62,16 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       e.preventDefault();
       insertAtCursor('  ');
     }
+
+    if (isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'h') {
+      e.preventDefault();
+      formatSelectedText("highlight");
+    }
+
+    if (isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.key === 'b') {
+      e.preventDefault();
+      formatSelectedText("bold");
+    }
   }
 
   function handleTextAreaHeight() {
@@ -222,6 +232,36 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     setContent(beforeText + text + afterText);
 
     const newPosition = startPos + text.length;
+    textarea.selectionStart = newPosition;
+    textarea.selectionEnd = newPosition;
+    textarea.focus();
+  }
+
+  function formatSelectedText(format) {
+    if (textareaRef.current === null) {
+      return;
+    }
+
+    const textarea = textareaRef.current;
+    const startPos = textarea.selectionStart;
+    const endPos = textarea.selectionEnd;
+    const beforeText = textarea.value.substring(0, startPos);
+    const afterText = textarea.value.substring(endPos);
+    const selectedText = textarea.value.substring(startPos, endPos);
+    let formattedText = "";
+    
+    switch (format) {
+      case "bold":
+        formattedText = `**${selectedText}**`;
+        break;
+      case "highlight":
+        formattedText = `==${selectedText}==`;
+        break;
+    }
+
+    setContent(beforeText + formattedText + afterText);
+
+    const newPosition = startPos + formattedText.length;
     textarea.selectionStart = newPosition;
     textarea.selectionEnd = newPosition;
     textarea.focus();
