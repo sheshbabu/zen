@@ -51,11 +51,11 @@ export default function TagDetailModal({ tag }) {
   return (
     <div class="modal-backdrop-container is-centered" onClick={handleBackdropClick}>
       <div class="modal-content-container tag-dialog">
+        <div className="modal-header">
+          <h3 className="modal-title">Manage Tag</h3>
+          <CloseIcon className="notes-editor-toolbar-button-close" onClick={closeModal} />
+        </div>
         <div className="modal-content">
-          <div className="modal-header">
-            <h3 className="modal-title">Manage Tag</h3>
-            <CloseIcon className="notes-editor-toolbar-button-close" onClick={closeModal} />
-          </div>
           <p>Edit the tag name or <b>permanently delete</b> this tag. Deleting the tag will remove it from all notes.</p>
           <Input id="tag-name" label="Tag Name" type="text" placeholder="Name your Tag" value={name} hint="" error="" isDisabled={false} onChange={handleNameChange} />
         </div>

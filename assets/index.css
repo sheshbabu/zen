@@ -957,6 +957,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--neutral-200);
 
     svg {
         width: 36px;
@@ -970,6 +972,11 @@ body {
             stroke: var(--neutral-500);
             stroke-width: 2.5;
         }
+
+        &:hover {
+            background-color: var(--neutral-100);
+            border-radius: 4px;
+        }
     }
 }
 
@@ -980,6 +987,7 @@ body {
     padding: 16px;
     padding-left: 8px;
     background-color: var(--neutral-50);
+    box-shadow: inset var(--shadow-2);
 
     &.right-aligned {
         justify-content: flex-end;
