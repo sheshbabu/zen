@@ -9,7 +9,7 @@ export default function NotesList({ notes = [], total, view, onViewChange, onLoa
   let listClassName = "notes-list";
   let items = notes.map(note => <NotesListItem note={note} key={note.NoteID} />);
 
-  if (view === "grid") {
+  if (view === "card") {
     containerClassName = "notes-grid-fragment";
     listClassName = "notes-grid";
     items = notes.map(note => <NotesGridItem note={note} key={note.NoteID} />);
@@ -17,7 +17,7 @@ export default function NotesList({ notes = [], total, view, onViewChange, onLoa
 
   return (
     <div className={containerClassName}>
-      <NotesListToolbar onListViewClick={() => onViewChange("list")} onGridViewClick={() => onViewChange("grid")} />
+      <NotesListToolbar onListViewClick={() => onViewChange("list")} onCardViewClick={() => onViewChange("card")} />
       <div className={listClassName}>
         {items}
         <LoadMoreButton notes={notes} total={total} onLoadMoreClick={onLoadMoreClick}/>

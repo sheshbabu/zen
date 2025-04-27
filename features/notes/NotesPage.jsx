@@ -13,7 +13,7 @@ export default function NotesPage({ noteId }) {
   const [tags, setTags] = useState([]);
   const [focusModes, setFocusModes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
-  const [selectedView, setSelectedView] = useState("list"); // "list" || "grid"
+  const [selectedView, setSelectedView] = useState("list"); // "list" || "card"
 
   const searchParams = useSearchParams();
   const selectedTagId = searchParams.get("tag_id");
@@ -125,7 +125,7 @@ export default function NotesPage({ noteId }) {
   if (selectedView === "list") {
     listClassName = "notes-list-container"
     editorClassName = "notes-editor-container";
-  } else if (selectedView === "grid") {
+  } else if (selectedView === "card") {
     listClassName = "notes-list-container grid";
 
     if (noteId === undefined) {
@@ -146,7 +146,7 @@ export default function NotesPage({ noteId }) {
       </div>
 
       <div className={editorClassName} data-page={noteId === undefined ? "notes" : "editor"}>
-        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.NoteID} isFloating={noteId !== undefined && selectedView === "grid"} onChange={handleNoteChange} />
+        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.NoteID} isFloating={noteId !== undefined && selectedView === "card"} onChange={handleNoteChange} />
       </div>
 
       <MobileNavbar />
