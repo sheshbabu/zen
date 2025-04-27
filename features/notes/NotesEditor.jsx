@@ -65,8 +65,6 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     }
 
     const textarea = textareaRef.current;
-    // Reset the height
-    textarea.style.height = 'auto';
     // scrollHeight is height of content and padding
     // It doesn't include border, margin, or scrollbar
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight
