@@ -50,18 +50,25 @@ func SearchTags(term string) ([]Tag, error) {
 	tags := []Tag{}
 	query := `
 		SELECT
-			tag_id,
-			name
+			t.tag_id,
+			t.name,
+			COUNT(nt.note_id) AS note_count
 		FROM
-			tags
+			tags t
+		LEFT JOIN
+			note_tags nt ON t.tag_id = nt.tag_id
 		WHERE
-			name LIKE '%' || ? || '%'
-		-- Boosting rows starting with the search term
+			t.name LIKE '%' || ? || '%'
+		GROUP BY
+			t.tag_id, t.name
 		ORDER BY 
+			-- Boosting rows starting with the search term
 			CASE
-				WHEN name LIKE ? || '%' THEN 1
+				WHEN t.name LIKE ? || '%' THEN 1
 				ELSE 2
-			END
+			END,
+			-- Boosting rows with more notes
+			note_count DESC
 	`
 
 	rows, err := sqlite.DB.Query(query, term, term)
@@ -74,7 +81,8 @@ func SearchTags(term string) ([]Tag, error) {
 
 	for rows.Next() {
 		var tag Tag
-		err = rows.Scan(&tag.TagID, &tag.Name)
+		var count int
+		err = rows.Scan(&tag.TagID, &tag.Name, &count)
 		if err != nil {
 			err = fmt.Errorf("error scanning tag: %w", err)
 			slog.Error(err.Error())
