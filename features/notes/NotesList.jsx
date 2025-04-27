@@ -34,7 +34,7 @@ function NotesListItem({ note }) {
   let title = <div className="notes-list-item-title">{note.Title}</div>
 
   if (note.Title === "") {
-    let preview = note.Snippet.split(" ").slice(0, 3).join(" ");
+    let preview = note.Snippet.split(" ").slice(0, 10).join(" ");
     if (preview.startsWith("![](/images/")) {
       preview = "Image";
     }
