@@ -1,6 +1,7 @@
 package notes
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -22,12 +23,14 @@ func GetAllNotes(page int) ([]Note, int, error) {
 			n.content,
 			SUBSTR(n.content, 0, 500) AS snippet,
 			n.updated_at,
-			COALESCE(
-                JSON_GROUP_ARRAY(JSON_OBJECT(
-					'tag_id', t.tag_id,
-					'name', t.name
-				)), '[]'
-            ) as tags_json,
+			CASE
+				WHEN COUNT(t.tag_id) > 0 THEN
+					JSON_GROUP_ARRAY(JSON_OBJECT(
+						'tag_id', t.tag_id,
+						'name', t.name
+					))
+				ELSE '[]'
+			END AS tags_json,
 			COUNT(*) OVER() as total_count
 		FROM
 			notes n
@@ -85,12 +88,14 @@ func GetNoteByID(noteID int) (Note, error) {
 			n.content,
 			SUBSTR(content, 0, 500) AS snippet,
 			n.updated_at,
-			COALESCE(
-                JSON_GROUP_ARRAY(JSON_OBJECT(
-					'tag_id', t.tag_id,
-					'name', t.name
-				)), '[]'
-            ) as tags_json
+			CASE
+				WHEN COUNT(t.tag_id) > 0 THEN
+					JSON_GROUP_ARRAY(JSON_OBJECT(
+						'tag_id', t.tag_id,
+						'name', t.name
+					))
+				ELSE '[]'
+			END AS tags_json
 		FROM
 			notes n
 		LEFT JOIN
@@ -205,16 +210,20 @@ func CreateNote(note Note) (Note, error) {
 	`
 	row = tx.QueryRow(query, note.NoteID)
 	err = row.Scan(&tagsJSON)
-	if err != nil {
+
+	if err == sql.ErrNoRows {
+		note.Tags = []tags.Tag{}
+	} else if err != nil {
 		err = fmt.Errorf("error retrieving tags for note %d: %w", note.NoteID, err)
 		slog.Error(err.Error())
 		note.Tags = []tags.Tag{}
-	}
-	err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
-	if err != nil {
-		err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
-		slog.Error(err.Error())
-		note.Tags = []tags.Tag{}
+	} else {
+		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+		if err != nil {
+			err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+			slog.Error(err.Error())
+			note.Tags = []tags.Tag{}
+		}
 	}
 
 	err = tx.Commit()
