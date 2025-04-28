@@ -29,17 +29,17 @@
     --font-family: ui-sans-serif, system-ui, sans-serif;
     --font-family-code: ui-monospace, monospace;
     /* 1rem * pow(var(--font-scale), 6) */
-    --h1: bold 2.027rem/1.2 var(--font-family);
+    --h1: 600 2.027rem/1.2 var(--font-family);
     /* 1rem * pow(var(--font-scale), 5) */
-    --h2: bold 1.802rem/1.2 var(--font-family);
+    --h2: 600 1.802rem/1.2 var(--font-family);
     /* 1rem * pow(var(--font-scale), 4) */
-    --h3: bold 1.602rem/1.2 var(--font-family);
+    --h3: 600 1.602rem/1.2 var(--font-family);
     /* 1rem * pow(var(--font-scale), 3) */
-    --h4: bold 1.424rem/1.2 var(--font-family);
+    --h4: 600 1.424rem/1.2 var(--font-family);
     /* 1rem * pow(var(--font-scale), 2) */
-    --h5: bold 1.266rem/1.2 var(--font-family);
+    --h5: 600 1.266rem/1.2 var(--font-family);
     /* 1rem * pow(var(--font-scale), 1) */
-    --h6: bold 1.125rem/1.2 var(--font-family);
+    --h6: 600 1.125rem/1.2 var(--font-family);
     /* https://m3.material.io/styles/typography/applying-type */
     --p1: normal 1rem/1.5 var(--font-family);
     /* 1rem / var(--font-scale) */
@@ -224,7 +224,7 @@ svg.lucide {
             font: var(--sm);
             color: var(--neutral-500);
             font-size: 12px;
-            font-weight: bold;
+            font-weight: 600;
             margin-bottom: 4px;
         }
 
