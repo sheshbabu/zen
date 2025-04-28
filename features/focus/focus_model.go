@@ -116,7 +116,6 @@ func GetFocusModeByID(focusModeID int) (FocusMode, error) {
 }
 
 func UpdateFocusMode(focusMode *FocusMode) error {
-	fmt.Println("Updating focus mode:", focusMode)
 	tx, err := sqlite.DB.Begin()
 
 	if err != nil {
