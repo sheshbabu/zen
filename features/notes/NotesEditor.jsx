@@ -17,6 +17,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   const [tags, setTags] = useState(selectedNote?.Tags || []);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [attachments, setAttachments] = useState([]);
+  const [isSaveLoading, setIsSaveLoading] = useState(false);
 
   const titleRef = useRef(null);
   const textareaRef = useRef(null);
@@ -94,6 +95,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     };
 
     let promise = null;
+    setIsSaveLoading(true);
 
     if (isNewNote) {
       promise = ApiClient.createNote(note);
@@ -114,6 +116,9 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       })
       .catch(e => {
         console.error('Error saving note:', e);
+      })
+      .finally(() => {
+        setIsSaveLoading(false);
       });
   }
 
@@ -335,6 +340,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
           note={selectedNote}
           isEditable={isEditable}
           isFloating={isFloating}
+          isSaveLoading={isSaveLoading}
           onSaveClick={handleSaveClick}
           onEditClick={handleEditClick}
           onCloseClick={handleCloseClick}
@@ -356,9 +362,10 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   );
 }
 
-function Toolbar({ note, isEditable, isFloating, onSaveClick, onEditClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick }) {
+function Toolbar({ note, isEditable, isFloating, isSaveLoading, onSaveClick, onEditClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick }) {
   const actions = [];
   const menuActions = [];
+  const saveButtonText = isSaveLoading ? "Saving..." : "Save";
 
   if (isFloating) {
     actions.push(
@@ -368,7 +375,7 @@ function Toolbar({ note, isEditable, isFloating, onSaveClick, onEditClick, onClo
 
   if (isEditable) {
     actions.push(
-      <div className="ghost-button" onClick={onSaveClick}>Save</div>
+      <div className="ghost-button" onClick={onSaveClick}>{saveButtonText}</div>
     );
   } else {
     actions.push(
