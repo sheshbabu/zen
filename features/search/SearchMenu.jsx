@@ -1,7 +1,7 @@
 import { h, render, useEffect, useState, useRef } from "../../assets/preact.esm.js"
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
-import { SearchIcon, NoteIcon } from "../../commons/components/Icon.jsx";
+import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon } from "../../commons/components/Icon.jsx";
 
 export default function SearchMenu() {
   const [query, setQuery] = useState("");
@@ -109,9 +109,17 @@ export default function SearchMenu() {
 }
 
 function SearchResultItem({ item, isSelected, onClick }) {
+  let icon = <NoteIcon />
+
+  if (item.IsArchived) {
+    icon = <ArchiveIcon />
+  } else if (item.IsDeleted) {
+    icon = <TrashIcon />
+  }
+
   return (
     <div className={`search-result-item ${isSelected ? "is-selected" : ""}`} onClick={onClick}>
-      <NoteIcon />
+      {icon}
       <div className="search-result-item-content">
         <p className="title">{item.Title}</p>
         <p className="subtitle">{item.Snippet}</p>

@@ -43,14 +43,14 @@ export default function Sidebar({ focusModes, tags }) {
         <TemplatesIcon />
         Templates
       </div>*/}
-        <div className="sidebar-button" activeClassName="is-active" to="/archives" shouldPreserveSearchParams>
+        <Link className="sidebar-button" activeClassName="is-active" to="/notes/?is_archived=true">
           <ArchiveIcon />
           Archives
-        </div>
-        <div className="sidebar-button" activeClassName="is-active" to="/trash" shouldPreserveSearchParams>
+        </Link>
+        <Link className="sidebar-button" activeClassName="is-active" to="/notes/?is_deleted=true">
           <TrashIcon />
           Trash
-        </div>
+        </Link>
       </div>
 
       <div className="sidebar-scrollable">

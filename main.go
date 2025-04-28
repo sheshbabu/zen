@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 	"zen/commons/sqlite"
 	"zen/features/focus"
 	"zen/features/images"
@@ -42,6 +43,8 @@ func main() {
 
 	sqlite.Migrate(migrations)
 
+	go runBackgroundTasks()
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -62,7 +65,10 @@ func newRouter() *http.ServeMux {
 	mux.HandleFunc("GET /api/notes/{note_id}/", notes.HandleGetNote)
 	mux.HandleFunc("PUT /api/notes/{note_id}/", notes.HandleUpdateNote)
 	mux.HandleFunc("POST /api/notes/", notes.HandleCreateNote)
-	mux.HandleFunc("DELETE /api/notes/{note_id}/", notes.HandleDeleteNote)
+	mux.HandleFunc("DELETE /api/notes/{note_id}/", notes.HandleSoftDeleteNote)
+	mux.HandleFunc("PUT /api/notes/{note_id}/restore/", notes.HandleRestoreDeletedNote)
+	mux.HandleFunc("PUT /api/notes/{note_id}/archive/", notes.HandleArchiveNote)
+	mux.HandleFunc("PUT /api/notes/{note_id}/unarchive/", notes.HandleUnarchiveNote)
 
 	mux.HandleFunc("GET /api/tags/", tags.HandleGetTags)
 	mux.HandleFunc("PUT /api/tags/", tags.HandleUpdateTag)
@@ -126,4 +132,11 @@ func handleStaticAssets(w http.ResponseWriter, r *http.Request) {
 
 func handleUploadedImages(w http.ResponseWriter, r *http.Request) {
 	http.StripPrefix("/images/", http.FileServer(http.Dir("images"))).ServeHTTP(w, r)
+}
+
+func runBackgroundTasks() {
+	frequency := 30 * 24 * time.Hour // 30 days
+	for range time.Tick(frequency) {
+		notes.EmptyTrash()
+	}
 }

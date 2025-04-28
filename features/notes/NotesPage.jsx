@@ -18,6 +18,8 @@ export default function NotesPage({ noteId }) {
   const searchParams = useSearchParams();
   const selectedTagId = searchParams.get("tag_id");
   const selectedFocusId = searchParams.get("focus_id");
+  const isArchivesPage = searchParams.get("is_archived") === "true";
+  const isTrashPage = searchParams.get("is_deleted") === "true";
 
   const isMobile = window.matchMedia("(max-width: 600px)").matches;
 
@@ -38,7 +40,7 @@ export default function NotesPage({ noteId }) {
 
     refreshNotes();
     refreshTags();
-  }, [selectedTagId, selectedFocusId]);
+  }, [selectedTagId, selectedFocusId, isArchivesPage, isTrashPage]);
 
   useEffect(() => {
     refreshNotes();
@@ -74,7 +76,7 @@ export default function NotesPage({ noteId }) {
   }, [noteId, notes]);
 
   function refreshNotes() {
-    ApiClient.getNotes(selectedTagId, selectedFocusId, notesPageNumber)
+    ApiClient.getNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage, notesPageNumber)
       .then(res => {
         if (notesPageNumber > 1) {
           setNotes(prevNotes => [...prevNotes, ...res.notes]);

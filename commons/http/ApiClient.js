@@ -41,7 +41,7 @@ async function updateFocusMode(focusMode) {
 
 // Notes
 
-async function getNotes(tagId, focusId, page) {
+async function getNotes(tagId, focusId, isArchived, isDeleted, page) {
   let url = "/api/notes/";
   const params = new URLSearchParams();
 
@@ -53,6 +53,12 @@ async function getNotes(tagId, focusId, page) {
 
   if (page) {
     params.append('page', page);
+  }
+
+  if (isArchived) {
+    params.append('is_archived', "true");
+  } else if (isDeleted) {
+    params.append('is_deleted', "true");
   }
 
   if (params.toString()) {
@@ -76,6 +82,18 @@ async function updateNote(noteId, note) {
 
 async function deleteNote(noteId) {
   return await request('DELETE', `/api/notes/${noteId}`);
+}
+
+async function restoreNote(noteId) {
+  return await request('PUT', `/api/notes/${noteId}/restore/`);
+}
+
+async function archiveNote(noteId) {
+  return await request('PUT', `/api/notes/${noteId}/archive/`);
+}
+
+async function unarchiveNote(noteId) {
+  return await request('PUT', `/api/notes/${noteId}/unarchive/`);
 }
 
 // Tags
@@ -124,6 +142,9 @@ export default {
   createNote,
   updateNote,
   deleteNote,
+  restoreNote,
+  archiveNote,
+  unarchiveNote,
   getTags,
   searchTags,
   updateTag,

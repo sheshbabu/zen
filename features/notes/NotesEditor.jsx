@@ -205,6 +205,36 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     render(null, document.querySelector('.modal-root'));
   }
 
+  function handleArchiveClick() {
+    ApiClient.archiveNote(selectedNote.NoteID)
+      .then(() => {
+        onChange();
+      })
+      .catch(e => {
+        console.error('Error archiving note:', e);
+      });
+  }
+
+  function handleUnarchiveClick() {
+    ApiClient.unarchiveNote(selectedNote.NoteID)
+      .then(() => {
+        onChange();
+      })
+      .catch(e => {
+        console.error('Error unarchiving note:', e);
+      });
+  }
+
+  function handleRestoreClick() {
+    ApiClient.restoreNote(selectedNote.NoteID)
+      .then(() => {
+        onChange();
+      })
+      .catch(e => {
+        console.error('Error restoring note:', e);
+      });
+  }
+
   function uploadImage(file) {
     const formData = new FormData();
     formData.append('image', file);
@@ -249,7 +279,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     const afterText = textarea.value.substring(endPos);
     const selectedText = textarea.value.substring(startPos, endPos);
     let formattedText = "";
-    
+
     switch (format) {
       case "bold":
         formattedText = `**${selectedText}**`;
@@ -301,7 +331,18 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     <div className={`notes-editor ${isEditable ? "is-editable" : ""}`} tabIndex="0" onPaste={handlePaste}>
       <div className="notes-editor-header">
         <div className="notes-editor-title" contentEditable={isEditable} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
-        <Toolbar isEditable={isEditable} isFloating={isFloating} onSaveClick={handleSaveClick} onEditClick={handleEditClick} onCloseClick={handleCloseClick} onDeleteClick={handleDeleteClick} />
+        <Toolbar
+          note={selectedNote}
+          isEditable={isEditable}
+          isFloating={isFloating}
+          onSaveClick={handleSaveClick}
+          onEditClick={handleEditClick}
+          onCloseClick={handleCloseClick}
+          onDeleteClick={handleDeleteClick}
+          onArchiveClick={handleArchiveClick}
+          onUnarchiveClick={handleUnarchiveClick}
+          onRestoreClick={handleRestoreClick}
+        />
       </div>
       <NotesEditorTags tags={tags} isEditable={isEditable} canCreateTag onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
       <div className={`notes-editor-image-dropzone ${isDraggingOver ? "dragover" : ""}`} onDrop={handleImageDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}>
@@ -315,7 +356,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   );
 }
 
-function Toolbar({ isEditable, isFloating, onSaveClick, onEditClick, onCloseClick, onDeleteClick }) {
+function Toolbar({ note, isEditable, isFloating, onSaveClick, onEditClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick }) {
   const actions = [];
   const menuActions = [];
 
@@ -333,6 +374,23 @@ function Toolbar({ isEditable, isFloating, onSaveClick, onEditClick, onCloseClic
     actions.push(
       <div className="ghost-button" onClick={onEditClick}>Edit</div>
     );
+  }
+
+  if (note.IsArchived) {
+    menuActions.push(
+      <div style="width: 80px;" onClick={onUnarchiveClick}>Unarchive</div>
+    );
+  } else if (!note.IsDeleted) {
+    menuActions.push(
+      <div style="width: 80px;" onClick={onArchiveClick}>Archive</div>
+    );
+  }
+
+  if (note.IsDeleted) {
+    menuActions.push(
+      <div style="width: 80px;" onClick={onRestoreClick}>Restore</div>
+    );
+  } else {
     menuActions.push(
       <div style="width: 80px;" onClick={onDeleteClick}>Delete</div>
     );
