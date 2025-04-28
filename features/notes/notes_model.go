@@ -549,7 +549,7 @@ func GetNotesByTagID(tagID int, page int) ([]Note, int, error) {
 		LEFT JOIN
 			tags t2 ON nt2.tag_id = t2.tag_id
 		WHERE
-			t.tag_id = ?
+			t.tag_id = ? AND n.deleted_at IS NULL AND n.archived_at IS NULL
 		GROUP BY
 			n.note_id
 		ORDER BY
@@ -623,7 +623,7 @@ func GetNotesByFocusModeID(focusModeID int, page int) ([]Note, int, error) {
 		JOIN
 			tags t ON nt.tag_id = t.tag_id
 		WHERE
-			fmt.focus_mode_id = ?
+			fmt.focus_mode_id = ? AND n.deleted_at IS NULL AND n.archived_at IS NULL
 		GROUP BY
             n.note_id
 		ORDER BY
