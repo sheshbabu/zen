@@ -10,9 +10,9 @@ export default function NotesListToolbar({ onListViewClick, onCardViewClick }) {
       <div onClick={() => onCardViewClick()}>
         <CardViewIcon />
       </div>
-      <div onClick={() => onCardViewClick()}>
+      {/* <div onClick={() => onCardViewClick()}>
         <GalleryViewIcon />
-      </div>
+      </div> */}
     </div>
   );
 }
