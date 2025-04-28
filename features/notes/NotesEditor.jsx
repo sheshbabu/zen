@@ -334,21 +334,21 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   // TODO: remove "is-editable" CSS and use JS
   return (
     <div className={`notes-editor ${isEditable ? "is-editable" : ""}`} tabIndex="0" onPaste={handlePaste}>
+      <Toolbar
+        note={selectedNote}
+        isEditable={isEditable}
+        isFloating={isFloating}
+        isSaveLoading={isSaveLoading}
+        onSaveClick={handleSaveClick}
+        onEditClick={handleEditClick}
+        onCloseClick={handleCloseClick}
+        onDeleteClick={handleDeleteClick}
+        onArchiveClick={handleArchiveClick}
+        onUnarchiveClick={handleUnarchiveClick}
+        onRestoreClick={handleRestoreClick}
+      />
       <div className="notes-editor-header">
         <div className="notes-editor-title" contentEditable={isEditable} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
-        <Toolbar
-          note={selectedNote}
-          isEditable={isEditable}
-          isFloating={isFloating}
-          isSaveLoading={isSaveLoading}
-          onSaveClick={handleSaveClick}
-          onEditClick={handleEditClick}
-          onCloseClick={handleCloseClick}
-          onDeleteClick={handleDeleteClick}
-          onArchiveClick={handleArchiveClick}
-          onUnarchiveClick={handleUnarchiveClick}
-          onRestoreClick={handleRestoreClick}
-        />
       </div>
       <NotesEditorTags tags={tags} isEditable={isEditable} canCreateTag onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
       <div className={`notes-editor-image-dropzone ${isDraggingOver ? "dragover" : ""}`} onDrop={handleImageDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}>
