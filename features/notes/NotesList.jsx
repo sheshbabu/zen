@@ -1,13 +1,15 @@
 import { h } from "../../assets/preact.esm.js"
 import NotesListToolbar from './NotesListToolbar.jsx';
 import Link from '../../commons/components/Link.jsx';
+import Spinner from '../../commons/components/Spinner.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import formatDate from '../../commons/utils/formatDate.js';
 
-export default function NotesList({ notes = [], total, view, onViewChange, onLoadMoreClick }) {
+export default function NotesList({ notes = [], total, isLoading, view, onViewChange, onLoadMoreClick }) {
   let containerClassName = "notes-list-fragment";
   let listClassName = "notes-list";
   let items = notes.map(note => <NotesListItem note={note} key={note.NoteID} />);
+  let content = <div className="notes-list-spinner"><Spinner/></div>;
 
   if (view === "card") {
     containerClassName = "notes-grid-fragment";
@@ -15,14 +17,20 @@ export default function NotesList({ notes = [], total, view, onViewChange, onLoa
     items = notes.map(note => <NotesGridItem note={note} key={note.NoteID} />);
   }
 
-  return (
-    <div className={containerClassName}>
-      <NotesListToolbar onListViewClick={() => onViewChange("list")} onCardViewClick={() => onViewChange("card")} />
+  if (!isLoading) {
+    content = (
       <div className={listClassName}>
         {items}
         <LoadMoreButton notes={notes} total={total} onLoadMoreClick={onLoadMoreClick}/>
         <EmptyList notes={notes} />
       </div>
+    )
+  }
+
+  return (
+    <div className={containerClassName}>
+      <NotesListToolbar onListViewClick={() => onViewChange("list")} onCardViewClick={() => onViewChange("card")} />
+      {content}
     </div>
   );
 }

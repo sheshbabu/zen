@@ -10,6 +10,7 @@ export default function NotesPage({ noteId }) {
   const [notes, setNotes] = useState([]);
   const [notesTotal, setNotesTotal] = useState(0);
   const [notesPageNumber, setNotesPageNumber] = useState(1);
+  const [isNotesLoading, setIsNotesLoading] = useState(true);
   const [tags, setTags] = useState([]);
   const [focusModes, setFocusModes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
@@ -76,6 +77,8 @@ export default function NotesPage({ noteId }) {
   }, [noteId, notes]);
 
   function refreshNotes() {
+    setIsNotesLoading(true);
+    
     ApiClient.getNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage, notesPageNumber)
       .then(res => {
         if (notesPageNumber > 1) {
@@ -87,6 +90,8 @@ export default function NotesPage({ noteId }) {
       })
       .catch(error => {
         console.error('Error loading notes:', error);
+      }).finally(() => {
+        setIsNotesLoading(false);
       });
   }
 
@@ -144,7 +149,7 @@ export default function NotesPage({ noteId }) {
       </div>
 
       <div className={listClassName} data-page={noteId === undefined ? "notes" : "editor"}>
-        <NotesList notes={notes} total={notesTotal} view={selectedView} onViewChange={handleViewChange} onLoadMoreClick={handleLoadMoreClick} />
+        <NotesList notes={notes} total={notesTotal} isLoading={isNotesLoading} view={selectedView} onViewChange={handleViewChange} onLoadMoreClick={handleLoadMoreClick} />
       </div>
 
       <div className={editorClassName} data-page={noteId === undefined ? "notes" : "editor"}>
