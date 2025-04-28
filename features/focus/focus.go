@@ -8,10 +8,10 @@ import (
 )
 
 type FocusMode struct {
-	FocusModeID int        `json:"focus_mode_id"`
+	FocusModeID int        `json:"focusId"`
 	Name        string     `json:"name"`
 	Tags        []tags.Tag `json:"tags"`
-	LastUsedAt  time.Time  `json:"last_used_at"`
+	LastUsedAt  time.Time  `json:"lastUsedAt"`
 }
 
 func HandleGetAllFocusModes(w http.ResponseWriter, r *http.Request) {

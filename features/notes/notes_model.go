@@ -26,7 +26,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 			CASE
 				WHEN COUNT(t.tag_id) > 0 THEN
 					JSON_GROUP_ARRAY(JSON_OBJECT(
-						'tag_id', t.tag_id,
+						'tagId', t.tag_id,
 						'name', t.name
 					))
 				ELSE '[]'
@@ -108,7 +108,7 @@ func GetNoteByID(noteID int) (Note, error) {
 			CASE
 				WHEN COUNT(t.tag_id) > 0 THEN
 					JSON_GROUP_ARRAY(JSON_OBJECT(
-						'tag_id', t.tag_id,
+						'tagId', t.tag_id,
 						'name', t.name
 					))
 				ELSE '[]'
@@ -216,7 +216,7 @@ func CreateNote(note Note) (Note, error) {
 		SELECT
 			COALESCE(
 				JSON_GROUP_ARRAY(JSON_OBJECT(
-					'tag_id', t.tag_id,
+					'tagId', t.tag_id,
 					'name', t.name
 				)), '[]'
 			) as tags_json
@@ -348,7 +348,7 @@ func UpdateNote(note Note) (Note, error) {
 		SELECT
 			COALESCE(
 				JSON_GROUP_ARRAY(JSON_OBJECT(
-					'tag_id', t.tag_id,
+					'tagId', t.tag_id,
 					'name', t.name
 				)), '[]'
 			) as tags_json
@@ -531,7 +531,7 @@ func GetNotesByTagID(tagID int, page int) ([]Note, int, error) {
 			n.updated_at,
 			COALESCE(
 				JSON_GROUP_ARRAY(JSON_OBJECT(
-					'tag_id', t2.tag_id,
+					'tagId', t2.tag_id,
 					'name', t2.name
 				)), '[]'
 			) as tags_json,
@@ -607,7 +607,7 @@ func GetNotesByFocusModeID(focusModeID int, page int) ([]Note, int, error) {
 			n.updated_at,
 			COALESCE(
                 JSON_GROUP_ARRAY(JSON_OBJECT(
-					'tag_id', t.tag_id,
+					'tagId', t.tag_id,
 					'name', t.name
 				)), '[]'
             ) as tags_json,

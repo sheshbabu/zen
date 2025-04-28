@@ -10,8 +10,8 @@ export default function SidebarTagsList({ tags = [] }) {
 
   const items = tags.map(tag => (
     <Link
-      key={tag.tag_id}
-      to={`/notes/?tag_id=${tag.tag_id}`}
+      key={tag.tagId}
+      to={`/notes/?tagId=${tag.tagId}`}
       shouldPreserveSearchParams
       className="sidebar-tag-link"
       activeClassName="is-active"

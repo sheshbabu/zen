@@ -62,21 +62,21 @@ func newRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /api/notes/", notes.HandleGetNotes)
-	mux.HandleFunc("GET /api/notes/{note_id}/", notes.HandleGetNote)
-	mux.HandleFunc("PUT /api/notes/{note_id}/", notes.HandleUpdateNote)
+	mux.HandleFunc("GET /api/notes/{noteId}/", notes.HandleGetNote)
+	mux.HandleFunc("PUT /api/notes/{noteId}/", notes.HandleUpdateNote)
 	mux.HandleFunc("POST /api/notes/", notes.HandleCreateNote)
-	mux.HandleFunc("DELETE /api/notes/{note_id}/", notes.HandleSoftDeleteNote)
-	mux.HandleFunc("PUT /api/notes/{note_id}/restore/", notes.HandleRestoreDeletedNote)
-	mux.HandleFunc("PUT /api/notes/{note_id}/archive/", notes.HandleArchiveNote)
-	mux.HandleFunc("PUT /api/notes/{note_id}/unarchive/", notes.HandleUnarchiveNote)
+	mux.HandleFunc("DELETE /api/notes/{noteId}/", notes.HandleSoftDeleteNote)
+	mux.HandleFunc("PUT /api/notes/{noteId}/restore/", notes.HandleRestoreDeletedNote)
+	mux.HandleFunc("PUT /api/notes/{noteId}/archive/", notes.HandleArchiveNote)
+	mux.HandleFunc("PUT /api/notes/{noteId}/unarchive/", notes.HandleUnarchiveNote)
 
 	mux.HandleFunc("GET /api/tags/", tags.HandleGetTags)
 	mux.HandleFunc("PUT /api/tags/", tags.HandleUpdateTag)
-	mux.HandleFunc("DELETE /api/tags/{tag_id}/", tags.HandleDeleteTag)
+	mux.HandleFunc("DELETE /api/tags/{tagId}/", tags.HandleDeleteTag)
 
 	mux.HandleFunc("GET /api/focus/", focus.HandleGetAllFocusModes)
 	mux.HandleFunc("POST /api/focus/", focus.HandleCreateFocusMode)
-	mux.HandleFunc("PUT /api/focus/{focus_id}/", focus.HandleUpdateFocusMode)
+	mux.HandleFunc("PUT /api/focus/{focusId}/", focus.HandleUpdateFocusMode)
 
 	mux.HandleFunc("POST /api/images/", images.HandleUploadImage)
 

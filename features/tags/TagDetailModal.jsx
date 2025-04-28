@@ -19,14 +19,14 @@ export default function TagDetailModal({ tag }) {
 
   function handleUpdateClick() {
     const payload = {
-      tag_id: tag.tag_id,
+      tagId: tag.tagId,
       name: name
     };
 
     ApiClient.updateTag(payload)
       .then(() => {
         closeModal();
-        navigateTo(`/notes/?tag_id=${tag.tag_id}`);
+        navigateTo(`/notes/?tagId=${tag.tagId}`);
       })
       .catch((error) => {
         console.error("Error updating tag:", error);
@@ -34,7 +34,7 @@ export default function TagDetailModal({ tag }) {
   }
 
   function handleDeleteClick() {
-    ApiClient.deleteTag(tag.tag_id)
+    ApiClient.deleteTag(tag.tagId)
       .then(() => {
         closeModal();
         navigateTo("/notes/");

@@ -27,7 +27,7 @@ func GetAllFocusModes() ([]FocusMode, error) {
 			fm.name,
             COALESCE(
                 JSON_GROUP_ARRAY(JSON_OBJECT(
-					'tag_id', t.tag_id,
+					'tagId', t.tag_id,
 					'name', t.name
 				)), '[]'
             ) as tags_json,
@@ -81,7 +81,7 @@ func GetFocusModeByID(focusModeID int) (FocusMode, error) {
 			fm.name,
             COALESCE(
                 JSON_GROUP_ARRAY(JSON_OBJECT(
-					'tag_id', t.tag_id,
+					'tagId', t.tag_id,
 					'name', t.name
 				)), '[]'
             ) as tags_json,

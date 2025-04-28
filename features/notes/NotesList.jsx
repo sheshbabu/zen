@@ -8,13 +8,13 @@ import formatDate from '../../commons/utils/formatDate.js';
 export default function NotesList({ notes = [], total, isLoading, view, onViewChange, onLoadMoreClick }) {
   let containerClassName = "notes-list-fragment";
   let listClassName = "notes-list";
-  let items = notes.map(note => <NotesListItem note={note} key={note.NoteID} />);
+  let items = notes.map(note => <NotesListItem note={note} key={note.noteId} />);
   let content = <div className="notes-list-spinner"><Spinner/></div>;
 
   if (view === "card") {
     containerClassName = "notes-grid-fragment";
     listClassName = "notes-grid";
-    items = notes.map(note => <NotesGridItem note={note} key={note.NoteID} />);
+    items = notes.map(note => <NotesGridItem note={note} key={note.noteId} />);
   }
 
   if (!isLoading) {
@@ -36,13 +36,13 @@ export default function NotesList({ notes = [], total, isLoading, view, onViewCh
 }
 
 function NotesListItem({ note }) {
-  const link = `/notes/${note.NoteID}`;
-  const updatedAt = formatDate(new Date(note.UpdatedAt))
-  const tags = note.Tags?.map(tag => <div className="notes-list-item-tag" key={tag.name}>{tag.name}</div>);
-  let title = <div className="notes-list-item-title">{note.Title}</div>
+  const link = `/notes/${note.noteId}`;
+  const updatedAt = formatDate(new Date(note.updatedAt))
+  const tags = note.tags?.map(tag => <div className="notes-list-item-tag" key={tag.name}>{tag.name}</div>);
+  let title = <div className="notes-list-item-title">{note.title}</div>
 
-  if (note.Title === "") {
-    let preview = note.Snippet.split(" ").slice(0, 10).join(" ");
+  if (note.title === "") {
+    let preview = note.snippet.split(" ").slice(0, 10).join(" ");
     if (preview.startsWith("![](/images/")) {
       preview = "Image";
     }
@@ -54,25 +54,25 @@ function NotesListItem({ note }) {
       {title}
       <div className="notes-list-item-subcontainer">
         <div className="notes-list-item-tags">{tags}</div>
-        <div className="notes-list-item-subtext" title={note.UpdatedAt}>{updatedAt}</div>
+        <div className="notes-list-item-subtext" title={note.updatedAt}>{updatedAt}</div>
       </div>
     </Link>
   );
 }
 
 function NotesGridItem({ note }) {
-  const link = `/notes/${note.NoteID}`;
-  const tags = note.Tags?.map(tag => (<Link className="tag" key={tag.tag_id} to={`/notes/?tag_id=${tag.tag_id}`} shouldPreserveSearchParams>{tag.name}</Link>));
-  let title = <div className="notes-grid-item-title">{note.Title}</div>
+  const link = `/notes/${note.noteId}`;
+  const tags = note.tags?.map(tag => (<Link className="tag" key={tag.tagId} to={`/notes/?tagId=${tag.tagId}`} shouldPreserveSearchParams>{tag.name}</Link>));
+  let title = <div className="notes-grid-item-title">{note.title}</div>
 
-  if (note.Title === "") {
+  if (note.title === "") {
     title = null;
   }
 
   return (
     <Link className="notes-grid-item" to={link} shouldPreserveSearchParams>
       {title}
-      <div className="notes-grid-item-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(note.Snippet) }} />
+      <div className="notes-grid-item-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(note.snippet) }} />
       <div className="notes-grid-item-tags">{tags}</div>
     </Link>
   );

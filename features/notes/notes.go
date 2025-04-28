@@ -14,14 +14,14 @@ type ResponseEnvelope struct {
 }
 
 type Note struct {
-	NoteID     int
-	Title      string
-	Snippet    string
-	Content    string
-	UpdatedAt  time.Time
-	Tags       []tags.Tag
-	IsArchived bool
-	IsDeleted  bool
+	NoteID     int        `json:"noteId"`
+	Title      string     `json:"title"`
+	Snippet    string     `json:"snippet"`
+	Content    string     `json:"content"`
+	UpdatedAt  time.Time  `json:"updatedAt"`
+	Tags       []tags.Tag `json:"tags"`
+	IsArchived bool       `json:"isArchived"`
+	IsDeleted  bool       `json:"isDeleted"`
 }
 
 type NotesFilter struct {
@@ -39,10 +39,10 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 	var filter NotesFilter
 
 	pageStr := r.URL.Query().Get("page")
-	tagIDStr := r.URL.Query().Get("tag_id")
-	focusModeIDStr := r.URL.Query().Get("focus_id")
-	isDeleted := r.URL.Query().Get("is_deleted")
-	isArchived := r.URL.Query().Get("is_archived")
+	tagIDStr := r.URL.Query().Get("tagId")
+	focusModeIDStr := r.URL.Query().Get("focusId")
+	isDeleted := r.URL.Query().Get("isDeleted")
+	isArchived := r.URL.Query().Get("isArchived")
 
 	page := 1
 	tagID := 0
@@ -115,7 +115,7 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleGetNote(w http.ResponseWriter, r *http.Request) {
-	noteIDStr := r.PathValue("note_id")
+	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
 		http.Error(w, "Invalid note ID", http.StatusBadRequest)
@@ -150,7 +150,7 @@ func HandleCreateNote(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleUpdateNote(w http.ResponseWriter, r *http.Request) {
-	noteIDStr := r.PathValue("note_id")
+	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
 		http.Error(w, "Invalid note ID", http.StatusBadRequest)
@@ -175,7 +175,7 @@ func HandleUpdateNote(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleForceDeleteNote(w http.ResponseWriter, r *http.Request) {
-	noteIDStr := r.PathValue("note_id")
+	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
 		http.Error(w, "Invalid note ID", http.StatusBadRequest)
@@ -192,7 +192,7 @@ func HandleForceDeleteNote(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleSoftDeleteNote(w http.ResponseWriter, r *http.Request) {
-	noteIDStr := r.PathValue("note_id")
+	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
 		http.Error(w, "Invalid note ID", http.StatusBadRequest)
@@ -209,7 +209,7 @@ func HandleSoftDeleteNote(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleRestoreDeletedNote(w http.ResponseWriter, r *http.Request) {
-	noteIDStr := r.PathValue("note_id")
+	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
 		http.Error(w, "Invalid note ID", http.StatusBadRequest)
@@ -226,7 +226,7 @@ func HandleRestoreDeletedNote(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleArchiveNote(w http.ResponseWriter, r *http.Request) {
-	noteIDStr := r.PathValue("note_id")
+	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
 		http.Error(w, "Invalid note ID", http.StatusBadRequest)
@@ -243,7 +243,7 @@ func HandleArchiveNote(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleUnarchiveNote(w http.ResponseWriter, r *http.Request) {
-	noteIDStr := r.PathValue("note_id")
+	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
 		http.Error(w, "Invalid note ID", http.StatusBadRequest)

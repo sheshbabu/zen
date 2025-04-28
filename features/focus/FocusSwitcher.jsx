@@ -6,17 +6,17 @@ import useSearchParams from "../../commons/components/useSearchParams.jsx";
 
 export default function FocusSwitcher({ focusModes }) {
   if (focusModes.length === 0) {
-    focusModes = [{ focus_mode_id: 0, name: "Everything" }];
+    focusModes = [{ focusId: 0, name: "Everything" }];
   }
 
   const [selectedFocusMode, setSelectedFocusMode] = useState(focusModes[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const searchParams = useSearchParams();
-  const selectedFocusId = searchParams.get("focus_id");
+  const selectedFocusId = searchParams.get("focusId");
 
   useEffect(() => {
-    setSelectedFocusMode(focusModes.find(focusMode => focusMode.focus_mode_id === parseInt(selectedFocusId, 10)) || focusModes[0]);
+    setSelectedFocusMode(focusModes.find(focusMode => focusMode.focusId === parseInt(selectedFocusId, 10)) || focusModes[0]);
   }, [selectedFocusId, focusModes]);
 
   function handleDropdownClick() {
@@ -25,8 +25,8 @@ export default function FocusSwitcher({ focusModes }) {
 
   function handleFocusModeClick(focusMode) {
     let to = "/notes/"
-    if (focusMode.focus_mode_id !== 0) {
-      to = `/notes/?focus_id=${focusMode.focus_mode_id}`
+    if (focusMode.focusId !== 0) {
+      to = `/notes/?focusId=${focusMode.focusId}`
     }
     navigateTo(to);
     setIsDropdownOpen(false);
@@ -45,11 +45,11 @@ export default function FocusSwitcher({ focusModes }) {
 
   const items = focusModes.map(focusMode => {
     let editIcon = null;
-    if (focusMode.focus_mode_id !== 0) {
+    if (focusMode.focusId !== 0) {
       editIcon = <PencilIcon onClick={e => handleEditClick(e, focusMode)}/>
     }
     return (
-      <li key={focusMode.focus_mode_id} className="dropdown-option" onClick={() => handleFocusModeClick(focusMode)}>
+      <li key={focusMode.focusId} className="dropdown-option" onClick={() => handleFocusModeClick(focusMode)}>
         {focusMode.name}
         {editIcon}
       </li>

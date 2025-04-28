@@ -11,8 +11,8 @@ export default function Sidebar({ focusModes, tags }) {
   }
 
   const currentSearchParams = new URLSearchParams(window.location.search);
-  const focusId = currentSearchParams.get("focus_id");
-  const notesLink = focusId ? `/notes/?focus_id=${focusId}` : "/notes/";
+  const focusId = currentSearchParams.get("focusId");
+  const notesLink = focusId ? `/notes/?focusId=${focusId}` : "/notes/";
 
   return (
     <Fragment>
@@ -43,11 +43,11 @@ export default function Sidebar({ focusModes, tags }) {
         <TemplatesIcon />
         Templates
       </div>*/}
-        <Link className="sidebar-button" activeClassName="is-active" to="/notes/?is_archived=true">
+        <Link className="sidebar-button" activeClassName="is-active" to="/notes/?isArchived=true">
           <ArchiveIcon />
           Archives
         </Link>
-        <Link className="sidebar-button" activeClassName="is-active" to="/notes/?is_deleted=true">
+        <Link className="sidebar-button" activeClassName="is-active" to="/notes/?isDeleted=true">
           <TrashIcon />
           Trash
         </Link>

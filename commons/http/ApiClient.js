@@ -36,7 +36,7 @@ async function createFocusMode(focusMode) {
 }
 
 async function updateFocusMode(focusMode) {
-  return await request('PUT', `/api/focus/${focusMode.focus_mode_id}`, focusMode);
+  return await request('PUT', `/api/focus/${focusMode.focusId}`, focusMode);
 }
 
 // Notes
@@ -46,9 +46,9 @@ async function getNotes(tagId, focusId, isArchived, isDeleted, page) {
   const params = new URLSearchParams();
 
   if (tagId) {
-    params.append('tag_id', tagId);
+    params.append('tagId', tagId);
   } else if (focusId) {
-    params.append('focus_id', focusId);
+    params.append('focusId', focusId);
   }
 
   if (page) {
@@ -56,9 +56,9 @@ async function getNotes(tagId, focusId, isArchived, isDeleted, page) {
   }
 
   if (isArchived) {
-    params.append('is_archived', "true");
+    params.append('isArchived', "true");
   } else if (isDeleted) {
-    params.append('is_deleted', "true");
+    params.append('isDeleted', "true");
   }
 
   if (params.toString()) {
@@ -102,7 +102,7 @@ async function getTags(focusId) {
   let url = "/api/tags";
 
   if (focusId) {
-    url += `?focus_id=${focusId}`;
+    url += `?focusId=${focusId}`;
   }
 
   return await request('GET', url);
@@ -113,7 +113,7 @@ async function searchTags(query) {
 }
 
 async function updateTag(tag) {
-  return await request('PUT', `/api/tags/${tag.tag_id}`, tag);
+  return await request('PUT', `/api/tags/${tag.tagId}`, tag);
 }
 
 async function deleteTag(tagId) {

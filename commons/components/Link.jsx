@@ -23,13 +23,13 @@ export default function Link({ to, shouldPreserveSearchParams, children, classNa
     // Example: "/notes/new" and "/notes/new"
     (isSamePath && isEmptySearchParams) ||
 
-    // Example: "/notes/?tag_id=1" and "/notes/?tag_id=1&focus_id=2"
+    // Example: "/notes/?tagId=1" and "/notes/?tagId=1&focusId=2"
     (isSamePath && hasSomeCommonSearchParams) ||
 
-    // Example: "/notes/29" and "/notes/29?tag_id=1"
+    // Example: "/notes/29" and "/notes/29?tagId=1"
     (isSamePath && shouldPreserveSearchParams && Array.from(linkSearchParams.entries()).length === 0) ||
     
-    // Example: "/notes/?tag_id=1" and "/notes/29?tag_id=1&focus_id=2"
+    // Example: "/notes/?tagId=1" and "/notes/29?tagId=1&focusId=2"
     (shouldPreserveSearchParams && hasSomeCommonSearchParams)
   ) {
     finalClassName += " " + activeClassName;

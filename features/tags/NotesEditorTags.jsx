@@ -32,8 +32,8 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddT
     }
 
     if (e.key === 'Enter' && selectedTag) {
-      if (selectedTag.tag_id === -1) {
-        onAddTag({ tag_id: -1, name: value });
+      if (selectedTag.tagId === -1) {
+        onAddTag({ tagId: -1, name: value });
       } else {
         onAddTag(selectedTag);
       }
@@ -63,11 +63,11 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddT
 
     ApiClient.searchTags(value)
       .then(tagSuggestions => {
-        const existingTagIds = tags.map(tag => tag.tag_id);
-        const filteredTags = tagSuggestions.filter(tag => !existingTagIds.includes(tag.tag_id));
+        const existingTagIds = tags.map(tag => tag.tagId);
+        const filteredTags = tagSuggestions.filter(tag => !existingTagIds.includes(tag.tagId));
 
         if (canCreateTag && tagSuggestions.length === 0 && value.trim() !== "") {
-          filteredTags.push({ tag_id: -1, name: `Add "${value}"` });
+          filteredTags.push({ tagId: -1, name: `Add "${value}"` });
         }
 
         setSuggestions(filteredTags);
@@ -81,7 +81,7 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddT
   }
 
   function handleAddNewTagClick() {
-    onAddTag({ tag_id: -1, name: query });
+    onAddTag({ tagId: -1, name: query });
     closeSuggestions();
   }
 
@@ -91,7 +91,7 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddT
     setSelectedTag(null);
   }
 
-  const tagItems = tags?.map(tag => <TagItem key={tag.tag_id} isEditable={isEditable} tag={tag} onRemoveTag={() => onRemoveTag(tag)} />);
+  const tagItems = tags?.map(tag => <TagItem key={tag.tagId} isEditable={isEditable} tag={tag} onRemoveTag={() => onRemoveTag(tag)} />);
 
   return (
     <div className="notes-editor-tags">
@@ -113,7 +113,7 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddT
 function TagItem({ tag, isEditable, onRemoveTag }) {
   if (isEditable) {
     return (
-      <div className="tag" key={tag.tag_id}>
+      <div className="tag" key={tag.tagId}>
         {tag.name}
         <RemoveIcon onClick={onRemoveTag} />
       </div>
@@ -121,7 +121,7 @@ function TagItem({ tag, isEditable, onRemoveTag }) {
   }
 
   return (
-    <Link className="tag" key={tag.tag_id} to={`/notes/?tag_id=${tag.tag_id}`} shouldPreserveSearchParams>
+    <Link className="tag" key={tag.tagId} to={`/notes/?tagId=${tag.tagId}`} shouldPreserveSearchParams>
       {tag.name}
     </Link>
   );
@@ -133,11 +133,11 @@ function TagSearch({ query, isEditable, suggestions, selectedTag, onKeyUp, onSug
   }
 
   const suggestionItems = suggestions.map(suggestion => {
-    const isSelected = suggestion.tag_id === selectedTag?.tag_id;
+    const isSelected = suggestion.tagId === selectedTag?.tagId;
     const className = isSelected ? 'dropdown-option is-selected' : 'dropdown-option';
-    const handleClick = suggestion.tag_id === -1 ? onAddNewTagClick : onSuggestionClick;
+    const handleClick = suggestion.tagId === -1 ? onAddNewTagClick : onSuggestionClick;
     return (
-      <li key={suggestion.tag_id} onClick={() => handleClick(suggestion)} className={className}>
+      <li key={suggestion.tagId} onClick={() => handleClick(suggestion)} className={className}>
         <span>{suggestion.name}</span>
       </li>
     );

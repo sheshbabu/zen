@@ -17,10 +17,10 @@ export default function NotesPage({ noteId }) {
   const [selectedView, setSelectedView] = useState("list"); // "list" || "card"
 
   const searchParams = useSearchParams();
-  const selectedTagId = searchParams.get("tag_id");
-  const selectedFocusId = searchParams.get("focus_id");
-  const isArchivesPage = searchParams.get("is_archived") === "true";
-  const isTrashPage = searchParams.get("is_deleted") === "true";
+  const selectedTagId = searchParams.get("tagId");
+  const selectedFocusId = searchParams.get("focusId");
+  const isArchivesPage = searchParams.get("isArchived") === "true";
+  const isTrashPage = searchParams.get("isDeleted") === "true";
 
   const isMobile = window.matchMedia("(max-width: 600px)").matches;
 
@@ -153,7 +153,7 @@ export default function NotesPage({ noteId }) {
       </div>
 
       <div className={editorClassName} data-page={noteId === undefined ? "notes" : "editor"}>
-        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.NoteID} isFloating={noteId !== undefined && selectedView === "card"} onChange={handleNoteChange} />
+        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.noteId} isFloating={noteId !== undefined && selectedView === "card"} onChange={handleNoteChange} />
       </div>
 
       <MobileNavbar />

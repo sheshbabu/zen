@@ -7,7 +7,7 @@ import (
 )
 
 type Tag struct {
-	TagID int    `json:"tag_id"`
+	TagID int    `json:"tagId"`
 	Name  string `json:"name"`
 }
 
@@ -16,7 +16,7 @@ func HandleGetTags(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	query := r.URL.Query().Get("query")
-	focusModeIDStr := r.URL.Query().Get("focus_id")
+	focusModeIDStr := r.URL.Query().Get("focusId")
 
 	focusModeID := 0
 	if focusModeIDStr != "" {
@@ -60,7 +60,7 @@ func HandleUpdateTag(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleDeleteTag(w http.ResponseWriter, r *http.Request) {
-	tagIDStr := r.PathValue("tag_id")
+	tagIDStr := r.PathValue("tagId")
 	tagID, err := strconv.Atoi(tagIDStr)
 	if err != nil {
 		http.Error(w, "Invalid tag ID", http.StatusBadRequest)

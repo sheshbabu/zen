@@ -12,9 +12,9 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }
 
   const [isEditable, setIsEditable] = useState(isNewNote);
-  const [title, setTitle] = useState(selectedNote?.Title || "");
-  const [content, setContent] = useState(selectedNote?.Content || "");
-  const [tags, setTags] = useState(selectedNote?.Tags || []);
+  const [title, setTitle] = useState(selectedNote?.title || "");
+  const [content, setContent] = useState(selectedNote?.content || "");
+  const [tags, setTags] = useState(selectedNote?.tags || []);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [attachments, setAttachments] = useState([]);
   const [isSaveLoading, setIsSaveLoading] = useState(false);
@@ -89,9 +89,9 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
 
   function handleSaveClick() {
     const note = {
-      Title: title,
-      Content: content,
-      Tags: tags,
+      title: title,
+      content: content,
+      tags: tags,
     };
 
     let promise = null;
@@ -100,7 +100,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     if (isNewNote) {
       promise = ApiClient.createNote(note);
     } else {
-      promise = ApiClient.updateNote(selectedNote.NoteID, note);
+      promise = ApiClient.updateNote(selectedNote.noteId, note);
     }
 
     promise
@@ -109,7 +109,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         setAttachments([]); // reset
 
         if (isNewNote) {
-          navigateTo(`/notes/${note.NoteID}`, true);
+          navigateTo(`/notes/${note.noteId}`, true);
         }
 
         onChange();
@@ -137,7 +137,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }
 
   function handleRemoveTag(tag) {
-    setTags((prevTags) => prevTags.filter(t => t.tag_id !== tag.tag_id));
+    setTags((prevTags) => prevTags.filter(t => t.tagId !== tag.tagId));
   }
 
   function handlePaste(e) {
@@ -195,7 +195,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }
 
   function handleDeleteConfirmClick() {
-    ApiClient.deleteNote(selectedNote.NoteID)
+    ApiClient.deleteNote(selectedNote.noteId)
       .then(() => {
         handleDeleteCloseClick();
         navigateTo("/", true);
@@ -211,7 +211,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }
 
   function handleArchiveClick() {
-    ApiClient.archiveNote(selectedNote.NoteID)
+    ApiClient.archiveNote(selectedNote.noteId)
       .then(() => {
         onChange();
       })
@@ -221,7 +221,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }
 
   function handleUnarchiveClick() {
-    ApiClient.unarchiveNote(selectedNote.NoteID)
+    ApiClient.unarchiveNote(selectedNote.noteId)
       .then(() => {
         onChange();
       })
@@ -231,7 +231,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }
 
   function handleRestoreClick() {
-    ApiClient.restoreNote(selectedNote.NoteID)
+    ApiClient.restoreNote(selectedNote.noteId)
       .then(() => {
         onChange();
       })
@@ -383,17 +383,17 @@ function Toolbar({ note, isEditable, isFloating, isSaveLoading, onSaveClick, onE
     );
   }
 
-  if (note.IsArchived) {
+  if (note.isArchived) {
     menuActions.push(
       <div style="width: 80px;" onClick={onUnarchiveClick}>Unarchive</div>
     );
-  } else if (!note.IsDeleted) {
+  } else if (!note.isDeleted) {
     menuActions.push(
       <div style="width: 80px;" onClick={onArchiveClick}>Archive</div>
     );
   }
 
-  if (note.IsDeleted) {
+  if (note.isDeleted) {
     menuActions.push(
       <div style="width: 80px;" onClick={onRestoreClick}>Restore</div>
     );

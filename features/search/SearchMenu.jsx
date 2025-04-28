@@ -69,7 +69,7 @@ export default function SearchMenu() {
   }
 
   function handleResultClick(item) {
-    navigateTo(`/notes/${item.NoteID}`);
+    navigateTo(`/notes/${item.noteId}`);
     closeModal();
   }
 
@@ -80,7 +80,7 @@ export default function SearchMenu() {
   }
 
   const items = results.map((item, index) => {
-    const isSelected = item.NoteID === selectedItem?.NoteID;
+    const isSelected = item.noteId === selectedItem?.noteId;
     return (
       <SearchResultItem key={index} item={item} isSelected={isSelected} onClick={e => handleResultClick(item)} />
     )
@@ -111,9 +111,9 @@ export default function SearchMenu() {
 function SearchResultItem({ item, isSelected, onClick }) {
   let icon = <NoteIcon />
 
-  if (item.IsArchived) {
+  if (item.isArchived) {
     icon = <ArchiveIcon />
-  } else if (item.IsDeleted) {
+  } else if (item.isDeleted) {
     icon = <TrashIcon />
   }
 
@@ -121,8 +121,8 @@ function SearchResultItem({ item, isSelected, onClick }) {
     <div className={`search-result-item ${isSelected ? "is-selected" : ""}`} onClick={onClick}>
       {icon}
       <div className="search-result-item-content">
-        <p className="title">{item.Title}</p>
-        <p className="subtitle">{item.Snippet}</p>
+        <p className="title">{item.title}</p>
+        <p className="subtitle">{item.snippet}</p>
       </div>
     </div>
   );

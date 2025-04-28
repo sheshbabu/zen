@@ -27,19 +27,19 @@ export default function FocusDetailsModal({ mode, focusMode }) {
   }
 
   function handleRemoveTag(tag) {
-    setTags((prevTags) => prevTags.filter(t => t.tag_id !== tag.tag_id));
+    setTags((prevTags) => prevTags.filter(t => t.tagId !== tag.tagId));
   }
 
   function handleCreateClick() {
     let promise = null;
 
     const payload = {
-      Name: name,
-      Tags: tags
+      name: name,
+      tags: tags
     };
 
     if (mode === "edit") {
-      payload.focus_mode_id = focusMode.focus_mode_id;
+      payload.focusId = focusMode.focusId;
       promise = ApiClient.updateFocusMode(payload);
     } else {
       promise = ApiClient.createFocusMode(payload);
@@ -49,7 +49,7 @@ export default function FocusDetailsModal({ mode, focusMode }) {
       .then(newFocusMode => {
         closeModal();
         if (mode === "create") {
-          navigateTo(`/notes/?focus_id=${newFocusMode.focus_mode_id}`);
+          navigateTo(`/notes/?focusId=${newFocusMode.focusId}`);
         }
       })
       .catch((error) => {
