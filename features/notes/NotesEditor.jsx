@@ -336,6 +336,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     <div className={`notes-editor ${isEditable ? "is-editable" : ""}`} tabIndex="0" onPaste={handlePaste}>
       <Toolbar
         note={selectedNote}
+        isNewNote={isNewNote}
         isEditable={isEditable}
         isFloating={isFloating}
         isSaveLoading={isSaveLoading}
@@ -362,7 +363,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   );
 }
 
-function Toolbar({ note, isEditable, isFloating, isSaveLoading, onSaveClick, onEditClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick }) {
+function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, onSaveClick, onEditClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick }) {
   const actions = [];
   const menuActions = [];
   const saveButtonText = isSaveLoading ? "Saving..." : "Save";
@@ -383,24 +384,26 @@ function Toolbar({ note, isEditable, isFloating, isSaveLoading, onSaveClick, onE
     );
   }
 
-  if (note.isArchived) {
-    menuActions.push(
-      <div style="width: 80px;" onClick={onUnarchiveClick}>Unarchive</div>
-    );
-  } else if (!note.isDeleted) {
-    menuActions.push(
-      <div style="width: 80px;" onClick={onArchiveClick}>Archive</div>
-    );
-  }
+  if (!isNewNote) {
+    if (note.isArchived) {
+      menuActions.push(
+        <div style="width: 80px;" onClick={onUnarchiveClick}>Unarchive</div>
+      );
+    } else if (!note.isDeleted) {
+      menuActions.push(
+        <div style="width: 80px;" onClick={onArchiveClick}>Archive</div>
+      );
+    }
 
-  if (note.isDeleted) {
-    menuActions.push(
-      <div style="width: 80px;" onClick={onRestoreClick}>Restore</div>
-    );
-  } else {
-    menuActions.push(
-      <div style="width: 80px;" onClick={onDeleteClick}>Delete</div>
-    );
+    if (note.isDeleted) {
+      menuActions.push(
+        <div style="width: 80px;" onClick={onRestoreClick}>Restore</div>
+      );
+    } else {
+      menuActions.push(
+        <div style="width: 80px;" onClick={onDeleteClick}>Delete</div>
+      );
+    }
   }
 
   return (
