@@ -680,8 +680,26 @@ svg.lucide {
         background-color: var(--neutral-900);
         color: white;
 
+        svg.lucide {
+            line,
+            circle,
+            rect,
+            path {
+                stroke: #fff;
+            }
+        }
+
         &:hover {
             background-color: var(--neutral-700);
+
+            svg.lucide {
+                line,
+                circle,
+                rect,
+                path {
+                    stroke: #fff;
+                }
+            }
         }
     }
 
@@ -1073,6 +1091,11 @@ svg.lucide {
     }
 }
 
+.spinner-container {
+    display: flex;
+    margin: auto;
+}
+
 .spinner {
     height: 24px;
     width: 24px;
@@ -1088,5 +1111,25 @@ svg.lucide {
     }
     100% {
         transform: rotate(360deg);
+    }
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+
+    .login-title {
+        font: var(--h5);
+    }
+
+    .login-subtitle {
+        margin-top: 4px;
+        color: var(--neutral-400);
+    }
+
+    .button {
+        margin-top: 24px;
+        align-self: flex-start;
     }
 }

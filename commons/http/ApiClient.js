@@ -12,17 +12,33 @@ async function request(method, url, payload) {
   }
 
   const response = await fetch(url, options);
-  const type = response.headers.get('content-type');
+  const isJsonResponse = response.headers.get('content-type')?.includes('application/json');
+  const body = isJsonResponse ? await response.json() : null;
 
   if (!response.ok) {
+    if (isJsonResponse) {
+      const error = new Error(response.statusText);
+      error.code = body.code;
+      throw error;
+    }
     throw new Error(response.statusText);
   }
-  
-  if (type?.includes('application/json')) {
-    return await response.json();
-  }
 
-  return null;
+  return body;
+}
+
+// Users
+
+async function checkUser() {
+  return await request('GET', '/api/users/me');
+}
+
+async function createUser(payload) {
+  return await request('POST', '/api/users/new', payload);
+}
+
+async function login(payload) {
+  return await request('POST', '/api/users/login', payload);
 }
 
 // Focus Modes
@@ -134,6 +150,9 @@ async function search(query) {
 
 export default {
   request,
+  checkUser,
+  createUser,
+  login,
   getFocusModes,
   createFocusMode,
   updateFocusMode,

@@ -1,0 +1,84 @@
+import { h, useState, useEffect } from "../../assets/preact.esm.js"
+import Input from "../../commons/components/Input.jsx";
+import { ArrowRightIcon } from "../../commons/components/Icon.jsx";
+import navigateTo from "../../commons/utils/navigateTo.js";
+import ApiClient from "../../commons/http/ApiClient.js";
+
+export default function LoginPage({ isOnboarding = false }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  function handleEmailChange(e) {
+    setEmail(e.target.value);
+  }
+
+  function handlePasswordChange(e) {
+    setPassword(e.target.value);
+  }
+
+  function handleLoginClick() {
+    setEmailError("");
+    setPasswordError("");
+
+    const payload = {
+      email: email,
+      password: password
+    };
+
+    const promise = isOnboarding ? ApiClient.createUser(payload) : ApiClient.login(payload);
+
+    promise
+      .then(() => {
+        navigateTo("/notes/");
+        window.location.reload();
+      })
+      .catch(e => {
+        switch (e.code) {
+          case "INVALID_EMAIL":
+            setEmailError("Invalid email address");
+            break;
+          case "INVALID_PASSWORD":
+            setPasswordError("Invalid password");
+            break;
+          case "INCORRECT_EMAIL":
+            setEmailError("Incorrect email address");
+            break;
+          case "INCORRECT_PASSWORD":
+            setPasswordError("Incorrect password");
+            break;
+          default:
+            console.error(e);
+        }
+      });
+  }
+
+  let header = null;
+  let buttonText = "Login";
+
+  if (isOnboarding) {
+    header = (
+      <div>
+        <div class="login-title">Let's get started!</div>
+        <div class="login-subtitle">Create your admin account</div>
+      </div>
+    );
+    buttonText = "Continue";
+  } else {
+    header = (
+      <div>
+        <div class="login-title">Login</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="login-container">
+      {header}
+      <Input id="email" label="Email" type="text" placeholder="Enter your email address" value={email} hint="" error={emailError} isDisabled={false} onChange={handleEmailChange} />
+      <Input id="password" label="Password" type="password" placeholder="Enter your password" value={password} hint="" error={passwordError} isDisabled={false} onChange={handlePasswordChange} />
+      <div className="button primary" onClick={handleLoginClick}>{buttonText}<ArrowRightIcon /></div>
+    </div>
+  );
+}

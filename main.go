@@ -8,12 +8,15 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"zen/commons/auth"
+	"zen/commons/session"
 	"zen/commons/sqlite"
 	"zen/features/focus"
 	"zen/features/images"
 	"zen/features/notes"
 	"zen/features/search"
 	"zen/features/tags"
+	"zen/features/users"
 )
 
 //go:embed assets/*
@@ -61,26 +64,31 @@ func main() {
 func newRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /api/notes/", notes.HandleGetNotes)
-	mux.HandleFunc("GET /api/notes/{noteId}/", notes.HandleGetNote)
-	mux.HandleFunc("PUT /api/notes/{noteId}/", notes.HandleUpdateNote)
-	mux.HandleFunc("POST /api/notes/", notes.HandleCreateNote)
-	mux.HandleFunc("DELETE /api/notes/{noteId}/", notes.HandleSoftDeleteNote)
-	mux.HandleFunc("PUT /api/notes/{noteId}/restore/", notes.HandleRestoreDeletedNote)
-	mux.HandleFunc("PUT /api/notes/{noteId}/archive/", notes.HandleArchiveNote)
-	mux.HandleFunc("PUT /api/notes/{noteId}/unarchive/", notes.HandleUnarchiveNote)
+	mux.HandleFunc("GET /api/users/me", users.HandleCheckUser)
+	mux.HandleFunc("POST /api/users/login", users.HandleLogin)
+	addPrivateRoute(mux, "POST /api/users/new", users.HandleCreateUser)
+	addPrivateRoute(mux, "POST /api/users/me/password", users.HandleUpdatePassword)
 
-	mux.HandleFunc("GET /api/tags/", tags.HandleGetTags)
-	mux.HandleFunc("PUT /api/tags/", tags.HandleUpdateTag)
-	mux.HandleFunc("DELETE /api/tags/{tagId}/", tags.HandleDeleteTag)
+	addPrivateRoute(mux, "GET /api/notes/", notes.HandleGetNotes)
+	addPrivateRoute(mux, "GET /api/notes/{noteId}/", notes.HandleGetNote)
+	addPrivateRoute(mux, "PUT /api/notes/{noteId}/", notes.HandleUpdateNote)
+	addPrivateRoute(mux, "POST /api/notes/", notes.HandleCreateNote)
+	addPrivateRoute(mux, "DELETE /api/notes/{noteId}/", notes.HandleSoftDeleteNote)
+	addPrivateRoute(mux, "PUT /api/notes/{noteId}/restore/", notes.HandleRestoreDeletedNote)
+	addPrivateRoute(mux, "PUT /api/notes/{noteId}/archive/", notes.HandleArchiveNote)
+	addPrivateRoute(mux, "PUT /api/notes/{noteId}/unarchive/", notes.HandleUnarchiveNote)
 
-	mux.HandleFunc("GET /api/focus/", focus.HandleGetAllFocusModes)
-	mux.HandleFunc("POST /api/focus/", focus.HandleCreateFocusMode)
-	mux.HandleFunc("PUT /api/focus/{focusId}/", focus.HandleUpdateFocusMode)
+	addPrivateRoute(mux, "GET /api/tags/", tags.HandleGetTags)
+	addPrivateRoute(mux, "PUT /api/tags/", tags.HandleUpdateTag)
+	addPrivateRoute(mux, "DELETE /api/tags/{tagId}/", tags.HandleDeleteTag)
 
-	mux.HandleFunc("POST /api/images/", images.HandleUploadImage)
+	addPrivateRoute(mux, "GET /api/focus/", focus.HandleGetAllFocusModes)
+	addPrivateRoute(mux, "POST /api/focus/", focus.HandleCreateFocusMode)
+	addPrivateRoute(mux, "PUT /api/focus/{focusId}/", focus.HandleUpdateFocusMode)
 
-	mux.HandleFunc(("GET /api/search/"), search.HandleSearch)
+	addPrivateRoute(mux, "POST /api/images/", images.HandleUploadImage)
+
+	addPrivateRoute(mux, "GET /api/search/", search.HandleSearch)
 
 	mux.HandleFunc("GET /assets/", handleStaticAssets)
 	mux.HandleFunc("GET /images/", handleUploadedImages)
@@ -134,9 +142,20 @@ func handleUploadedImages(w http.ResponseWriter, r *http.Request) {
 	http.StripPrefix("/images/", http.FileServer(http.Dir("images"))).ServeHTTP(w, r)
 }
 
+func addPrivateRoute(mux *http.ServeMux, pattern string, handlerFunc func(w http.ResponseWriter, r *http.Request)) {
+	handler := http.HandlerFunc(handlerFunc)
+	mux.HandleFunc(pattern, auth.EnsureAuthenticated(handler))
+}
+
 func runBackgroundTasks() {
-	frequency := 30 * 24 * time.Hour // 30 days
-	for range time.Tick(frequency) {
+	trashCleanupFrequency := 30 * 24 * time.Hour // 30 days
+	sessionCleanupFrequency := 24 * time.Hour    // 24 hours
+
+	for range time.Tick(trashCleanupFrequency) {
 		notes.EmptyTrash()
+	}
+
+	for range time.Tick(sessionCleanupFrequency) {
+		session.DeleteExpiredSessions()
 	}
 }
