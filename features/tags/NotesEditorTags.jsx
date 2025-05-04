@@ -65,8 +65,10 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddT
       .then(tagSuggestions => {
         const existingTagIds = tags.map(tag => tag.tagId);
         const filteredTags = tagSuggestions.filter(tag => !existingTagIds.includes(tag.tagId));
+        const hasExactInputInFilteredTags = filteredTags.some(tag => tag.name.toLowerCase() === value.trim().toLowerCase());
 
-        if (canCreateTag && tagSuggestions.length === 0 && value.trim() !== "") {
+        // Showing "Add" even if there are other suggestions since a new tag can be a substring of an existing tag
+        if (canCreateTag && value.trim() !== "" && !hasExactInputInFilteredTags) {
           filteredTags.push({ tagId: -1, name: `Add "${value}"` });
         }
 
