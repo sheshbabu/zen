@@ -10,7 +10,7 @@ RUN go mod download && go mod verify
 COPY . .
 
 RUN esbuild index.js --bundle --minify --format=esm --outfile=assets/bundle.js --loader:.js=jsx --jsx-factory=h --jsx-fragment=Fragment
-RUN go build -v -o ./zen .
+RUN go build --tags "fts5" -v -o ./zen .
 
 FROM debian:bookworm-slim
 
