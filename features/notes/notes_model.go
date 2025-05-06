@@ -672,31 +672,35 @@ func SearchNotes(term string, limit int) ([]Note, error) {
 
 	query := `
 		SELECT
-			note_id,
-			title,
-			content,
-			SUBSTR(content, 0, 500) AS snippet,
-			updated_at,
-			archived_at,
-			deleted_at
+			n.note_id,
+			n.title,
+			n.content,
+			SUBSTR(n.content, 0, 500) AS snippet,
+			n.updated_at,
+			n.archived_at,
+			n.deleted_at
 		FROM
-			notes
+			notes n
+		JOIN
+			notes_search ns ON n.note_id = ns.rowid
 		WHERE
-			title LIKE ? OR content LIKE ?
+			notes_search MATCH ?
 		ORDER BY
-			-- Boosting by title, then content, then archived, then deleted notes
+			-- Boosting by active notes, then archived, then deleted notes
 			CASE
-				WHEN title   LIKE ? AND archived_at IS NULL AND deleted_at IS NULL THEN 1
-				WHEN content LIKE ? AND archived_at IS NULL AND deleted_at IS NULL THEN 2
-				WHEN archived_at IS NOT NULL THEN 3
-				WHEN deleted_at  IS NOT NULL THEN 4
-				ELSE 5
-			END
+				WHEN n.archived_at IS NULL AND n.deleted_at IS NULL THEN 1
+				WHEN archived_at IS NOT NULL THEN 2
+				WHEN deleted_at  IS NOT NULL THEN 3
+				ELSE 4
+			END ASC,
+			-- Then by BM25 rank within each group
+			rank
 		LIMIT
 			?
 	`
 
-	rows, err := sqlite.DB.Query(query, "%"+term+"%", "%"+term+"%", "%"+term+"%", "%"+term+"%", limit)
+	// https://www.sqlite.org/fts5.html#fts5_column_filters
+	rows, err := sqlite.DB.Query(query, "{title content}: "+term, limit)
 	if err != nil {
 		err = fmt.Errorf("error retrieving notes: %w", err)
 		slog.Error(err.Error())
