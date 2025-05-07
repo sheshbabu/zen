@@ -1,7 +1,7 @@
 import { h } from "../../assets/preact.esm.js"
 import { ListViewIcon, CardViewIcon, GalleryViewIcon } from "../../commons/components/Icon.jsx";
 
-export default function NotesListToolbar({ onListViewClick, onCardViewClick }) {
+export default function NotesListToolbar({ onListViewClick, onCardViewClick, onGalleryViewClick }) {
   return (
     <div className="notes-list-toolbar">
       <div onClick={() => onListViewClick()}>
@@ -10,9 +10,9 @@ export default function NotesListToolbar({ onListViewClick, onCardViewClick }) {
       <div onClick={() => onCardViewClick()}>
         <CardViewIcon />
       </div>
-      {/* <div onClick={() => onCardViewClick()}>
+      <div onClick={() => onGalleryViewClick()}>
         <GalleryViewIcon />
-      </div> */}
+      </div>
     </div>
   );
 }

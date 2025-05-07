@@ -1133,3 +1133,43 @@ svg.lucide {
         align-self: flex-start;
     }
 }
+
+.notes-gallery {
+    margin-left: 12px;
+
+    .image-gallery {
+        position: relative;
+        width: 100%;
+        box-sizing: border-box;
+
+        .image-gallery-item {
+            position: absolute;
+            margin: 0;
+            box-sizing: border-box;
+            object-fit: cover;
+            border-radius: 4px;
+            transition-property: box-shadow, opacity;
+            transition-duration: 500ms;
+            box-shadow: var(--shadow-2);
+            opacity: 0;
+        
+            &.loaded {
+                opacity: 1;
+            }
+        
+            &:hover {
+                box-shadow: var(--shadow-4);
+            }
+        }
+
+        .image-gallery-empty-text {
+            font: var(--sm);
+            padding: 16px;
+            color: var(--neutral-400);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 64px;
+        }
+    }
+}

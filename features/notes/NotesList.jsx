@@ -4,32 +4,37 @@ import Link from '../../commons/components/Link.jsx';
 import Spinner from '../../commons/components/Spinner.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import formatDate from '../../commons/utils/formatDate.js';
+import ImageGallery from "./ImageGallery.jsx";
 
 export default function NotesList({ notes = [], total, isLoading, view, onViewChange, onLoadMoreClick }) {
   let containerClassName = "notes-list-fragment";
   let listClassName = "notes-list";
   let items = notes.map(note => <NotesListItem note={note} key={note.noteId} />);
-  let content = <div className="notes-list-spinner"><Spinner/></div>;
+  let content = <div className="notes-list-spinner"><Spinner /></div>;
 
   if (view === "card") {
     containerClassName = "notes-grid-fragment";
     listClassName = "notes-grid";
     items = notes.map(note => <NotesGridItem note={note} key={note.noteId} />);
+  } else if (view === "gallery") {
+    containerClassName = "notes-gallery-fragment";
+    listClassName = "notes-gallery";
+    items = <ImageGallery notes={notes} columnWidth={400} gutter={20}/>;
   }
 
   if (!isLoading) {
     content = (
       <div className={listClassName}>
         {items}
-        <LoadMoreButton notes={notes} total={total} onLoadMoreClick={onLoadMoreClick}/>
-        <EmptyList notes={notes} />
+        <LoadMoreButton notes={notes} total={total} onLoadMoreClick={onLoadMoreClick} />
+        <EmptyList notes={notes}/>
       </div>
     )
   }
 
   return (
     <div className={containerClassName}>
-      <NotesListToolbar onListViewClick={() => onViewChange("list")} onCardViewClick={() => onViewChange("card")} />
+      <NotesListToolbar onListViewClick={() => onViewChange("list")} onCardViewClick={() => onViewChange("card")} onGalleryViewClick={() => onViewChange("gallery")} />
       {content}
     </div>
   );
