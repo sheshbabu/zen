@@ -139,6 +139,7 @@ func handleStaticAssets(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleUploadedImages(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "public, max-age=31536000") // 1 year
 	http.StripPrefix("/images/", http.FileServer(http.Dir("images"))).ServeHTTP(w, r)
 }
 
