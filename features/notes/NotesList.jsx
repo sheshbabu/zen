@@ -19,7 +19,7 @@ export default function NotesList({ notes = [], total, isLoading, view, onViewCh
   } else if (view === "gallery") {
     containerClassName = "notes-gallery-fragment";
     listClassName = "notes-gallery";
-    items = <ImageGallery notes={notes} columnWidth={400} gutter={20}/>;
+    items = <ImageGallery notes={notes}/>;
   }
 
   if (!isLoading) {

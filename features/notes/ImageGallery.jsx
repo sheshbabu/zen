@@ -1,7 +1,11 @@
 import { h, useEffect, useRef, useState } from "../../assets/preact.esm.js";
 import Link from '../../commons/components/Link.jsx';
 
-export default function ImageGallery({ notes, columnWidth = 200, gutter = 0 }) {
+const MIN_COLUMN_WIDTH = 300;
+const GUTTER_WIDTH = 20;
+const GUTTER_HEIGHT = 20;
+
+export default function ImageGallery({ notes }) {
   const [isLoading, setIsLoading] = useState(true);
   const [columnHeights, setColumnHeights] = useState([]);
   const [imageDetails, setImageDetails] = useState([]);
@@ -56,11 +60,21 @@ export default function ImageGallery({ notes, columnWidth = 200, gutter = 0 }) {
     containerRef.current.style.position = 'relative';
 
     const containerWidth = containerRef.current.clientWidth;
-    const totalColumnWidth = columnWidth + gutter;
-    let columnCount = Math.floor((containerWidth + gutter) / totalColumnWidth);
-    columnCount = Math.max(columnCount, 1);
+    const [columnWidth, gutter, columnCount] = calculateColumns(containerWidth);
 
     setColumnHeights(new Array(columnCount).fill(0));
+  }
+
+  // columnWidth, gutterWidth, columnCount
+  function calculateColumns(containerWidth) {
+    if (containerWidth <= MIN_COLUMN_WIDTH) {
+      return [containerWidth, 0, 1];
+    }
+
+    const columnCount = Math.floor(containerWidth / (MIN_COLUMN_WIDTH + GUTTER_WIDTH));
+    let columnWidth = containerWidth / columnCount;
+    columnWidth = columnWidth - GUTTER_WIDTH;
+    return [columnWidth, GUTTER_WIDTH, columnCount];
   }
 
   function getShortestColumnIndex(heights) {
@@ -72,7 +86,8 @@ export default function ImageGallery({ notes, columnWidth = 200, gutter = 0 }) {
     if (!containerRef.current) {
       return;
     }
-
+    const containerWidth = containerRef.current.clientWidth;
+    const [columnWidth, gutter, columnCount] = calculateColumns(containerWidth);
     const items = containerRef.current.children;
     const newColumnHeights = [...columnHeights];
 
@@ -94,7 +109,7 @@ export default function ImageGallery({ notes, columnWidth = 200, gutter = 0 }) {
       item.style.width = columnWidth + 'px';
       item.style.height = height + 'px';
 
-      newColumnHeights[shortestColumnIndex] = y + height + gutter;
+      newColumnHeights[shortestColumnIndex] = y + height + GUTTER_HEIGHT;
     });
 
     setColumnHeights(newColumnHeights);
