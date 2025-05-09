@@ -1,4 +1,4 @@
-import { h, useEffect, useRef, useState } from "../../assets/preact.esm.js";
+import { h, useEffect, useRef, useState, useCallback } from "../../assets/preact.esm.js";
 import Link from '../../commons/components/Link.jsx';
 
 const MIN_COLUMN_WIDTH = 300;
@@ -7,17 +7,32 @@ const GUTTER_HEIGHT = 20;
 
 export default function ImageGallery({ notes }) {
   const [isLoading, setIsLoading] = useState(true);
-  const [columnHeights, setColumnHeights] = useState([]);
   const [imageDetails, setImageDetails] = useState([]);
 
   const containerRef = useRef(null);
 
   useEffect(() => {
+    if (notes.length === 0) {
+      setImageDetails([]);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
-    const images = extractImagesFromNotes(notes);
+
+    const processedNoteIds = imageDetails.map(detail => detail.noteId);
+    const newNotes = notes.filter(note => !processedNoteIds.includes(note.noteId));
+
+    if (newNotes.length === 0) {
+      setIsLoading(false);
+      return;
+    }
+
+    const newImages = extractImagesFromNotes(newNotes);
+
     // Get image dimensions without rendering
     Promise.all(
-      images.map(image =>
+      newImages.map(image =>
         new Promise(resolve => {
           const img = new Image();
           img.onload = () => {
@@ -32,37 +47,67 @@ export default function ImageGallery({ notes }) {
           img.src = image.url;
         })
       )
-    ).then(details => {
-      setImageDetails(details);
+    ).then(newDetails => {
+      setImageDetails(prev => [...prev, ...newDetails]);
       initLayout();
       setIsLoading(false);
     });
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
   }, [notes]);
 
   useEffect(() => {
-    if (columnHeights.length > 0 && imageDetails.length > 0) {
+    if (imageDetails.length > 0) {
       layout();
     }
   }, [imageDetails]);
 
-  function handleResize() {
-    initLayout();
-  }
+  const layout = useCallback(() => {
+    if (!containerRef.current) {
+      return;
+    }
+    const containerWidth = containerRef.current.clientWidth;
+    const [columnWidth, gutter, columnCount] = calculateColumns(containerWidth);
+    const items = containerRef.current.children;
+    const heights = new Array(columnCount).fill(0);
 
+    Array.from(items).forEach((item, index) => {
+      const imageDetail = imageDetails[index];
+      if (!imageDetail) {
+        return;
+      }
+
+      const shortestColumnIndex = getShortestColumnIndex(heights);
+      const x = shortestColumnIndex * (columnWidth + gutter);
+      const y = heights[shortestColumnIndex];
+
+      const height = columnWidth / imageDetail.aspectRatio;
+
+      item.style.position = 'absolute';
+      item.style.left = x + 'px';
+      item.style.top = y + 'px';
+      item.style.width = columnWidth + 'px';
+      item.style.height = height + 'px';
+
+      heights[shortestColumnIndex] = y + height + GUTTER_HEIGHT;
+    });
+
+    containerRef.current.style.height = Math.max(...heights) + 'px';
+  }, [imageDetails]);
+
+  const handleResize = useCallback(() => {
+    initLayout();
+    layout();
+  }, [layout]);
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [handleResize]);
   function initLayout() {
     if (!containerRef.current) {
       return;
     }
 
     containerRef.current.style.position = 'relative';
-
-    const containerWidth = containerRef.current.clientWidth;
-    const [columnWidth, gutter, columnCount] = calculateColumns(containerWidth);
-
-    setColumnHeights(new Array(columnCount).fill(0));
   }
 
   // columnWidth, gutterWidth, columnCount
@@ -82,45 +127,11 @@ export default function ImageGallery({ notes }) {
     return heights.indexOf(minHeight);
   }
 
-  function layout() {
-    if (!containerRef.current) {
-      return;
-    }
-    const containerWidth = containerRef.current.clientWidth;
-    const [columnWidth, gutter, columnCount] = calculateColumns(containerWidth);
-    const items = containerRef.current.children;
-    const newColumnHeights = [...columnHeights];
-
-    Array.from(items).forEach((item, index) => {
-      const imageDetail = imageDetails[index];
-      if (!imageDetail) {
-        return;
-      }
-
-      const shortestColumnIndex = getShortestColumnIndex(newColumnHeights);
-      const x = shortestColumnIndex * (columnWidth + gutter);
-      const y = newColumnHeights[shortestColumnIndex];
-
-      const height = columnWidth / imageDetail.aspectRatio;
-
-      item.style.position = 'absolute';
-      item.style.left = x + 'px';
-      item.style.top = y + 'px';
-      item.style.width = columnWidth + 'px';
-      item.style.height = height + 'px';
-
-      newColumnHeights[shortestColumnIndex] = y + height + GUTTER_HEIGHT;
-    });
-
-    setColumnHeights(newColumnHeights);
-    containerRef.current.style.height = Math.max(...newColumnHeights) + 'px';
-  }
-
   const items = imageDetails.map((image, index) => {
     const link = `/notes/${image.noteId}`;
     return (
-      <Link to={link} shouldPreserveSearchParams>
-        <img key={index} src={image.url} loading="lazy" className="image-gallery-item" onLoad={e => e.target.classList.add('loaded')} />
+      <Link key={index} to={link} shouldPreserveSearchParams>
+        <img src={image.url} loading="lazy" className="image-gallery-item" onLoad={e => e.target.classList.add('loaded')} />
       </Link>
     );
   });
@@ -165,9 +176,5 @@ function extractImagesFromNotes(notes) {
 }
 
 function EmptyList({ images }) {
-  if (images.length > 0) {
-    return null;
-  }
-
   return <div className="image-gallery-empty-text">No images found</div>
 }
