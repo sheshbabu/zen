@@ -107,7 +107,6 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddT
         onInput={handleInput}
         onSuggestionClick={handleSuggestionClick}
         onAddNewTagClick={handleAddNewTagClick}
-        onBlur={closeSuggestions}
       />
     </div>
   );
@@ -130,7 +129,7 @@ function TagItem({ tag, isEditable, onRemoveTag }) {
   );
 }
 
-function TagSearch({ query, isEditable, suggestions, selectedTag, onKeyUp, onSuggestionClick, onAddNewTagClick, onInput, onBlur }) {
+function TagSearch({ query, isEditable, suggestions, selectedTag, onKeyUp, onSuggestionClick, onAddNewTagClick, onInput }) {
   if (!isEditable) {
     return null;
   }
@@ -155,7 +154,6 @@ function TagSearch({ query, isEditable, suggestions, selectedTag, onKeyUp, onSug
         value={query}
         onKeyUp={onKeyUp}
         onInput={onInput}
-        onBlur={onBlur}
       />
       <div className={`dropdown-container ${suggestions.length ? 'open' : ''}`}>
         <ul className="dropdown-menu">
