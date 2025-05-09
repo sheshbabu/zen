@@ -51,6 +51,7 @@ export default function FocusDetailsModal({ mode, focusMode }) {
         if (mode === "create") {
           navigateTo(`/notes/?focusId=${newFocusMode.focusId}`);
         }
+        window.location.reload();
       })
       .catch((error) => {
         console.error("Error creating focus mode:", error);
