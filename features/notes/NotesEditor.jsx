@@ -29,6 +29,10 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       titleRef.current.focus();
     }
 
+    if (!isNewNote) {
+      document.title = title === "" ? "Zen" : title;
+    }
+
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {
