@@ -102,6 +102,7 @@ export default function ImageGallery({ notes }) {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [handleResize]);
+  
   function initLayout() {
     if (!containerRef.current) {
       return;

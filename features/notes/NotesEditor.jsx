@@ -1,4 +1,4 @@
-import { h, render, useState, useRef, useEffect } from "../../assets/preact.esm.js"
+import { h, render, useState, useRef, useEffect, useCallback } from "../../assets/preact.esm.js"
 import ApiClient from '../../commons/http/ApiClient.js';
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
@@ -32,19 +32,13 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     if (!isNewNote) {
       document.title = title === "" ? "Zen" : title;
     }
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
   }, []);
 
   useEffect(() => {
     handleTextAreaHeight();
   }, [content, isEditable]);
 
-  function handleKeyDown(e) {
+  const handleKeyDown = useCallback(e => {
     const isTextAreaFocused = document.activeElement.className == "notes-editor-textarea";
 
     if (!isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.key === 'Enter') {
@@ -77,7 +71,15 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       e.preventDefault();
       formatSelectedText("bold");
     }
-  }
+  }, [isEditable, isFloating]);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown]);
 
   function handleTextAreaHeight() {
     if (textareaRef.current === null) {
