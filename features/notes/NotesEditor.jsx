@@ -57,7 +57,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       }
     }
 
-    if (isTextAreaFocused && e.key === 'Tab') {
+    if (isTextAreaFocused && e.key === 'Tab' && !e.shiftKey) {
       e.preventDefault();
       insertAtCursor('  ');
     }
