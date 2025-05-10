@@ -374,6 +374,15 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, onSav
   const menuActions = [];
   const saveButtonText = isSaveLoading ? "Saving..." : "Save";
 
+  function handleClick(e) {
+    if (e.target.className !== "notes-editor-toolbar") {
+      e.stopPropagation();
+      return;
+    }
+
+    document.querySelector(".notes-editor-container").scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   if (isFloating) {
     actions.push(
       <div className="ghost-button" onClick={onCloseClick}>Close</div>
@@ -413,7 +422,7 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, onSav
   }
 
   return (
-    <div className="notes-editor-toolbar">
+    <div className="notes-editor-toolbar" onClick={handleClick}>
       {actions}
       <DropdownMenu actions={menuActions} />
     </div>
