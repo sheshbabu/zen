@@ -1,4 +1,4 @@
-import { h, useState } from "../../assets/preact.esm.js"
+import { h, useState, useEffect, useRef } from "../../assets/preact.esm.js"
 import { EllipsisIcon } from "../../commons/components/Icon.jsx";
 
 export default function DropdownMenu({ actions }) {
@@ -7,6 +7,21 @@ export default function DropdownMenu({ actions }) {
   }
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   function handleDropdownClick() {
     setIsDropdownOpen(prevIsDropdownOpen => !prevIsDropdownOpen);
@@ -24,8 +39,8 @@ export default function DropdownMenu({ actions }) {
 
 
   return (
-    <div>
-      <div className="ghost-button" onClick={handleDropdownClick}><EllipsisIcon/></div>
+    <div ref={dropdownRef}>
+      <div className="ghost-button" onClick={handleDropdownClick}><EllipsisIcon /></div>
       <div className={`dropdown-container ${isDropdownOpen ? 'open' : ''}`}>
         <ul className="dropdown-menu">
           {items}

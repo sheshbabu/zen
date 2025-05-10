@@ -1,6 +1,6 @@
-import { h, render, useEffect, useState } from "../../assets/preact.esm.js"
+import { h, render, useEffect, useState, useRef } from "../../assets/preact.esm.js"
 import FocusDetailsModal from './FocusDetailsModal.jsx';
-import { ArrowDownIcon, PencilIcon, NewIcon } from "../../commons/components/Icon.jsx";
+import { ArrowDownIcon, PencilIcon } from "../../commons/components/Icon.jsx";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import useSearchParams from "../../commons/components/useSearchParams.jsx";
 
@@ -12,8 +12,23 @@ export default function FocusSwitcher({ focusModes }) {
   const [selectedFocusMode, setSelectedFocusMode] = useState(focusModes[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  const dropdownRef = useRef(null);
+
   const searchParams = useSearchParams();
   const selectedFocusId = searchParams.get("focusId");
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [dropdownRef]);
 
   useEffect(() => {
     setSelectedFocusMode(focusModes.find(focusMode => focusMode.focusId === parseInt(selectedFocusId, 10)) || focusModes[0]);
@@ -58,7 +73,7 @@ export default function FocusSwitcher({ focusModes }) {
   items.push(<li className="dropdown-option" onClick={handleAddNewClick}>Add new...</li>);
 
   return (
-    <div className="sidebar-focus-switcher">
+    <div ref={dropdownRef} className="sidebar-focus-switcher">
       <div className="dropdown-button button" onClick={handleDropdownClick}>
         {selectedFocusMode.name}
         <ArrowDownIcon />

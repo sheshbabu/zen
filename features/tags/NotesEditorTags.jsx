@@ -1,4 +1,4 @@
-import { h, Fragment, useState } from "../../assets/preact.esm.js"
+import { h, Fragment, useState, useEffect, useRef } from "../../assets/preact.esm.js"
 import ApiClient from '../../commons/http/ApiClient.js';
 import { RemoveIcon } from "../../commons/components/Icon.jsx";
 import Link from "../../commons/components/Link.jsx";
@@ -7,6 +7,21 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddT
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [selectedTag, setSelectedTag] = useState(null);
+
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        closeSuggestions();
+      }
+    }
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [dropdownRef, closeSuggestions]);
 
   function handleKeyUp(e) {
     const value = e.target.value;
@@ -93,21 +108,46 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddT
     setSelectedTag(null);
   }
 
+  let tagSearch = null;
   const tagItems = tags?.map(tag => <TagItem key={tag.tagId} isEditable={isEditable} tag={tag} onRemoveTag={() => onRemoveTag(tag)} />);
+
+  const suggestionItems = suggestions.map(suggestion => {
+    const isSelected = suggestion.tagId === selectedTag?.tagId;
+    const className = isSelected ? 'dropdown-option is-selected' : 'dropdown-option';
+    const handleClick = suggestion.tagId === -1 ? handleAddNewTagClick : handleSuggestionClick;
+    return (
+      <li key={suggestion.tagId} onClick={() => handleClick(suggestion)} className={className}>
+        <span>{suggestion.name}</span>
+      </li>
+    );
+  });
+
+  if (isEditable) {
+    tagSearch = (
+      <Fragment>
+        <input
+          className="notes-editor-tags-input"
+          placeholder="Add Tags..."
+          autoComplete="off"
+          value={query}
+          onKeyUp={handleKeyUp}
+          onInput={handleInput}
+        />
+        <div ref={dropdownRef} className={`dropdown-container ${suggestions.length ? 'open' : ''}`}>
+          <ul className="dropdown-menu">
+            {suggestionItems}
+          </ul>
+        </div>
+      </Fragment>
+    )
+  } else {
+    tagSearch = null;
+  }
 
   return (
     <div className="notes-editor-tags">
       {tagItems}
-      <TagSearch
-        query={query}
-        isEditable={isEditable}
-        suggestions={suggestions}
-        selectedTag={selectedTag}
-        onKeyUp={handleKeyUp}
-        onInput={handleInput}
-        onSuggestionClick={handleSuggestionClick}
-        onAddNewTagClick={handleAddNewTagClick}
-      />
+      {tagSearch}
     </div>
   );
 }
@@ -128,41 +168,3 @@ function TagItem({ tag, isEditable, onRemoveTag }) {
     </Link>
   );
 }
-
-function TagSearch({ query, isEditable, suggestions, selectedTag, onKeyUp, onSuggestionClick, onAddNewTagClick, onInput }) {
-  if (!isEditable) {
-    return null;
-  }
-
-  const suggestionItems = suggestions.map(suggestion => {
-    const isSelected = suggestion.tagId === selectedTag?.tagId;
-    const className = isSelected ? 'dropdown-option is-selected' : 'dropdown-option';
-    const handleClick = suggestion.tagId === -1 ? onAddNewTagClick : onSuggestionClick;
-    return (
-      <li key={suggestion.tagId} onClick={() => handleClick(suggestion)} className={className}>
-        <span>{suggestion.name}</span>
-      </li>
-    );
-  });
-
-  return (
-    <Fragment>
-      <input
-        className="notes-editor-tags-input"
-        placeholder="Add Tags..."
-        autoComplete="off"
-        value={query}
-        onKeyUp={onKeyUp}
-        onInput={onInput}
-      />
-      <div className={`dropdown-container ${suggestions.length ? 'open' : ''}`}>
-        <ul className="dropdown-menu">
-          {suggestionItems}
-        </ul>
-      </div>
-    </Fragment>
-  )
-}
-
-
-
