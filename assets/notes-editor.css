@@ -115,6 +115,7 @@
 .notes-grid-item-content,
 .notes-editor-rendered {
     display: block;
+    overflow-x: scroll; /* for long tables */
 
     strong {
         font-weight: 600;
@@ -231,7 +232,7 @@
     table, th, td {
         border: 1px solid var(--neutral-200);
         padding: 5px 15px;
-        width: fit-content;
+        width: max-content;
     }
 
     th {
