@@ -7,6 +7,8 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 	"zen/commons/auth"
 	"zen/commons/session"
@@ -43,6 +45,18 @@ func main() {
 
 	sqlite.NewDB()
 	defer sqlite.DB.Close()
+
+	osSignalChan := make(chan os.Signal, 1)
+	signal.Notify(osSignalChan, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-osSignalChan
+		slog.Info("received shutdown signal, closing database connection...")
+		if err := sqlite.DB.Close(); err != nil {
+			slog.Error("error closing database", "error", err)
+		}
+		slog.Info("database connection closed. Exiting.")
+		os.Exit(0)
+	}()
 
 	sqlite.Migrate(migrations)
 
