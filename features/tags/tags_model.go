@@ -7,7 +7,7 @@ import (
 )
 
 func GetAllTags() ([]Tag, error) {
-	var tags []Tag
+	tags := []Tag{}
 	query := `
 		SELECT
 			t.tag_id,
