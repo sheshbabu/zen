@@ -1,8 +1,9 @@
-import { h, useState, useEffect } from "../../assets/preact.esm.js"
+import { h, useState, useEffect, Fragment } from "../../assets/preact.esm.js"
 import Input from "../../commons/components/Input.jsx";
 import { ArrowRightIcon } from "../../commons/components/Icon.jsx";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import ApiClient from "../../commons/http/ApiClient.js";
+import { showToast } from "../../commons/components/Toast.jsx";
 
 export default function LoginPage({ isOnboarding = false }) {
   const [email, setEmail] = useState("");
@@ -51,6 +52,7 @@ export default function LoginPage({ isOnboarding = false }) {
             setPasswordError("Incorrect password");
             break;
           default:
+            showToast("An unexpected error occurred.");
             console.error(e);
         }
       });
@@ -76,11 +78,14 @@ export default function LoginPage({ isOnboarding = false }) {
   }
 
   return (
-    <form className="login-container" onSubmit={handleLoginClick}>
-      {header}
-      <Input id="email" label="Email" type="text" placeholder="Enter your email address" value={email} hint="" error={emailError} isDisabled={false} onChange={handleEmailChange} />
-      <Input id="password" label="Password" type="password" placeholder="Enter your password" value={password} hint="" error={passwordError} isDisabled={false} onChange={handlePasswordChange} />
-      <button className="button primary" type="submit" onClick={handleLoginClick}>{buttonText}<ArrowRightIcon /></button>
-    </form>
+    <>
+      <form className="login-container" onSubmit={handleLoginClick}>
+        {header}
+        <Input id="email" label="Email" type="text" placeholder="Enter your email address" value={email} hint="" error={emailError} isDisabled={false} onChange={handleEmailChange} />
+        <Input id="password" label="Password" type="password" placeholder="Enter your password" value={password} hint="" error={passwordError} isDisabled={false} onChange={handlePasswordChange} />
+        <button className="button primary" type="submit" onClick={handleLoginClick}>{buttonText}<ArrowRightIcon /></button>
+      </form>
+      <div className="toast-root"></div>
+    </>
   );
 }

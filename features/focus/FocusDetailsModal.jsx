@@ -4,6 +4,7 @@ import { CloseIcon } from "../../commons/components/Icon.jsx";
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
+import { showToast } from "../../commons/components/Toast.jsx";
 
 export default function FocusDetailsModal({ mode, focusMode }) {
   const [name, setName] = useState(focusMode ? focusMode.name : "");
@@ -54,7 +55,9 @@ export default function FocusDetailsModal({ mode, focusMode }) {
         window.location.reload();
       })
       .catch((error) => {
-        console.error("Error creating focus mode:", error);
+        const message = mode === "edit" ? "Error updating focus mode." : "Error creating focus mode.";
+        showToast(message);
+        console.error(message, error);
       });
   }
 
