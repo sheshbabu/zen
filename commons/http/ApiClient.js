@@ -1,3 +1,5 @@
+import { showToast } from "../components/Toast.jsx";
+
 async function request(method, url, payload) {
   const options = {
     method: method,
@@ -11,20 +13,46 @@ async function request(method, url, payload) {
     options.body = JSON.stringify(payload);
   }
 
-  const response = await fetch(url, options);
-  const isJsonResponse = response.headers.get('content-type')?.includes('application/json');
-  const body = isJsonResponse ? await response.json() : null;
-
-  if (!response.ok) {
-    if (isJsonResponse) {
-      const error = new Error(response.statusText);
-      error.code = body.code;
-      throw error;
+  try {
+    const response = await fetch(url, options);
+    
+    if (!response.ok) {
+      throw response;
     }
-    throw new Error(response.statusText);
-  }
 
-  return body;
+    const isJsonResponse = response.headers.get('content-type')?.includes('application/json');
+    return isJsonResponse ? await response.json() : null;
+  } catch (error) {
+    
+    if (!navigator.onLine) {
+      showToast("No internet connection.");
+      console.error("Network error:", error);
+    }
+    
+    if (error instanceof TypeError && (
+      error.message.includes('fetch') ||
+      error.message.includes('Load failed') ||
+      error.message.includes('NetworkError') 
+    )) {
+      showToast("Connection failed.");
+      console.error("Fetch error:", error);
+    }
+
+    if (error instanceof Response) {
+      const isJsonResponse = error.headers.get('content-type')?.includes('application/json');
+      
+      if (isJsonResponse) {
+        const body = await error.json();
+        const err = new Error(error.statusText);
+        err.code = body?.code;
+        throw err;
+      }
+      
+      throw new Error(error.statusText);
+    }
+
+    throw error;
+  }
 }
 
 // Users
