@@ -90,7 +90,7 @@ func GetUserID(sessionID string) (string, error) {
 	err := row.Scan(&userID)
 
 	if err != nil {
-		err = fmt.Errorf("error retrieving user_id: %w", err)
+		err = fmt.Errorf("error retrieving user session: %w", err)
 		slog.Error(err.Error())
 		return "", err
 	}
