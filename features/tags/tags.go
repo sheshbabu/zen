@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"zen/commons/utils"
 )
 
 type Tag struct {
@@ -22,7 +23,7 @@ func HandleGetTags(w http.ResponseWriter, r *http.Request) {
 	if focusModeIDStr != "" {
 		focusModeID, err = strconv.Atoi(focusModeIDStr)
 		if err != nil {
-			http.Error(w, "Invalid focus mode ID", http.StatusBadRequest)
+			utils.SendErrorResponse(w, "INVALID_FOCUS_ID", err, http.StatusBadRequest)
 			return
 		}
 	}
@@ -36,7 +37,7 @@ func HandleGetTags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "TAGS_FETCH_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -47,12 +48,12 @@ func HandleGetTags(w http.ResponseWriter, r *http.Request) {
 func HandleUpdateTag(w http.ResponseWriter, r *http.Request) {
 	var tag Tag
 	if err := json.NewDecoder(r.Body).Decode(&tag); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", err, http.StatusBadRequest)
 		return
 	}
 
 	if err := UpdateTag(tag); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "TAG_UPDATE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -63,12 +64,12 @@ func HandleDeleteTag(w http.ResponseWriter, r *http.Request) {
 	tagIDStr := r.PathValue("tagId")
 	tagID, err := strconv.Atoi(tagIDStr)
 	if err != nil {
-		http.Error(w, "Invalid tag ID", http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_TAG_ID", err, http.StatusBadRequest)
 		return
 	}
 
 	if err := DeleteTag(tagID); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "TAG_DELETE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 

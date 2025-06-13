@@ -46,7 +46,7 @@ func HandleCheckUser(w http.ResponseWriter, r *http.Request) {
 
 	_, err = GetUserByID(userID)
 	if err != nil {
-		utils.SendErrorResponse(w, "", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "USER_READ_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -56,7 +56,7 @@ func HandleCheckUser(w http.ResponseWriter, r *http.Request) {
 func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 	var payload UserRecord
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", err, http.StatusBadRequest)
 		return
 	}
 
@@ -73,26 +73,26 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 	passwordHash, err := HashPassword(payload.Password)
 	if err != nil {
 		err = fmt.Errorf("error hashing password: %w", err)
-		utils.SendErrorResponse(w, "", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "PASSWORD_HASH_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
 	hasUsers := HasUsers()
 	if hasUsers {
 		err = fmt.Errorf("can't create more than one user: %w", err)
-		utils.SendErrorResponse(w, "", err, http.StatusBadRequest)
+		utils.SendErrorResponse(w, "USER_CREATE_FAILED", err, http.StatusBadRequest)
 		return
 	}
 
 	user, err := InsertUser(payload.Email, passwordHash, true)
 	if err != nil {
-		utils.SendErrorResponse(w, "", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "USER_CREATE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
 	s, err := session.NewSession(user.UserID)
 	if err != nil {
-		utils.SendErrorResponse(w, "", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "SESSION_CREATE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 	session.SetSessionCookie(w, s)
@@ -103,7 +103,7 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	var payload UserRecord
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		utils.SendErrorResponse(w, "", err, http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", err, http.StatusBadRequest)
 		return
 	}
 
@@ -113,7 +113,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		utils.SendErrorResponse(w, "", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "USER_READ_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -124,7 +124,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 
 	sess, err := session.NewSession(user.UserID)
 	if err != nil {
-		utils.SendErrorResponse(w, "", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "SESSION_CREATE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -136,7 +136,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 func HandleUpdatePassword(w http.ResponseWriter, r *http.Request) {
 	var payload PasswordUpdateRecord
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
-		utils.SendErrorResponse(w, "", err, http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", err, http.StatusBadRequest)
 		return
 	}
 
@@ -172,14 +172,14 @@ func HandleUpdatePassword(w http.ResponseWriter, r *http.Request) {
 	passwordHash, err := HashPassword(payload.NewPassword)
 	if err != nil {
 		err = fmt.Errorf("error hashing password: %w", err)
-		utils.SendErrorResponse(w, "", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "PASSWORD_HASH_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
 	err = UpdatePassword(userID, passwordHash)
 	if err != nil {
 		err = fmt.Errorf("error updating password: %w", err)
-		utils.SendErrorResponse(w, "", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "PASSWORD_UPDATE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 

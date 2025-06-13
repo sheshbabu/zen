@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"zen/commons/utils"
 	"zen/features/tags"
 )
 
@@ -59,7 +60,7 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 		page, err = strconv.Atoi(pageStr)
 		filter.page = page
 		if err != nil {
-			http.Error(w, "Invalid page number", http.StatusBadRequest)
+			utils.SendErrorResponse(w, "INVALID_PAGE_NUMBER", err, http.StatusBadRequest)
 			return
 		}
 	}
@@ -68,7 +69,7 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 		tagID, err = strconv.Atoi(tagIDStr)
 		filter.tagID = tagID
 		if err != nil {
-			http.Error(w, "Invalid tag ID", http.StatusBadRequest)
+			utils.SendErrorResponse(w, "INVALID_TAG_ID", err, http.StatusBadRequest)
 			return
 		}
 	}
@@ -77,7 +78,7 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 		focusModeID, err = strconv.Atoi(focusModeIDStr)
 		filter.focusModeID = focusModeID
 		if err != nil {
-			http.Error(w, "Invalid focus mode ID", http.StatusBadRequest)
+			utils.SendErrorResponse(w, "INVALID_FOCUS_ID", err, http.StatusBadRequest)
 			return
 		}
 	}
@@ -101,7 +102,7 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "NOTES_READ_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -118,13 +119,13 @@ func HandleGetNote(w http.ResponseWriter, r *http.Request) {
 	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
-		http.Error(w, "Invalid note ID", http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", err, http.StatusBadRequest)
 		return
 	}
 
 	note, err := GetNoteByID(noteID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "NOTES_READ_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -135,13 +136,13 @@ func HandleGetNote(w http.ResponseWriter, r *http.Request) {
 func HandleCreateNote(w http.ResponseWriter, r *http.Request) {
 	var noteInput Note
 	if err := json.NewDecoder(r.Body).Decode(&noteInput); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", err, http.StatusBadRequest)
 		return
 	}
 
 	note, err := CreateNote(noteInput)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "NOTES_CREATE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -153,20 +154,20 @@ func HandleUpdateNote(w http.ResponseWriter, r *http.Request) {
 	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
-		http.Error(w, "Invalid note ID", http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", err, http.StatusBadRequest)
 		return
 	}
 
 	var noteInput Note
 	if err := json.NewDecoder(r.Body).Decode(&noteInput); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", err, http.StatusBadRequest)
 		return
 	}
 	noteInput.NoteID = noteID
 
 	note, err := UpdateNote(noteInput)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "NOTES_UPDATE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -178,13 +179,13 @@ func HandleForceDeleteNote(w http.ResponseWriter, r *http.Request) {
 	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
-		http.Error(w, "Invalid note ID", http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", err, http.StatusBadRequest)
 		return
 	}
 
 	err = ForceDeleteNote(noteID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "NOTES_FORCE_DELETE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -195,13 +196,13 @@ func HandleSoftDeleteNote(w http.ResponseWriter, r *http.Request) {
 	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
-		http.Error(w, "Invalid note ID", http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", err, http.StatusBadRequest)
 		return
 	}
 
 	err = SoftDeleteNote(noteID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "NOTES_SOFT_DELETE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -212,13 +213,13 @@ func HandleRestoreDeletedNote(w http.ResponseWriter, r *http.Request) {
 	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
-		http.Error(w, "Invalid note ID", http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", err, http.StatusBadRequest)
 		return
 	}
 
 	err = RestoreDeletedNote(noteID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "NOTES_RESTORE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -229,13 +230,13 @@ func HandleArchiveNote(w http.ResponseWriter, r *http.Request) {
 	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
-		http.Error(w, "Invalid note ID", http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", err, http.StatusBadRequest)
 		return
 	}
 
 	err = ArchiveNote(noteID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "NOTES_ARCHIVE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -246,13 +247,13 @@ func HandleUnarchiveNote(w http.ResponseWriter, r *http.Request) {
 	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
-		http.Error(w, "Invalid note ID", http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", err, http.StatusBadRequest)
 		return
 	}
 
 	err = UnarchiveNote(noteID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "NOTES_UNARCHIVE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 

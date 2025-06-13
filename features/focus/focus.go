@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+	"zen/commons/utils"
 	"zen/features/tags"
 )
 
@@ -17,7 +18,7 @@ type FocusMode struct {
 func HandleGetAllFocusModes(w http.ResponseWriter, r *http.Request) {
 	allFocusModes, err := GetAllFocusModes()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "FOCUS_READ_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -28,12 +29,12 @@ func HandleGetAllFocusModes(w http.ResponseWriter, r *http.Request) {
 func HandleCreateFocusMode(w http.ResponseWriter, r *http.Request) {
 	var focusMode FocusMode
 	if err := json.NewDecoder(r.Body).Decode(&focusMode); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", err, http.StatusBadRequest)
 		return
 	}
 
 	if err := CreateFocusMode(&focusMode); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "FOCUS_CREATE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -45,12 +46,12 @@ func HandleCreateFocusMode(w http.ResponseWriter, r *http.Request) {
 func HandleUpdateFocusMode(w http.ResponseWriter, r *http.Request) {
 	var focusMode FocusMode
 	if err := json.NewDecoder(r.Body).Decode(&focusMode); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", err, http.StatusBadRequest)
 		return
 	}
 
 	if err := UpdateFocusMode(&focusMode); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "FOCUS_UPDATE_FAILED", err, http.StatusInternalServerError)
 		return
 	}
 
