@@ -15,14 +15,14 @@ func HandleUploadImage(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(10 << 20) // Max 10MB
 	if err != nil {
 		err = fmt.Errorf("error parsing image: %w", err)
-		utils.SendErrorResponse(w, "INVALID_IMAGE", err, http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_IMAGE", "Invalid image file", err, http.StatusBadRequest)
 		return
 	}
 
 	file, handler, err := r.FormFile("image")
 	if err != nil {
 		err = fmt.Errorf("error parsing image: %w", err)
-		utils.SendErrorResponse(w, "INVALID_IMAGE", err, http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_IMAGE", "Invalid image file", err, http.StatusBadRequest)
 		return
 	}
 	defer file.Close()
@@ -33,14 +33,14 @@ func HandleUploadImage(w http.ResponseWriter, r *http.Request) {
 	dst, err := os.Create(filepath)
 	if err != nil {
 		err = fmt.Errorf("error creating image file: %w", err)
-		utils.SendErrorResponse(w, "IMAGE_CREATE_FAILED", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "IMAGE_CREATE_FAILED", "Error creating image file.", err, http.StatusInternalServerError)
 		return
 	}
 	defer dst.Close()
 
 	if _, err := io.Copy(dst, file); err != nil {
 		err = fmt.Errorf("error uploading image file: %w", err)
-		utils.SendErrorResponse(w, "IMAGE_UPLOAD_FAILED", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "IMAGE_UPLOAD_FAILED", "Error uploading image.", err, http.StatusInternalServerError)
 		return
 	}
 

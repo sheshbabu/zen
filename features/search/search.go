@@ -12,13 +12,13 @@ const LIMIT = 20
 func HandleSearch(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query().Get("query")
 	if query == "" {
-		utils.SendErrorResponse(w, "INVALID_SEARCH_QUERY", nil, http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_SEARCH_QUERY", "Search query is required", nil, http.StatusBadRequest)
 		return
 	}
 
 	notes, err := notes.SearchNotes(query, LIMIT)
 	if err != nil {
-		utils.SendErrorResponse(w, "NOTES_SEARCH_FAILED", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "NOTES_SEARCH_FAILED", "Error searching notes.", err, http.StatusInternalServerError)
 		return
 	}
 

@@ -3,7 +3,6 @@ import Input from "../../commons/components/Input.jsx";
 import { ArrowRightIcon } from "../../commons/components/Icon.jsx";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import ApiClient from "../../commons/http/ApiClient.js";
-import { showToast } from "../../commons/components/Toast.jsx";
 
 export default function LoginPage({ isOnboarding = false }) {
   const [email, setEmail] = useState("");
@@ -51,9 +50,6 @@ export default function LoginPage({ isOnboarding = false }) {
           case "INCORRECT_PASSWORD":
             setPasswordError("Incorrect password");
             break;
-          default:
-            showToast("An unexpected error occurred.");
-            console.error(e);
         }
       });
   }

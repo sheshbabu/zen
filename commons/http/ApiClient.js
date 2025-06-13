@@ -45,9 +45,18 @@ async function request(method, url, payload) {
         const body = await error.json();
         const err = new Error(error.statusText);
         err.code = body?.code;
+
+        const skipCodes = ['NO_USERS', 'NO_SESSION', 'INVALID_EMAIL', 'INVALID_PASSWORD', 'INCORRECT_EMAIL', 'INCORRECT_PASSWORD'];
+        if (!skipCodes.includes(body?.code)) {
+          const message = body?.message || 'An unexpected error occurred';
+          showToast(message);
+        }
+        console.error('API error:', body);
+        
         throw err;
       }
-      
+
+      showToast('An unexpected error occurred');
       throw new Error(error.statusText);
     }
 

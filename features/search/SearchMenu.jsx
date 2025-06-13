@@ -2,7 +2,6 @@ import { h, render, useEffect, useState, useRef } from "../../assets/preact.esm.
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon } from "../../commons/components/Icon.jsx";
-import { showToast } from "../../commons/components/Toast.jsx";
 
 export default function SearchMenu() {
   const [query, setQuery] = useState("");
@@ -32,10 +31,6 @@ export default function SearchMenu() {
         if (notes.length > 0) {
           setSelectedItem(notes[0]);
         }
-      })
-      .catch(error => {
-        showToast("Error searching notes.");
-        console.error("Error searching:", error);
       });
   }
 

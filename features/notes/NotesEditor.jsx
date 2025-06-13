@@ -5,7 +5,6 @@ import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
 import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
-import { showToast } from "../../commons/components/Toast.jsx";
 
 export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange }) {
   if (!isNewNote && selectedNote === null) {
@@ -121,10 +120,6 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
 
         onChange();
       })
-      .catch(e => {
-        showToast("Error saving note.");
-        console.error('Error saving note:', e);
-      })
       .finally(() => {
         setIsSaveLoading(false);
       });
@@ -208,10 +203,6 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         handleDeleteCloseClick();
         navigateTo("/", true);
         onChange();
-      })
-      .catch(e => {
-        showToast("Error deleting note.");
-        console.error('Error deleting note:', e);
       });
   }
 
@@ -223,10 +214,6 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     ApiClient.archiveNote(selectedNote.noteId)
       .then(() => {
         onChange();
-      })
-      .catch(e => {
-        showToast("Error archiving note.");
-        console.error('Error archiving note:', e);
       });
   }
 
@@ -234,10 +221,6 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     ApiClient.unarchiveNote(selectedNote.noteId)
       .then(() => {
         onChange();
-      })
-      .catch(e => {
-        showToast("Error unarchiving note.");
-        console.error('Error unarchiving note:', e);
       });
   }
 
@@ -245,10 +228,6 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     ApiClient.restoreNote(selectedNote.noteId)
       .then(() => {
         onChange();
-      })
-      .catch(e => {
-        showToast("Error restoring note.");
-        console.error('Error restoring note:', e);
       });
   }
 
@@ -259,10 +238,6 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       .then(result => {
         const imageUrl = `![](/images/${result.filename})`;
         insertAtCursor(imageUrl);
-      })
-      .catch(error => {
-        showToast("Error uploading image.");
-        console.error('Error uploading image:', error);
       });
   }
 

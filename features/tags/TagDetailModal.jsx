@@ -3,7 +3,6 @@ import Input from "../../commons/components/Input.jsx";
 import { CloseIcon } from "../../commons/components/Icon.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
-import { showToast } from "../../commons/components/Toast.jsx";
 
 export default function TagDetailModal({ tag }) {
   const [name, setName] = useState(tag.name);
@@ -28,10 +27,6 @@ export default function TagDetailModal({ tag }) {
       .then(() => {
         closeModal();
         navigateTo(`/notes/?tagId=${tag.tagId}`);
-      })
-      .catch((error) => {
-        showToast("Error updating tag.");
-        console.error("Error updating tag:", error);
       });
   }
 
@@ -40,10 +35,6 @@ export default function TagDetailModal({ tag }) {
       .then(() => {
         closeModal();
         navigateTo("/notes/");
-      })
-      .catch((error) => {
-        showToast("Error deleting tag.");
-        console.error("Error deleting tag:", error);
       });
   }
 

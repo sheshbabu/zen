@@ -18,7 +18,7 @@ type FocusMode struct {
 func HandleGetAllFocusModes(w http.ResponseWriter, r *http.Request) {
 	allFocusModes, err := GetAllFocusModes()
 	if err != nil {
-		utils.SendErrorResponse(w, "FOCUS_READ_FAILED", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "FOCUS_READ_FAILED", "Error fetching focus modes.", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -29,12 +29,12 @@ func HandleGetAllFocusModes(w http.ResponseWriter, r *http.Request) {
 func HandleCreateFocusMode(w http.ResponseWriter, r *http.Request) {
 	var focusMode FocusMode
 	if err := json.NewDecoder(r.Body).Decode(&focusMode); err != nil {
-		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", err, http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", "Invalid request data", err, http.StatusBadRequest)
 		return
 	}
 
 	if err := CreateFocusMode(&focusMode); err != nil {
-		utils.SendErrorResponse(w, "FOCUS_CREATE_FAILED", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "FOCUS_CREATE_FAILED", "Error creating focus mode.", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -46,12 +46,12 @@ func HandleCreateFocusMode(w http.ResponseWriter, r *http.Request) {
 func HandleUpdateFocusMode(w http.ResponseWriter, r *http.Request) {
 	var focusMode FocusMode
 	if err := json.NewDecoder(r.Body).Decode(&focusMode); err != nil {
-		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", err, http.StatusBadRequest)
+		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", "Invalid request data", err, http.StatusBadRequest)
 		return
 	}
 
 	if err := UpdateFocusMode(&focusMode); err != nil {
-		utils.SendErrorResponse(w, "FOCUS_UPDATE_FAILED", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "FOCUS_UPDATE_FAILED", "Error updating focus mode.", err, http.StatusInternalServerError)
 		return
 	}
 
