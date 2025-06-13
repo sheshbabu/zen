@@ -826,11 +826,23 @@ svg.lucide {
     &.open {
         .dropdown-menu {
             display: block;
+            animation: dropdown-fade-in 0.15s ease-out;
         }
 
         .dropdown-button {
             border-radius: 6px 6px 0 0;
         }
+    }
+}
+
+@keyframes dropdown-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
