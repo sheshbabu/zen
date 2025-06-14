@@ -701,3 +701,51 @@ func EmptyTrash() error {
 
 	return nil
 }
+
+func GetNotesWithImages() ([]Note, error) {
+	var notes []Note
+	query := `
+		SELECT
+			note_id,
+			title,
+			content,
+			SUBSTR(content, 0, 500) AS snippet,
+			updated_at,
+			archived_at,
+			deleted_at
+		FROM
+			notes
+		WHERE
+			deleted_at IS NULL
+			AND content LIKE '%![%](/images/%'
+	`
+
+	rows, err := sqlite.DB.Query(query)
+	if err != nil {
+		err = fmt.Errorf("error querying notes: %w", err)
+		slog.Error(err.Error())
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var note Note
+		var archivedAt sql.NullTime
+		var deletedAt sql.NullTime
+
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &archivedAt, &deletedAt)
+		if err != nil {
+			err = fmt.Errorf("error scanning note: %w", err)
+			slog.Error(err.Error())
+			return nil, err
+		}
+
+		note.IsArchived = archivedAt.Valid
+		note.IsDeleted = deletedAt.Valid
+		note.Tags = []tags.Tag{}
+
+		notes = append(notes, note)
+	}
+
+	return notes, nil
+}

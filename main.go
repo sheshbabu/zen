@@ -101,6 +101,7 @@ func newRouter() *http.ServeMux {
 	addPrivateRoute(mux, "PUT /api/focus/{focusId}/", focus.HandleUpdateFocusMode)
 
 	addPrivateRoute(mux, "POST /api/images/", images.HandleUploadImage)
+	addPrivateRoute(mux, "GET /api/images/", images.HandleGetImages)
 
 	addPrivateRoute(mux, "GET /api/search/", search.HandleSearch)
 
@@ -165,12 +166,23 @@ func addPrivateRoute(mux *http.ServeMux, pattern string, handlerFunc func(w http
 func runBackgroundTasks() {
 	trashCleanupFrequency := 30 * 24 * time.Hour // 30 days
 	sessionCleanupFrequency := 24 * time.Hour    // 24 hours
+	imageSyncFrequency := 24 * time.Hour         // 24 hours
 
-	for range time.Tick(trashCleanupFrequency) {
-		notes.EmptyTrash()
-	}
+	go func() {
+		for range time.Tick(trashCleanupFrequency) {
+			notes.EmptyTrash()
+		}
+	}()
 
-	for range time.Tick(sessionCleanupFrequency) {
-		session.DeleteExpiredSessions()
-	}
+	go func() {
+		for range time.Tick(sessionCleanupFrequency) {
+			session.DeleteExpiredSessions()
+		}
+	}()
+
+	go func() {
+		for range time.Tick(imageSyncFrequency) {
+			images.SyncImagesFromDisk()
+		}
+	}()
 }

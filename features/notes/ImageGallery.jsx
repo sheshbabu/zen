@@ -1,58 +1,38 @@
 import { h, useEffect, useRef, useState, useCallback } from "../../assets/preact.esm.js";
-import Link from '../../commons/components/Link.jsx';
 
 const MIN_COLUMN_WIDTH = 300;
 const GUTTER_WIDTH = 20;
 const GUTTER_HEIGHT = 20;
 
-export default function ImageGallery({ notes }) {
-  const [isLoading, setIsLoading] = useState(true);
+export default function ImageGallery({ images }) {
   const [imageDetails, setImageDetails] = useState([]);
 
   const containerRef = useRef(null);
 
   useEffect(() => {
-    if (notes.length === 0) {
+    if (images.length === 0) {
       setImageDetails([]);
-      setIsLoading(false);
       return;
     }
 
-    setIsLoading(true);
+    const processedFilenames = imageDetails.map(detail => detail.filename);
+    const newImages = images.filter(image => !processedFilenames.includes(image.filename));
 
-    const processedNoteIds = imageDetails.map(detail => detail.noteId);
-    const newNotes = notes.filter(note => !processedNoteIds.includes(note.noteId));
-
-    if (newNotes.length === 0) {
-      setIsLoading(false);
+    if (newImages.length === 0) {
       return;
     }
 
-    const newImages = extractImagesFromNotes(newNotes);
+    const newDetails = newImages.map(image => ({
+      url: `/images/${image.filename}`,
+      width: image.width,
+      height: image.height,
+      aspectRatio: image.aspectRatio,
+      filename: image.filename,
+    }));
 
-    // Get image dimensions without rendering
-    Promise.all(
-      newImages.map(image =>
-        new Promise(resolve => {
-          const img = new Image();
-          img.onload = () => {
-            resolve({
-              url: image.url,
-              width: img.width,
-              height: img.height,
-              aspectRatio: img.width / img.height,
-              noteId: image.noteId,
-            });
-          };
-          img.src = image.url;
-        })
-      )
-    ).then(newDetails => {
-      setImageDetails(prev => [...prev, ...newDetails]);
-      initLayout();
-      setIsLoading(false);
-    });
-  }, [notes]);
+    setImageDetails(prev => [...prev, ...newDetails]);
+    initLayout();
+  }, [images]);
 
   useEffect(() => {
     if (imageDetails.length > 0) {
@@ -129,53 +109,14 @@ export default function ImageGallery({ notes }) {
   }
 
   const items = imageDetails.map((image, index) => {
-    const link = `/notes/${image.noteId}`;
     return (
-      <Link key={index} to={link} shouldPreserveSearchParams>
-        <img src={image.url} loading="lazy" className="image-gallery-item" onLoad={e => e.target.classList.add('loaded')} />
-      </Link>
+      <img key={image.filename} src={image.url} loading="lazy" className="image-gallery-item" onLoad={e => e.target.classList.add('loaded')} />
     );
   });
-
-  if (items.length === 0 && !isLoading) {
-    return (
-      <div ref={containerRef} className="image-gallery">
-        <EmptyList images={imageDetails} />
-      </div>
-    );
-  }
 
   return (
     <div ref={containerRef} className="image-gallery">
       {items}
     </div>
   );
-}
-
-function extractImagesFromNotes(notes) {
-  const images = [];
-
-  notes.forEach(note => {
-    // ![](/images/xxx.png)
-    const matches = note.content.match(/!\[\]\(\/images\/[\w.-]+\.(?:png|jpg|jpeg|gif)\)/g);
-
-    if (!matches) {
-      return;
-    }
-
-    matches.forEach(match => {
-      const url = match.match(/\/images\/[\w.-]+\.(?:png|jpg|jpeg|gif)/)[0];
-      images.push({
-        url,
-        noteId: note.noteId,
-        noteTitle: note.title
-      });
-    });
-  });
-
-  return images;
-}
-
-function EmptyList({ images }) {
-  return <div className="image-gallery-empty-text">No images found</div>
 }

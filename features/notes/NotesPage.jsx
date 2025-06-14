@@ -11,6 +11,10 @@ export default function NotesPage({ noteId }) {
   const [notesTotal, setNotesTotal] = useState(0);
   const [notesPageNumber, setNotesPageNumber] = useState(1);
   const [isNotesLoading, setIsNotesLoading] = useState(true);
+  const [images, setImages] = useState([]);
+  const [imagesTotal, setImagesTotal] = useState(0);
+  const [imagesPageNumber, setImagesPageNumber] = useState(1);
+  const [isImagesLoading, setIsImagesLoading] = useState(true);
   const [tags, setTags] = useState([]);
   const [focusModes, setFocusModes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
@@ -29,6 +33,7 @@ export default function NotesPage({ noteId }) {
 
   useEffect(() => {
     refreshNotes();
+    refreshImages();
     refreshTags();
     refreshFocusModes();
   }, []);
@@ -37,15 +42,22 @@ export default function NotesPage({ noteId }) {
     // Reset to avoid showing incorrect notes
     setNotesPageNumber(1);
     setNotes([]);
+    setImagesPageNumber(1);
+    setImages([]);
     setSelectedNote(null);
 
     refreshNotes();
+    refreshImages();
     refreshTags();
   }, [selectedTagId, selectedFocusId, isArchivesPage, isTrashPage]);
 
   useEffect(() => {
     refreshNotes();
   }, [notesPageNumber]);
+
+  useEffect(() => {
+    refreshImages();
+  }, [imagesPageNumber]);
 
   // TODO: Move this to NotesEditor
   useEffect(() => {
@@ -95,6 +107,25 @@ export default function NotesPage({ noteId }) {
       });
   }
 
+  function refreshImages() {
+    setIsImagesLoading(true);
+    
+    ApiClient.getImages(selectedTagId, selectedFocusId, imagesPageNumber)
+      .then(res => {
+        if (imagesPageNumber > 1) {
+          setImages(prevImages => [...prevImages, ...res.images]);
+        } else {
+          setImages(res.images);
+        }
+        setImagesTotal(res.total);
+      })
+      .catch(error => {
+        console.error('Error loading images:', error);
+      }).finally(() => {
+        setIsImagesLoading(false);
+      });
+  }
+
   function refreshTags() {
     ApiClient.getTags(selectedFocusId)
       .then(newTags => {
@@ -118,6 +149,7 @@ export default function NotesPage({ noteId }) {
   // Update notes, tags, and focus modes when a note is created/updated/deleted
   function handleNoteChange() {
     refreshNotes();
+    refreshImages();
     refreshTags();
   }
 
@@ -127,6 +159,10 @@ export default function NotesPage({ noteId }) {
 
   function handleLoadMoreClick() {
     setNotesPageNumber(notesPageNumber + 1);
+  }
+
+  function handleLoadMoreImagesClick() {
+    setImagesPageNumber(imagesPageNumber + 1);
   }
 
   if (selectedView === "list") {
@@ -149,7 +185,18 @@ export default function NotesPage({ noteId }) {
       </div>
 
       <div className={listClassName} data-page={noteId === undefined ? "notes" : "editor"}>
-        <NotesList notes={notes} total={notesTotal} isLoading={isNotesLoading} view={selectedView} onViewChange={handleViewChange} onLoadMoreClick={handleLoadMoreClick} />
+        <NotesList 
+          notes={notes} 
+          total={notesTotal} 
+          isLoading={isNotesLoading} 
+          images={images}
+          imagesTotal={imagesTotal}
+          isImagesLoading={isImagesLoading}
+          view={selectedView} 
+          onViewChange={handleViewChange} 
+          onLoadMoreClick={handleLoadMoreClick}
+          onLoadMoreImagesClick={handleLoadMoreImagesClick}
+        />
       </div>
 
       <div className={editorClassName} data-page={noteId === undefined ? "notes" : "editor"}>

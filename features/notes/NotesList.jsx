@@ -6,11 +6,14 @@ import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import formatDate from '../../commons/utils/formatDate.js';
 import ImageGallery from "./ImageGallery.jsx";
 
-export default function NotesList({ notes = [], total, isLoading, view, onViewChange, onLoadMoreClick }) {
+export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick }) {
   let containerClassName = "notes-list-fragment";
   let listClassName = "notes-list";
   let items = notes.map(note => <NotesListItem note={note} key={note.noteId} />);
   let content = <div className="notes-list-spinner"><Spinner /></div>;
+  let loadMoreHandler = onLoadMoreClick;
+  let currentTotal = total;
+  let currentItems = notes;
 
   if (view === "card") {
     containerClassName = "notes-grid-fragment";
@@ -19,15 +22,18 @@ export default function NotesList({ notes = [], total, isLoading, view, onViewCh
   } else if (view === "gallery") {
     containerClassName = "notes-gallery-fragment";
     listClassName = "notes-gallery";
-    items = <ImageGallery notes={notes}/>;
+    items = <ImageGallery images={images}/>;
+    loadMoreHandler = onLoadMoreImagesClick;
+    currentTotal = imagesTotal;
+    currentItems = images;
   }
 
-  if (!isLoading) {
+  if ((view === "gallery" && !isImagesLoading) || (view !== "gallery" && !isLoading)) {
     content = (
       <div className={listClassName}>
         {items}
-        <LoadMoreButton notes={notes} total={total} onLoadMoreClick={onLoadMoreClick} />
-        <EmptyList notes={notes}/>
+        <LoadMoreButton items={currentItems} total={currentTotal} onLoadMoreClick={loadMoreHandler} />
+        <EmptyList items={currentItems} view={view}/>
       </div>
     )
   }
@@ -83,22 +89,23 @@ function NotesGridItem({ note }) {
   );
 }
 
-function LoadMoreButton({ notes, total, onLoadMoreClick }) {
-  if (notes.length === 0) {
+function LoadMoreButton({ items, total, onLoadMoreClick }) {
+  if (items.length === 0) {
     return null;
   }
 
-  if (notes.length === total) {
+  if (items.length === total) {
     return null;
   }
 
   return <div className="notes-list-load-more-button" onClick={onLoadMoreClick}>Load more</div>
 }
 
-function EmptyList({ notes }) {
-  if (notes.length > 0) {
+function EmptyList({ items, view }) {
+  if (items.length > 0) {
     return null;
   }
 
-  return <div className="notes-list-empty-text">No notes found</div>
+  const message = view === "gallery" ? "No images found" : "No notes found";
+  return <div className="notes-list-empty-text">{message}</div>
 }
