@@ -264,10 +264,15 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
 
     setContent(beforeText + text + afterText);
 
+    // Use setTimeout to ensure cursor position is set after DOM update
     const newPosition = startPos + text.length;
-    textarea.selectionStart = newPosition;
-    textarea.selectionEnd = newPosition;
-    textarea.focus();
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.selectionStart = newPosition;
+        textareaRef.current.selectionEnd = newPosition;
+        textareaRef.current.focus();
+      }
+    }, 0);
   }
 
   function formatSelectedText(format) {
