@@ -38,10 +38,48 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     handleTextAreaHeight();
   }, [content, isEditable]);
 
+  const handleSaveClick = useCallback(() => {
+    const currentTitle = titleRef.current?.textContent || "";
+    const currentContent = textareaRef.current?.value || content;
+    
+    const note = {
+      title: currentTitle,
+      content: currentContent,
+      tags: tags,
+    };
+    
+    setTitle(currentTitle);
+    setContent(currentContent);
+
+    let promise = null;
+    setIsSaveLoading(true);
+
+    if (isNewNote) {
+      promise = ApiClient.createNote(note);
+    } else {
+      promise = ApiClient.updateNote(selectedNote.noteId, note);
+    }
+
+    promise
+      .then(note => {
+        setIsEditable(false);
+        setAttachments([]); // reset
+
+        if (isNewNote) {
+          navigateTo(`/notes/${note.noteId}`, true);
+        }
+
+        onChange();
+      })
+      .finally(() => {
+        setIsSaveLoading(false);
+      });
+  }, [content, tags, isNewNote, selectedNote, onChange]);
+
   const handleKeyDown = useCallback(e => {
     const isTextAreaFocused = document.activeElement.className == "notes-editor-textarea";
 
-    if (!isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault();
       if (isEditable) {
         handleSaveClick();
@@ -71,7 +109,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       e.preventDefault();
       formatSelectedText("bold");
     }
-  }, [isEditable, isFloating]);
+  }, [isEditable, isFloating, handleSaveClick]);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
@@ -91,38 +129,6 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     // It doesn't include border, margin, or scrollbar
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight
     textarea.style.height = `${textarea.scrollHeight + 2}px`;
-  }
-
-  function handleSaveClick() {
-    const note = {
-      title: title,
-      content: content,
-      tags: tags,
-    };
-
-    let promise = null;
-    setIsSaveLoading(true);
-
-    if (isNewNote) {
-      promise = ApiClient.createNote(note);
-    } else {
-      promise = ApiClient.updateNote(selectedNote.noteId, note);
-    }
-
-    promise
-      .then(note => {
-        setIsEditable(false);
-        setAttachments([]); // reset
-
-        if (isNewNote) {
-          navigateTo(`/notes/${note.noteId}`, true);
-        }
-
-        onChange();
-      })
-      .finally(() => {
-        setIsSaveLoading(false);
-      });
   }
 
   function handleEditClick() {
