@@ -129,6 +129,10 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     setIsEditable(true);
   }
 
+  function handleEditCancelClick() {
+    setIsEditable(false);
+  }
+
   // https://blixtdev.com/how-to-use-contenteditable-with-react/
   function handleTitleChange(e) {
     const newTitle = e.target.textContent;
@@ -330,6 +334,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         isSaveLoading={isSaveLoading}
         onSaveClick={handleSaveClick}
         onEditClick={handleEditClick}
+        onEditCancelClick={handleEditCancelClick}
         onCloseClick={handleCloseClick}
         onDeleteClick={handleDeleteClick}
         onArchiveClick={handleArchiveClick}
@@ -351,7 +356,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   );
 }
 
-function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, onSaveClick, onEditClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick }) {
+function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, onSaveClick, onEditClick, onEditCancelClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick }) {
   const actions = [];
   const menuActions = [];
   const saveButtonText = isSaveLoading ? "Saving..." : "Save";
@@ -374,6 +379,9 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, onSav
   if (isEditable) {
     actions.push(
       <div className="ghost-button" onClick={onSaveClick}>{saveButtonText}</div>
+    );
+    actions.push(
+      <div className="ghost-button" onClick={onEditCancelClick}>Cancel</div>
     );
   } else {
     actions.push(
