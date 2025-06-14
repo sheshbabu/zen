@@ -37,7 +37,6 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 	var allNotes []Note
 	var err error
 	var total int
-	var filter NotesFilter
 
 	pageStr := r.URL.Query().Get("page")
 	tagIDStr := r.URL.Query().Get("tagId")
@@ -48,17 +47,9 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 	page := 1
 	tagID := 0
 	focusModeID := 0
-	filter = NotesFilter{
-		page:        page,
-		tagID:       tagID,
-		focusModeID: focusModeID,
-		isDeleted:   false,
-		isArchived:  false,
-	}
 
 	if pageStr != "" {
 		page, err = strconv.Atoi(pageStr)
-		filter.page = page
 		if err != nil {
 			utils.SendErrorResponse(w, "INVALID_PAGE_NUMBER", "Invalid page number", err, http.StatusBadRequest)
 			return
@@ -67,7 +58,6 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 
 	if tagIDStr != "" {
 		tagID, err = strconv.Atoi(tagIDStr)
-		filter.tagID = tagID
 		if err != nil {
 			utils.SendErrorResponse(w, "INVALID_TAG_ID", "Invalid tag ID", err, http.StatusBadRequest)
 			return
@@ -76,30 +66,21 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 
 	if focusModeIDStr != "" {
 		focusModeID, err = strconv.Atoi(focusModeIDStr)
-		filter.focusModeID = focusModeID
 		if err != nil {
 			utils.SendErrorResponse(w, "INVALID_FOCUS_ID", "Invalid focus mode ID", err, http.StatusBadRequest)
 			return
 		}
 	}
 
-	if isDeleted == "true" {
-		filter.isDeleted = true
-	} else if isArchived == "true" {
-		filter.isArchived = true
+	filter := NotesFilter{
+		page:        page,
+		tagID:       tagID,
+		focusModeID: focusModeID,
+		isDeleted:   isDeleted == "true",
+		isArchived:  isArchived == "true",
 	}
 
-	if focusModeID == 0 && tagID == 0 {
-		allNotes, total, err = GetAllNotes(filter)
-	} else if tagID != 0 {
-		allNotes, total, err = GetNotesByTagID(tagID, page)
-	} else if focusModeID != 0 {
-		allNotes, total, err = GetNotesByFocusModeID(focusModeID, page)
-	} else if isDeleted == "true" {
-		allNotes, total, err = GetAllNotes(filter)
-	} else if isArchived == "true" {
-		allNotes, total, err = GetAllNotes(filter)
-	}
+	allNotes, total, err = GetAllNotes(filter)
 
 	if err != nil {
 		utils.SendErrorResponse(w, "NOTES_READ_FAILED", "Error fetching notes.", err, http.StatusInternalServerError)

@@ -16,50 +16,133 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 	total := 0
 	offset := (filter.page - 1) * NOTES_LIMIT
 
-	query := `
-		SELECT
-			n.note_id,
-			n.title,
-			n.content,
-			SUBSTR(n.content, 0, 500) AS snippet,
-			n.updated_at,
-			CASE
-				WHEN COUNT(t.tag_id) > 0 THEN
+	var query string
+	var queryArgs []interface{}
+
+	if filter.tagID != 0 {
+		query = `
+			SELECT
+				n.note_id,
+				n.title,
+				n.content,
+				SUBSTR(n.content, 0, 500) AS snippet,
+				n.updated_at,
+				COALESCE(
+					JSON_GROUP_ARRAY(JSON_OBJECT(
+						'tagId', t2.tag_id,
+						'name', t2.name
+					)), '[]'
+				) as tags_json,
+				n.archived_at,
+				n.deleted_at,
+				COUNT(*) OVER() as total_count
+			FROM
+				notes n
+			INNER JOIN
+				note_tags nt ON n.note_id = nt.note_id
+			INNER JOIN
+				tags t ON nt.tag_id = t.tag_id
+			LEFT JOIN
+				note_tags nt2 ON n.note_id = nt2.note_id
+			LEFT JOIN
+				tags t2 ON nt2.tag_id = t2.tag_id
+			WHERE
+				t.tag_id = ? AND n.deleted_at IS NULL AND n.archived_at IS NULL
+			GROUP BY
+				n.note_id
+			ORDER BY
+				n.updated_at DESC
+			LIMIT
+				?
+			OFFSET
+				?
+		`
+		queryArgs = []interface{}{filter.tagID, NOTES_LIMIT, offset}
+	} else if filter.focusModeID != 0 {
+		query = `
+			SELECT
+				n.note_id,
+				n.title,
+				n.content,
+				SUBSTR(n.content, 0, 500) AS snippet,
+				n.updated_at,
+				COALESCE(
 					JSON_GROUP_ARRAY(JSON_OBJECT(
 						'tagId', t.tag_id,
 						'name', t.name
-					))
-				ELSE '[]'
-			END AS tags_json,
-			n.archived_at,
-			n.deleted_at,
-			COUNT(*) OVER() as total_count
-		FROM
-			notes n
-		LEFT JOIN
-			note_tags nt ON n.note_id = nt.note_id
-		LEFT JOIN
-			tags t ON nt.tag_id = t.tag_id
-		%s
-		GROUP BY
-            n.note_id
-		ORDER BY
-			n.updated_at DESC
-		LIMIT
-			?
-		OFFSET
-			?
-	`
-
-	if filter.isDeleted {
-		query = fmt.Sprintf(query, "WHERE n.deleted_at IS NOT NULL")
-	} else if filter.isArchived {
-		query = fmt.Sprintf(query, "WHERE n.archived_at IS NOT NULL")
+					)), '[]'
+				) as tags_json,
+				n.archived_at,
+				n.deleted_at,
+				COUNT(*) OVER() as total_count
+			FROM
+				focus_mode_tags fmt
+			JOIN
+				note_tags nt ON fmt.tag_id = nt.tag_id
+			JOIN
+				notes n ON nt.note_id = n.note_id
+			JOIN
+				tags t ON nt.tag_id = t.tag_id
+			WHERE
+				fmt.focus_mode_id = ? AND n.deleted_at IS NULL AND n.archived_at IS NULL
+			GROUP BY
+				n.note_id
+			ORDER BY
+				n.updated_at DESC
+			LIMIT
+				?
+			OFFSET
+				?
+		`
+		queryArgs = []interface{}{filter.focusModeID, NOTES_LIMIT, offset}
 	} else {
-		query = fmt.Sprintf(query, "WHERE n.deleted_at IS NULL AND n.archived_at IS NULL")
+		whereCondition := ""
+		if filter.isDeleted {
+			whereCondition = "WHERE n.deleted_at IS NOT NULL"
+		} else if filter.isArchived {
+			whereCondition = "WHERE n.archived_at IS NOT NULL"
+		} else {
+			whereCondition = "WHERE n.deleted_at IS NULL AND n.archived_at IS NULL"
+		}
+
+		query = fmt.Sprintf(`
+			SELECT
+				n.note_id,
+				n.title,
+				n.content,
+				SUBSTR(n.content, 0, 500) AS snippet,
+				n.updated_at,
+				CASE
+					WHEN COUNT(t.tag_id) > 0 THEN
+						JSON_GROUP_ARRAY(JSON_OBJECT(
+							'tagId', t.tag_id,
+							'name', t.name
+						))
+					ELSE '[]'
+				END AS tags_json,
+				n.archived_at,
+				n.deleted_at,
+				COUNT(*) OVER() as total_count
+			FROM
+				notes n
+			LEFT JOIN
+				note_tags nt ON n.note_id = nt.note_id
+			LEFT JOIN
+				tags t ON nt.tag_id = t.tag_id
+			%s
+			GROUP BY
+				n.note_id
+			ORDER BY
+				n.updated_at DESC
+			LIMIT
+				?
+			OFFSET
+				?
+		`, whereCondition)
+		queryArgs = []interface{}{NOTES_LIMIT, offset}
 	}
 
-	rows, err := sqlite.DB.Query(query, NOTES_LIMIT, offset)
+	rows, err := sqlite.DB.Query(query, queryArgs...)
 	if err != nil {
 		err = fmt.Errorf("error retrieving notes: %w", err)
 		slog.Error(err.Error())
@@ -515,156 +598,6 @@ func UnarchiveNote(noteID int) error {
 	}
 
 	return nil
-}
-
-func GetNotesByTagID(tagID int, page int) ([]Note, int, error) {
-	notes := []Note{}
-	total := 0
-	offset := (page - 1) * NOTES_LIMIT
-
-	query := `
-		SELECT
-			n.note_id,
-			n.title,
-			n.content,
-			SUBSTR(n.content, 0, 500) AS snippet,
-			n.updated_at,
-			COALESCE(
-				JSON_GROUP_ARRAY(JSON_OBJECT(
-					'tagId', t2.tag_id,
-					'name', t2.name
-				)), '[]'
-			) as tags_json,
-			n.archived_at,
-			n.deleted_at,
-			COUNT(*) OVER() as total_count
-		FROM
-			notes n
-		INNER JOIN
-			note_tags nt ON n.note_id = nt.note_id
-		INNER JOIN
-			tags t ON nt.tag_id = t.tag_id
-		LEFT JOIN
-			note_tags nt2 ON n.note_id = nt2.note_id
-		LEFT JOIN
-			tags t2 ON nt2.tag_id = t2.tag_id
-		WHERE
-			t.tag_id = ? AND n.deleted_at IS NULL AND n.archived_at IS NULL
-		GROUP BY
-			n.note_id
-		ORDER BY
-			n.updated_at DESC
-		LIMIT
-			?
-		OFFSET
-			?
-	`
-
-	rows, err := sqlite.DB.Query(query, tagID, NOTES_LIMIT, offset)
-	if err != nil {
-		err = fmt.Errorf("error retrieving notes: %w", err)
-		slog.Error(err.Error())
-		return notes, total, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var note Note
-		var tagsJSON string
-		var archivedAt sql.NullTime
-		var deletedAt sql.NullTime
-		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &total)
-		if err != nil {
-			err = fmt.Errorf("error scanning note: %w", err)
-			slog.Error(err.Error())
-			return notes, total, err
-		}
-		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
-		if err != nil {
-			err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
-			slog.Error(err.Error())
-			note.Tags = []tags.Tag{}
-		}
-		note.IsArchived = archivedAt.Valid
-		note.IsDeleted = deletedAt.Valid
-		notes = append(notes, note)
-	}
-
-	return notes, total, nil
-}
-
-func GetNotesByFocusModeID(focusModeID int, page int) ([]Note, int, error) {
-	notes := []Note{}
-	total := 0
-	offset := (page - 1) * NOTES_LIMIT
-
-	query := `
-		SELECT
-			n.note_id,
-			n.title,
-			n.content,
-			SUBSTR(n.content, 0, 500) AS snippet,
-			n.updated_at,
-			COALESCE(
-                JSON_GROUP_ARRAY(JSON_OBJECT(
-					'tagId', t.tag_id,
-					'name', t.name
-				)), '[]'
-            ) as tags_json,
-			n.archived_at,
-			n.deleted_at,
-			COUNT(*) OVER() as total_count
-		FROM
-			focus_mode_tags fmt
-		JOIN
-			note_tags nt ON fmt.tag_id = nt.tag_id
-		JOIN
-			notes n ON nt.note_id = n.note_id
-		JOIN
-			tags t ON nt.tag_id = t.tag_id
-		WHERE
-			fmt.focus_mode_id = ? AND n.deleted_at IS NULL AND n.archived_at IS NULL
-		GROUP BY
-            n.note_id
-		ORDER BY
-			n.updated_at DESC
-		LIMIT
-			?
-		OFFSET
-			?
-	`
-
-	rows, err := sqlite.DB.Query(query, focusModeID, NOTES_LIMIT, offset)
-	if err != nil {
-		err = fmt.Errorf("error retrieving notes by focus mode ID: %w", err)
-		slog.Error(err.Error())
-		return notes, total, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var note Note
-		var tagsJSON string
-		var archivedAt sql.NullTime
-		var deletedAt sql.NullTime
-		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &total)
-		if err != nil {
-			err = fmt.Errorf("error scanning note by focus mode ID: %w", err)
-			slog.Error(err.Error())
-			return notes, total, err
-		}
-		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
-		if err != nil {
-			err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
-			slog.Error(err.Error())
-			note.Tags = []tags.Tag{}
-		}
-		note.IsArchived = archivedAt.Valid
-		note.IsDeleted = deletedAt.Valid
-		notes = append(notes, note)
-	}
-
-	return notes, total, nil
 }
 
 func SearchNotes(term string, limit int) ([]Note, error) {
