@@ -1,0 +1,27 @@
+app = 'zendemo'
+primary_region = 'sin'
+
+[build]
+
+[env]
+  PORT = '8080'
+
+[[mounts]]
+  source = 'app_data'
+  destination = '/data'
+
+[[mounts]]
+  source = 'app_images'
+  destination = '/images'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = false
+  min_machines_running = 1
+  processes = ['app']
+
+[[vm]]
+  size = 'shared-cpu-1x'
+  memory = '256mb'
