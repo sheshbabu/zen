@@ -470,5 +470,39 @@ $ cd zen</pre>
         </main>
     </div>
 
+    <!-- mouji snippet -->
+    <script>
+        (function() {
+            var COLLECT_URL = "https://mouji.fly.dev/collect";
+            var PROJECT_ID = "4b8f80d61e65f0c6c954826d89646e4a";
+            var GLOBAL_VAR_NAME = "__mouji__";
+
+            window[GLOBAL_VAR_NAME] = {};
+
+            window[GLOBAL_VAR_NAME].sendPageView = function() {
+                var path = location.pathname;
+                var title = document.title;
+                var referrer = document.referrer;
+
+                var url =
+                    COLLECT_URL +
+                    "?project_id=" +
+                    PROJECT_ID +
+                    "&title=" +
+                    encodeURIComponent(title) +
+                    "&path=" +
+                    encodeURIComponent(path) +
+                    "&referrer=" +
+                    encodeURIComponent(referrer);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", url);
+                xhr.send();
+            };
+
+            window[GLOBAL_VAR_NAME].sendPageView();
+        })();
+    </script>
+
 </body>
 </html>
