@@ -372,6 +372,14 @@
                             <li><a href="#build-from-scratch" class="sidebar-nav-item">Build from Scratch</a></li>
                         </ul>
                     </li>
+                    <li>
+                        <a href="#keyboard-shortcuts" class="sidebar-nav-item">Keyboard Shortcuts</a>
+                        <ul class="sidebar-nav-sub">
+                            <li><a href="#global-shortcuts" class="sidebar-nav-item">Global</a></li>
+                            <li><a href="#editor-shortcuts" class="sidebar-nav-item">Editor</a></li>
+                            <li><a href="#navigation-shortcuts" class="sidebar-nav-item">Navigation</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </aside>
@@ -382,7 +390,7 @@
 
                 <h3 id="docker-compose">Docker Compose</h3>
                 <p>
-                    The easiest way to get started with Zen is using <code>Docker Compose</code>. This method requires 
+                    The easiest way to get started is using <code>Docker Compose</code>. This method requires 
                     minimal setup and handles all dependencies automatically.
                 </p>
 
@@ -466,6 +474,48 @@ $ cd zen</pre>
                 <ol start="4">
                     <li>Access Zen in your browser at <code class="inline-code">http://localhost:8080</code></li>
                 </ol>
+            </section>
+
+            <section id="keyboard-shortcuts" class="content-section">
+                <h1>Keyboard Shortcuts</h1>
+                
+                <p>
+                    Shortcuts use <code>Ctrl</code> on Windows/Linux and <code>Cmd</code> on macOS.
+                </p>
+
+                <h3 id="global-shortcuts">Global Shortcuts</h3>
+                <p>These shortcuts work from anywhere in the application:</p>
+                
+                <ul>
+                    <li><code>Ctrl/Cmd + N</code> - Create a new note</li>
+                    <li><code>Ctrl/Cmd + K</code> - Open search</li>
+                    <li><code>Escape</code> - Close modals and dialogs</li>
+                </ul>
+
+                <h3 id="editor-shortcuts">Editor Shortcuts</h3>
+                <p>These shortcuts work when editing notes:</p>
+                
+                <ul>
+                    <li><code>Ctrl/Cmd + Enter</code> - Save note (or start editing when viewing)</li>
+                    <li><code>Ctrl/Cmd + B</code> - Bold selected text</li>
+                    <li><code>Ctrl/Cmd + Shift + H</code> - Highlight selected text</li>
+                    <li><code>Tab</code> - Insert indentation (2 spaces)</li>
+                    <li><code>Escape</code> - Close floating editor</li>
+                </ul>
+
+                <h3 id="navigation-shortcuts">Navigation Shortcuts</h3>
+                <p>These shortcuts help you navigate through search results and suggestions:</p>
+                
+                <ul>
+                    <li><code>Arrow Up/Down</code> - Navigate through search results</li>
+                    <li><code>Enter</code> - Select highlighted search result or tag suggestion</li>
+                    <li><code>Escape</code> - Close search or tag suggestions</li>
+                    <li><code>Backspace</code> - Close tag suggestions when input is empty</li>
+                </ul>
+
+                <div class="callout">
+                    <p><strong>Tip:</strong> Most shortcuts work contextually - they only activate when you're in the relevant part of the interface (like the editor or search).</p>
+                </div>
             </section>
         </main>
     </div>
