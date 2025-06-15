@@ -1,3 +1,8 @@
+# fly.toml app configuration file generated for zendemo on 2025-06-15T22:37:45+08:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
 app = 'zendemo'
 primary_region = 'sin'
 
@@ -7,17 +12,13 @@ primary_region = 'sin'
   PORT = '8080'
 
 [[mounts]]
-  source = 'app_data'
+  source = 'data'
   destination = '/data'
-
-[[mounts]]
-  source = 'app_images'
-  destination = '/images'
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = false
+  auto_stop_machines = 'off'
   auto_start_machines = false
   min_machines_running = 1
   processes = ['app']

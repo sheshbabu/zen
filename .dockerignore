@@ -1,0 +1,9 @@
+# flyctl launch added from .gitignore
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/*.bak
+tmp
+images
+assets/bundle.js
+fly.toml
