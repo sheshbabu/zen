@@ -119,6 +119,39 @@ export default function ImageGallery({ images }) {
     }
   }
 
+  function handleKeyDown(e) {
+    if (!selectedImage) {
+      return;
+    }
+
+    const currentIndex = imageDetails.findIndex(img => img.filename === selectedImage.filename);
+    
+    switch (e.key) {
+      case 'Escape':
+        setSelectedImage(null);
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        if (currentIndex > 0) {
+          setSelectedImage(imageDetails[currentIndex - 1]);
+        }
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        if (currentIndex < imageDetails.length - 1) {
+          setSelectedImage(imageDetails[currentIndex + 1]);
+        }
+        break;
+    }
+  }
+
+  useEffect(() => {
+    if (selectedImage) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [selectedImage, imageDetails]);
+
   const items = imageDetails.map((image, index) => {
     return (
       <img 
