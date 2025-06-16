@@ -137,7 +137,11 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }
 
   function handleEditCancelClick() {
-    setIsEditable(false);
+    if (isNewNote) {
+      navigateTo("/", true);
+    } else {
+      setIsEditable(false);
+    }
   }
 
   // https://blixtdev.com/how-to-use-contenteditable-with-react/
