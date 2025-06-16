@@ -1,4 +1,4 @@
-import { h, useEffect, useRef, useState, useCallback } from "../../assets/preact.esm.js";
+import { h, useEffect, useRef, useState, useCallback, Fragment } from "../../assets/preact.esm.js";
 
 const MIN_COLUMN_WIDTH = 300;
 const GUTTER_WIDTH = 20;
@@ -6,6 +6,7 @@ const GUTTER_HEIGHT = 20;
 
 export default function ImageGallery({ images }) {
   const [imageDetails, setImageDetails] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const containerRef = useRef(null);
 
@@ -108,15 +109,51 @@ export default function ImageGallery({ images }) {
     return heights.indexOf(minHeight);
   }
 
+  function handleImageClick(image) {
+    setSelectedImage(image);
+  }
+
+  function handleBackdropClick(e) {
+    if (e.target.classList.contains("modal-backdrop-container")) {
+      setSelectedImage(null);
+    }
+  }
+
   const items = imageDetails.map((image, index) => {
     return (
-      <img key={image.filename} src={image.url} loading="lazy" className="image-gallery-item" onLoad={e => e.target.classList.add('loaded')} />
+      <img 
+        key={image.filename} 
+        src={image.url} 
+        loading="lazy" 
+        className="image-gallery-item" 
+        onLoad={e => e.target.classList.add('loaded')}
+        onClick={() => handleImageClick(image)}
+      />
     );
   });
 
   return (
-    <div ref={containerRef} className="image-gallery">
-      {items}
+    <>
+      <div ref={containerRef} className="image-gallery">
+        {items}
+      </div>
+      <Lightbox selectedImage={selectedImage} onBackdropClick={handleBackdropClick} />
+    </>
+  );
+}
+
+function Lightbox({ selectedImage, onBackdropClick }) {
+  if (!selectedImage) {
+    return null;
+  }
+
+  return (
+    <div className="modal-backdrop-container is-centered" onClick={onBackdropClick}>
+      <div className="modal-content-container lightbox">
+        <div className="lightbox-image-container">
+          <img src={selectedImage.url} alt="" className="lightbox-image" />
+        </div>
+      </div>
     </div>
   );
 }
