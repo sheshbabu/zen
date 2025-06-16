@@ -5,6 +5,7 @@ import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
 import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
+import { showToast } from '../../commons/components/Toast.jsx';
 
 export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange }) {
   if (!isNewNote && selectedNote === null) {
@@ -244,6 +245,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   function handleArchiveClick() {
     ApiClient.archiveNote(selectedNote.noteId)
       .then(() => {
+        showToast("Note archived.");
         onChange();
       });
   }
@@ -251,6 +253,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   function handleUnarchiveClick() {
     ApiClient.unarchiveNote(selectedNote.noteId)
       .then(() => {
+        showToast("Note unarchived.");
         onChange();
       });
   }
