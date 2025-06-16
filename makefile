@@ -8,3 +8,6 @@ dev:
 
 watch:
 	DEV_MODE=true air --build.cmd 'go build --tags "fts5" -o ./tmp/main .' & esbuild index.js --bundle --outfile=assets/bundle.js --loader:.js=jsx --jsx-factory=h --jsx-fragment=Fragment --watch
+
+deploy:
+	fly deploy
