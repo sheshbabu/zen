@@ -5,6 +5,7 @@ import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
 import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
+import { showToast } from '../../commons/components/Toast.jsx';
 
 export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange }) {
   if (!isNewNote && selectedNote === null) {
@@ -21,6 +22,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
 
   const titleRef = useRef(null);
   const textareaRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   let contentArea = null;
 
@@ -136,7 +138,11 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }
 
   function handleEditCancelClick() {
-    setIsEditable(false);
+    if (isNewNote) {
+      navigateTo("/", true);
+    } else {
+      setIsEditable(false);
+    }
   }
 
   // https://blixtdev.com/how-to-use-contenteditable-with-react/
@@ -186,6 +192,22 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     setIsDraggingOver(false);
 
     const files = e.dataTransfer.files;
+    processImageFiles(files);
+  }
+
+  function handleDropzoneClick() {
+    fileInputRef.current?.click();
+  }
+
+  function handleFileInputChange(e) {
+    const files = e.target.files;
+    if (files) {
+      processImageFiles(files);
+      e.target.value = '';
+    }
+  }
+
+  function processImageFiles(files) {
     for (let file of files) {
       if (file.type.startsWith('image/')) {
         setAttachments((prevAttachments) => [...prevAttachments, file]);
@@ -223,6 +245,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   function handleArchiveClick() {
     ApiClient.archiveNote(selectedNote.noteId)
       .then(() => {
+        showToast("Note archived.");
         onChange();
       });
   }
@@ -230,6 +253,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   function handleUnarchiveClick() {
     ApiClient.unarchiveNote(selectedNote.noteId)
       .then(() => {
+        showToast("Note unarchived.");
         onChange();
       });
   }
@@ -356,8 +380,9 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         <div className="notes-editor-title" contentEditable={isEditable} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
       </div>
       <NotesEditorTags tags={tags} isEditable={isEditable} canCreateTag onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
-      <div className={`notes-editor-image-dropzone ${isDraggingOver ? "dragover" : ""}`} onDrop={handleImageDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}>
-        Drag and drop images here...
+      <div className={`notes-editor-image-dropzone ${isDraggingOver ? "dragover" : ""}`} onDrop={handleImageDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onClick={handleDropzoneClick}>
+        Click to upload or drag and drop images
+        <input type="file" accept="image/*" multiple ref={fileInputRef} onChange={handleFileInputChange} style={{ display: "none" }} />
       </div>
       <div className="notes-editor-image-attachment-preview">{imagePreviewItems}</div>
       <div className="notes-editor-content">

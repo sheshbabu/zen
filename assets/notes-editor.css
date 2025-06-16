@@ -12,6 +12,14 @@
             font-weight: 500;
             color: var(--neutral-400);
             font-size: 14px;
+            cursor: pointer;
+            transition-property: background-color, border-color;
+            transition-duration: 500ms;
+
+            &:hover {
+                background-color: var(--neutral-50);
+                border-color: var(--neutral-400);
+            }
 
             &.dragover {
                 background-color: var(--neutral-50);
@@ -22,10 +30,11 @@
             display: flex;
             overflow-x: auto;
             img {
-                max-height: 400px;
+                max-height: 200px;
                 box-shadow: var(--shadow-2);
-                padding: 8px;
-                margin: 16px 0;
+                box-sizing: border-box;
+                object-fit: cover;
+                margin: 16px 16px 16px 0;
                 border-radius: 4px;
             }
 

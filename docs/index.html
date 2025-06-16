@@ -232,7 +232,6 @@
         }
         
         .screenshot {
-            max-width: 900px;
             margin: 0 auto;
             border-radius: 8px;
             box-shadow: var(--shadow-4);
@@ -328,7 +327,7 @@
                 Zen
             </a>
             <div class="nav-links">
-                <a href="#demo" class="nav-link">Demo</a>
+                <a href="https://zendemo.fly.dev" class="nav-link">Demo</a>
                 <a href="/zen/documentation" class="nav-link">Documentation</a>
                 <a href="https://github.com/sheshbabu/zen" class="nav-link">GitHub</a>
             </div>
@@ -344,7 +343,7 @@
                 </p>
                 
                 <div class="hero-buttons">
-                    <a href="#demo" class="button primary">Try Demo</a>
+                    <a href="https://zendemo.fly.dev" class="button primary">Try Demo</a>
                     <a href="/zen/documentation" class="button secondary">Documentation</a>
                 </div>
                 
@@ -384,11 +383,39 @@
                             Everything you need to structure your thoughts: tables, code blocks, task lists, highlights, and more, all with standard Markdown.
                         </p>
                     </div>
-                    
+
+                    <div class="feature-card">
+                        <h3 class="feature-title">Instant Search</h3>
+                        <p class="feature-description">
+                            Full-text search across titles and content with BM25 ranking. Find what you need instantly as you type, including archived and deleted notes.
+                        </p>
+                    </div>
+
                     <div class="feature-card">
                         <h3 class="feature-title">Thoughtful by Design</h3>
                         <p class="feature-description">
                             The interface disappears so your thinking can surface. A minimal palette and essential features keep you focused on your ideas.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3 class="feature-title">Smart Organization</h3>
+                        <p class="feature-description">
+                            Archive notes for later, soft delete with restore capability. Automatic cleanup keeps your workspace tidy without losing important content.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3 class="feature-title">Keyboard Shortcuts</h3>
+                        <p class="feature-description">
+                            Essential keyboard shortcuts for creating notes, searching, text formatting, and navigation throughout the interface.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3 class="feature-title">Mobile-Friendly</h3>
+                        <p class="feature-description">
+                            Responsive design that works well on mobile devices. Can be installed as a web app for quick access from your home screen.
                         </p>
                     </div>
 
@@ -399,10 +426,58 @@
                         </p>
                     </div>
 
+                    <div class="feature-card">
+                        <h3 class="feature-title">Multiple Views</h3>
+                        <p class="feature-description">
+                            Switch between list, card, and gallery layouts. Each view optimized for different types of content and workflows.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3 class="feature-title">Image Support</h3>
+                        <p class="feature-description">
+                            Drag and drop images directly into notes or paste from clipboard. Gallery view organizes visual content with automatic image management.
+                        </p>
+                    </div>
+
                 </div>
             </div>
         </section>
     </main>
+
+    <!-- mouji snippet -->
+    <script>
+        (function() {
+            var COLLECT_URL = "https://mouji.fly.dev/collect";
+            var PROJECT_ID = "4b8f80d61e65f0c6c954826d89646e4a";
+            var GLOBAL_VAR_NAME = "__mouji__";
+
+            window[GLOBAL_VAR_NAME] = {};
+
+            window[GLOBAL_VAR_NAME].sendPageView = function() {
+                var path = location.pathname;
+                var title = document.title;
+                var referrer = document.referrer;
+
+                var url =
+                    COLLECT_URL +
+                    "?project_id=" +
+                    PROJECT_ID +
+                    "&title=" +
+                    encodeURIComponent(title) +
+                    "&path=" +
+                    encodeURIComponent(path) +
+                    "&referrer=" +
+                    encodeURIComponent(referrer);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", url);
+                xhr.send();
+            };
+
+            window[GLOBAL_VAR_NAME].sendPageView();
+        })();
+    </script>
     
 </body>
 </html>
