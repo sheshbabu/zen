@@ -381,6 +381,12 @@
                             <li><a href="#image-gallery-shortcuts" class="sidebar-nav-item">Image Gallery</a></li>
                         </ul>
                     </li>
+                    <li>
+                        <a href="#backup" class="sidebar-nav-item">Backup</a>
+                        <ul class="sidebar-nav-sub">
+                            <li><a href="#backup-powershell" class="sidebar-nav-item">PowerShell</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </aside>
@@ -527,6 +533,61 @@ $ cd zen</pre>
                     <p><strong>Tip:</strong> Most shortcuts work contextually - they only activate when you're in the relevant part of the interface (like the editor or search).</p>
                 </div>
             </section>
+
+            <section id="backup" class="content-section">
+                <h1>Backup</h1>
+
+                <h3 id="backup-powershell">PowerShell</h3>
+
+                <p>
+                    To back up your notes, you can use the following PowerShell script. 
+                    This script creates a timestamped backup of your SQLite database and verifies its integrity.
+                </p>
+
+                <pre class="code-block">
+$sourceDbPath  = "C:\path\to\data\zen.db"
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$backupDbPath = "C:\path\to\backup\zen_backup_$timestamp.db"
+
+Write-Host "Backing up Zen..."
+
+sqlite3 $sourceDbPath ".backup '$backupDbPath'"
+
+Write-Host "`n--- Checking integrity of the backup database ---"
+$integrityResult = sqlite3 $backupDbPath "PRAGMA integrity_check;"
+$integrityResult = $integrityResult.Trim()
+
+if ($integrityResult -eq "ok") {
+    Write-Host "Backup successful and verified: $backupDbPath"
+    Write-Host "`n--- Checking for notes in the backup database ---"
+    $notesCheckOutput = sqlite3 $backupDbPath "SELECT COUNT(*) FROM notes;"
+    $notesCheckOutput = $notesCheckOutput.Trim()
+
+    if ($notesCheckOutput -match "^\d+$") {
+        $notesCount = [int]$notesCheckOutput
+        if ($notesCount -gt 0) {
+            Write-Host "Notes table found with $notesCount rows."
+        } else {
+            Write-Host "Notes table exists but is empty (0 rows)."
+        }
+    } elseif ($notesCheckOutput -like "Error: no such table:*") {
+        Write-Host "Notes table not found in the backup database."
+    } else {
+        Write-Host "Could not determine notes table status. SQLite output: '$notesCheckOutput'"
+    }
+
+} else {
+    Write-Host "Backup verification failed for: $backupDbPath"
+    Write-Host "Integrity check result: '$integrityResult'"
+}
+
+# Restart so the WAL file is created again
+Write-Host "`nRestarting Zen..."
+docker compose restart
+                </pre>
+            </section>
+
+
         </main>
     </div>
 
