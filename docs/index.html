@@ -9,11 +9,78 @@
     <meta name="description" content="A minimal, clean space for your thoughts. Store notes securely in Markdown format within a local SQLite database.">
     
     <style>
-        *, *::before, *::after {
+        /* https: //www.joshwcomeau.com/css/custom-css-reset/ */
+
+        /* 1. Use a more-intuitive box-sizing model */
+        *,
+        *::before,
+        *::after {
             box-sizing: border-box;
+        }
+
+        /* 2. Remove default margin */
+        * {
             margin: 0;
         }
-        
+
+        body {
+            /* 3. Add accessible line-height */
+            line-height: 1.5;
+            /* 4. Improve text rendering */
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 5. Improve media defaults */
+        img,
+        picture,
+        video,
+        canvas,
+        svg {
+            display: block;
+            max-width: 100%;
+        }
+
+        /* 6. Inherit fonts for form controls */
+        input,
+        button,
+        textarea,
+        select {
+            font: inherit;
+        }
+
+        /* 7. Avoid text overflows */
+        p,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            overflow-wrap: break-word;
+        }
+
+        /* 8. Improve line wrapping */
+        p {
+            text-wrap: pretty;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            text-wrap: balance;
+        }
+
+        /*
+        9. Create a root stacking context
+        */
+        #root,
+        #__next {
+            isolation: isolate;
+        }
+
         :root {
             /* https://tailwindcss.com/docs/colors */
             /* https://gist.github.com/guvener/d8952570d5a8be430580b93800519439 */
@@ -28,7 +95,7 @@
             --neutral-800: #262626;
             --neutral-900: #171717;
             --red-600: #DC2626;
-            --red-700: #B91C1C;
+            --red-700 : #B91C1C;
             --yellow-100: #FEF9C3;
 
             /* typography */
@@ -76,7 +143,7 @@
             --mobile-navbar-height: 60px;
             --safe-area-bottom: env(safe-area-inset-bottom, 0px);
         }
-        
+
         * {
             -webkit-font-smoothing: antialiased;
             text-rendering: optimizelegibility;
@@ -85,16 +152,12 @@
         html {
             /* 1rem */
             font-size: 16px;
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizelegibility;
         }
-        
+
         body {
             font: var(--p1);
             /* https://uxmovement.com/content/why-you-should-never-use-pure-black-for-text-or-backgrounds/ */
             color: #444;
-            line-height: 1.5;
-            background-color: #fff;
         }
         
         .container {
