@@ -181,15 +181,10 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font: var(--h4);
+            font: var(--p);
             font-weight: 600;
             color: var(--neutral-900);
             text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 24px;
-            height: 24px;
         }
         
         .nav-links {
@@ -361,6 +356,7 @@
                 }
 
                 font: var(--code);
+                line-height: 24px;
             }
 
             blockquote {
@@ -459,10 +455,7 @@
 <body>
     <header class="header">
         <nav class="nav container">
-            <a href="/zen" class="logo">
-                <img src="android-chrome-192x192.png" alt="Zen icon" class="logo-icon">
-                Zen
-            </a>
+            <a href="/zen" class="logo">Zen</a>
             <div class="nav-links">
                 <a href="https://zendemo.fly.dev" class="nav-link">Demo</a>
                 <a href="/documentation.html" class="nav-link active">Documentation</a>

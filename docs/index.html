@@ -184,15 +184,10 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font: var(--h4);
+            font: var(--p);
             font-weight: 600;
             color: var(--neutral-900);
             text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 24px;
-            height: 24px;
         }
         
         .nav-links {
@@ -278,7 +273,6 @@
         .button.primary {
             background-color: var(--neutral-900);
             color: white;
-            border-color: var(--neutral-900);
         }
 
         .button.primary:hover {
@@ -292,6 +286,10 @@
 
         .button.secondary:hover {
             background-color: var(--neutral-50);
+        }
+
+        svg {
+            margin-left: 6px;
         }
         
         .screenshot {
@@ -314,21 +312,19 @@
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: var(--spacing-lg);
-            margin-top: var(--spacing-lg);
+            gap: 32px;
+            margin-top: 32px;
         }
         
         .feature-card {
             background: white;
-            padding: var(--spacing-lg);
+            padding: 18px;
             border-radius: 8px;
             box-shadow: var(--shadow-3);
         }
         
         .feature-title {
-            font: var(--h4);
             color: var(--neutral-900);
-            margin-bottom: var(--spacing-md);
         }
         
         .feature-description {
@@ -366,6 +362,133 @@
             max-width: 800px;
             margin: 0 auto;
         }
+
+
+        strong {
+            font-weight: 600;
+        }
+
+        em {
+            font-style: italic;
+        }
+
+        h1 {
+            font: var(--h2);
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            font: var(--h3);
+        }
+
+        h3 {
+            font: var(--h5);
+        }
+
+        h4, h5, h6 {
+            font: var(--h6);
+        }
+
+        p,
+        blockquote,
+        ul,
+        li,
+        table {
+            font: var(--p1);
+            padding: 3px 0;
+        }
+
+        img {
+            width: auto;
+            max-width: 100%;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            padding: 3px 0;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        code {
+            font: var(--code);
+            background-color: var(--neutral-50);
+            border-radius: 4px;
+            padding: 4px 8px;
+        }
+
+        pre {
+            margin: 4px 0;
+            padding: 12px;
+            background-color: var(--neutral-50);
+            border-radius: 4px;
+            overflow: scroll;
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            font: var(--code);
+            line-height: 24px;
+        }
+
+        blockquote {
+            border-left: 3px solid var(--neutral-700);
+            padding-left: 10px;
+            margin: 10px 4px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul > li > ul {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        li > ul > li {
+            padding-bottom: 0;
+        }
+
+        ul.contains-task-list {
+            padding-left: 0;
+        }
+
+        li.task-list-item {
+            list-style-type: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+        }
+
+        table, th, td {
+            border: 1px solid var(--neutral-200);
+            padding: 5px 15px;
+            width: max-content;
+        }
+
+        th {
+            text-align: left;
+        }
+
+        hr {
+            margin-top: 24px;
+            margin-bottom: 24px;
+            border: 1px solid var(--neutral-100);
+        }
+
+        s {
+            color: var(--neutral-400);
+        }
+
+        mark {
+            background: var(--yellow-100);
+            border-radius: 4px;
+            padding: 2px;
+        }
         
         @media (max-width: 768px) {
             .nav-links {
@@ -385,10 +508,7 @@
 <body>
     <header class="header">
         <nav class="nav container">
-            <a href="/zen" class="logo">
-                <img src="android-chrome-192x192.png" alt="Zen icon" class="logo-icon">
-                Zen
-            </a>
+            <a href="/zen" class="logo">Zen</a>
             <div class="nav-links">
                 <a href="https://zendemo.fly.dev" class="nav-link">Demo</a>
                 <a href="/zen/documentation" class="nav-link">Documentation</a>
@@ -406,7 +526,9 @@
                 </p>
                 
                 <div class="hero-buttons">
-                    <a href="https://zendemo.fly.dev" class="button primary">Try Demo</a>
+                    <a href="https://zendemo.fly.dev" class="button primary">Try Demo
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-icon lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </a>
                     <a href="/zen/documentation" class="button secondary">Documentation</a>
                 </div>
                 
