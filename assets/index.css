@@ -6,7 +6,7 @@
  * "Responsive And Fluid Typography With vh And vw Units" https://www.smashingmagazine.com/2016/05/fluid-typography/
  */
 
-:root {
+ :root {
     /* https://tailwindcss.com/docs/colors */
     /* https://gist.github.com/guvener/d8952570d5a8be430580b93800519439 */
     --neutral-50: #FAFAFA;
@@ -67,6 +67,46 @@
     /* globals */
     --mobile-navbar-height: 60px;
     --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+
+    /* text colors */
+    --text-primary: var(--neutral-700);
+    --text-secondary: var(--neutral-400);
+    --bg-primary: #FFF;
+    --bg-secondary: var(--neutral-50);
+    --bg-tertiary: var(--neutral-100);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --neutral-50: #171717;
+        --neutral-100: #262626;
+        --neutral-200: #404040;
+        --neutral-300: #525252;
+        --neutral-400: #737373;
+        --neutral-500: #A3A3A3;
+        --neutral-600: #D4D4D4;
+        --neutral-700: #E5E5E5;
+        --neutral-800: #F5F5F5;
+        --neutral-900: #FAFAFA;
+        --red-600: #991B1B;
+        --red-700: #B91C1C;
+        --yellow-100: #A16207;
+
+        /* elevation - darker shadows for dark mode */
+        --shadow-1: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.3) 0px 1px 3px 0px;
+        --shadow-2: rgba(0, 0, 0, 0.3) 0px 1px 3px 0px, rgba(0, 0, 0, 0.3) 0px 1px 3px 0px;
+        --shadow-3: rgba(0, 0, 0, 0.3) 0px 4px 6px -1px, rgba(0, 0, 0, 0.2) 0px 2px 4px -1px;
+        --shadow-4: rgba(0, 0, 0, 0.3) 0px 10px 15px -3px, rgba(0, 0, 0, 0.2) 0px 4px 6px -2px;
+        --shadow-5: rgba(0, 0, 0, 0.5) 0px 25px 50px -12px;
+        --shadow-6: rgba(0, 0, 0, 0.3) 0px -10px 15px -3px;
+
+        /* text and background colors for dark mode */
+        --text-primary: var(--neutral-700);
+        --text-secondary: var(--neutral-400);
+        --bg-primary: #121212;
+        --bg-secondary: var(--neutral-50);
+        --bg-tertiary: var(--neutral-100);
+    }
 }
 
 * {
@@ -92,7 +132,8 @@ body {
     display: flex;
     font: var(--p1);
     /* https://uxmovement.com/content/why-you-should-never-use-pure-black-for-text-or-backgrounds/ */
-    color: #444;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
     /* for floating editor */
     position: relative;
     height: 100%;
@@ -162,7 +203,7 @@ svg.lucide {
 .sidebar-container {
     min-width: 220px;
     padding: 14px 0;
-    background-color: var(--neutral-50);
+    background-color: var(--bg-secondary);
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -297,7 +338,7 @@ svg.lucide {
         justify-content: space-around;
         padding: 8px;
         height: var(--mobile-navbar-height);
-        background-color: #fff;
+        background-color: var(--bg-primary);
         box-shadow: var(--shadow-6);
 
         .mobile-navbar-button {
@@ -365,7 +406,7 @@ svg.lucide {
 
     &.grid {
         width: 100%;
-        background-color: var(--neutral-50);
+        background-color: var(--bg-secondary);
     }
 
     .notes-list-title {
@@ -385,7 +426,7 @@ svg.lucide {
 
         &:hover,
         &.is-active {
-            background-color: var(--neutral-50);
+            background-color: var(--bg-secondary);
         }
 
         .notes-list-item-title {
@@ -450,7 +491,7 @@ svg.lucide {
             border-radius: 8px;
             padding: 20px;
             border: 1px solid var(--neutral-100);
-            background-color: #fff;
+            background-color: var(--bg-primary);
             display: block;
             text-decoration: none;
             color: inherit;
@@ -475,7 +516,7 @@ svg.lucide {
                 left: 0;
                 width: 100%;
                 height: 300px;
-                background: linear-gradient(180deg, transparent 50%, #fff 100%);
+                background: linear-gradient(180deg, transparent 50%, var(--bg-primary) 100%);
             }
 
             .notes-grid-item-tags {
@@ -484,7 +525,7 @@ svg.lucide {
                 left: 0;
                 right: 0;
                 padding: 20px;
-                background: linear-gradient(180deg, transparent 0%, #fff 20%);
+                background: linear-gradient(180deg, transparent 0%, var(--bg-primary) 20%);
             }
 
             &.is-draggable {
@@ -581,7 +622,7 @@ svg.lucide {
 
     &.is-floating {
         position: absolute;
-        background-color: #fff;
+        background-color: var(--bg-primary);
         top: 10px;
         right: 10px;
         bottom: 10px;
@@ -606,7 +647,7 @@ svg.lucide {
         position: sticky;
         width: 100%;
         top: 0;
-        background: #fff;
+        background: var(--bg-primary);
         z-index: 1;
 
         svg.lucide {
@@ -656,7 +697,7 @@ svg.lucide {
     transition-duration: 500ms;
     text-decoration: none;
     box-shadow: var(--shadow-1);
-    background-color: #fff;
+    background-color: var(--bg-primary);
 
     &:hover {
         background-color: var(--neutral-100);
@@ -686,14 +727,14 @@ svg.lucide {
 
     &.primary {
         background-color: var(--neutral-900);
-        color: white;
+        color: var(--neutral-50);
 
         svg.lucide {
             line,
             circle,
             rect,
             path {
-                stroke: #fff;
+                stroke: var(--neutral-50);
             }
         }
 
@@ -705,7 +746,7 @@ svg.lucide {
                 circle,
                 rect,
                 path {
-                    stroke: #fff;
+                    stroke: var(--neutral-50);
                 }
             }
         }
@@ -713,7 +754,7 @@ svg.lucide {
 
     &.danger {
         background-color: var(--red-600);
-        color: white;
+        color: var(--neutral-50);
 
         &:hover {
             background-color: var(--red-700);
@@ -723,6 +764,14 @@ svg.lucide {
     a {
         height: 34px;
         line-height: 1;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .button {
+        &.danger {
+            color: var(--text-primary);
+        }
     }
 }
 
@@ -761,7 +810,7 @@ svg.lucide {
         min-width: 100%;
         box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
         display: none;
-        background-color: white;
+        background-color: var(--bg-primary);
         z-index: 1;
         /* 5.5 items * 36px of option height */
         max-height: 198px;
@@ -785,7 +834,7 @@ svg.lucide {
         border-bottom: none;
         white-space: nowrap;
         overflow: hidden;
-        background: white;
+        background: var(--bg-primary);
         font-weight: 500;
         font-size: 14px;
         cursor: pointer;
@@ -794,7 +843,7 @@ svg.lucide {
 
         &:hover,
         &.is-selected {
-            background-color: var(--neutral-50);
+            background-color: var(--bg-secondary);
 
             svg.lucide {
                 display: block;
@@ -888,6 +937,8 @@ svg.lucide {
         height: 44px;
         border-radius: 4px;
         border: 1px solid var(--neutral-200);
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
         padding: 8px;
         margin-top: var(--spacing-xs);
         min-width: 320px;
@@ -947,7 +998,7 @@ svg.lucide {
 }
 
 .modal-content-container {
-    background-color: #fff;
+    background-color: var(--bg-primary);
     border: 1px solid var(--neutral-100);
     border-radius: 4px;
     box-shadow: var(--shadow-5);
@@ -1052,6 +1103,8 @@ svg.lucide {
             width: 100%;
             height: 40px;
             padding-left: 10px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
         }
     }
 
