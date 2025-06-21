@@ -224,9 +224,10 @@
         }
         
         .hero-title {
-            font: var(--h1);
             color: var(--neutral-900);
-            margin-bottom: var(--spacing-md);
+            margin-bottom: 8px;
+            font-size: 56px;
+            font-weight: 400;
         }
         
         .hero-subtitle {
@@ -241,7 +242,7 @@
         
         .hero-description {
             font: var(--p1);
-            color: var(--neutral-700);
+            color: var(--neutral-500);
             max-width: 700px;
             margin: 0 auto var(--spacing-md);
         }
@@ -307,8 +308,10 @@
         
         .screenshot {
             margin: 0 auto;
+            border: 1px solid var(--neutral-200);
+            outline: 5px solid var(--neutral-100);
             border-radius: 8px;
-            box-shadow: var(--shadow-4);
+            box-shadow: var(--shadow-5);
             overflow: hidden;
             opacity: 0;
             transform: translateY(30px);
@@ -356,23 +359,7 @@
         }
         
         .feature-description {
-            color: var(--neutral-700);
-        }
-        
-        .feature-list {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .feature-list li {
-            padding: 4px 0;
-            color: var(--neutral-700);
-        }
-        
-        .feature-list li:before {
-            content: "•";
             color: var(--neutral-500);
-            margin-right: 8px;
         }
         
         .focus-section {
@@ -390,7 +377,6 @@
             max-width: 800px;
             margin: 0 auto;
         }
-
 
         strong {
             font-weight: 600;
@@ -524,7 +510,7 @@
             }
             
             .hero-title {
-                font-size: 1.8rem;
+                font-size: 40px;
             }
             
             .features-grid {
@@ -548,16 +534,15 @@
     <main>
         <section class="hero section">
             <div class="container">
-                <h1 class="hero-title">Your Calm, Enduring Home for Thoughts.</h1>
+                <h1 class="hero-title">Write it Down. Own it Forever.</h1>
                 <p class="hero-description">
-                    Zen gives you a clean, quiet space to think. Your notes live in standard Markdown within a local SQLite database. No vendor lock-in, no distractions.
+                    A clean, quiet space to think. Your notes live in standard Markdown within a local SQLite database. No vendor lock-in, no distractions.
                 </p>
                 
                 <div class="hero-buttons">
-                    <a href="https://zendemo.fly.dev" class="button primary">Try Demo
+                    <a href="https://zendemo.fly.dev" class="button primary" target="_blank">Try Demo
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-icon lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                     </a>
-                    <a href="/zen/documentation" class="button secondary">Documentation</a>
                 </div>
                 
                 <div class="screenshot">
@@ -595,7 +580,7 @@
                             Focus Areas
                         </h3>
                         <p class="feature-description">
-                            Organize with flexible tags, not rigid folders. Create custom views that adapt with your priorities.
+                            Organize with flexible tags, not rigid folders. Create custom views called "Focus Modes" that adapt with your priorities.
                         </p>
                     </div>
 
@@ -655,7 +640,7 @@
                             Mobile-Friendly
                         </h3>
                         <p class="feature-description">
-                            Responsive design that works well on mobile devices. Can be installed as a web app for quick access from your home screen.
+                            Responsive design that works well on mobile devices. Can be installed as a PWA for quick access from your home screen.
                         </p>
                     </div>
 
@@ -675,7 +660,7 @@
                             Multiple Views
                         </h3>
                         <p class="feature-description">
-                            Switch between list, card, and gallery layouts. Each view optimized for different types of content and workflows.
+                            Switch between list, card, and gallery layouts. Each view optimized for different types of content.
                         </p>
                     </div>
 
