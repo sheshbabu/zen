@@ -1,4 +1,4 @@
-import { h, useEffect, useRef, useState, useCallback, Fragment } from "../../assets/preact.esm.js";
+import { h, render, useEffect, useRef, useState, useCallback, Fragment } from "../../assets/preact.esm.js";
 
 const MIN_COLUMN_WIDTH = 300;
 const GUTTER_WIDTH = 20;
@@ -6,7 +6,6 @@ const GUTTER_HEIGHT = 20;
 
 export default function ImageGallery({ images }) {
   const [imageDetails, setImageDetails] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(null);
 
   const containerRef = useRef(null);
 
@@ -109,14 +108,15 @@ export default function ImageGallery({ images }) {
     return heights.indexOf(minHeight);
   }
 
-  function handleImageClick(image) {
-    setSelectedImage(image);
+  function handleImageClick(selectedImage) {
+    render(
+      <Lightbox selectedImage={selectedImage} imageDetails={imageDetails} onClose={closeLightbox} />,
+      document.querySelector('.modal-root')
+    );
   }
 
-  function handleBackdropClick(e) {
-    if (e.target.classList.contains("modal-backdrop-container")) {
-      setSelectedImage(null);
-    }
+  function closeLightbox() {
+    render(null, document.querySelector('.modal-root'));
   }
 
   const items = imageDetails.map((image, index) => {
@@ -133,25 +133,57 @@ export default function ImageGallery({ images }) {
   });
 
   return (
-    <>
-      <div ref={containerRef} className="image-gallery">
-        {items}
-      </div>
-      <Lightbox selectedImage={selectedImage} onBackdropClick={handleBackdropClick} />
-    </>
+    <div ref={containerRef} className="image-gallery">
+      {items}
+    </div>
   );
 }
 
-function Lightbox({ selectedImage, onBackdropClick }) {
-  if (!selectedImage) {
+function Lightbox({ selectedImage, imageDetails, onClose }) {
+  const [currentImage, setCurrentImage] = useState(selectedImage);
+
+  if (!currentImage) {
     return null;
   }
 
+  useEffect(() => {
+    function handleKeyDown(e) {
+      const currentIndex = imageDetails.findIndex(img => img.filename === currentImage.filename);
+      
+      switch (e.key) {
+        case 'Escape':
+          onClose();
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          if (currentIndex > 0) {
+            setCurrentImage(imageDetails[currentIndex - 1]);
+          }
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          if (currentIndex < imageDetails.length - 1) {
+            setCurrentImage(imageDetails[currentIndex + 1]);
+          }
+          break;
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [currentImage, imageDetails, onClose]);
+
+  function handleBackdropClick(e) {
+    if (e.target.classList.contains("modal-backdrop-container")) {
+      onClose();
+    }
+  }
+
   return (
-    <div className="modal-backdrop-container is-centered" onClick={onBackdropClick}>
+    <div className="modal-backdrop-container is-centered" onClick={handleBackdropClick}>
       <div className="modal-content-container lightbox">
         <div className="lightbox-image-container">
-          <img src={selectedImage.url} alt="" className="lightbox-image" />
+          <img src={currentImage.url} alt="" className="lightbox-image" />
         </div>
       </div>
     </div>

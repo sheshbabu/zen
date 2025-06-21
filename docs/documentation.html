@@ -5,13 +5,80 @@
     <meta name="viewport" content="initial-scale=1, viewport-fit=cover, width=device-width, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
     <link rel="icon" type="image/png" sizes="32x32" href="/zen/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/zen/favicon-16x16.png">
-    <title>Zen - Docs</title>
+    <title>Zen Documentation</title>
     <meta name="description" content="A minimal, clean space for your thoughts. Store notes securely in Markdown format within a local SQLite database.">
     
     <style>
-         *, *::before, *::after {
+        /* https: //www.joshwcomeau.com/css/custom-css-reset/ */
+
+        /* 1. Use a more-intuitive box-sizing model */
+        *,
+        *::before,
+        *::after {
             box-sizing: border-box;
+        }
+
+        /* 2. Remove default margin */
+        * {
             margin: 0;
+        }
+
+        body {
+            /* 3. Add accessible line-height */
+            line-height: 1.5;
+            /* 4. Improve text rendering */
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 5. Improve media defaults */
+        img,
+        picture,
+        video,
+        canvas,
+        svg {
+            display: block;
+            max-width: 100%;
+        }
+
+        /* 6. Inherit fonts for form controls */
+        input,
+        button,
+        textarea,
+        select {
+            font: inherit;
+        }
+
+        /* 7. Avoid text overflows */
+        p,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            overflow-wrap: break-word;
+        }
+
+        /* 8. Improve line wrapping */
+        p {
+            text-wrap: pretty;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            text-wrap: balance;
+        }
+
+        /*
+        9. Create a root stacking context
+        */
+        #root,
+        #__next {
+            isolation: isolate;
         }
         
         :root {
@@ -28,7 +95,7 @@
             --neutral-800: #262626;
             --neutral-900: #171717;
             --red-600: #DC2626;
-            --red-700: #B91C1C;
+            --red-700 : #B91C1C;
             --yellow-100: #FEF9C3;
 
             /* typography */
@@ -75,9 +142,8 @@
             /* globals */
             --mobile-navbar-height: 60px;
             --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-            --sidebar-width: 240px;
         }
-        
+
         * {
             -webkit-font-smoothing: antialiased;
             text-rendering: optimizelegibility;
@@ -86,17 +152,12 @@
         html {
             /* 1rem */
             font-size: 16px;
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizelegibility;
-            scroll-behavior: smooth;
         }
-        
+
         body {
             font: var(--p1);
             /* https://uxmovement.com/content/why-you-should-never-use-pure-black-for-text-or-backgrounds/ */
             color: #444;
-            line-height: 1.5;
-            background-color: #fff;
         }
         
         .container {
@@ -120,15 +181,10 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font: var(--h4);
+            font: var(--p);
             font-weight: 600;
             color: var(--neutral-900);
             text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 24px;
-            height: 24px;
         }
         
         .nav-links {
@@ -181,7 +237,7 @@
         }
         
         .sidebar-nav > li {
-            margin-bottom: var(--spacing-xs);
+            margin-bottom: 8px;
         }
         
         .sidebar-nav-item {
@@ -200,19 +256,13 @@
             color: var(--neutral-900);
         }
         
-        .sidebar-nav-item.active {
-            color: var(--neutral-900);
-            font-weight: 500;
-        }
-        
         .sidebar-nav-sub {
             list-style: none;
             padding: 0;
-            margin: var(--spacing-xs) 0 0 var(--spacing-md);
+            margin: 0 16px;
         }
         
         .sidebar-nav-sub .sidebar-nav-item {
-            font-size: 0.8rem;
             color: var(--neutral-500);
         }
         
@@ -226,93 +276,149 @@
         
         .content {
             flex: 1;
-            padding: var(--spacing-lg);
+            padding: 0 40px;
             max-width: calc(100% - var(--sidebar-width));
         }
         
-        .content-section {
+        section {
             margin-bottom: var(--spacing-lg);
         }
-        
-        .content h1 {
-            font: var(--h2);
-            color: var(--neutral-900);
-            margin-bottom: var(--spacing-md);
-        }
-        
-        .content h2 {
-            font: var(--h3);
-            color: var(--neutral-900);
-            margin-bottom: var(--spacing-md);
-            margin-top: var(--spacing-lg);
-        }
-        
-        .content h3 {
-            font: var(--h5);
-            color: var(--neutral-900);
-            margin-bottom: var(--spacing-sm);
-            margin-top: var(--spacing-md);
+
+        .content {
+            
+            strong {
+                font-weight: 600;
+            }
+
+            em {
+                font-style: italic;
+            }
+
+            h1 {
+                font: var(--h2);
+                margin-bottom: 24px;
+            }
+
+            h2 {
+                font: var(--h3);
+            }
+
+            h3 {
+                font: var(--h5);
+            }
+
+            h4, h5, h6 {
+                font: var(--h6);
+            }
+
+            p,
+            blockquote,
+            ul,
+            li,
+            table {
+                font: var(--p1);
+                padding: 3px 0;
+            }
+
+            a {
+                color: var(--neutral-500);
+                text-decoration: none;
+                border-bottom: 1px dashed var(--neutral-500);
+            }
+
+            img {
+                width: auto;
+                max-width: 100%;
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                padding: 3px 0;
+                margin-top: 24px;
+                margin-bottom: 4px;
+                font-weight: 600;
+            }
+
+            code {
+                font: var(--code);
+                background-color: var(--neutral-50);
+                border-radius: 4px;
+                padding: 4px 8px;
+            }
+
+            pre {
+                margin: 4px 0;
+                padding: 12px;
+                background-color: var(--neutral-50);
+                border-radius: 4px;
+                overflow: scroll;
+                &::-webkit-scrollbar {
+                    display: none;
+                }
+
+                font: var(--code);
+                line-height: 24px;
+            }
+
+            blockquote {
+                border-left: 3px solid var(--neutral-700);
+                padding-left: 10px;
+                margin: 10px 4px;
+            }
+
+            ul {
+                padding-left: 20px;
+            }
+
+            ul > li > ul {
+                padding-top: 0;
+                padding-bottom: 0;
+            }
+
+            li > ul > li {
+                padding-bottom: 0;
+            }
+
+            ul.contains-task-list {
+                padding-left: 0;
+            }
+
+            li.task-list-item {
+                list-style-type: none;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 24px 0;
+            }
+
+            table, th, td {
+                border: 1px solid var(--neutral-200);
+                padding: 5px 15px;
+                width: max-content;
+            }
+
+            th {
+                text-align: left;
+            }
+
+            hr {
+                margin-top: 24px;
+                margin-bottom: 24px;
+                border: 1px solid var(--neutral-100);
+            }
+
+            s {
+                color: var(--neutral-400);
+            }
+
+            mark {
+                background: var(--yellow-100);
+                border-radius: 4px;
+                padding: 2px;
+            }
         }
 
-        .content code {
-            font: var(--code);
-            background-color: var(--neutral-50);
-            border-radius: 4px;
-            padding: 4px 8px;
-        }
-        
-        .content p {
-            margin-bottom: var(--spacing-md);
-            color: var(--neutral-700);
-        }
-        
-        .content ul, .content ol {
-            margin-bottom: var(--spacing-md);
-            padding-left: var(--spacing-md);
-        }
-        
-        .content li {
-            margin-bottom: var(--spacing-xs);
-            color: var(--neutral-700);
-        }
-
-        .content a {
-            color: var(--neutral-500);
-            text-decoration: none;
-            border-bottom: 1px dashed var(--neutral-500);
-        }
-        
-        .code-block {
-            background-color: var(--neutral-50);
-            color: var(--neutral-900);
-            padding: var(--spacing-md);
-            border-radius: 4px;
-            margin: var(--spacing-md) 0;
-            overflow-x: auto;
-            font: var(--code);
-            border: 1px solid var(--neutral-200);
-        }
-        
-        .inline-code {
-            background-color: var(--neutral-100);
-            color: var(--neutral-800);
-            padding: 2px 6px;
-            border-radius: 3px;
-            font: var(--code);
-            border: 1px solid var(--neutral-200);
-        }
-        
-        .callout {
-            border-left: 3px solid var(--neutral-700);
-            padding-left: 10px;
-            margin: 10px 4px;
-        }
-        
-        .callout p {
-            margin-bottom: 0;
-            color: var(--neutral-700);
-        }
-        
         @media (max-width: 1024px) {
             .content-container {
                 flex-direction: column;
@@ -349,10 +455,7 @@
 <body>
     <header class="header">
         <nav class="nav container">
-            <a href="/zen" class="logo">
-                <img src="android-chrome-192x192.png" alt="Zen icon" class="logo-icon">
-                Zen
-            </a>
+            <a href="/zen" class="logo">Zen</a>
             <div class="nav-links">
                 <a href="https://zendemo.fly.dev" class="nav-link">Demo</a>
                 <a href="/documentation.html" class="nav-link active">Documentation</a>
@@ -378,6 +481,13 @@
                             <li><a href="#global-shortcuts" class="sidebar-nav-item">Global</a></li>
                             <li><a href="#editor-shortcuts" class="sidebar-nav-item">Editor</a></li>
                             <li><a href="#navigation-shortcuts" class="sidebar-nav-item">Navigation</a></li>
+                            <li><a href="#image-gallery-shortcuts" class="sidebar-nav-item">Image Gallery</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#backup" class="sidebar-nav-item">Backup</a>
+                        <ul class="sidebar-nav-sub">
+                            <li><a href="#backup-powershell" class="sidebar-nav-item">PowerShell</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -385,7 +495,7 @@
         </aside>
 
         <main class="content">
-            <section id="installation" class="content-section">
+            <section id="installation">
                 <h1>Installation</h1>
 
                 <h3 id="docker-compose">Docker Compose</h3>
@@ -394,23 +504,20 @@
                     minimal setup and handles all dependencies automatically.
                 </p>
 
-                <p><strong>Prerequisites:</strong></p>
+                <h4>Prerequisites:</h4>
                 <ul>
                     <li><code>Docker</code> and <code>Docker Compose</code> installed on your system</li>
                 </ul>
 
-                <p><strong>Installation steps:</strong></p>
+                <h4>Installation steps:</h4>
                 <ol>
                     <li>Create a new directory for your Zen installation:</li>
+                    <pre>$ mkdir zen && cd zen</pre>
                 </ol>
-
-                <div class="code-block">$ mkdir zen && cd zen</div>
 
                 <ol start="2">
-                    <li>Create a <code class="inline-code">docker-compose.yml</code> file:</li>
-                </ol>
-
-                <pre class="code-block">
+                    <li>Create a <code>docker-compose.yml</code> file:</li>
+<pre>
 services:
   zen:
     image: ghcr.io/sheshbabu/zen/zen:latest
@@ -421,21 +528,24 @@ services:
     volumes:
       - /path/to/data:/data
       - /path/to/images:/images
-    restart: 'unless-stopped'</pre>
+    restart: 'unless-stopped'
+</pre>
+                </ol>
+
+                
 
                 <ol start="3">
                     <li>Start the application:</li>
+                    <pre>docker-compose up -d</pre>
                 </ol>
-
-                <div class="code-block">docker-compose up -d</div>
 
                 <ol start="4">
-                    <li>Access Zen in your browser at <code class="inline-code">http://localhost:8080</code></li>
+                    <li>Access Zen in your browser at <code>http://localhost:8080</code></li>
                 </ol>
 
-                <div class="callout">
-                    <p><strong>Note:</strong> Your notes and images will be stored in the <code class="inline-code">./data</code> and <code class="inline-code">./images</code> directories respectively, ensuring your data persists between container restarts.</p>
-                </div>
+                <blockquote>
+                    <p><strong>Note:</strong> Your notes and images will be stored in the <code>./data</code> and <code>./images</code> directories respectively, ensuring your data persists between container restarts.</p>
+                </blockquote>
 
                 <h3 id="build-from-scratch">Build from Scratch</h3>
                 <p>
@@ -443,40 +553,37 @@ services:
                     you can build Zen from the source repository.
                 </p>
 
-                <p><strong>Prerequisites:</strong></p>
+                <h4>Prerequisites:</h4>
                 <ul>
                     <li>Go 1.23 or later</li>
                     <li>Git</li>
                     <li>esbuild</li>
                 </ul>
 
-                <p><strong>Build steps:</strong></p>
+                <h4>Build steps:</h4>
                 <ol>
                     <li>Clone the repository:</li>
-                </ol>
-
-                <pre class="code-block">
+<pre>
 $ git clone https://github.com/sheshbabu/zen.git
 $ cd zen</pre>
+                </ol>
 
                 <ol start="2">
                     <li>Build the application:</li>
+                    <pre>make build</pre>
                 </ol>
-
-                <div class="code-block">make build</div>
-
+                
                 <ol start="3">
                     <li>Run the application:</li>
+                    <pre>./zen</pre>
                 </ol>
 
-                <div class="code-block">./zen</div>
-
                 <ol start="4">
-                    <li>Access Zen in your browser at <code class="inline-code">http://localhost:8080</code></li>
+                    <li>Access Zen in your browser at <code>http://localhost:8080</code></li>
                 </ol>
             </section>
 
-            <section id="keyboard-shortcuts" class="content-section">
+            <section id="keyboard-shortcuts">
                 <h1>Keyboard Shortcuts</h1>
                 
                 <p>
@@ -513,10 +620,74 @@ $ cd zen</pre>
                     <li><code>Backspace</code> - Close tag suggestions when input is empty</li>
                 </ul>
 
-                <div class="callout">
-                    <p><strong>Tip:</strong> Most shortcuts work contextually - they only activate when you're in the relevant part of the interface (like the editor or search).</p>
-                </div>
+                <h3 id="image-gallery-shortcuts">Image Gallery Shortcuts</h3>
+                <p>These shortcuts work when viewing images in the lightbox:</p>
+                
+                <ul>
+                    <li><code>Escape</code> - Close the image lightbox</li>
+                    <li><code>Arrow Left</code> - Navigate to previous image</li>
+                    <li><code>Arrow Right</code> - Navigate to next image</li>
+                </ul>
+
+                <blockquote>
+                    <p><strong>Tip:</strong> Most shortcuts work contextually, they only activate when you're in the relevant part of the interface.</p>
+                </blockquote>
             </section>
+
+            <section id="backup">
+                <h1>Backup</h1>
+
+                <h3 id="backup-powershell">PowerShell</h3>
+
+                <p>
+                    To back up your notes, you can use the following PowerShell script. 
+                    This script creates a timestamped backup of your SQLite database and verifies its integrity.
+                </p>
+
+                <pre>
+$sourceDbPath  = "C:\path\to\data\zen.db"
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$backupDbPath = "C:\path\to\backup\zen_backup_$timestamp.db"
+
+Write-Host "Backing up Zen..."
+
+sqlite3 $sourceDbPath ".backup '$backupDbPath'"
+
+Write-Host "`n--- Checking integrity of the backup database ---"
+$integrityResult = sqlite3 $backupDbPath "PRAGMA integrity_check;"
+$integrityResult = $integrityResult.Trim()
+
+if ($integrityResult -eq "ok") {
+    Write-Host "Backup successful and verified: $backupDbPath"
+    Write-Host "`n--- Checking for notes in the backup database ---"
+    $notesCheckOutput = sqlite3 $backupDbPath "SELECT COUNT(*) FROM notes;"
+    $notesCheckOutput = $notesCheckOutput.Trim()
+
+    if ($notesCheckOutput -match "^\d+$") {
+        $notesCount = [int]$notesCheckOutput
+        if ($notesCount -gt 0) {
+            Write-Host "Notes table found with $notesCount rows."
+        } else {
+            Write-Host "Notes table exists but is empty (0 rows)."
+        }
+    } elseif ($notesCheckOutput -like "Error: no such table:*") {
+        Write-Host "Notes table not found in the backup database."
+    } else {
+        Write-Host "Could not determine notes table status. SQLite output: '$notesCheckOutput'"
+    }
+
+} else {
+    Write-Host "Backup verification failed for: $backupDbPath"
+    Write-Host "Integrity check result: '$integrityResult'"
+}
+
+# Restart so the WAL file is created again
+Write-Host "`nRestarting Zen..."
+docker compose restart
+                </pre>
+            </section>
+
+
         </main>
     </div>
 
