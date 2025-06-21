@@ -36,20 +36,6 @@ document.addEventListener("keydown", e => {
 });
 
 function App() {
-  const { isLoading, shouldShowLogin, shouldShowOnboarding } = useAuth();
-
-  if (isLoading) {
-    return <LoadingPage />;
-  }
-
-  if (shouldShowLogin) {
-    return <LoginPage />;
-  }
-
-  if (shouldShowOnboarding) {
-    return <LoginPage isOnboarding />;
-  }
-
   return (
     <Router>
       <Route path="/" component={NotesPage} />

@@ -10,9 +10,9 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-	"zen/commons/auth"
 	"zen/commons/session"
 	"zen/commons/sqlite"
+	"zen/commons/utils"
 	"zen/features/focus"
 	"zen/features/images"
 	"zen/features/notes"
@@ -159,8 +159,14 @@ func handleUploadedImages(w http.ResponseWriter, r *http.Request) {
 }
 
 func addPrivateRoute(mux *http.ServeMux, pattern string, handlerFunc func(w http.ResponseWriter, r *http.Request)) {
-	handler := http.HandlerFunc(handlerFunc)
-	mux.HandleFunc(pattern, auth.EnsureAuthenticated(handler))
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			utils.SendErrorResponse(w, "METHOD_NOT_ALLOWED", "This functionality is disabled in demo mode", nil, http.StatusMethodNotAllowed)
+			return
+		}
+		handlerFunc(w, r)
+	})
+	mux.HandleFunc(pattern, handler)
 }
 
 func runBackgroundTasks() {
