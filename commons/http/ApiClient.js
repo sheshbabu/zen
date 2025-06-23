@@ -206,6 +206,12 @@ async function search(query) {
   return await request('GET', `/api/search?query=${query}`);
 }
 
+// Import
+
+async function importFile(formData) {
+  return await request('POST', '/api/import/', formData);
+}
+
 export default {
   request,
   checkUser,
@@ -228,5 +234,6 @@ export default {
   deleteTag,
   getImages,
   uploadImage,
-  search
+  search,
+  importFile
 };

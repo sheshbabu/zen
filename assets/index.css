@@ -19,6 +19,7 @@
     --neutral-700: #404040;
     --neutral-800: #262626;
     --neutral-900: #171717;
+    --red-500: #EF4444;
     --red-600: #DC2626;
     --red-700 : #B91C1C;
     --yellow-100: #FEF9C3;
@@ -1374,5 +1375,160 @@ svg.lucide {
             max-width: none;
             width: 100%;
         }
+    }
+}
+
+.settings-modal {
+    width: 800px;
+    max-height: 600px;
+    overflow: hidden;
+
+    .settings-content {
+        display: flex;
+        height: 500px;
+    }
+    
+    .settings-sidebar {
+        width: 200px;
+        background-color: var(--bg-secondary);
+        border-right: 1px solid var(--neutral-100);
+        padding: 0;
+        
+        .settings-tab {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 4px 8px;
+            text-decoration: none;
+            color: var(--neutral-500);
+            border-bottom: 1px solid var(--bg-tertiary);
+            transition-property: color, stroke;
+            transition-duration: 500ms;
+            
+            &:hover {
+                color: var(--text-primary);
+                background-color: var(--bg-tertiary);
+            }
+            
+            &.active {
+                color: var(--text-primary);
+                border-right: 2px solid var(--neutral-500);
+            }
+
+            svg.lucide {
+                padding: 8px;
+
+                circle,
+                rect,
+                path {
+                    stroke: var(--neutral-900);
+                }
+            }
+        }
+    }
+    
+    .settings-main {
+        flex: 1;
+        padding: 12px 24px;
+        overflow-y: auto;
+        
+        .settings-tab-content {
+            h3 {
+                margin-bottom: 8px;
+            }
+            
+            p {
+                margin-bottom: 8px;
+                color: var(--text-secondary);
+                font: var(--sm);
+            }
+            
+            .file-upload-container {
+                margin-bottom: 16px;
+                
+                input[type="file"] {
+                    display: none;
+                }
+                
+                .file-upload-label {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 12px 16px;
+                    border: 1px dashed var(--neutral-300);
+                    border-radius: 4px;
+                    color: var(--neutral-400);
+                    cursor: pointer;
+                    transition-property: color, background-color;
+                    transition-duration: 500ms;
+                    font: var(--sm);
+                    min-height: 100px;
+                    justify-content: center;
+                    
+                    &:hover {
+                        background-color: var(--neutral-50);
+                        border-color: var(--neutral-400);
+                    }
+                    
+                    &.disabled {
+                        cursor: not-allowed;
+                    }
+                    
+                    svg {
+                        width: 16px;
+                        height: 16px;
+                    }
+                }
+                
+                .upload-progress {
+                    margin-top: 16px;
+                    
+                    .upload-progress-text {
+                        font: var(--sm);
+                        color: var(--text-secondary);
+                        margin-bottom: 8px;
+                    }
+                    
+                    .upload-progress-bar {
+                        width: 100%;
+                        height: 8px;
+                        background-color: var(--neutral-200);
+                        box-shadow: inset var(--shadow-4);
+                        border-radius: 4px;
+                        overflow: hidden;
+                        
+                        .upload-progress-fill {
+                            height: 100%;
+                            border-radius: 4px;
+                            background-color: var(--neutral-700);
+                            transition: width 0.3s ease;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.beta-banner {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    
+    .beta-badge {
+        background-color: var(--red-500);
+        color: white;
+        padding: 0 4px;
+        border-radius: 4px;
+        font: var(--xs);
+        font-size: 12px;
+        font-weight: 700;
+        margin-right: 8px;
+        text-transform: uppercase;
+    }
+    
+    .beta-description {
+        font: var(--sm);
+        color: var(--red-500);
     }
 }

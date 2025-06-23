@@ -125,7 +125,7 @@
 .notes-grid-item-content,
 .notes-editor-rendered {
     display: block;
-    overflow-x: scroll; /* for long tables */
+    overflow-x: auto;
 
     strong {
         font-weight: 600;
