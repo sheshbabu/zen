@@ -9,6 +9,7 @@ import navigateTo from './commons/utils/navigateTo.js';
 import SearchMenu from './features/search/SearchMenu.jsx';
 
 document.addEventListener('DOMContentLoaded', () => {
+  setUserPreferredTheme();
   render(
     <App />,
     document.body
@@ -59,3 +60,9 @@ function App() {
   );
 }
 
+function setUserPreferredTheme() {
+  const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+  const theme = prefersDarkScheme.matches ? 'dark' : 'light';
+  document.querySelector("meta[name=theme-color]").setAttribute("content", theme === 'dark' ? "#121212" : "#FFF");
+  document.querySelector("meta[name=background-color]").setAttribute("content", theme === 'dark' ? "#121212" : "#FFF");
+}
