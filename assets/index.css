@@ -1458,7 +1458,7 @@ svg.lucide {
             }
 
             p {
-                margin-bottom: 8px;
+                margin-bottom: 12px;
                 color: var(--text-secondary);
                 font: var(--sm);
             }
@@ -1626,28 +1626,5 @@ svg.lucide {
                 }
             }
         }
-    }
-}
-
-.beta-banner {
-    display: flex;
-    align-items: center;
-    margin: 20px 0;
-
-    .beta-badge {
-        background-color: var(--red-500);
-        color: white;
-        padding: 0 4px;
-        border-radius: 4px;
-        font: var(--xs);
-        font-size: 12px;
-        font-weight: 700;
-        margin-right: 8px;
-        text-transform: uppercase;
-    }
-
-    .beta-description {
-        font: var(--sm);
-        color: var(--red-500);
     }
 }

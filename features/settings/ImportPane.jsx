@@ -102,13 +102,6 @@ export default function ImportPane() {
       <h3>Import Files</h3>
       <p>Import .md or .txt files.</p>
 
-      <div className="beta-banner">
-        <div className="beta-badge">Beta</div>
-        <div className="beta-description">
-          This feature is in testing. Please back up your data before use.
-        </div>
-      </div>
-
       <div className="file-upload-container">
         <input
           type="file"
