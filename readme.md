@@ -19,7 +19,7 @@
 ### Installation
 Build from source
 ```shell
-$ go build
+$ make build
 ```
 
 

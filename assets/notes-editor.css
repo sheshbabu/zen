@@ -6,7 +6,7 @@
             display: block;
             border: 1px dashed var(--neutral-300);
             padding: 16px;
-            margin: 16px 0;
+            margin: 8px 0;
             border-radius: 4px;
             text-align: left;
             font-weight: 500;
@@ -25,10 +25,11 @@
                 background-color: var(--neutral-50);
             }
         }
-        
+
         .notes-editor-image-attachment-preview {
             display: flex;
             overflow-x: auto;
+
             img {
                 max-height: 200px;
                 box-shadow: var(--shadow-2);
@@ -125,7 +126,7 @@
 .notes-grid-item-content,
 .notes-editor-rendered {
     display: block;
-    overflow-x: scroll; /* for long tables */
+    overflow-x: auto;
 
     strong {
         font-weight: 600;
@@ -148,13 +149,16 @@
         font: var(--h5);
     }
 
-    h4, h5, h6 {
+    h4,
+    h5,
+    h6 {
         font: var(--h6);
     }
 
     p,
     blockquote,
     ul,
+    ol,
     li,
     table {
         font: var(--p1);
@@ -172,7 +176,12 @@
         max-width: 100%;
     }
 
-    h1, h2, h3, h4, h5, h6 {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         padding: 3px 0;
         margin-top: 24px;
         margin-bottom: 4px;
@@ -192,6 +201,7 @@
         background-color: var(--neutral-50);
         border-radius: 4px;
         overflow: scroll;
+
         &::-webkit-scrollbar {
             display: none;
         }
@@ -213,25 +223,53 @@
         margin: 10px 4px;
     }
 
-    ul {
+    ul,
+    ol {
         padding-left: 20px;
     }
 
-    ul > li > ul {
+    ul>li>ul,
+    ol>li>ul {
         padding-top: 0;
         padding-bottom: 0;
     }
 
-    li > ul > li {
+    li>ul>li,
+    li>ol>li {
         padding-bottom: 0;
     }
 
-    ul.contains-task-list {
+    ul.contains-task-list,
+    ol.contains-task-list {
         padding-left: 0;
     }
 
     li.task-list-item {
         list-style-type: none;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .task-list-item-checkbox {
+        flex-shrink: 0;
+        margin-top: 2px;
+        cursor: pointer;
+        color: var(--neutral-400);
+        transition: color 0.2s ease;
+
+        &:hover {
+            color: var(--neutral-600);
+            cursor: not-allowed;
+        }
+
+        &.checked {
+            color: var(--neutral-700);
+
+            &:hover {
+                color: var(--neutral-600);
+            }
+        }
     }
 
     table {
@@ -240,7 +278,9 @@
         margin: 24px 0;
     }
 
-    table, th, td {
+    table,
+    th,
+    td {
         border: 1px solid var(--neutral-200);
         padding: 5px 15px;
         width: max-content;
@@ -265,5 +305,98 @@
         color: var(--text-primary);
         border-radius: 4px;
         padding: 2px;
+    }
+}
+
+.formatting-toolbar {
+    display: none;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+    border: 1px solid var(--neutral-300);
+    border-radius: 4px;
+    align-items: center;
+
+    .notes-editor.is-editable & {
+        display: flex;
+    }
+
+    .formatting-toolbar-group {
+        display: flex;
+        padding-right: 8px;
+
+        &:last-child {
+            border-right: none;
+            padding-right: 0;
+        }
+
+        .formatting-button {
+            background: none;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            min-width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            margin: 4px;
+
+            &:hover {
+                background-color: var(--neutral-200);
+            }
+
+            &:active {
+                background-color: var(--neutral-100);
+                transform: translateY(0);
+                box-shadow: none;
+            }
+
+            svg.lucide {
+                width: 16px;
+                height: 16px;
+                stroke: currentColor;
+            }
+
+            strong,
+            em,
+            s,
+            mark,
+            code {
+                font-size: 12px;
+                font-weight: 600;
+                margin: 0;
+                padding: 0;
+            }
+
+            mark {
+                background: var(--yellow-200);
+                border-radius: 2px;
+                padding: 1px 2px;
+            }
+
+            code {
+                background: var(--neutral-100);
+                border-radius: 2px;
+                padding: 1px 2px;
+                font-family: var(--font-family-code);
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 948px) {
+    .formatting-toolbar {
+        display: none;
+
+        .notes-editor.is-editable & {
+            display: none;
+        }
     }
 }

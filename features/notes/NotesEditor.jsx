@@ -1,6 +1,7 @@
 import { h, render, useState, useRef, useEffect, useCallback } from "../../assets/preact.esm.js"
 import ApiClient from '../../commons/http/ApiClient.js';
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
+import NotesEditorFormattingToolbar from './NotesEditorFormattingToolbar.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
@@ -43,13 +44,13 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   const handleSaveClick = useCallback(() => {
     const currentTitle = titleRef.current?.textContent || "";
     const currentContent = textareaRef.current?.value || content;
-    
+
     const note = {
       title: currentTitle,
       content: currentContent,
       tags: tags,
     };
-    
+
     setTitle(currentTitle);
     setContent(currentContent);
 
@@ -110,6 +111,52 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     if (isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.key === 'b') {
       e.preventDefault();
       formatSelectedText("bold");
+    }
+
+    if (isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.key === 'i') {
+      e.preventDefault();
+      formatSelectedText("italic");
+    }
+
+    if (isTextAreaFocused && e.key === 'Enter' && !e.metaKey && !e.ctrlKey) {
+      const textarea = textareaRef.current;
+      const cursorPos = textarea.selectionStart;
+      const textBeforeCursor = textarea.value.substring(0, cursorPos);
+      const lines = textBeforeCursor.split('\n');
+      const currentLine = lines[lines.length - 1];
+      
+      // Check for list patterns: unordered lists, todo items, ordered lists
+      const listPatterns = [
+        /^(\s*)(- \[ \] )/,  // Todo items: "- [ ] "
+        /^(\s*)(- \[x\] )/,  // Completed todo items: "- [x] "
+        /^(\s*)(- )/,        // Unordered lists: "- "
+        /^(\s*)(\* )/,       // Unordered lists: "* "
+        /^(\s*)(\+ )/,       // Unordered lists: "+ "
+        /^(\s*)(\d+\. )/,    // Ordered lists: "1. ", "2. ", etc.
+      ];
+      
+      for (const pattern of listPatterns) {
+        const match = currentLine.match(pattern);
+        if (match) {
+          e.preventDefault();
+          const indentation = match[1];
+          let prefix = match[2];
+          
+          // For completed todos, create a new unchecked todo
+          if (prefix === "- [x] ") {
+            prefix = "- [ ] ";
+          }
+          // For ordered lists, increment the number
+          else if (/^\d+\. $/.test(prefix)) {
+            const num = parseInt(prefix.match(/^(\d+)/)[1]) + 1;
+            prefix = `${num}. `;
+          }
+          
+          const newLineText = `\n${indentation}${prefix}`;
+          insertAtCursor(newLineText);
+          return;
+        }
+      }
     }
   }, [isEditable, isFloating, handleSaveClick]);
 
@@ -300,6 +347,10 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }
 
   function formatSelectedText(format) {
+    applyMarkdownFormat(format);
+  }
+
+  function applyMarkdownFormat(format, placeholder = "") {
     if (textareaRef.current === null) {
       return;
     }
@@ -310,23 +361,85 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     const beforeText = textarea.value.substring(0, startPos);
     const afterText = textarea.value.substring(endPos);
     const selectedText = textarea.value.substring(startPos, endPos);
+
     let formattedText = "";
+    let cursorOffset = 0;
 
     switch (format) {
       case "bold":
-        formattedText = `**${selectedText}**`;
+        formattedText = `**${selectedText || placeholder}**`;
+        cursorOffset = selectedText ? formattedText.length : 2;
+        break;
+      case "italic":
+        formattedText = `*${selectedText || placeholder}*`;
+        cursorOffset = selectedText ? formattedText.length : 1;
+        break;
+      case "strikethrough":
+        formattedText = `~~${selectedText || placeholder}~~`;
+        cursorOffset = selectedText ? formattedText.length : 2;
         break;
       case "highlight":
-        formattedText = `==${selectedText}==`;
+        formattedText = `==${selectedText || placeholder}==`;
+        cursorOffset = selectedText ? formattedText.length : 2;
+        break;
+      case "code":
+        formattedText = `\`${selectedText || placeholder}\``;
+        cursorOffset = selectedText ? formattedText.length : 1;
+        break;
+      case "h1":
+        formattedText = `# ${selectedText || placeholder}`;
+        cursorOffset = selectedText ? formattedText.length : 2;
+        break;
+      case "h2":
+        formattedText = `## ${selectedText || placeholder}`;
+        cursorOffset = selectedText ? formattedText.length : 3;
+        break;
+      case "h3":
+        formattedText = `### ${selectedText || placeholder}`;
+        cursorOffset = selectedText ? formattedText.length : 4;
+        break;
+      case "ul":
+        formattedText = `- ${selectedText || placeholder}`;
+        cursorOffset = selectedText ? formattedText.length : 2;
+        break;
+      case "ol":
+        formattedText = `1. ${selectedText || placeholder}`;
+        cursorOffset = selectedText ? formattedText.length : 3;
+        break;
+      case "todo":
+        formattedText = `- [ ] ${selectedText || placeholder}`;
+        cursorOffset = selectedText ? formattedText.length : 6;
+        break;
+      case "quote":
+        formattedText = `> ${selectedText || placeholder}`;
+        cursorOffset = selectedText ? formattedText.length : 2;
+        break;
+      case "hr":
+        formattedText = `\n---\n`;
+        cursorOffset = formattedText.length;
+        break;
+      case "link":
+        if (selectedText) {
+          formattedText = `[${selectedText}](url)`;
+          cursorOffset = formattedText.length - 4; // Position cursor at "url"
+        } else {
+          formattedText = `[${placeholder}](url)`;
+          cursorOffset = 1; // Position cursor at placeholder
+        }
         break;
     }
 
     setContent(beforeText + formattedText + afterText);
 
-    const newPosition = startPos + formattedText.length;
-    textarea.selectionStart = newPosition;
-    textarea.selectionEnd = newPosition;
-    textarea.focus();
+    // Set cursor position after content update
+    setTimeout(() => {
+      if (textareaRef.current) {
+        const newPosition = startPos + cursorOffset;
+        textareaRef.current.selectionStart = newPosition;
+        textareaRef.current.selectionEnd = newPosition;
+        textareaRef.current.focus();
+      }
+    }, 0);
   }
 
   if (isEditable) {
@@ -385,6 +498,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         <input type="file" accept="image/*" multiple ref={fileInputRef} onChange={handleFileInputChange} style={{ display: "none" }} />
       </div>
       <div className="notes-editor-image-attachment-preview">{imagePreviewItems}</div>
+      <NotesEditorFormattingToolbar isEditable={isEditable} onFormat={applyMarkdownFormat} />
       <div className="notes-editor-content">
         {contentArea}
       </div>
@@ -414,7 +528,7 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, onSav
 
   if (isEditable) {
     actions.push(
-      <div className="ghost-button" onClick={onSaveClick}>{saveButtonText}</div>
+      <div className="ghost-button" disabled={isSaveLoading} onClick={onSaveClick}>{saveButtonText}</div>
     );
     actions.push(
       <div className="ghost-button" onClick={onEditCancelClick}>Cancel</div>

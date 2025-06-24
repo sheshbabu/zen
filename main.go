@@ -17,6 +17,7 @@ import (
 	"zen/features/images"
 	"zen/features/notes"
 	"zen/features/search"
+	"zen/features/settings"
 	"zen/features/tags"
 	"zen/features/users"
 )
@@ -102,6 +103,8 @@ func newRouter() *http.ServeMux {
 
 	addPrivateRoute(mux, "POST /api/images/", images.HandleUploadImage)
 	addPrivateRoute(mux, "GET /api/images/", images.HandleGetImages)
+
+	addPrivateRoute(mux, "POST /api/import/", settings.HandleImport)
 
 	addPrivateRoute(mux, "GET /api/search/", search.HandleSearch)
 

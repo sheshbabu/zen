@@ -3,11 +3,16 @@ import Link from './Link.jsx';
 import SidebarTagsList from "../../features/tags/SidebarTagsList.jsx";
 import FocusSwitcher from "../../features/focus/FocusSwitcher.jsx";
 import SearchMenu from "../../features/search/SearchMenu.jsx";
+import SettingsModal from "../../features/settings/SettingsModal.jsx";
 import { NotesIcon, SearchIcon, NewIcon, ArchiveIcon, TrashIcon, BoardIcon, SettingsIcon, TemplatesIcon } from "./Icon.jsx"
 
 export default function Sidebar({ focusModes, tags }) {
   function handleSearchClick() {
     render(<SearchMenu />, document.querySelector('.modal-root'));
+  }
+
+  function handleSettingsClick() {
+    render(<SettingsModal />, document.querySelector('.modal-root'));
   }
 
   const currentSearchParams = new URLSearchParams(window.location.search);
@@ -32,17 +37,13 @@ export default function Sidebar({ focusModes, tags }) {
           Notes
         </Link>
         {/* <Link className="sidebar-button" to="/">
-        <BoardIcon />
-        Boards
-      </Link>
-      <Link className="sidebar-button" to="/">
-        <SettingsIcon />
-        Settings
-      </Link>
-      <div className="sidebar-button" activeClassName="is-active" to="/archives" shouldPreserveSearchParams>
-        <TemplatesIcon />
-        Templates
-      </div>*/}
+          <BoardIcon />
+          Boards
+        </Link>
+        <div className="sidebar-button" activeClassName="is-active" to="/archives" shouldPreserveSearchParams>
+          <TemplatesIcon />
+          Templates
+        </div>*/}
         <Link className="sidebar-button" activeClassName="is-active" to="/notes/?isArchived=true">
           <ArchiveIcon />
           Archives
@@ -51,6 +52,10 @@ export default function Sidebar({ focusModes, tags }) {
           <TrashIcon />
           Trash
         </Link>
+        <div className="sidebar-button" onClick={handleSettingsClick}>
+          <SettingsIcon />
+          Settings
+        </div>
       </div>
 
       <div className="sidebar-scrollable">

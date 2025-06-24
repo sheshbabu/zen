@@ -1,3 +1,5 @@
+// WARN: Have updated the makeCheckbox function to use SVG icons instead of images
+
 // Markdown-it plugin to render GitHub-style task lists; see
 //
 // https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments
@@ -76,11 +78,15 @@ function todoify(token, TokenConstructor) {
 
 function makeCheckbox(token, TokenConstructor) {
 	var checkbox = new TokenConstructor('html_inline', '', 0);
-	var disabledAttr = disableCheckboxes ? ' disabled="" ' : '';
 	if (token.content.indexOf('[ ] ') === 0) {
-		checkbox.content = '<input class="task-list-item-checkbox"' + disabledAttr + 'type="checkbox">';
+		checkbox.content = '<svg class="task-list-item-checkbox unchecked" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+			'<circle cx="12" cy="12" r="10" />' +
+			'</svg>';
 	} else if (token.content.indexOf('[x] ') === 0 || token.content.indexOf('[X] ') === 0) {
-		checkbox.content = '<input class="task-list-item-checkbox" checked=""' + disabledAttr + 'type="checkbox">';
+		checkbox.content = '<svg class="task-list-item-checkbox checked" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+			'<circle cx="12" cy="12" r="10" />' +
+			'<path d="m9 12 2 2 4-4" />' +
+			'</svg>';
 	}
 	return checkbox;
 }
