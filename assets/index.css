@@ -6,7 +6,7 @@
  * "Responsive And Fluid Typography With vh And vw Units" https://www.smashingmagazine.com/2016/05/fluid-typography/
  */
 
- :root {
+:root {
     /* https://tailwindcss.com/docs/colors */
     /* https://gist.github.com/guvener/d8952570d5a8be430580b93800519439 */
     --neutral-50: #FAFAFA;
@@ -21,8 +21,10 @@
     --neutral-900: #171717;
     --red-500: #EF4444;
     --red-600: #DC2626;
-    --red-700 : #B91C1C;
+    --red-700: #B91C1C;
     --yellow-100: #FEF9C3;
+    --yellow-500: #EAB308;
+    --green-500: #22C55E;
 
     /* typography */
     /* Major Second */
@@ -163,6 +165,7 @@ svg.lucide {
 }
 
 @media screen and (max-width: 948px) {
+
     .notes-list-container,
     .notes-grid-container {
         &[data-page="notes"] {
@@ -212,12 +215,12 @@ svg.lucide {
     .sidebar-fixed {
         flex-shrink: 0;
     }
-    
+
     .sidebar-scrollable {
         flex: 1;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        
+
         &::-webkit-scrollbar {
             display: none;
         }
@@ -243,6 +246,7 @@ svg.lucide {
             color: var(--neutral-900);
 
             svg.lucide {
+
                 circle,
                 rect,
                 path {
@@ -385,6 +389,7 @@ svg.lucide {
         transition-duration: 500ms;
 
         &:hover {
+
             rect,
             path {
                 stroke: var(--neutral-900);
@@ -660,6 +665,7 @@ svg.lucide {
             transition-duration: 500ms;
 
             &:hover {
+
                 rect,
                 path {
                     stroke: var(--neutral-900);
@@ -715,6 +721,7 @@ svg.lucide {
         transition-duration: 500ms;
 
         &:hover {
+
             rect,
             path {
                 stroke: var(--neutral-900);
@@ -731,6 +738,7 @@ svg.lucide {
         color: var(--neutral-50);
 
         svg.lucide {
+
             line,
             circle,
             rect,
@@ -743,6 +751,7 @@ svg.lucide {
             background-color: var(--neutral-700);
 
             svg.lucide {
+
                 line,
                 circle,
                 rect,
@@ -890,6 +899,7 @@ svg.lucide {
         opacity: 0;
         transform: translateY(-4px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1025,6 +1035,7 @@ svg.lucide {
         transform: scale(0.9);
         opacity: 0;
     }
+
     to {
         transform: scale(1);
         opacity: 1;
@@ -1195,6 +1206,7 @@ svg.lucide {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
@@ -1239,11 +1251,11 @@ svg.lucide {
             box-shadow: var(--shadow-2);
             opacity: 0;
             cursor: pointer;
-        
+
             &.loaded {
                 opacity: 1;
             }
-        
+
             &:hover {
                 box-shadow: var(--shadow-4);
             }
@@ -1326,7 +1338,7 @@ svg.lucide {
             svg.lucide {
                 width: 16px;
                 height: 16px;
-                
+
                 line,
                 circle,
                 rect,
@@ -1335,11 +1347,12 @@ svg.lucide {
                     stroke: var(--neutral-100);
                 }
             }
-            
+
             &:hover {
                 background-color: var(--neutral-100);
-                
+
                 svg.lucide {
+
                     line,
                     circle,
                     rect,
@@ -1357,6 +1370,7 @@ svg.lucide {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1387,13 +1401,13 @@ svg.lucide {
         display: flex;
         height: 500px;
     }
-    
+
     .settings-sidebar {
         width: 200px;
         background-color: var(--bg-secondary);
         border-right: 1px solid var(--neutral-100);
         padding: 0;
-        
+
         .settings-tab {
             display: flex;
             align-items: center;
@@ -1404,12 +1418,12 @@ svg.lucide {
             border-bottom: 1px solid var(--bg-tertiary);
             transition-property: color, stroke;
             transition-duration: 500ms;
-            
+
             &:hover {
                 color: var(--text-primary);
                 background-color: var(--bg-tertiary);
             }
-            
+
             &.active {
                 color: var(--text-primary);
                 border-right: 2px solid var(--neutral-500);
@@ -1426,30 +1440,30 @@ svg.lucide {
             }
         }
     }
-    
+
     .settings-main {
         flex: 1;
         padding: 12px 24px;
         overflow-y: auto;
-        
+
         .settings-tab-content {
             h3 {
                 margin-bottom: 8px;
             }
-            
+
             p {
                 margin-bottom: 8px;
                 color: var(--text-secondary);
                 font: var(--sm);
             }
-            
+
             .file-upload-container {
                 margin-bottom: 16px;
-                
+
                 input[type="file"] {
                     display: none;
                 }
-                
+
                 .file-upload-label {
                     display: flex;
                     align-items: center;
@@ -1464,31 +1478,31 @@ svg.lucide {
                     font: var(--sm);
                     min-height: 100px;
                     justify-content: center;
-                    
+
                     &:hover {
                         background-color: var(--neutral-50);
                         border-color: var(--neutral-400);
                     }
-                    
+
                     &.disabled {
                         cursor: not-allowed;
                     }
-                    
+
                     svg {
                         width: 16px;
                         height: 16px;
                     }
                 }
-                
+
                 .upload-progress {
                     margin-top: 16px;
-                    
+
                     .upload-progress-text {
                         font: var(--sm);
                         color: var(--text-secondary);
                         margin-bottom: 8px;
                     }
-                    
+
                     .upload-progress-bar {
                         width: 100%;
                         height: 8px;
@@ -1496,12 +1510,111 @@ svg.lucide {
                         box-shadow: inset var(--shadow-4);
                         border-radius: 4px;
                         overflow: hidden;
-                        
+
                         .upload-progress-fill {
                             height: 100%;
                             border-radius: 4px;
                             background-color: var(--neutral-700);
                             transition: width 0.3s ease;
+                        }
+                    }
+                }
+
+                .upload-summary {
+                    margin-top: 16px;
+
+                    h4 {
+                        margin-bottom: 4px;
+                    }
+
+                    .upload-summary-message {
+                        margin-bottom: 16px;
+
+                        a {
+                            display: inline;
+                            font: var(--sm);
+                            color: var(--text-primary);
+                            text-decoration: none;
+                        }
+                    }
+
+                    .upload-summary-section {
+                        h5 {
+                            margin-bottom: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 4px;
+
+                            svg {
+                                width: 16px;
+                                height: 16px;
+
+                                line,
+                                circle,
+                                rect,
+                                path {
+                                    stroke-width: 2.5;
+                                }
+                            }
+                        }
+
+                        &.uploaded {
+                            h5 {
+                                color: var(--green-500);
+
+                                svg {
+
+                                    line,
+                                    circle,
+                                    rect,
+                                    path {
+                                        stroke: var(--green-500);
+                                    }
+                                }
+                            }
+                        }
+
+                        &.skipped {
+                            h5 {
+                                color: var(--yellow-500);
+
+                                svg {
+
+                                    line,
+                                    circle,
+                                    rect,
+                                    path {
+                                        stroke: var(--yellow-500);
+                                    }
+                                }
+                            }
+                        }
+
+                        &.errored {
+                            h5 {
+                                color: var(--red-500);
+
+                                svg {
+
+                                    line,
+                                    circle,
+                                    rect,
+                                    path {
+                                        stroke: var(--red-500);
+                                    }
+                                }
+                            }
+                        }
+
+                        .file-list {
+                            padding: 0;
+                            margin-bottom: 8px;
+                            color: var(--text-secondary);
+                            font: var(--code);
+
+                            .file-item {
+                                list-style: none;
+                            }
                         }
                     }
                 }
@@ -1514,7 +1627,7 @@ svg.lucide {
     display: flex;
     align-items: center;
     margin: 20px 0;
-    
+
     .beta-badge {
         background-color: var(--red-500);
         color: white;
@@ -1526,7 +1639,7 @@ svg.lucide {
         margin-right: 8px;
         text-transform: uppercase;
     }
-    
+
     .beta-description {
         font: var(--sm);
         color: var(--red-500);
