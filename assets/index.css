@@ -797,6 +797,11 @@ svg.lucide {
     &:hover {
         background-color: var(--neutral-100);
     }
+
+    &[disabled] {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
 }
 
 .button-group {

@@ -414,7 +414,7 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, onSav
 
   if (isEditable) {
     actions.push(
-      <div className="ghost-button" onClick={onSaveClick}>{saveButtonText}</div>
+      <div className="ghost-button" disabled={isSaveLoading} onClick={onSaveClick}>{saveButtonText}</div>
     );
     actions.push(
       <div className="ghost-button" onClick={onEditCancelClick}>Cancel</div>
