@@ -83,7 +83,7 @@ function NotesGridItem({ note, onChange }) {
   }
 
   function handleClick() {
-    render(<NotesEditorModal note={note} onChange={onChange} />, document.querySelector('.modal-root'));
+    render(<NotesEditorModal note={note} onChange={onChange} />, document.querySelector('.note-modal-root'));
   }
 
   const content = (

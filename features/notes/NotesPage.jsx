@@ -205,6 +205,7 @@ export default function NotesPage({ noteId }) {
 
       <MobileNavbar />
 
+      <div className="note-modal-root"></div>
       <div className="modal-root"></div>
       <div className="toast-root"></div>
     </div>

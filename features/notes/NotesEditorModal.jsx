@@ -11,7 +11,7 @@ export default function NotesEditorModal({ note, onChange }) {
 
   function closeModal() {
     document.title = "Zen";
-    render(null, document.querySelector('.modal-root'));
+    render(null, document.querySelector('.note-modal-root'));
   }
 
   function handleEditorChange() {
