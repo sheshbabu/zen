@@ -72,7 +72,7 @@ export default function FocusDetailsModal({ mode, focusMode }) {
           <CloseIcon className="notes-editor-toolbar-button-close" onClick={closeModal} />
         </div>
         <div className="modal-content">
-          <p>Define your Focus to concentrate on what matters most. Add tags to view only the relevant notes for this topic and work without distraction.</p>
+          <p className="modal-description">Define your Focus to concentrate on what matters most. Add tags to view only the relevant notes for this topic and work without distraction.</p>
           <Input id="focus-name" label="Focus Name" type="text" placeholder="Name your Focus" value={name} hint="" error="" isDisabled={false} onChange={handleNameChange} />
           <div className="form-field-container">
             <label htmlFor="focus-tags">Tags</label>

@@ -1,12 +1,13 @@
-import { h } from "../../assets/preact.esm.js"
+import { h, render, Fragment } from "../../assets/preact.esm.js"
 import NotesListToolbar from './NotesListToolbar.jsx';
 import Link from '../../commons/components/Link.jsx';
 import Spinner from '../../commons/components/Spinner.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import formatDate from '../../commons/utils/formatDate.js';
 import ImageGallery from "./ImageGallery.jsx";
+import NotesEditorModal from './NotesEditorModal.jsx';
 
-export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick }) {
+export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onChange }) {
   let containerClassName = "notes-list-fragment";
   let listClassName = "notes-list";
   let items = notes.map(note => <NotesListItem note={note} key={note.noteId} />);
@@ -18,11 +19,11 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
   if (view === "card") {
     containerClassName = "notes-grid-fragment";
     listClassName = "notes-grid";
-    items = notes.map(note => <NotesGridItem note={note} key={note.noteId} />);
+    items = notes.map(note => <NotesGridItem note={note} key={note.noteId} onChange={onChange} />);
   } else if (view === "gallery") {
     containerClassName = "notes-gallery-fragment";
     listClassName = "notes-gallery";
-    items = <ImageGallery images={images}/>;
+    items = <ImageGallery images={images} />;
     loadMoreHandler = onLoadMoreImagesClick;
     currentTotal = imagesTotal;
     currentItems = images;
@@ -33,7 +34,7 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
       <div className={listClassName}>
         {items}
         <LoadMoreButton items={currentItems} total={currentTotal} onLoadMoreClick={loadMoreHandler} />
-        <EmptyList items={currentItems} view={view}/>
+        <EmptyList items={currentItems} view={view} />
       </div>
     )
   }
@@ -71,7 +72,8 @@ function NotesListItem({ note }) {
   );
 }
 
-function NotesGridItem({ note }) {
+function NotesGridItem({ note, onChange }) {
+  const isMobile = window.matchMedia("(max-width: 948px)").matches;
   const link = `/notes/${note.noteId}`;
   const tags = note.tags?.map(tag => (<Link className="tag" key={tag.tagId} to={`/notes/?tagId=${tag.tagId}`} shouldPreserveSearchParams>{tag.name}</Link>));
   let title = <div className="notes-grid-item-title">{note.title}</div>
@@ -80,12 +82,30 @@ function NotesGridItem({ note }) {
     title = null;
   }
 
-  return (
-    <Link className="notes-grid-item" to={link} shouldPreserveSearchParams>
+  function handleClick() {
+    render(<NotesEditorModal note={note} onChange={onChange} />, document.querySelector('.modal-root'));
+  }
+
+  const content = (
+    <>
       {title}
       <div className="notes-grid-item-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(note.snippet) }} />
       <div className="notes-grid-item-tags">{tags}</div>
-    </Link>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <Link className="notes-grid-item" to={link} shouldPreserveSearchParams>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <div className="notes-grid-item" onClick={handleClick}>
+      {content}
+    </div>
   );
 }
 

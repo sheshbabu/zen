@@ -26,7 +26,7 @@ export default function NotesPage({ noteId }) {
   const isArchivesPage = searchParams.get("isArchived") === "true";
   const isTrashPage = searchParams.get("isDeleted") === "true";
 
-  const isMobile = window.matchMedia("(max-width: 600px)").matches;
+  const isMobile = window.matchMedia("(max-width: 948px)").matches;
 
   let listClassName = "notes-list-container";
   let editorClassName = "notes-editor-container";
@@ -90,7 +90,7 @@ export default function NotesPage({ noteId }) {
 
   function refreshNotes() {
     setIsNotesLoading(true);
-    
+
     ApiClient.getNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage, notesPageNumber)
       .then(res => {
         if (notesPageNumber > 1) {
@@ -109,7 +109,7 @@ export default function NotesPage({ noteId }) {
 
   function refreshImages() {
     setIsImagesLoading(true);
-    
+
     ApiClient.getImages(selectedTagId, selectedFocusId, imagesPageNumber)
       .then(res => {
         if (imagesPageNumber > 1) {
@@ -170,11 +170,10 @@ export default function NotesPage({ noteId }) {
     editorClassName = "notes-editor-container";
   } else if (selectedView === "card" || selectedView === "gallery") {
     listClassName = "notes-list-container grid";
-
-    if (noteId === undefined) {
+    if (noteId === undefined || !isMobile) {
       editorClassName = "notes-editor-container is-hidden";
-    } else if (!isMobile) {
-      editorClassName = "notes-editor-container is-floating";
+    } else {
+      editorClassName = "notes-editor-container";
     }
   }
 
@@ -185,22 +184,23 @@ export default function NotesPage({ noteId }) {
       </div>
 
       <div className={listClassName} data-page={noteId === undefined ? "notes" : "editor"}>
-        <NotesList 
-          notes={notes} 
-          total={notesTotal} 
-          isLoading={isNotesLoading} 
+        <NotesList
+          notes={notes}
+          total={notesTotal}
+          isLoading={isNotesLoading}
           images={images}
           imagesTotal={imagesTotal}
           isImagesLoading={isImagesLoading}
-          view={selectedView} 
-          onViewChange={handleViewChange} 
+          view={selectedView}
+          onViewChange={handleViewChange}
           onLoadMoreClick={handleLoadMoreClick}
           onLoadMoreImagesClick={handleLoadMoreImagesClick}
+          onChange={handleNoteChange}
         />
       </div>
 
       <div className={editorClassName} data-page={noteId === undefined ? "notes" : "editor"}>
-        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.noteId} isFloating={noteId !== undefined && selectedView !== "list"} onChange={handleNoteChange} />
+        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.noteId} onChange={handleNoteChange} />
       </div>
 
       <MobileNavbar />

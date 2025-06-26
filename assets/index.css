@@ -138,8 +138,6 @@ body {
     /* https://uxmovement.com/content/why-you-should-never-use-pure-black-for-text-or-backgrounds/ */
     color: var(--text-primary);
     background-color: var(--bg-primary);
-    /* for floating editor */
-    position: relative;
     height: 100%;
     overflow: hidden;
     margin: 0;
@@ -502,6 +500,7 @@ svg.lucide {
             display: block;
             text-decoration: none;
             color: inherit;
+            cursor: pointer;
 
             .notes-grid-item-title {
                 font: var(--h4);
@@ -625,18 +624,6 @@ svg.lucide {
 
     &::-webkit-scrollbar {
         display: none;
-    }
-
-    &.is-floating {
-        position: absolute;
-        background-color: var(--bg-primary);
-        top: 10px;
-        right: 10px;
-        bottom: 10px;
-        width: 600px;
-        overflow-y: auto;
-        border: 1px solid var(--neutral-100);
-        box-shadow: var(--shadow-4);
     }
 
     &.is-hidden {
@@ -1028,7 +1015,7 @@ svg.lucide {
     .modal-content {
         padding: 16px;
 
-        p {
+        .modal-description {
             font: var(--sm);
             margin-top: 4px;
             color: var(--neutral-500);
@@ -1626,5 +1613,28 @@ svg.lucide {
                 }
             }
         }
+    }
+}
+
+.notes-editor-modal {
+    width: 90vw;
+    max-width: 1200px;
+    height: 80vh;
+    max-height: 800px;
+    overflow: hidden;
+
+    .modal-content {
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .notes-editor {
+        height: 100%;
+        border: none;
+        border-radius: 0;
+        padding: 32px;
+        padding-top: 0;
+        overflow-y: auto;
     }
 }
