@@ -8,7 +8,6 @@ import ImageGallery from "./ImageGallery.jsx";
 import NotesEditorModal from './NotesEditorModal.jsx';
 
 export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onChange }) {
-  let containerClassName = "notes-list-fragment";
   let listClassName = "notes-list";
   let items = notes.map(note => <NotesListItem note={note} key={note.noteId} />);
   let content = <div className="notes-list-spinner"><Spinner /></div>;
@@ -17,11 +16,14 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
   let currentItems = notes;
 
   if (view === "card") {
-    containerClassName = "notes-grid-fragment";
-    listClassName = "notes-grid";
+    listClassName = "";
     items = notes.map(note => <NotesGridItem note={note} key={note.noteId} onChange={onChange} />);
+    items = (
+      <div className="notes-grid">
+        {items}
+      </div>
+    );
   } else if (view === "gallery") {
-    containerClassName = "notes-gallery-fragment";
     listClassName = "notes-gallery";
     items = <ImageGallery images={images} />;
     loadMoreHandler = onLoadMoreImagesClick;
@@ -40,10 +42,10 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
   }
 
   return (
-    <div className={containerClassName}>
+    <>
       <NotesListToolbar onListViewClick={() => onViewChange("list")} onCardViewClick={() => onViewChange("card")} onGalleryViewClick={() => onViewChange("gallery")} />
       {content}
-    </div>
+    </>
   );
 }
 
