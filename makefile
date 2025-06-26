@@ -11,3 +11,8 @@ watch:
 
 deploy:
 	fly deploy
+
+dump:
+	fly ssh sftp get ./data/zen.db ./zen.db
+	fly ssh sftp get ./data/zen.db-shm ./zen.db-shm
+	fly ssh sftp get ./data/zen.db-wal ./zen.db-wal
