@@ -472,7 +472,7 @@ svg.lucide {
 
     .notes-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 20px;
         padding: 20px;
         padding-top: 0;
@@ -488,7 +488,7 @@ svg.lucide {
 
         .notes-grid-item {
             position: relative;
-            height: 300px;
+            height: 500px;
             overflow: hidden;
             transition-property: box-shadow;
             transition-duration: 500ms;
@@ -501,6 +501,7 @@ svg.lucide {
             text-decoration: none;
             color: inherit;
             cursor: pointer;
+            zoom: 0.6;
 
             .notes-grid-item-title {
                 font: var(--h4);
@@ -602,7 +603,6 @@ svg.lucide {
 @media screen and (max-width: 948px) {
     .notes-list-container {
         .notes-grid {
-            /* Make it into single column card view */
             grid-template-columns: repeat(auto-fill, 100%);
         }
     }
