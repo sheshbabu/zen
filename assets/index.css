@@ -615,8 +615,9 @@ svg.lucide {
     border-left: 1px solid var(--neutral-100);
     transition-property: opacity, transform;
     transition-duration: 300ms;
+    transition-timing-function: ease-in-out;
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
     overflow-y: auto;
     word-wrap: break-word;
     max-height: 100%;
@@ -629,7 +630,7 @@ svg.lucide {
     &.is-hidden {
         opacity: 0;
         padding: 0;
-        transform: translateX(100%);
+        transform: translateY(10px);
     }
 
     .notes-editor-toolbar {
