@@ -1,4 +1,4 @@
-import { h, render } from './assets/preact.esm.js';
+import { h, render, Fragment } from './assets/preact.esm.js';
 import Router from './commons/components/Router.jsx';
 import Route from './commons/components/Route.jsx';
 import useAuth from './commons/auth/useAuth.jsx';
@@ -8,6 +8,7 @@ import MobileHomePage from './features/notes/MobileHomePage.jsx';
 import LoginPage from './features/users/LoginPage.jsx';
 import navigateTo from './commons/utils/navigateTo.js';
 import SearchMenu from './features/search/SearchMenu.jsx';
+import OfflineIndicator from './commons/components/OfflineIndicator.jsx';
 
 document.addEventListener('DOMContentLoaded', () => {
   setUserPreferredTheme();
@@ -54,11 +55,14 @@ function App() {
   }
 
   return (
-    <Router>
-      <Route path="/" component={isMobile ? MobileHomePage : NotesPage} />
-      <Route path="/notes/" component={NotesPage} />
-      <Route path="/notes/:noteId" component={NotesPage} />
-    </Router>
+    <>
+      <OfflineIndicator />
+      <Router>
+        <Route path="/" component={isMobile ? MobileHomePage : NotesPage} />
+        <Route path="/notes/" component={NotesPage} />
+        <Route path="/notes/:noteId" component={NotesPage} />
+      </Router>
+    </>
   );
 }
 

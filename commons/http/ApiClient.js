@@ -23,10 +23,10 @@ async function request(method, url, payload) {
     const isJsonResponse = response.headers.get('content-type')?.includes('application/json');
     return isJsonResponse ? await response.json() : null;
   } catch (error) {
-    
     if (!navigator.onLine) {
       showToast("No internet connection.");
       console.error("Network error:", error);
+      throw error;
     }
     
     if (error instanceof TypeError && (
@@ -36,6 +36,7 @@ async function request(method, url, payload) {
     )) {
       showToast("Connection failed.");
       console.error("Fetch error:", error);
+      throw error;
     }
 
     if (error instanceof Response) {
