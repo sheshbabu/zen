@@ -326,7 +326,7 @@ svg.lucide {
 
     .mobile-home-container {
         .sidebar-container {
-            display: block;
+            display: flex;
             min-width: 100vw;
             background-color: var(--bg-primary);
 
@@ -373,7 +373,7 @@ svg.lucide {
     width: 100%;
     height: calc(var(--mobile-navbar-height) + var(--safe-area-bottom));
     z-index: 2;
-    background-color: transparent;
+    background-color: var(--bg-primary);
     padding-bottom: var(--safe-area-bottom);
 
     .mobile-navbar {
