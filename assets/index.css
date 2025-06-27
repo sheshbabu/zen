@@ -138,8 +138,6 @@ body {
     /* https://uxmovement.com/content/why-you-should-never-use-pure-black-for-text-or-backgrounds/ */
     color: var(--text-primary);
     background-color: var(--bg-primary);
-    /* for floating editor */
-    position: relative;
     height: 100%;
     overflow: hidden;
     margin: 0;
@@ -156,6 +154,22 @@ svg.lucide {
         stroke-width: 2;
         stroke: var(--neutral-500);
     }
+}
+
+.offline-indicator {
+    position: fixed;
+    top: 0;
+    background: var(--red-500);
+    color: white;
+    text-align: center;
+    font: var(--sm);
+    z-index: 4;
+    left: calc(50% - 75px);
+    width: 150px;
+    padding: 4px;
+    border-radius: 4px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 .page-container {
@@ -325,6 +339,61 @@ svg.lucide {
     .sidebar-container {
         display: none;
     }
+
+    .mobile-home-container {
+        .sidebar-container {
+            display: flex;
+            min-width: 100vw;
+            background-color: var(--bg-primary);
+
+            .sidebar-focus-switcher {
+                .dropdown-button {
+                    height: 48px;
+                }
+
+                .dropdown-container {
+                    max-width: 100%;
+
+                    .dropdown-option {
+                        height: 48px;
+
+                        &:hover,
+                        &.is-selected {
+                            svg.lucide {
+                                display: none;
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            .sidebar-button {
+                padding: 2px 8px;
+
+                &.new,
+                &.search,
+                &.settings {
+                    display: none;
+                }
+            }
+
+            .sidebar-section {
+                margin-bottom: calc(var(--mobile-navbar-height) + var(--safe-area-bottom));
+
+                a.sidebar-tag-link {
+                    font: var(--p1);
+                    padding: 8px 0;
+
+                    &:hover {
+                        svg.lucide {
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 .mobile-navbar-container {
@@ -336,13 +405,13 @@ svg.lucide {
     width: 100%;
     height: calc(var(--mobile-navbar-height) + var(--safe-area-bottom));
     z-index: 2;
-    background-color: transparent;
+    background-color: var(--bg-primary);
     padding-bottom: var(--safe-area-bottom);
 
     .mobile-navbar {
         display: flex;
         justify-content: space-around;
-        padding: 8px;
+        padding: 0 8px;
         height: var(--mobile-navbar-height);
         background-color: var(--bg-primary);
         box-shadow: var(--shadow-6);
@@ -353,6 +422,7 @@ svg.lucide {
             text-decoration: none;
             color: var(--neutral-900);
             min-height: 44px;
+            font: var(--sm);
 
             svg.lucide {
                 padding: 8px;
@@ -474,7 +544,7 @@ svg.lucide {
 
     .notes-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 20px;
         padding: 20px;
         padding-top: 0;
@@ -490,7 +560,7 @@ svg.lucide {
 
         .notes-grid-item {
             position: relative;
-            height: 300px;
+            height: 500px;
             overflow: hidden;
             transition-property: box-shadow;
             transition-duration: 500ms;
@@ -502,6 +572,8 @@ svg.lucide {
             display: block;
             text-decoration: none;
             color: inherit;
+            cursor: pointer;
+            zoom: 0.6;
 
             .notes-grid-item-title {
                 font: var(--h4);
@@ -603,7 +675,6 @@ svg.lucide {
 @media screen and (max-width: 948px) {
     .notes-list-container {
         .notes-grid {
-            /* Make it into single column card view */
             grid-template-columns: repeat(auto-fill, 100%);
         }
     }
@@ -616,8 +687,9 @@ svg.lucide {
     border-left: 1px solid var(--neutral-100);
     transition-property: opacity, transform;
     transition-duration: 300ms;
+    transition-timing-function: ease-in-out;
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
     overflow-y: auto;
     word-wrap: break-word;
     max-height: 100%;
@@ -627,22 +699,10 @@ svg.lucide {
         display: none;
     }
 
-    &.is-floating {
-        position: absolute;
-        background-color: var(--bg-primary);
-        top: 10px;
-        right: 10px;
-        bottom: 10px;
-        width: 600px;
-        overflow-y: auto;
-        border: 1px solid var(--neutral-100);
-        box-shadow: var(--shadow-4);
-    }
-
     &.is-hidden {
         opacity: 0;
         padding: 0;
-        transform: translateX(100%);
+        transform: translateY(10px);
     }
 
     .notes-editor-toolbar {
@@ -1028,7 +1088,7 @@ svg.lucide {
     .modal-content {
         padding: 16px;
 
-        p {
+        .modal-description {
             font: var(--sm);
             margin-top: 4px;
             color: var(--neutral-500);
@@ -1458,7 +1518,7 @@ svg.lucide {
             }
 
             p {
-                margin-bottom: 8px;
+                margin-bottom: 12px;
                 color: var(--text-secondary);
                 font: var(--sm);
             }
@@ -1629,25 +1689,25 @@ svg.lucide {
     }
 }
 
-.beta-banner {
-    display: flex;
-    align-items: center;
-    margin: 20px 0;
+.notes-editor-modal {
+    width: 90vw;
+    max-width: 1200px;
+    height: 80vh;
+    max-height: 800px;
+    overflow: hidden;
 
-    .beta-badge {
-        background-color: var(--red-500);
-        color: white;
-        padding: 0 4px;
-        border-radius: 4px;
-        font: var(--xs);
-        font-size: 12px;
-        font-weight: 700;
-        margin-right: 8px;
-        text-transform: uppercase;
+    .modal-content {
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
     }
 
-    .beta-description {
-        font: var(--sm);
-        color: var(--red-500);
+    .notes-editor {
+        height: 100%;
+        border: none;
+        border-radius: 0;
+        padding: 32px;
+        padding-top: 0;
+        overflow-y: auto;
     }
 }

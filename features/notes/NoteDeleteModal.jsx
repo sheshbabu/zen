@@ -16,7 +16,7 @@ export default function NoteDeleteModal({ onDeleteClick, onCloseClick }) {
           <CloseIcon className="notes-editor-toolbar-button-close" onClick={onCloseClick} />
         </div>
         <div className="modal-content">
-          <p>This note will be moved to the Trash and <b>permanently deleted</b> after 30 days.</p>
+          <p className="modal-description">This note will be moved to the Trash and <b>permanently deleted</b> after 30 days.</p>
         </div>
         <div className="model-footer-container right-aligned">
           <div className="button" onClick={onCloseClick}>Cancel</div>

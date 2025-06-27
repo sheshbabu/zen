@@ -110,6 +110,7 @@ func newRouter() *http.ServeMux {
 
 	mux.HandleFunc("GET /assets/", handleStaticAssets)
 	mux.HandleFunc("GET /images/", handleUploadedImages)
+	mux.HandleFunc("GET /sw.js", handleServiceWorker)
 	mux.HandleFunc("GET /", handleRoot)
 
 	return mux
@@ -194,4 +195,23 @@ func runBackgroundTasks() {
 			images.SyncImagesFromDisk()
 		}
 	}()
+}
+
+func handleServiceWorker(w http.ResponseWriter, r *http.Request) {
+	var swContent []byte
+	var err error
+
+	swContent, err = os.ReadFile("./sw.js")
+	if err != nil {
+		err = fmt.Errorf("error reading sw.js: %w", err)
+		slog.Error(err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/javascript")
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+	w.Header().Set("Service-Worker-Allowed", "/")
+	w.WriteHeader(http.StatusOK)
+	w.Write(swContent)
 }

@@ -7,8 +7,9 @@ import navigateTo from '../../commons/utils/navigateTo.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
 import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
+import { CloseIcon } from "../../commons/components/Icon.jsx";
 
-export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange }) {
+export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange, onClose }) {
   if (!isNewNote && selectedNote === null) {
     return null;
   }
@@ -68,7 +69,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         setIsEditable(false);
         setAttachments([]); // reset
 
-        if (isNewNote) {
+        if (isNewNote && !onClose) {
           navigateTo(`/notes/${note.noteId}`, true);
         }
 
@@ -124,7 +125,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       const textBeforeCursor = textarea.value.substring(0, cursorPos);
       const lines = textBeforeCursor.split('\n');
       const currentLine = lines[lines.length - 1];
-      
+
       // Check for list patterns: unordered lists, todo items, ordered lists
       const listPatterns = [
         /^(\s*)(- \[ \] )/,  // Todo items: "- [ ] "
@@ -134,14 +135,14 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         /^(\s*)(\+ )/,       // Unordered lists: "+ "
         /^(\s*)(\d+\. )/,    // Ordered lists: "1. ", "2. ", etc.
       ];
-      
+
       for (const pattern of listPatterns) {
         const match = currentLine.match(pattern);
         if (match) {
           e.preventDefault();
           const indentation = match[1];
           let prefix = match[2];
-          
+
           // For completed todos, create a new unchecked todo
           if (prefix === "- [x] ") {
             prefix = "- [ ] ";
@@ -151,7 +152,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
             const num = parseInt(prefix.match(/^(\d+)/)[1]) + 1;
             prefix = `${num}. `;
           }
-          
+
           const newLineText = `\n${indentation}${prefix}`;
           insertAtCursor(newLineText);
           return;
@@ -186,7 +187,11 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
 
   function handleEditCancelClick() {
     if (isNewNote) {
-      navigateTo("/", true);
+      if (onClose) {
+        onClose();
+      } else {
+        navigateTo("/", true);
+      }
     } else {
       setIsEditable(false);
     }
@@ -264,7 +269,11 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }
 
   function handleCloseClick() {
-    navigateTo("/", true);
+    if (onClose) {
+      onClose();
+    } else {
+      navigateTo("/", true);
+    }
   }
 
   function handleDeleteClick() {
@@ -280,7 +289,11 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     ApiClient.deleteNote(selectedNote.noteId)
       .then(() => {
         handleDeleteCloseClick();
-        navigateTo("/", true);
+        if (onClose) {
+          onClose();
+        } else {
+          navigateTo("/", true);
+        }
         onChange();
       });
   }
@@ -522,7 +535,7 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, onSav
 
   if (isFloating) {
     actions.push(
-      <div className="ghost-button" onClick={onCloseClick}>Close</div>
+      <div className="ghost-button" onClick={onCloseClick}><CloseIcon /></div>
     );
   }
 
