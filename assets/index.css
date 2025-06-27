@@ -323,6 +323,45 @@ svg.lucide {
     .sidebar-container {
         display: none;
     }
+
+    .mobile-home-container {
+        .sidebar-container {
+            display: block;
+            min-width: 100vw;
+            background-color: var(--bg-primary);
+
+            .sidebar-focus-switcher {
+                .dropdown-container {
+                    max-width: 100%;
+                    .dropdown-option {
+                        &:hover,
+                        &.is-selected {
+                            svg.lucide {
+                                display: none;
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            .sidebar-button {
+                &.new, &.search, &.settings {
+                    display: none;
+                }
+            }
+
+            a.sidebar-tag-link {
+                font: var(--p1);
+
+                &:hover {
+                    svg.lucide {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
 }
 
 .mobile-navbar-container {
@@ -340,7 +379,7 @@ svg.lucide {
     .mobile-navbar {
         display: flex;
         justify-content: space-around;
-        padding: 8px;
+        padding: 0 8px;
         height: var(--mobile-navbar-height);
         background-color: var(--bg-primary);
         box-shadow: var(--shadow-6);
@@ -351,6 +390,7 @@ svg.lucide {
             text-decoration: none;
             color: var(--neutral-900);
             min-height: 44px;
+            font: var(--sm);
 
             svg.lucide {
                 padding: 8px;

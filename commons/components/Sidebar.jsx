@@ -24,15 +24,15 @@ export default function Sidebar({ focusModes, tags }) {
       <div className="sidebar-fixed">
         <FocusSwitcher focusModes={focusModes} />
 
-        <Link className="sidebar-button" to="/notes/new" shouldPreserveSearchParams>
+        <Link className="sidebar-button new" to="/notes/new" shouldPreserveSearchParams>
           <NewIcon />
           New
         </Link>
-        <div className="sidebar-button" onClick={handleSearchClick}>
+        <div className="sidebar-button search" onClick={handleSearchClick}>
           <SearchIcon />
           Search
         </div>
-        <Link className="sidebar-button" to={notesLink}>
+        <Link className="sidebar-button notes" to={notesLink}>
           <NotesIcon />
           Notes
         </Link>
@@ -44,15 +44,15 @@ export default function Sidebar({ focusModes, tags }) {
           <TemplatesIcon />
           Templates
         </div>*/}
-        <Link className="sidebar-button" activeClassName="is-active" to="/notes/?isArchived=true">
+        <Link className="sidebar-button archives" activeClassName="is-active" to="/notes/?isArchived=true">
           <ArchiveIcon />
           Archives
         </Link>
-        <Link className="sidebar-button" activeClassName="is-active" to="/notes/?isDeleted=true">
+        <Link className="sidebar-button trash" activeClassName="is-active" to="/notes/?isDeleted=true">
           <TrashIcon />
           Trash
         </Link>
-        <div className="sidebar-button" onClick={handleSettingsClick}>
+        <div className="sidebar-button settings" onClick={handleSettingsClick}>
           <SettingsIcon />
           Settings
         </div>
