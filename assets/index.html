@@ -20,7 +20,10 @@
     <link rel="stylesheet" href="/assets/index.css">
     <script type="module" src="/assets/bundle.js"></script>
     <script>
-      navigator.serviceWorker.register('/sw.js')
+      // Supported only in HTTPS or localhost
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register('/assets/sw.js');
+      }
     </script>
 </head>
 <body>

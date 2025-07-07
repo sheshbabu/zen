@@ -201,7 +201,7 @@ func handleServiceWorker(w http.ResponseWriter, r *http.Request) {
 	var swContent []byte
 	var err error
 
-	swContent, err = os.ReadFile("./sw.js")
+	swContent, err = os.ReadFile("./assets/sw.js")
 	if err != nil {
 		err = fmt.Errorf("error reading sw.js: %w", err)
 		slog.Error(err.Error())
