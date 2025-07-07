@@ -4,10 +4,11 @@ import Link from '../../commons/components/Link.jsx';
 import Spinner from '../../commons/components/Spinner.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import formatDate from '../../commons/utils/formatDate.js';
+import isMobile from "../../commons/utils/isMobile.js";
 import ImageGallery from "./ImageGallery.jsx";
 import NotesEditorModal from './NotesEditorModal.jsx';
 
-export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onChange }) {
+export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onChange, onSidebarToggle }) {
   let listClassName = "notes-list";
   let items = notes.map(note => <NotesListItem note={note} key={note.noteId} />);
   let content = <div className="notes-list-spinner"><Spinner /></div>;
@@ -43,7 +44,7 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
 
   return (
     <>
-      <NotesListToolbar onListViewClick={() => onViewChange("list")} onCardViewClick={() => onViewChange("card")} onGalleryViewClick={() => onViewChange("gallery")} />
+      <NotesListToolbar onListViewClick={() => onViewChange("list")} onCardViewClick={() => onViewChange("card")} onGalleryViewClick={() => onViewChange("gallery")} onSidebarToggle={onSidebarToggle} />
       {content}
     </>
   );
@@ -75,7 +76,6 @@ function NotesListItem({ note }) {
 }
 
 function NotesGridItem({ note, onChange }) {
-  const isMobile = window.matchMedia("(max-width: 948px)").matches;
   const link = `/notes/${note.noteId}`;
   const tags = note.tags?.map(tag => (<Link className="tag" key={tag.tagId} to={`/notes/?tagId=${tag.tagId}`} shouldPreserveSearchParams>{tag.name}</Link>));
   let title = <div className="notes-grid-item-title">{note.title}</div>
@@ -96,7 +96,7 @@ function NotesGridItem({ note, onChange }) {
     </>
   );
 
-  if (isMobile) {
+  if (isMobile()) {
     return (
       <Link className="notes-grid-item" to={link} shouldPreserveSearchParams>
         {content}

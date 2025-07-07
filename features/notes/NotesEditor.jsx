@@ -4,10 +4,11 @@ import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import NotesEditorFormattingToolbar from './NotesEditorFormattingToolbar.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
+import isMobile from '../../commons/utils/isMobile.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
 import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
-import { CloseIcon } from "../../commons/components/Icon.jsx";
+import { CloseIcon, SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
 
 export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange, onClose }) {
   if (!isNewNote && selectedNote === null) {
@@ -21,6 +22,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [attachments, setAttachments] = useState([]);
   const [isSaveLoading, setIsSaveLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const titleRef = useRef(null);
   const textareaRef = useRef(null);
@@ -99,6 +101,11 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       }
     }
 
+    if ((e.metaKey || e.ctrlKey) && e.key === '\\') {
+      e.preventDefault();
+      handleExpandToggleClick();
+    }
+
     if (isTextAreaFocused && e.key === 'Tab' && !e.shiftKey) {
       e.preventDefault();
       insertAtCursor('  ');
@@ -159,7 +166,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         }
       }
     }
-  }, [isEditable, isFloating, handleSaveClick]);
+  }, [isEditable, isFloating, isExpanded, handleSaveClick, handleExpandToggleClick]);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
@@ -323,6 +330,16 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       .then(() => {
         onChange();
       });
+  }
+
+  function handleExpandToggleClick() {
+    setIsExpanded((prev) => !prev);
+    const editor = document.querySelector('.notes-editor-container');
+    if (isExpanded) {
+      editor.classList.remove('is-expanded');
+    } else {
+      editor.classList.add('is-expanded');
+    }
   }
 
   function uploadImage(file) {
@@ -493,6 +510,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         isEditable={isEditable}
         isFloating={isFloating}
         isSaveLoading={isSaveLoading}
+        isExpanded={isExpanded}
         onSaveClick={handleSaveClick}
         onEditClick={handleEditClick}
         onEditCancelClick={handleEditCancelClick}
@@ -501,6 +519,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         onArchiveClick={handleArchiveClick}
         onUnarchiveClick={handleUnarchiveClick}
         onRestoreClick={handleRestoreClick}
+        onExpandToggleClick={handleExpandToggleClick}
       />
       <div className="notes-editor-header">
         <div className="notes-editor-title" contentEditable={isEditable} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
@@ -519,8 +538,9 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   );
 }
 
-function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, onSaveClick, onEditClick, onEditCancelClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick }) {
-  const actions = [];
+function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExpanded, onSaveClick, onEditClick, onEditCancelClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick }) {
+  const rightToolbarActions = [];
+  const leftToolbarActions = [];
   const menuActions = [];
   const saveButtonText = isSaveLoading ? "Saving..." : "Save";
 
@@ -534,20 +554,38 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, onSav
   }
 
   if (isFloating) {
-    actions.push(
+    rightToolbarActions.push(
       <div className="ghost-button" onClick={onCloseClick}><CloseIcon /></div>
     );
   }
 
+  if (!isFloating && !isMobile()) {
+    if (isExpanded) {
+      leftToolbarActions.push(
+        <div className="ghost-button" onClick={onExpandToggleClick}><SidebarCloseIcon /></div>
+      );
+    } else {
+      leftToolbarActions.push(
+        <div className="ghost-button" onClick={onExpandToggleClick}><SidebarOpenIcon /></div>
+      );
+    }
+  }
+
+  if (isMobile() && !isNewNote) {
+    leftToolbarActions.push(
+      <div className="ghost-button" onClick={() => window.history.back()}><BackIcon /></div>
+    );
+  }
+
   if (isEditable) {
-    actions.push(
+    rightToolbarActions.push(
       <div className="ghost-button" disabled={isSaveLoading} onClick={onSaveClick}>{saveButtonText}</div>
     );
-    actions.push(
+    rightToolbarActions.push(
       <div className="ghost-button" onClick={onEditCancelClick}>Cancel</div>
     );
   } else {
-    actions.push(
+    rightToolbarActions.push(
       <div className="ghost-button" onClick={onEditClick}>Edit</div>
     );
   }
@@ -576,8 +614,13 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, onSav
 
   return (
     <div className="notes-editor-toolbar" onClick={handleClick}>
-      {actions}
-      <DropdownMenu actions={menuActions} />
+      <div className="left-toolbar">
+        {leftToolbarActions}
+      </div>
+      <div className="right-toolbar">
+        {rightToolbarActions}
+        <DropdownMenu actions={menuActions} />
+      </div>
     </div>
   );
 }

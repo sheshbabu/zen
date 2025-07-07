@@ -177,6 +177,7 @@ svg.lucide {
     width: 100%;
     height: 100%;
     overflow: hidden;
+    position: relative;
 }
 
 @media screen and (max-width: 948px) {
@@ -217,6 +218,10 @@ svg.lucide {
             display: none;
         }
     }
+}
+
+.sidebar-backdrop-container {
+    display: none;
 }
 
 .sidebar-container {
@@ -336,15 +341,35 @@ svg.lucide {
 }
 
 @media screen and (max-width: 948px) {
-    .sidebar-container {
-        display: none;
+    .sidebar-backdrop-container {
+        background-color: none;
+        transition: background-color 0.3s ease-in-out;
+
+        &.is-open {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2;
+            backdrop-filter: blur(2px);
+            background-color: rgba(0, 0, 0, 0.8);
+        }
     }
 
-    .mobile-home-container {
-        .sidebar-container {
-            display: flex;
-            min-width: 100vw;
-            background-color: var(--bg-primary);
+    .sidebar-container {
+        display: flex;
+        opacity: 0;
+        width: 0;
+        z-index: 3;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out, opacity 0.1s ease-in-out;
+
+        &.is-open {
+            width: 80vw;
+            transform: translateX(0);
+            opacity: 1;
 
             .sidebar-focus-switcher {
                 .dropdown-button {
@@ -394,6 +419,7 @@ svg.lucide {
             }
         }
     }
+
 }
 
 .mobile-navbar-container {
@@ -411,7 +437,7 @@ svg.lucide {
     .mobile-navbar {
         display: flex;
         justify-content: space-around;
-        padding: 0 8px;
+        padding: 8px;
         height: var(--mobile-navbar-height);
         background-color: var(--bg-primary);
         box-shadow: var(--shadow-6);
@@ -446,9 +472,17 @@ svg.lucide {
 
 .notes-list-toolbar {
     display: flex;
+    justify-content: space-between;
     padding: 8px 0;
-    margin-top: 6px;
-    margin-left: 4px;
+    margin: 6px 12px 0 4px;
+
+    .button-group {
+        display: flex;
+    }
+
+    .is-mobile {
+        display: none;
+    }
 
     svg.lucide {
         cursor: pointer;
@@ -465,6 +499,14 @@ svg.lucide {
             path {
                 stroke: var(--neutral-900);
             }
+        }
+    }
+}
+
+@media screen and (max-width: 948px) {
+    .notes-list-toolbar {
+        .is-mobile {
+            display: flex;
         }
     }
 }
@@ -705,9 +747,18 @@ svg.lucide {
         transform: translateY(10px);
     }
 
+    &.is-expanded {
+        position: absolute;
+        background: var(--bg-primary);
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+
     .notes-editor-toolbar {
         display: flex;
-        flex-direction: row-reverse;
+        justify-content: space-between;
         align-items: center;
         padding-top: 18px;
         padding-bottom: 18px;
@@ -716,6 +767,16 @@ svg.lucide {
         top: 0;
         background: var(--bg-primary);
         z-index: 1;
+
+        .right-toolbar,
+        .left-toolbar {
+            display: flex;
+            flex-direction: row-reverse;
+        }
+
+        .left-toolbar {
+            margin-left: -12px;
+        }
 
         svg.lucide {
             cursor: pointer;

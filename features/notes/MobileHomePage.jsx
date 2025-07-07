@@ -38,9 +38,7 @@ export default function MobileHomePage() {
 
   return (
     <div className="mobile-home-container">
-      <div className="sidebar-container">
-        <Sidebar focusModes={focusModes} tags={tags} />
-      </div>
+      <Sidebar focusModes={focusModes} tags={tags} />
 
       <MobileNavbar />
 

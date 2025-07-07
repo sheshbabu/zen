@@ -4,7 +4,6 @@ import Route from './commons/components/Route.jsx';
 import useAuth from './commons/auth/useAuth.jsx';
 import LoadingPage from './commons/components/LoadingPage.jsx';
 import NotesPage from "./features/notes/NotesPage.jsx";
-import MobileHomePage from './features/notes/MobileHomePage.jsx';
 import LoginPage from './features/users/LoginPage.jsx';
 import navigateTo from './commons/utils/navigateTo.js';
 import SearchMenu from './features/search/SearchMenu.jsx';
@@ -40,7 +39,6 @@ document.addEventListener("keydown", e => {
 
 function App() {
   const { isLoading, shouldShowLogin, shouldShowOnboarding } = useAuth();
-  const isMobile = window.matchMedia("(max-width: 948px)").matches;
 
   if (isLoading) {
     return <LoadingPage />;
@@ -58,7 +56,7 @@ function App() {
     <>
       <OfflineIndicator />
       <Router>
-        <Route path="/" component={isMobile ? MobileHomePage : NotesPage} />
+        <Route path="/" component={NotesPage} />
         <Route path="/notes/" component={NotesPage} />
         <Route path="/notes/:noteId" component={NotesPage} />
       </Router>

@@ -4,6 +4,7 @@ import NotesList from './NotesList.jsx';
 import NotesEditor from './NotesEditor.jsx';
 import MobileNavbar from '../../commons/components/MobileNavbar.jsx';
 import ApiClient from "../../commons/http/ApiClient.js";
+import isMobile from "../../commons/utils/isMobile.js";
 import useSearchParams from "../../commons/components/useSearchParams.jsx";
 
 export default function NotesPage({ noteId }) {
@@ -19,14 +20,13 @@ export default function NotesPage({ noteId }) {
   const [focusModes, setFocusModes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
   const [selectedView, setSelectedView] = useState("list"); // "list" || "card" || "gallery"
+  const [isSidebarOpen, setIsSidebarOpen] = useState(isMobile() ? false : true);
 
   const searchParams = useSearchParams();
   const selectedTagId = searchParams.get("tagId");
   const selectedFocusId = searchParams.get("focusId");
   const isArchivesPage = searchParams.get("isArchived") === "true";
   const isTrashPage = searchParams.get("isDeleted") === "true";
-
-  const isMobile = window.matchMedia("(max-width: 948px)").matches;
 
   let listClassName = "notes-list-container";
   let editorClassName = "notes-editor-container";
@@ -68,7 +68,7 @@ export default function NotesPage({ noteId }) {
 
     if (noteId === undefined) {
       // Automatically select first note in desktop mode
-      if (!isMobile && notes.length > 0) {
+      if (!isMobile() && notes.length > 0) {
         setSelectedNote(notes[0]);
         return;
       }
@@ -170,7 +170,7 @@ export default function NotesPage({ noteId }) {
     editorClassName = "notes-editor-container";
   } else if (selectedView === "card" || selectedView === "gallery") {
     listClassName = "notes-list-container grid";
-    if (noteId === undefined || !isMobile) {
+    if (noteId === undefined || !isMobile()) {
       editorClassName = "notes-editor-container is-hidden";
     } else {
       editorClassName = "notes-editor-container";
@@ -179,9 +179,7 @@ export default function NotesPage({ noteId }) {
 
   return (
     <div className="page-container">
-      <div className="sidebar-container">
-        <Sidebar focusModes={focusModes} tags={tags} />
-      </div>
+      <Sidebar isOpen={isSidebarOpen} onSidebarClose={() => setIsSidebarOpen(false)} focusModes={focusModes} tags={tags} />
 
       <div className={listClassName} data-page={noteId === undefined ? "notes" : "editor"}>
         <NotesList
@@ -196,6 +194,7 @@ export default function NotesPage({ noteId }) {
           onLoadMoreClick={handleLoadMoreClick}
           onLoadMoreImagesClick={handleLoadMoreImagesClick}
           onChange={handleNoteChange}
+          onSidebarToggle={() => setIsSidebarOpen(!isSidebarOpen)}
         />
       </div>
 

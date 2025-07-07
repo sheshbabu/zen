@@ -1,7 +1,7 @@
 import { h, render } from "../../assets/preact.esm.js"
 import Link from './Link.jsx';
 import SearchMenu from "../../features/search/SearchMenu.jsx";
-import { NotesIcon, SearchIcon, NewIcon, HomeIcon } from "./Icon.jsx"
+import { NotesIcon, SearchIcon, NewIcon } from "./Icon.jsx"
 
 export default function MobileNavbar() {
   function handleSearchClick() {
@@ -11,10 +11,6 @@ export default function MobileNavbar() {
   return (
     <div className="mobile-navbar-container">
       <div className="mobile-navbar">
-        <Link className="mobile-navbar-button" to="/" shouldPreserveSearchParams>
-          <HomeIcon />
-          Home
-        </Link>
         <Link className="mobile-navbar-button" to="/notes/" shouldPreserveSearchParams>
           <NotesIcon />
           Notes
