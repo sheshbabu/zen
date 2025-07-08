@@ -77,7 +77,7 @@ export default function LoginPage({ isOnboarding = false }) {
     <>
       <form className="login-container" onSubmit={handleLoginClick}>
         {header}
-        <Input id="email" label="Email" type="text" placeholder="Enter your email address" value={email} hint="" error={emailError} isDisabled={false} onChange={handleEmailChange} />
+        <Input id="email" label="Email" type="email" placeholder="Enter your email address" value={email} hint="" error={emailError} isDisabled={false} onChange={handleEmailChange} />
         <Input id="password" label="Password" type="password" placeholder="Enter your password" value={password} hint="" error={passwordError} isDisabled={false} onChange={handlePasswordChange} />
         <button className="button primary" type="submit" onClick={handleLoginClick}>{buttonText}<ArrowRightIcon /></button>
       </form>
