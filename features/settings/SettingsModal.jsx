@@ -1,14 +1,15 @@
 import { h, render, useState } from "../../assets/preact.esm.js"
-import { CloseIcon, UploadIcon } from "../../commons/components/Icon.jsx";
+import { CloseIcon, UploadIcon, ThemeIcon } from "../../commons/components/Icon.jsx";
 import ImportPane from "./ImportPane.jsx";
+import AppearancePane from "./AppearancePane.jsx";
 
-const tabs = [{ id: "import", label: "Import" }]
+const tabs = [
+  { id: "appearance", label: "Appearance", icon: <ThemeIcon className="settings-tab-icon" />, content: <AppearancePane /> },
+  { id: "import", label: "Import", icon: <UploadIcon className="settings-tab-icon" />, content: <ImportPane /> }
+];
 
 export default function SettingsModal() {
-  const [activeTab, setActiveTab] = useState("import");
-  
-  let sidebar = [];
-  let paneContent = null;
+  const [activeTab, setActiveTab] = useState("appearance");
 
   function handleBackdropClick(e) {
     if (e.target.classList.contains("modal-backdrop-container")) {
@@ -24,16 +25,14 @@ export default function SettingsModal() {
     setActiveTab(tabId);
   }
 
-  sidebar = tabs.map(tab => (
-    <div key={tab.id} className={`settings-tab ${activeTab === tab.id ? 'active' : ''}`} onClick={() => handleTabClick(tab.id)}>
-      <UploadIcon className="settings-tab-icon" />
+  const sidebar = tabs.map(tab => (
+    <div key={tab.id} className={`settings-tab ${activeTab === tab.id ? 'is-active' : ''}`} onClick={() => handleTabClick(tab.id)}>
+      {tab.icon}
       {tab.label}
     </div>
   ));
 
-  if (activeTab === "import") {
-    paneContent = <ImportPane />;
-  }
+  const paneContent = tabs.find(tab => tab.id === activeTab).content || null;
 
   return (
     <div className="modal-backdrop-container is-centered" onClick={handleBackdropClick}>
