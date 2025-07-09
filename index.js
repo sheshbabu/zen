@@ -4,7 +4,6 @@ import Route from './commons/components/Route.jsx';
 import useAuth from './commons/auth/useAuth.jsx';
 import LoadingPage from './commons/components/LoadingPage.jsx';
 import NotesPage from "./features/notes/NotesPage.jsx";
-import MobileHomePage from './features/notes/MobileHomePage.jsx';
 import LoginPage from './features/users/LoginPage.jsx';
 import navigateTo from './commons/utils/navigateTo.js';
 import SearchMenu from './features/search/SearchMenu.jsx';
@@ -39,13 +38,11 @@ document.addEventListener("keydown", e => {
 });
 
 function App() {
-  const isMobile = window.matchMedia("(max-width: 948px)").matches;
-
   return (
     <>
       <OfflineIndicator />
       <Router>
-        <Route path="/" component={isMobile ? MobileHomePage : NotesPage} />
+        <Route path="/" component={NotesPage} />
         <Route path="/notes/" component={NotesPage} />
         <Route path="/notes/:noteId" component={NotesPage} />
       </Router>
@@ -54,8 +51,19 @@ function App() {
 }
 
 function setUserPreferredTheme() {
-  const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
-  const theme = prefersDarkScheme.matches ? 'dark' : 'light';
-  document.querySelector("meta[name=theme-color]").setAttribute("content", theme === 'dark' ? "#121212" : "#FFF");
-  document.querySelector("meta[name=background-color]").setAttribute("content", theme === 'dark' ? "#121212" : "#FFF");
+  const savedThemeId = localStorage.getItem('theme-preference');
+  const darkBgColor = "#121212";
+  const lightBgColor = "#FFF";
+  
+  if (savedThemeId && savedThemeId !== 'system') {
+    document.documentElement.setAttribute('data-theme', savedThemeId);
+    const themeColor = savedThemeId === 'dark' ? darkBgColor : lightBgColor;
+    document.querySelector("meta[name=theme-color]").setAttribute("content", themeColor);
+    document.querySelector("meta[name=background-color]").setAttribute("content", themeColor);
+  } else {
+    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+    const theme = prefersDarkScheme.matches ? 'dark' : 'light';
+    document.querySelector("meta[name=theme-color]").setAttribute("content", theme === 'dark' ? darkBgColor : lightBgColor);
+    document.querySelector("meta[name=background-color]").setAttribute("content", theme === 'dark' ? darkBgColor : lightBgColor);
+  }
 }
