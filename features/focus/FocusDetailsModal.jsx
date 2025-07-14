@@ -65,8 +65,8 @@ export default function FocusDetailsModal({ mode, focusMode }) {
   }
 
   return (
-    <div class="modal-backdrop-container is-centered" onClick={handleBackdropClick}>
-      <div class="modal-content-container focus-dialog">
+    <div className="modal-backdrop-container is-centered" onClick={handleBackdropClick}>
+      <div className="modal-content-container focus-dialog">
         <div className="modal-header">
           <h3 className="modal-title">{title}</h3>
           <CloseIcon className="notes-editor-toolbar-button-close" onClick={closeModal} />

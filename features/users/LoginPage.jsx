@@ -60,15 +60,15 @@ export default function LoginPage({ isOnboarding = false }) {
   if (isOnboarding) {
     header = (
       <div>
-        <div class="login-title">Let's get started!</div>
-        <div class="login-subtitle">Create your admin account</div>
+        <div className="login-title">Let's get started!</div>
+        <div className="login-subtitle">Create your admin account</div>
       </div>
     );
     buttonText = "Continue";
   } else {
     header = (
       <div>
-        <div class="login-title">Login</div>
+        <div className="login-title">Login</div>
       </div>
     );
   }

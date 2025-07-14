@@ -43,8 +43,8 @@ export default function TagDetailModal({ tag }) {
   }
 
   return (
-    <div class="modal-backdrop-container is-centered" onClick={handleBackdropClick}>
-      <div class="modal-content-container tag-dialog">
+    <div className="modal-backdrop-container is-centered" onClick={handleBackdropClick}>
+      <div className="modal-content-container tag-dialog">
         <div className="modal-header">
           <h3 className="modal-title">Manage Tag</h3>
           <CloseIcon className="notes-editor-toolbar-button-close" onClick={closeModal} />
