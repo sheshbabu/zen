@@ -103,6 +103,7 @@ func DeleteExpiredSessions() {
 	_, err := sqlite.DB.Exec(query, time.Now().Format(expiresAtFormat))
 
 	if err != nil {
-		slog.Error("error deleting expired sessions", "error", err)
+		err = fmt.Errorf("error deleting expired sessions: %w", err)
+		slog.Error(err.Error())
 	}
 }

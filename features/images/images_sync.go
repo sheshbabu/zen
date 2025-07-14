@@ -17,24 +17,32 @@ func SyncImagesFromDisk() error {
 
 	diskImages, err := scanImagesDirectory()
 	if err != nil {
-		return fmt.Errorf("error scanning images directory: %w", err)
+		err = fmt.Errorf("error scanning images directory: %w", err)
+		slog.Error(err.Error())
+		return err
 	}
 
 	dbImages, err := getAllDatabaseImages()
 	if err != nil {
-		return fmt.Errorf("error retrieving database images: %w", err)
+		err = fmt.Errorf("error retrieving database images: %w", err)
+		slog.Error(err.Error())
+		return err
 	}
 
 	notesWithImages, err := notes.GetNotesWithImages()
 	if err != nil {
-		return fmt.Errorf("error getting notes with images: %w", err)
+		err = fmt.Errorf("error getting notes with images: %w", err)
+		slog.Error(err.Error())
+		return err
 	}
 
 	noteImageRefs := extractImageReferencesFromNotes(notesWithImages)
 
 	err = syncImageRecords(diskImages, dbImages, noteImageRefs)
 	if err != nil {
-		return fmt.Errorf("error syncing image records: %w", err)
+		err = fmt.Errorf("error syncing image records: %w", err)
+		slog.Error(err.Error())
+		return err
 	}
 
 	slog.Info("image sync job completed")
@@ -191,13 +199,17 @@ func createImageRecordFromFile(filename string, fileInfo os.FileInfo) error {
 	filepath := filepath.Join("images", filename)
 	file, err := os.Open(filepath)
 	if err != nil {
-		return fmt.Errorf("error opening image file: %w", err)
+		err = fmt.Errorf("error opening image file: %w", err)
+		slog.Error(err.Error())
+		return err
 	}
 	defer file.Close()
 
 	imageInfo, err := getImageInfo(file, filename)
 	if err != nil {
-		return fmt.Errorf("error getting image info: %w", err)
+		err = fmt.Errorf("error getting image info: %w", err)
+		slog.Error(err.Error())
+		return err
 	}
 
 	imageRecord := ImageRecord{
@@ -212,7 +224,9 @@ func createImageRecordFromFile(filename string, fileInfo os.FileInfo) error {
 
 	_, err = CreateImage(imageRecord)
 	if err != nil {
-		return fmt.Errorf("error creating image record: %w", err)
+		err = fmt.Errorf("error creating image record: %w", err)
+		slog.Error(err.Error())
+		return err
 	}
 
 	slog.Info("inserted image into database", "filename", filename)
@@ -229,7 +243,9 @@ func ensureImageNoteLinks(noteIDs []int, filename string) error {
 		if !contains(existingLinks, noteID) {
 			err := LinkImageToNote(noteID, filename)
 			if err != nil {
-				return fmt.Errorf("error linking image to note: %w", err)
+				err = fmt.Errorf("error linking image to note: %w", err)
+				slog.Error(err.Error())
+				return err
 			}
 		}
 	}
@@ -260,7 +276,9 @@ func deleteImageFromFilesystem(filename string) error {
 
 	err := os.Remove(filepath)
 	if err != nil {
-		return fmt.Errorf("error deleting image file %s: %w", filepath, err)
+		err = fmt.Errorf("error deleting image file %s: %w", filepath, err)
+		slog.Error(err.Error())
+		return err
 	}
 
 	return nil
