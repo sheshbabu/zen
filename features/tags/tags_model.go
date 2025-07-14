@@ -158,21 +158,31 @@ func UpdateTag(tag Tag) error {
 }
 
 func DeleteTag(tagID int) error {
-	query := `
-		DELETE FROM
-			note_tags
-		WHERE
-			tag_id = ?;
-
-		DELETE FROM
-			tags
-		WHERE
-			tag_id = ?;
-	`
-
-	_, err := sqlite.DB.Exec(query, tagID, tagID)
+	tx, err := sqlite.DB.Begin()
 	if err != nil {
-		err = fmt.Errorf("error deleting tag: %w", err)
+		err = fmt.Errorf("error starting transaction: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+	defer tx.Rollback()
+
+	_, err = tx.Exec("DELETE FROM note_tags WHERE tag_id = ?", tagID)
+	if err != nil {
+		err = fmt.Errorf("error deleting from note_tags: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	_, err = tx.Exec("DELETE FROM tags WHERE tag_id = ?", tagID)
+	if err != nil {
+		err = fmt.Errorf("error deleting from tags: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("error committing transaction: %w", err)
 		slog.Error(err.Error())
 		return err
 	}
