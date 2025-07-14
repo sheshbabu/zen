@@ -3,6 +3,7 @@ import Input from "../../commons/components/Input.jsx";
 import { ArrowRightIcon } from "../../commons/components/Icon.jsx";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import ApiClient from "../../commons/http/ApiClient.js";
+import "./LoginPage.css";
 
 export default function LoginPage({ isOnboarding = false }) {
   const [email, setEmail] = useState("");

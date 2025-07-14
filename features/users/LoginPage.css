@@ -1,0 +1,19 @@
+.login-container {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+
+    .login-title {
+        font: var(--h5);
+    }
+
+    .login-subtitle {
+        margin-top: 4px;
+        color: var(--neutral-400);
+    }
+
+    .button {
+        margin-top: 24px;
+        align-self: flex-start;
+    }
+}

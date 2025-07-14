@@ -2,6 +2,7 @@ import { h, render, useEffect, useState, useRef } from "../../assets/preact.esm.
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon } from "../../commons/components/Icon.jsx";
+import "./SearchMenu.css";
 
 export default function SearchMenu() {
   const [query, setQuery] = useState("");

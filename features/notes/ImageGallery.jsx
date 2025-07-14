@@ -1,4 +1,5 @@
 import { h, render, useEffect, useRef, useState, useCallback, Fragment } from "../../assets/preact.esm.js";
+import "./ImageGallery.css";
 
 const MIN_COLUMN_WIDTH = 300;
 const GUTTER_WIDTH = 20;

@@ -1,0 +1,22 @@
+.notes-editor-modal {
+    width: 90vw;
+    max-width: 1200px;
+    height: 80vh;
+    max-height: 800px;
+    overflow: hidden;
+
+    .modal-content {
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .notes-editor {
+        height: 100%;
+        border: none;
+        border-radius: 0;
+        padding: 32px;
+        padding-top: 0;
+        overflow-y: auto;
+    }
+}

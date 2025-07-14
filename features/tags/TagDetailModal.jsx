@@ -3,6 +3,7 @@ import Input from "../../commons/components/Input.jsx";
 import { CloseIcon } from "../../commons/components/Icon.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
+import "./TagDetailModal.css";
 
 export default function TagDetailModal({ tag }) {
   const [name, setName] = useState(tag.name);

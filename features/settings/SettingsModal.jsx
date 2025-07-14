@@ -2,6 +2,7 @@ import { h, render, useState } from "../../assets/preact.esm.js"
 import { CloseIcon, UploadIcon, ThemeIcon } from "../../commons/components/Icon.jsx";
 import ImportPane from "./ImportPane.jsx";
 import AppearancePane from "./AppearancePane.jsx";
+import "./SettingsModal.css";
 
 const tabs = [
   { id: "appearance", label: "Appearance", icon: <ThemeIcon className="settings-tab-icon" />, content: <AppearancePane /> },

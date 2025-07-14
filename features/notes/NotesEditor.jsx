@@ -8,6 +8,7 @@ import isMobile from '../../commons/utils/isMobile.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
 import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
+import "./NotesEditor.css";
 import { CloseIcon, SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
 
 export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange, onClose }) {

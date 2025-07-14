@@ -1,6 +1,7 @@
 import { h, render } from "../../assets/preact.esm.js"
 import NotesEditor from './NotesEditor.jsx';
 import { CloseIcon } from "../../commons/components/Icon.jsx";
+import "./NotesEditorModal.css";
 
 export default function NotesEditorModal({ note, onChange }) {
   function handleBackdropClick(e) {

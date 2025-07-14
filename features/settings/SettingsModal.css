@@ -1,0 +1,292 @@
+.settings-modal {
+    width: 800px;
+    max-height: 600px;
+    overflow: hidden;
+
+    .settings-content {
+        display: flex;
+        height: 500px;
+    }
+
+    .settings-sidebar {
+        width: 200px;
+        background-color: var(--bg-secondary);
+        border-right: 1px solid var(--neutral-100);
+        padding: 8px 0;
+
+        .settings-tab {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 0 8px;
+            text-decoration: none;
+            color: var(--neutral-500);
+            transition-property: color, stroke;
+            transition-duration: 500ms;
+
+            &:hover,
+            &.is-active {
+                color: var(--neutral-900);
+
+                svg.lucide {
+
+                    circle,
+                    rect,
+                    path {
+                        stroke: var(--neutral-900);
+                    }
+                }
+            }
+
+            svg.lucide {
+                padding: 8px;
+            }
+        }
+    }
+
+    .settings-main {
+        flex: 1;
+        padding: 12px 24px;
+        overflow-y: auto;
+
+        .settings-tab-content {
+            h3 {
+                margin-bottom: 8px;
+            }
+
+            p {
+                margin-bottom: 12px;
+                color: var(--text-secondary);
+                font: var(--sm);
+            }
+
+            .file-upload-container {
+                margin-bottom: 16px;
+
+                input[type="file"] {
+                    display: none;
+                }
+
+                .file-upload-label {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 12px 16px;
+                    border: 1px dashed var(--neutral-300);
+                    border-radius: 4px;
+                    color: var(--neutral-400);
+                    cursor: pointer;
+                    transition-property: color, background-color;
+                    transition-duration: 500ms;
+                    font: var(--sm);
+                    min-height: 100px;
+                    justify-content: center;
+
+                    &:hover {
+                        background-color: var(--neutral-50);
+                        border-color: var(--neutral-400);
+                    }
+
+                    &.disabled {
+                        cursor: not-allowed;
+                    }
+
+                    svg {
+                        width: 16px;
+                        height: 16px;
+                    }
+                }
+
+                .upload-progress {
+                    margin-top: 16px;
+
+                    .upload-progress-text {
+                        font: var(--sm);
+                        color: var(--text-secondary);
+                        margin-bottom: 8px;
+                    }
+
+                    .upload-progress-bar {
+                        width: 100%;
+                        height: 8px;
+                        background-color: var(--neutral-200);
+                        box-shadow: inset var(--shadow-4);
+                        border-radius: 4px;
+                        overflow: hidden;
+
+                        .upload-progress-fill {
+                            height: 100%;
+                            border-radius: 4px;
+                            background-color: var(--neutral-700);
+                            transition: width 0.3s ease;
+                        }
+                    }
+                }
+
+                .upload-summary {
+                    margin-top: 16px;
+
+                    h4 {
+                        margin-bottom: 4px;
+                    }
+
+                    .upload-summary-message {
+                        margin-bottom: 16px;
+
+                        a {
+                            display: inline;
+                            font: var(--sm);
+                            color: var(--text-primary);
+                            text-decoration: none;
+                        }
+                    }
+
+                    .upload-summary-section {
+                        h5 {
+                            margin-bottom: 8px;
+                            display: flex;
+                            align-items: center;
+                            gap: 4px;
+
+                            svg {
+                                width: 16px;
+                                height: 16px;
+
+                                line,
+                                circle,
+                                rect,
+                                path {
+                                    stroke-width: 2.5;
+                                }
+                            }
+                        }
+
+                        &.uploaded {
+                            h5 {
+                                color: var(--green-500);
+
+                                svg {
+
+                                    line,
+                                    circle,
+                                    rect,
+                                    path {
+                                        stroke: var(--green-500);
+                                    }
+                                }
+                            }
+                        }
+
+                        &.skipped {
+                            h5 {
+                                color: var(--yellow-500);
+
+                                svg {
+
+                                    line,
+                                    circle,
+                                    rect,
+                                    path {
+                                        stroke: var(--yellow-500);
+                                    }
+                                }
+                            }
+                        }
+
+                        &.errored {
+                            h5 {
+                                color: var(--red-500);
+
+                                svg {
+
+                                    line,
+                                    circle,
+                                    rect,
+                                    path {
+                                        stroke: var(--red-500);
+                                    }
+                                }
+                            }
+                        }
+
+                        .file-list {
+                            padding: 0;
+                            margin-bottom: 8px;
+                            color: var(--text-secondary);
+                            font: var(--code);
+
+                            .file-item {
+                                list-style: none;
+                            }
+                        }
+                    }
+                }
+            }
+
+            .theme-selector {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+                gap: 16px;
+                margin-top: 16px;
+
+                .theme-option {
+                    cursor: pointer;
+                    border: 1px solid var(--neutral-200);
+                    border-radius: 8px;
+                    padding: 12px;
+                    transition: all 0.2s ease;
+
+                    &:hover {
+                        border-color: var(--neutral-300);
+                    }
+
+                    &.is-selected {
+                        border-color: var(--neutral-600);
+                    }
+
+                    .theme-preview {
+                        position: relative;
+                        width: 100%;
+                        height: auto;
+                        overflow: hidden;
+                        margin-bottom: 16px;
+                        background: var(--bg-primary);
+
+                        svg {
+                            width: 100%;
+                            height: auto;
+                            display: block;
+                        }
+
+                        .system-theme-preview {
+                            display: flex;
+                            position: relative;
+
+                            .system-theme-half {
+                                flex: 1;
+                                overflow: hidden;
+
+                                &:first-child {
+                                    clip-path: polygon(0 0, 100% 0, 0 100%);
+                                }
+
+                                &:last-child {
+                                    margin-left: -100%;
+                                    clip-path: polygon(100% 0, 100% 0, 100% 100%, 0 100%);
+                                }
+                            }
+                        }
+                    }
+
+                    .theme-info {
+                        .theme-name {
+                            font: var(--sm);
+                            font-weight: 600;
+                            color: var(--text-primary);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,8 @@
+.focus-dialog,
+.tag-dialog {
+    width: 600px;
+
+    .notes-editor-tags-input {
+        display: inline-block;
+    }
+}

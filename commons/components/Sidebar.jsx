@@ -4,7 +4,8 @@ import SidebarTagsList from "../../features/tags/SidebarTagsList.jsx";
 import FocusSwitcher from "../../features/focus/FocusSwitcher.jsx";
 import SearchMenu from "../../features/search/SearchMenu.jsx";
 import SettingsModal from "../../features/settings/SettingsModal.jsx";
-import { NotesIcon, SearchIcon, NewIcon, ArchiveIcon, TrashIcon, BoardIcon, SettingsIcon, TemplatesIcon } from "./Icon.jsx"
+import { NotesIcon, SearchIcon, NewIcon, ArchiveIcon, TrashIcon, BoardIcon, SettingsIcon, TemplatesIcon } from "./Icon.jsx";
+import "./Sidebar.css";
 
 export default function Sidebar({ isOpen, onSidebarClose, focusModes, tags }) {
   useEffect(() => {

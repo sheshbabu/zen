@@ -7,6 +7,7 @@ import formatDate from '../../commons/utils/formatDate.js';
 import isMobile from "../../commons/utils/isMobile.js";
 import ImageGallery from "./ImageGallery.jsx";
 import NotesEditorModal from './NotesEditorModal.jsx';
+import "./NotesList.css";
 
 export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onChange, onSidebarToggle }) {
   let listClassName = "notes-list";

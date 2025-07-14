@@ -1,5 +1,6 @@
 import { h, render, useState, useEffect } from "../../assets/preact.esm.js"
 import { CloseIcon } from "./Icon.jsx";
+import "./Toast.css";
 
 function Toast({ message, duration = 3000 }) {
   const [isOpen, setIsOpen] = useState(true);
