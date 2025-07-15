@@ -123,6 +123,7 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
 
 #### Component Structure
 - Use function components with hooks
+- Main exported function/component should always be the top function unless there are hoisting issues
 - Early returns for conditional rendering
 - Sub-components defined in same file after main component
 - Default exports for components, named exports for utilities

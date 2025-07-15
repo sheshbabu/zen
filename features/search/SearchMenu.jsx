@@ -4,10 +4,14 @@ import navigateTo from "../../commons/utils/navigateTo.js";
 import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon, TagIcon } from "../../commons/components/Icon.jsx";
 import "./SearchMenu.css";
 
+const SEARCH_HISTORY_KEY = 'search-history';
+const MAX_HISTORY_ENTRIES = 5;
+
 export default function SearchMenu() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState({ notes: [], tags: [] });
   const [selectedItem, setSelectedItem] = useState(null);
+  const [searchHistory, setSearchHistory] = useState([]);
 
   const inputRef = useRef(null);
 
@@ -15,6 +19,7 @@ export default function SearchMenu() {
     if (inputRef.current) {
       inputRef.current.focus();
     }
+    setSearchHistory(getSearchHistory());
   }, []);
 
   function handleChange(e) {
@@ -23,6 +28,7 @@ export default function SearchMenu() {
 
     if (value.trim() === "") {
       setResults({ notes: [], tags: [] });
+      setSelectedItem(searchHistory.length > 0 ? searchHistory[0] : null);
       return;
     }
 
@@ -37,8 +43,8 @@ export default function SearchMenu() {
   }
 
   function handleKeyUp(e) {
-    const allItems = [...results.notes, ...results.tags];
-    
+    const allItems = query.trim() === "" ? searchHistory : [...results.notes, ...results.tags];
+
     if (e.key === "ArrowDown") {
       const nextIndex = allItems.indexOf(selectedItem) + 1;
       if (nextIndex < allItems.length) {
@@ -70,6 +76,7 @@ export default function SearchMenu() {
   }
 
   function handleResultClick(item) {
+    saveToSearchHistory(item);
     if (item.noteId) {
       navigateTo(`/notes/${item.noteId}`);
     } else if (item.tagId) {
@@ -84,25 +91,56 @@ export default function SearchMenu() {
     }
   }
 
-  let noteItems = [];
-  let tagItems = [];
-  
-  if (results.notes.length > 0) {
-    noteItems = results.notes.map((item, index) => {
-      const isSelected = item.noteId === selectedItem?.noteId;
-      return (
-        <SearchResultItem key={`note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
-      )
-    });
-  }
+  let historySection = null;
+  let notesSection = null;
+  let tagsSection = null;
 
-  if (results.tags.length > 0) {
-    tagItems = results.tags.map((item, index) => {
-      const isSelected = item.tagId === selectedItem?.tagId;
+  if (query.trim() === "" && searchHistory.length > 0) {
+    const historyItems = searchHistory.map((item, index) => {
+      const isSelected = (item.noteId && item.noteId === selectedItem?.noteId) || (item.tagId && item.tagId === selectedItem?.tagId);
       return (
-        <SearchResultItem key={`tag-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
+        <SearchResultItem key={`history-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
       )
     });
+
+    historySection = (
+      <div className="search-section">
+        <h4 className="search-section-title">Recent</h4>
+        {historyItems}
+      </div>
+    );
+  } else {
+    if (results.notes.length > 0) {
+      const noteItems = results.notes.map((item, index) => {
+        const isSelected = item.noteId === selectedItem?.noteId;
+        return (
+          <SearchResultItem key={`note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
+        )
+      });
+
+      notesSection = (
+        <div className="search-section">
+          <h4 className="search-section-title">Notes</h4>
+          {noteItems}
+        </div>
+      );
+    }
+
+    if (results.tags.length > 0) {
+      const tagItems = results.tags.map((item, index) => {
+        const isSelected = item.tagId === selectedItem?.tagId;
+        return (
+          <SearchResultItem key={`tag-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
+        )
+      });
+
+      tagsSection = (
+        <div className="search-section">
+          <h4 className="search-section-title">Tags</h4>
+          {tagItems}
+        </div>
+      );
+    }
   }
 
   return (
@@ -120,8 +158,9 @@ export default function SearchMenu() {
           />
         </div>
         <div className="search-results-container">
-          {noteItems}
-          {tagItems}
+          {historySection}
+          {notesSection}
+          {tagsSection}
         </div>
       </div>
     </div>
@@ -153,3 +192,36 @@ function SearchResultItem({ item, isSelected, onClick }) {
   );
 }
 
+function getSearchHistory() {
+  try {
+    const history = localStorage.getItem(SEARCH_HISTORY_KEY);
+    return history ? JSON.parse(history) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveToSearchHistory(item) {
+  try {
+    let history = getSearchHistory();
+
+    const existingIndex = history.findIndex(h =>
+      (h.noteId && h.noteId === item.noteId) ||
+      (h.tagId && h.tagId === item.tagId)
+    );
+
+    if (existingIndex !== -1) {
+      history.splice(existingIndex, 1);
+    }
+
+    history.unshift(item);
+
+    if (history.length > MAX_HISTORY_ENTRIES) {
+      history = history.slice(0, MAX_HISTORY_ENTRIES);
+    }
+
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
+  } catch {
+    // Ignore localStorage errors
+  }
+}

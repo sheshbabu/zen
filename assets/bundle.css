@@ -177,6 +177,12 @@
     &::-webkit-scrollbar {
       display: none;
     }
+    .search-section-title {
+      font: var(--sm);
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 10px;
+    }
     .search-result-item {
       display: flex;
       align-items: center;
