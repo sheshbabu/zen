@@ -135,6 +135,7 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
 
 #### API Calls
 - Use centralized `ApiClient` from `commons/http/ApiClient.js`
+- Use specific named methods (e.g., `ApiClient.createUser()`, `ApiClient.getTokens()`) rather than generic HTTP methods
 - Promise chains with `.then()`, `.catch()`, `.finally()`
 - Consistent error handling with toast notifications
 - Skip toast for expected errors using `skipCodes` array

@@ -33,6 +33,16 @@ type NotesFilter struct {
 	isArchived  bool
 }
 
+func NewNotesFilter(page, tagID, focusModeID int, isDeleted, isArchived bool) NotesFilter {
+	return NotesFilter{
+		page:        page,
+		tagID:       tagID,
+		focusModeID: focusModeID,
+		isDeleted:   isDeleted,
+		isArchived:  isArchived,
+	}
+}
+
 func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 	var allNotes []Note
 	var err error

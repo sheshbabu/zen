@@ -213,6 +213,20 @@ async function importFile(formData) {
   return await request('POST', '/api/import/', formData);
 }
 
+// MCP Tokens
+
+async function getTokens() {
+  return await request('GET', '/api/mcp/tokens/');
+}
+
+async function createToken(payload) {
+  return await request('POST', '/api/mcp/tokens/', payload);
+}
+
+async function deleteToken(tokenId) {
+  return await request('DELETE', `/api/mcp/tokens/${tokenId}/`);
+}
+
 export default {
   request,
   checkUser,
@@ -236,5 +250,8 @@ export default {
   getImages,
   uploadImage,
   search,
-  importFile
+  importFile,
+  getTokens,
+  createToken,
+  deleteToken
 };

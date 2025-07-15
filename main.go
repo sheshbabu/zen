@@ -15,6 +15,7 @@ import (
 	"zen/commons/sqlite"
 	"zen/features/focus"
 	"zen/features/images"
+	"zen/features/mcp"
 	"zen/features/notes"
 	"zen/features/search"
 	"zen/features/settings"
@@ -106,7 +107,14 @@ func newRouter() *http.ServeMux {
 
 	addPrivateRoute(mux, "POST /api/import/", settings.HandleImport)
 
+	addPrivateRoute(mux, "GET /api/mcp/tokens/", mcp.HandleGetMCPTokens)
+	addPrivateRoute(mux, "POST /api/mcp/tokens/", mcp.HandleCreateMCPToken)
+	addPrivateRoute(mux, "DELETE /api/mcp/tokens/{tokenId}/", mcp.HandleRevokeMCPToken)
+
 	addPrivateRoute(mux, "GET /api/search/", search.HandleSearch)
+
+	mux.HandleFunc("POST /mcp", mcp.HandleMCP)
+	mux.HandleFunc("OPTIONS /mcp", mcp.HandleMCP)
 
 	mux.HandleFunc("GET /assets/", handleStaticAssets)
 	mux.HandleFunc("GET /images/", handleUploadedImages)

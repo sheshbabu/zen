@@ -328,9 +328,11 @@ svg.lucide {
 }
 
 @media (prefers-color-scheme: dark) {
-    .button {
-        &.danger {
-            color: var(--text-primary);
+    [data-theme="dark"] {
+        .button {
+            &.danger {
+                color: var(--text-primary);
+            }
         }
     }
 }
