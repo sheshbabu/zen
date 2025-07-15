@@ -495,6 +495,7 @@
                         <ul class="sidebar-nav-sub">
                             <li><a href="#mcp-generate-token" class="sidebar-nav-item">Generate Token</a></li>
                             <li><a href="#mcp-claude-code" class="sidebar-nav-item">Claude Code</a></li>
+                            <li><a href="#mcp-lm-studio" class="sidebar-nav-item">LM Studio</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -748,6 +749,29 @@ docker compose restart
                     <li>List all your notes</li>
                     <li>Access notes from your development workflow</li>
                 </ul>
+
+                <h3 id="mcp-lm-studio">LM Studio</h3>
+                <p>
+                    To integrate Zen with LM Studio, you can configure the MCP server in your LM Studio settings.
+                    See the <a href="https://lmstudio.ai/docs/app/plugins/mcp#use-mcp-servers-in-lm-studio">LM Studio MCP documentation</a> for detailed setup instructions.
+                </p>
+
+                <p>Add the following configuration to your <code>mcp.json</code> file:</p>
+
+                <pre>
+{
+  "mcpServers": {
+    "zen-notes": {
+      "url": "http://&lt;ZEN_URL&gt;/mcp",
+      "headers": {
+        "Authorization": "Bearer &lt;TOKEN&gt;"
+      }
+    }
+  }
+}
+                </pre>
+
+                <p>Replace <code>&lt;TOKEN&gt;</code> with the actual token you generated.</p>
             </section>
 
 
