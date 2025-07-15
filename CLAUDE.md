@@ -79,7 +79,8 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
 ### Preact/React Components
 - Extract logic from components into separate if-else conditions
 - Extract map loops to variables outside JSX
-- Ternary operators in JSX are fine when used sparingly and concisely
+- For conditional rendering, use if-else conditions outside JSX to build arrays/variables, not ternary operators or logical AND inside JSX
+- Ternary operators in JSX are only acceptable for simple inline styles or class names
 - Use `is` prefix for boolean props (`isActive`, `isLoading`)
 - Use `has`, `can`, `should` prefixes for other boolean checks
 - Refer to `index.css` for styling patterns

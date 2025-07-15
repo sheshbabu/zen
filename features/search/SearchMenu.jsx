@@ -1,12 +1,12 @@
 import { h, render, useEffect, useState, useRef } from "../../assets/preact.esm.js"
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
-import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon } from "../../commons/components/Icon.jsx";
+import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon, TagIcon } from "../../commons/components/Icon.jsx";
 import "./SearchMenu.css";
 
 export default function SearchMenu() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState({ notes: [], tags: [] });
   const [selectedItem, setSelectedItem] = useState(null);
 
   const inputRef = useRef(null);
@@ -22,36 +22,39 @@ export default function SearchMenu() {
     setQuery(value);
 
     if (value.trim() === "") {
-      setResults([]);
+      setResults({ notes: [], tags: [] });
       return;
     }
 
     ApiClient.search(value)
-      .then(notes => {
-        setResults(notes);
-        if (notes.length > 0) {
-          setSelectedItem(notes[0]);
+      .then(searchResults => {
+        setResults(searchResults);
+        const allItems = [...searchResults.notes, ...searchResults.tags];
+        if (allItems.length > 0) {
+          setSelectedItem(allItems[0]);
         }
       });
   }
 
   function handleKeyUp(e) {
+    const allItems = [...results.notes, ...results.tags];
+    
     if (e.key === "ArrowDown") {
-      const nextIndex = results.indexOf(selectedItem) + 1;
-      if (nextIndex < results.length) {
-        setSelectedItem(results[nextIndex]);
+      const nextIndex = allItems.indexOf(selectedItem) + 1;
+      if (nextIndex < allItems.length) {
+        setSelectedItem(allItems[nextIndex]);
       } else {
-        setSelectedItem(results[0]);
+        setSelectedItem(allItems[0]);
       }
       return;
     }
 
     if (e.key === "ArrowUp") {
-      const prevIndex = results.indexOf(selectedItem) - 1;
+      const prevIndex = allItems.indexOf(selectedItem) - 1;
       if (prevIndex >= 0) {
-        setSelectedItem(results[prevIndex]);
+        setSelectedItem(allItems[prevIndex]);
       } else {
-        setSelectedItem(results[results.length - 1]);
+        setSelectedItem(allItems[allItems.length - 1]);
       }
       return;
     }
@@ -67,7 +70,11 @@ export default function SearchMenu() {
   }
 
   function handleResultClick(item) {
-    navigateTo(`/notes/${item.noteId}`);
+    if (item.noteId) {
+      navigateTo(`/notes/${item.noteId}`);
+    } else if (item.tagId) {
+      navigateTo(`/?tagId=${item.tagId}`);
+    }
     closeModal();
   }
 
@@ -77,12 +84,26 @@ export default function SearchMenu() {
     }
   }
 
-  const items = results.map((item, index) => {
-    const isSelected = item.noteId === selectedItem?.noteId;
-    return (
-      <SearchResultItem key={index} item={item} isSelected={isSelected} onClick={e => handleResultClick(item)} />
-    )
-  });
+  let noteItems = [];
+  let tagItems = [];
+  
+  if (results.notes.length > 0) {
+    noteItems = results.notes.map((item, index) => {
+      const isSelected = item.noteId === selectedItem?.noteId;
+      return (
+        <SearchResultItem key={`note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
+      )
+    });
+  }
+
+  if (results.tags.length > 0) {
+    tagItems = results.tags.map((item, index) => {
+      const isSelected = item.tagId === selectedItem?.tagId;
+      return (
+        <SearchResultItem key={`tag-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
+      )
+    });
+  }
 
   return (
     <div className="modal-backdrop-container" onClick={handleBackdropClick}>
@@ -99,7 +120,8 @@ export default function SearchMenu() {
           />
         </div>
         <div className="search-results-container">
-          {items}
+          {noteItems}
+          {tagItems}
         </div>
       </div>
     </div>
@@ -108,8 +130,13 @@ export default function SearchMenu() {
 
 function SearchResultItem({ item, isSelected, onClick }) {
   let icon = <NoteIcon />
+  let title = item.title || item.name
+  let subtitle = item.snippet || ""
 
-  if (item.isArchived) {
+  if (item.tagId) {
+    icon = <TagIcon />
+    subtitle = "Tag"
+  } else if (item.isArchived) {
     icon = <ArchiveIcon />
   } else if (item.isDeleted) {
     icon = <TrashIcon />
@@ -119,8 +146,8 @@ function SearchResultItem({ item, isSelected, onClick }) {
     <div className={`search-result-item ${isSelected ? "is-selected" : ""}`} onClick={onClick}>
       {icon}
       <div className="search-result-item-content">
-        <p className="title">{item.title}</p>
-        <p className="subtitle">{item.snippet}</p>
+        <p className="title">{title}</p>
+        <p className="subtitle">{subtitle}</p>
       </div>
     </div>
   );
