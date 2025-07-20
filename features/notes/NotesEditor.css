@@ -30,6 +30,12 @@
         bottom: 0;
         left: 0;
         right: 0;
+
+        /* Don't take up full width */
+        .notes-editor {
+            width: 850px;
+            margin: 0 auto;
+        }
     }
 
     .notes-editor-toolbar {

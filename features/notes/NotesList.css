@@ -37,11 +37,11 @@
 
         .notes-list-item-title {
             font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
 
             &.untitled {
                 color: var(--neutral-300);
-                white-space: nowrap;
-                overflow: hidden;
             }
         }
 

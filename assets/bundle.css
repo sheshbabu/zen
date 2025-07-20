@@ -974,6 +974,10 @@
     bottom: 0;
     left: 0;
     right: 0;
+    .notes-editor {
+      width: 850px;
+      margin: 0 auto;
+    }
   }
   .notes-editor-toolbar {
     display: flex;
@@ -1429,10 +1433,10 @@
     }
     .notes-list-item-title {
       font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
       &.untitled {
         color: var(--neutral-300);
-        white-space: nowrap;
-        overflow: hidden;
       }
     }
     .notes-list-item-subcontainer {

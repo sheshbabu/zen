@@ -346,6 +346,7 @@ svg.lucide {
     align-items: center;
     padding: 4px 8px;
     margin-right: 4px;
+    margin-bottom: 4px;
     border-radius: 4px;
     font-weight: 500;
     color: var(--neutral-400);
