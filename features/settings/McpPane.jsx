@@ -5,6 +5,7 @@ import formatDate from "../../commons/utils/formatDate.js";
 
 export default function McpPane() {
   const [tokens, setTokens] = useState([]);
+  const [isTokensLoading, setIsTokensLoading] = useState(true);
   const [newTokenName, setNewTokenName] = useState("");
   const [newlyCreatedToken, setNewlyCreatedToken] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -20,6 +21,8 @@ export default function McpPane() {
       setTokens(response);
     } catch (err) {
       console.error('Load token error:', err);
+    } finally {
+      setIsTokensLoading(false);
     }
   }
 
@@ -90,7 +93,7 @@ export default function McpPane() {
   }
 
   let tokensContent = null;
-  if (tokens.length === 0) {
+  if (tokens.length === 0 && isTokensLoading === false) {
     tokensContent = <p className="mcp-no-tokens">No tokens created yet. Create your first token above.</p>;
   } else {
     tokensContent = (
