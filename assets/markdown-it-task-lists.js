@@ -22,7 +22,7 @@ module.exports = function(md, options) {
 			if (isTodoItem(tokens, i)) {
 				todoify(tokens[i], state.Token);
 				attrSet(tokens[i-2], 'class', 'task-list-item' + (!disableCheckboxes ? ' enabled' : ''));
-				attrSet(tokens[parentToken(tokens, i-2)], 'class', 'contains-task-list');
+				attrSet(tokens[parentToken(tokens, i-2)], 'class', 'task-list-container');
 			}
 		}
 	});
@@ -43,6 +43,14 @@ function parentToken(tokens, index) {
 	var targetLevel = tokens[index].level - 1;
 	for (var i = index - 1; i >= 0; i--) {
 		if (tokens[i].level === targetLevel) {
+			if (tokens[i].type === 'list_item_open') {
+				var ulOlLevel = tokens[i].level - 1;
+				for (var j = i - 1; j >= 0; j--) {
+					if ((tokens[j].type === 'bullet_list_open' || tokens[j].type === 'ordered_list_open') && tokens[j].level === ulOlLevel) {
+						return j;
+					}
+				}
+			}
 			return i;
 		}
 	}
@@ -51,29 +59,64 @@ function parentToken(tokens, index) {
 
 function isTodoItem(tokens, index) {
 	return isInline(tokens[index]) &&
-	       isParagraph(tokens[index - 1]) &&
-	       isListItem(tokens[index - 2]) &&
-	       startsWithTodoMarkdown(tokens[index]);
+		isParagraph(tokens[index - 1]) &&
+		isListItem(tokens[index - 2]) &&
+		startsWithTodoMarkdown(tokens[index]);
 }
 
 function todoify(token, TokenConstructor) {
-	token.children.unshift(makeCheckbox(token, TokenConstructor));
-	token.children[1].content = token.children[1].content.slice(3);
-	token.content = token.content.slice(3);
+    var wrapperOpen = new TokenConstructor('html_inline', '', 0);
+    wrapperOpen.content = '<div class="task-item-content">';
+    wrapperOpen.block = true;
 
-	if (useLabelWrapper) {
-		if (useLabelAfter) {
-			token.children.pop();
+    var wrapperClose = new TokenConstructor('html_inline', '', 0);
+    wrapperClose.content = '</div>';
+    wrapperClose.block = true;
 
-			// Use large random number as id property of the checkbox.
-			var id = 'task-item-' + Math.ceil(Math.random() * (10000 * 1000) - 1000);
-			token.children[0].content = token.children[0].content.slice(0, -1) + ' id="' + id + '">';
-			token.children.push(afterLabel(token.content, id, TokenConstructor));
-		} else {
-			token.children.unshift(beginLabel(TokenConstructor));
-			token.children.push(endLabel(TokenConstructor));
-		}
-	}
+    var checkbox = makeCheckbox(token, TokenConstructor);
+
+    var newChildren = [];
+
+    if (token.children.length > 0 && token.children[0].type === 'text') {
+        var firstTextToken = new TokenConstructor('text', '', 0);
+        firstTextToken.content = token.children[0].content.slice(3);
+        newChildren.push(firstTextToken);
+
+        for (var i = 1; i < token.children.length; i++) {
+            newChildren.push(token.children[i]);
+        }
+    } else {
+        for (var i = 0; i < token.children.length; i++) {
+            if (i === 0 && token.children[i].type === 'text') {
+                var firstTextToken = new TokenConstructor('text', '', 0);
+                firstTextToken.content = token.children[i].content.slice(3);
+                newChildren.push(firstTextToken);
+            } else {
+                newChildren.push(token.children[i]);
+            }
+        }
+    }
+
+    token.children = [];
+    token.children.push(wrapperOpen);
+    token.children.push(checkbox);
+
+    for (var i = 0; i < newChildren.length; i++) {
+        token.children.push(newChildren[i]);
+    }
+
+    token.children.push(wrapperClose);
+
+    token.content = token.content.slice(3);
+
+    if (useLabelWrapper) {
+        if (useLabelAfter) {
+            console.warn("`useLabelWrapper` with `useLabelAfter` might need re-evaluation with the new HTML structure.");
+        } else {
+            token.children.unshift(beginLabel(TokenConstructor));
+            token.children.push(endLabel(TokenConstructor));
+        }
+    }
 }
 
 function makeCheckbox(token, TokenConstructor) {

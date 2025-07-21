@@ -1239,19 +1239,25 @@
   li > ol > li {
     padding-bottom: 0;
   }
-  ul.contains-task-list,
-  ol.contains-task-list {
+  .task-list-container {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .task-list-item {
     padding-left: 0;
   }
-  li.task-list-item {
-    list-style-type: none;
+  .task-list-item:has(> .task-list-container) {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  .task-item-content {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 8px;
   }
   .task-list-item-checkbox {
     flex-shrink: 0;
-    margin-top: 2px;
     cursor: pointer;
     color: var(--neutral-400);
     transition: color 0.2s ease;
@@ -1265,6 +1271,10 @@
         color: var(--neutral-600);
       }
     }
+  }
+  .task-list-item > .task-list-container {
+    padding-left: 24px;
+    margin-bottom: 0;
   }
   table {
     width: 100%;
