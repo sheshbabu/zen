@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/mail"
 	"strings"
@@ -79,7 +80,8 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	hasUsers := HasUsers()
 	if hasUsers {
-		err = fmt.Errorf("can't create more than one user: %w", err)
+		err = fmt.Errorf("can't create more than one user")
+		slog.Error(err.Error())
 		utils.SendErrorResponse(w, "USER_CREATE_FAILED", "User already exists", err, http.StatusBadRequest)
 		return
 	}
@@ -118,6 +120,8 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !VerifyPassword(payload.Password, user.Password) {
+		err = fmt.Errorf("incorrect password for user %s", payload.Email)
+		slog.Error(err.Error())
 		utils.SendErrorResponse(w, "INCORRECT_PASSWORD", "Incorrect password", err, http.StatusBadRequest)
 		return
 	}

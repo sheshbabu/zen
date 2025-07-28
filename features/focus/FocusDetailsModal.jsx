@@ -4,6 +4,7 @@ import { CloseIcon } from "../../commons/components/Icon.jsx";
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
+import "./FocusDetailsModal.css";
 
 export default function FocusDetailsModal({ mode, focusMode }) {
   const [name, setName] = useState(focusMode ? focusMode.name : "");
@@ -65,8 +66,8 @@ export default function FocusDetailsModal({ mode, focusMode }) {
   }
 
   return (
-    <div class="modal-backdrop-container is-centered" onClick={handleBackdropClick}>
-      <div class="modal-content-container focus-dialog">
+    <div className="modal-backdrop-container is-centered" onClick={handleBackdropClick}>
+      <div className="modal-content-container focus-dialog">
         <div className="modal-header">
           <h3 className="modal-title">{title}</h3>
           <CloseIcon className="notes-editor-toolbar-button-close" onClick={closeModal} />

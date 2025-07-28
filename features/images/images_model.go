@@ -297,7 +297,9 @@ func GetLinkedNotesByImage(filename string) ([]int, error) {
 
 	rows, err := sqlite.DB.Query(query, filename)
 	if err != nil {
-		return nil, fmt.Errorf("error querying note_images: %w", err)
+		err = fmt.Errorf("error querying note_images: %w", err)
+		slog.Error(err.Error())
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -305,7 +307,9 @@ func GetLinkedNotesByImage(filename string) ([]int, error) {
 		var noteID int
 		err = rows.Scan(&noteID)
 		if err != nil {
-			return nil, fmt.Errorf("error scanning note_id: %w", err)
+			err = fmt.Errorf("error scanning note_id: %w", err)
+			slog.Error(err.Error())
+			return nil, err
 		}
 		noteIDs = append(noteIDs, noteID)
 	}

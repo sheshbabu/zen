@@ -1,0 +1,117 @@
+.ghost-button {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 4px 10px;
+    font: var(--sm);
+    font-weight: 600;
+    transition: background-color 500ms;
+
+    &:hover {
+        background-color: var(--neutral-100);
+    }
+
+    &[disabled] {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+}
+
+.dropdown-container {
+    position: relative;
+    max-width: 200px;
+
+    .dropdown-button {
+        min-width: 160px;
+    }
+
+    .dropdown-menu {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        top: 4px;
+        position: absolute;
+        min-width: 100%;
+        box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+        display: none;
+        background-color: var(--bg-primary);
+        z-index: 1;
+        max-height: 198px;
+        overflow: scroll;
+        border-radius: 4px;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    .dropdown-option {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 12px;
+        height: 36px;
+        border: 1px solid var(--neutral-100);
+        border-bottom: none;
+        white-space: nowrap;
+        overflow: hidden;
+        background: var(--bg-primary);
+        font: var(--sm);
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 500ms;
+
+        &:hover,
+        &.is-selected {
+            background-color: var(--bg-secondary);
+
+            svg.lucide {
+                display: block;
+            }
+        }
+
+        svg.lucide {
+            display: none;
+            width: 20px;
+            height: 20px;
+            padding: 4px;
+            margin-right: 8px;
+            transition: background-color 500ms;
+
+            line,
+            circle,
+            rect,
+            path {
+                stroke: var(--neutral-600);
+            }
+
+            &:hover {
+                background-color: var(--neutral-200);
+                border-radius: 4px;
+            }
+        }
+    }
+
+    &.open {
+        .dropdown-menu {
+            display: block;
+            animation: dropdown-fade-in 0.15s ease-out;
+        }
+
+        .dropdown-button {
+            border-radius: 6px 6px 0 0;
+        }
+    }
+}
+
+@keyframes dropdown-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

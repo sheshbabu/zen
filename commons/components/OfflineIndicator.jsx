@@ -1,4 +1,5 @@
 import { h, useState, useEffect } from "../../assets/preact.esm.js";
+import "./OfflineIndicator.css";
 
 export default function OfflineIndicator() {
     const [isOnline, setIsOnline] = useState(navigator.onLine);

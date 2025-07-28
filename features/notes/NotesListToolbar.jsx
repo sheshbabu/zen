@@ -1,5 +1,6 @@
 import { h } from "../../assets/preact.esm.js"
 import { ListViewIcon, CardViewIcon, GalleryViewIcon, HamburgerIcon } from "../../commons/components/Icon.jsx";
+import "./NotesListToolbar.css";
 
 export default function NotesListToolbar({ onListViewClick, onCardViewClick, onGalleryViewClick, onSidebarToggle }) {
   return (

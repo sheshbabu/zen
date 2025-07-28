@@ -1,5 +1,6 @@
 import { h, useState, useEffect, useRef } from "../../assets/preact.esm.js"
 import { EllipsisIcon } from "../../commons/components/Icon.jsx";
+import "./DropdownMenu.css";
 
 export default function DropdownMenu({ actions }) {
   if (actions.length === 0) {

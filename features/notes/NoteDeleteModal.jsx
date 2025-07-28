@@ -1,5 +1,6 @@
 import { h } from "../../assets/preact.esm.js"
 import { CloseIcon } from "../../commons/components/Icon.jsx";
+import "./NoteDeleteModal.css";
 
 export default function NoteDeleteModal({ onDeleteClick, onCloseClick }) {
   function handleBackdropClick(e) {

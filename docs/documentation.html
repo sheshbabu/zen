@@ -490,6 +490,14 @@
                             <li><a href="#backup-powershell" class="sidebar-nav-item">PowerShell</a></li>
                         </ul>
                     </li>
+                    <li>
+                        <a href="#mcp-integration" class="sidebar-nav-item">MCP Integration</a>
+                        <ul class="sidebar-nav-sub">
+                            <li><a href="#mcp-generate-token" class="sidebar-nav-item">Generate Token</a></li>
+                            <li><a href="#mcp-claude-code" class="sidebar-nav-item">Claude Code</a></li>
+                            <li><a href="#mcp-lm-studio" class="sidebar-nav-item">LM Studio</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </aside>
@@ -607,6 +615,7 @@ $ cd zen</pre>
                 <ul>
                     <li><code>Ctrl/Cmd + N</code> - Create a new note</li>
                     <li><code>Ctrl/Cmd + K</code> - Open search</li>
+                    <li><code>Ctrl/Cmd + \</code> - Toggle editor width</li>
                     <li><code>Escape</code> - Close modals and dialogs</li>
                 </ul>
 
@@ -696,6 +705,73 @@ if ($integrityResult -eq "ok") {
 Write-Host "`nRestarting Zen..."
 docker compose restart
                 </pre>
+            </section>
+
+            <section id="mcp-integration">
+                <h1>MCP Integration</h1>
+                
+                <p>
+                    Zen provides Model Context Protocol (MCP) integration, allowing you to connect with 
+                    external tools and services like Claude Code. This enables you to search, read, 
+                    and manage your notes directly from supported applications.
+                </p>
+
+                <h3 id="mcp-generate-token">Generate Token</h3>
+                <p>
+                    Before you can use MCP integration, you need to generate an access token:
+                </p>
+                
+                <ol>
+                    <li>Open Zen in your browser</li>
+                    <li>Click on <strong>Settings</strong> in the sidebar</li>
+                    <li>Click on the <strong>MCP</strong> tab</li>
+                    <li>Click <strong>Generate Token</strong> to create a new access token</li>
+                    <li>Copy the generated token - you'll need this for the next step</li>
+                </ol>
+
+                <h3 id="mcp-claude-code">Claude Code</h3>
+                <p>
+                    To integrate Zen with Claude Code, use the following command with the token you generated in the previous step:
+                </p>
+
+                <pre>claude mcp add --transport http zen-notes http://&lt;ZEN_URL&gt;/mcp --header "Authorization: Bearer &lt;TOKEN&gt;"</pre>
+
+                <p>Replace <code>&lt;TOKEN&gt;</code> with the actual token you generated.</p>
+                <br/>
+
+                <p>
+                    Once configured, you can use Claude Code to:
+                </p>
+                
+                <ul>
+                    <li>Search through your notes</li>
+                    <li>Read specific notes by ID</li>
+                    <li>List all your notes</li>
+                    <li>Access notes from your development workflow</li>
+                </ul>
+
+                <h3 id="mcp-lm-studio">LM Studio</h3>
+                <p>
+                    To integrate Zen with LM Studio, you can configure the MCP server in your LM Studio settings.
+                    See the <a href="https://lmstudio.ai/docs/app/plugins/mcp#use-mcp-servers-in-lm-studio">LM Studio MCP documentation</a> for detailed setup instructions.
+                </p>
+
+                <p>Add the following configuration to your <code>mcp.json</code> file:</p>
+
+                <pre>
+{
+  "mcpServers": {
+    "zen-notes": {
+      "url": "http://&lt;ZEN_URL&gt;/mcp",
+      "headers": {
+        "Authorization": "Bearer &lt;TOKEN&gt;"
+      }
+    }
+  }
+}
+                </pre>
+
+                <p>Replace <code>&lt;TOKEN&gt;</code> with the actual token you generated.</p>
             </section>
 
 

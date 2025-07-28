@@ -3,6 +3,7 @@ import Input from "../../commons/components/Input.jsx";
 import { ArrowRightIcon } from "../../commons/components/Icon.jsx";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import ApiClient from "../../commons/http/ApiClient.js";
+import "./LoginPage.css";
 
 export default function LoginPage({ isOnboarding = false }) {
   const [email, setEmail] = useState("");
@@ -60,15 +61,15 @@ export default function LoginPage({ isOnboarding = false }) {
   if (isOnboarding) {
     header = (
       <div>
-        <div class="login-title">Let's get started!</div>
-        <div class="login-subtitle">Create your admin account</div>
+        <div className="login-title">Let's get started!</div>
+        <div className="login-subtitle">Create your admin account</div>
       </div>
     );
     buttonText = "Continue";
   } else {
     header = (
       <div>
-        <div class="login-title">Login</div>
+        <div className="login-title">Login</div>
       </div>
     );
   }

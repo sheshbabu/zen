@@ -1,0 +1,40 @@
+.notes-list-toolbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    margin: 6px 12px 0 4px;
+
+    .button-group {
+        display: flex;
+    }
+
+    .is-mobile {
+        display: none;
+    }
+
+    svg.lucide {
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+        margin: 8px;
+        margin-right: 0;
+        transition-property: stroke;
+        transition-duration: 500ms;
+
+        &:hover {
+
+            rect,
+            path {
+                stroke: var(--neutral-900);
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 948px) {
+    .notes-list-toolbar {
+        .is-mobile {
+            display: flex;
+        }
+    }
+}
