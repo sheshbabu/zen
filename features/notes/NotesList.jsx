@@ -53,7 +53,9 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
 
 function NotesListItem({ note }) {
   const link = `/notes/${note.noteId}`;
-  const updatedAt = formatDate(new Date(note.updatedAt))
+  const updatedAtDate = new Date(note.updatedAt);
+  const shortUpdatedAt = formatDate(updatedAtDate);
+  const fullUpdatedAt = updatedAtDate.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
   const tags = note.tags?.map(tag => <div className="notes-list-item-tag" key={tag.name}>{tag.name}</div>);
   let title = <div className="notes-list-item-title">{note.title}</div>
 
@@ -70,7 +72,7 @@ function NotesListItem({ note }) {
       {title}
       <div className="notes-list-item-subcontainer">
         <div className="notes-list-item-tags">{tags}</div>
-        <div className="notes-list-item-subtext" title={note.updatedAt}>{updatedAt}</div>
+        <div className="notes-list-item-subtext" title={fullUpdatedAt}>{shortUpdatedAt}</div>
       </div>
     </Link>
   );
