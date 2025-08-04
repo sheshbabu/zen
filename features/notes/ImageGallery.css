@@ -25,6 +25,11 @@
             &:hover {
                 box-shadow: var(--shadow-4);
             }
+
+            &:active {
+                transform: scale(0.98);
+                transition: transform 150ms ease-out;
+            }
         }
 
         .image-gallery-empty-text {

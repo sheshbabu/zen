@@ -265,6 +265,10 @@
           }
         }
       }
+      &:active {
+        transform: scale(0.98);
+        transition: transform 150ms ease-out;
+      }
       svg.lucide {
         padding: 8px;
       }
@@ -305,6 +309,10 @@
           &:hover {
             background-color: var(--neutral-50);
             border-color: var(--neutral-400);
+          }
+          &:active {
+            transform: scale(0.98);
+            transition: transform 150ms ease-out;
           }
           &.disabled {
             cursor: not-allowed;
@@ -431,6 +439,10 @@
           transition: all 0.2s ease;
           &:hover {
             border-color: var(--neutral-300);
+          }
+          &:active {
+            transform: scale(0.98);
+            transition: transform 150ms ease-out;
           }
           &.is-selected {
             border-color: var(--neutral-600);
@@ -593,6 +605,10 @@
         }
       }
     }
+    &:active {
+      transform: scale(0.98);
+      transition: transform 150ms ease-out;
+    }
     svg.lucide {
       padding: 8px;
     }
@@ -623,6 +639,10 @@
       &.is-active {
         color: var(--neutral-600);
       }
+      &:active {
+        transform: scale(0.98);
+        transition: transform 150ms ease-out;
+      }
       &:hover {
         svg.lucide {
           display: block;
@@ -643,6 +663,10 @@
         &:hover {
           background-color: var(--neutral-200);
           border-radius: 4px;
+        }
+        &:active {
+          transform: scale(0.97);
+          transition: transform 150ms ease-out;
         }
       }
     }
@@ -798,6 +822,10 @@
       &:hover {
         box-shadow: var(--shadow-4);
       }
+      &:active {
+        transform: scale(0.98);
+        transition: transform 150ms ease-out;
+      }
     }
     .image-gallery-empty-text {
       font: var(--sm);
@@ -876,6 +904,10 @@
   &:hover {
     background-color: var(--neutral-100);
   }
+  &:active {
+    transform: scale(0.98);
+    transition: transform 150ms ease-out;
+  }
   &[disabled] {
     cursor: not-allowed;
     opacity: 0.6;
@@ -928,6 +960,10 @@
         display: block;
       }
     }
+    &:active {
+      transform: scale(0.98);
+      transition: transform 150ms ease-out;
+    }
     svg.lucide {
       display: none;
       width: 20px;
@@ -944,6 +980,10 @@
       &:hover {
         background-color: var(--neutral-200);
         border-radius: 4px;
+      }
+      &:active {
+        transform: scale(0.97);
+        transition: transform 150ms ease-out;
       }
     }
   }
@@ -1465,6 +1505,10 @@
     &.is-active {
       background-color: var(--bg-secondary);
     }
+    &:active {
+      transform: scale(0.98);
+      transition: transform 150ms ease-out;
+    }
     .notes-list-item-title {
       font-weight: 500;
       white-space: nowrap;
@@ -1587,6 +1631,10 @@
       }
       &:hover {
         box-shadow: var(--shadow-4);
+      }
+      &:active {
+        transform: scale(0.98);
+        transition: transform 150ms ease-out;
       }
     }
   }

@@ -38,6 +38,11 @@
                 }
             }
 
+            &:active {
+                transform: scale(0.98);
+                transition: transform 150ms ease-out;
+            }
+
             svg.lucide {
                 padding: 8px;
             }
@@ -85,6 +90,11 @@
                     &:hover {
                         background-color: var(--neutral-50);
                         border-color: var(--neutral-400);
+                    }
+
+                    &:active {
+                        transform: scale(0.98);
+                        transition: transform 150ms ease-out;
                     }
 
                     &.disabled {
@@ -238,6 +248,11 @@
 
                     &:hover {
                         border-color: var(--neutral-300);
+                    }
+
+                    &:active {
+                        transform: scale(0.98);
+                        transition: transform 150ms ease-out;
                     }
 
                     &.is-selected {
