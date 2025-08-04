@@ -142,10 +142,23 @@ export default function ImageGallery({ images }) {
 
 function Lightbox({ selectedImage, imageDetails, onClose }) {
   const [currentImage, setCurrentImage] = useState(selectedImage);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [shouldShowZoom, setShouldShowZoom] = useState(false);
 
   if (!currentImage) {
     return null;
   }
+
+  useEffect(() => {
+    const viewportHeight = window.innerHeight * 0.95;
+    const viewportWidth = window.innerWidth * 0.95;
+    const imageAspectRatio = currentImage.aspectRatio;
+    
+    const scaledHeight = viewportWidth / imageAspectRatio;
+    
+    setShouldShowZoom(scaledHeight > viewportHeight);
+    setIsZoomed(false);
+  }, [currentImage]);
 
   useEffect(() => {
     function handleKeyDown(e) {
@@ -180,11 +193,22 @@ function Lightbox({ selectedImage, imageDetails, onClose }) {
     }
   }
 
+  function handleImageClick() {
+    if (shouldShowZoom) {
+      setIsZoomed(!isZoomed);
+    }
+  }
+
   return (
     <div className="modal-backdrop-container is-centered" onClick={handleBackdropClick}>
-      <div className="modal-content-container lightbox">
+      <div className={`modal-content-container lightbox ${isZoomed ? 'zoomed' : ''}`}>
         <div className="lightbox-image-container">
-          <img src={currentImage.url} alt="" className="lightbox-image" />
+          <img 
+            src={currentImage.url} 
+            alt="" 
+            className={`lightbox-image ${shouldShowZoom ? 'zoomable' : ''}`}
+            onClick={handleImageClick}
+          />
         </div>
       </div>
     </div>
