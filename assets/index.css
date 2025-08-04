@@ -281,6 +281,8 @@ svg.lucide {
 
     &:active {
         box-shadow: none;
+        transform: scale(0.98);
+        transition: transform 150ms ease-out;
     }
 
     &.primary {
@@ -373,6 +375,11 @@ svg.lucide {
     &:hover {
         color: var(--neutral-500);
         background-color: var(--neutral-200);
+    }
+
+    &:active {
+        transform: scale(0.97);
+        transition: transform 150ms ease-out;
     }
 }
 
