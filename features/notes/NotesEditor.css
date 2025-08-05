@@ -330,7 +330,10 @@
         margin: 10px 4px;
     }
 
-    ul,
+    ul {
+        padding-left: 20px;
+    }
+
     ol {
         padding-left: 30px;
     }
