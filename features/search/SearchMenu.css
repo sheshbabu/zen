@@ -66,6 +66,7 @@
 
                 .subtitle {
                     font: var(--sm);
+                    color: var(--neutral-400);
                     max-width: 500px;
                     overflow: hidden;
                     height: 20px;
