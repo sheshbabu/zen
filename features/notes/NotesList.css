@@ -35,11 +35,6 @@
             background-color: var(--bg-secondary);
         }
 
-        &:active {
-            transform: scale(0.98);
-            transition: transform 150ms ease-out;
-        }
-
         .notes-list-item-title {
             font-weight: 500;
             white-space: nowrap;
