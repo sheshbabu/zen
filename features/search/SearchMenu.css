@@ -6,8 +6,10 @@
     .search-input-container {
         display: flex;
         align-items: center;
-        padding-left: 10px;
+        padding-left: 2px;
         margin: 8px;
+        background-color: var(--neutral-100);
+        border-radius: 4px;
 
         input {
             border: 0;
@@ -15,8 +17,9 @@
             width: 100%;
             height: 40px;
             padding-left: 10px;
-            background-color: var(--bg-primary);
             color: var(--text-primary);
+            background-color: var(--neutral-100);
+            border-radius: 4px;
         }
     }
 

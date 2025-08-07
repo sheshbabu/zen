@@ -358,6 +358,7 @@ svg.lucide {
     transition-duration: 500ms;
     cursor: pointer;
     text-decoration: none;
+    user-select: none;
 
     svg.lucide {
         height: 14px;
