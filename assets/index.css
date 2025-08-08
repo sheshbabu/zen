@@ -246,7 +246,7 @@ svg.lucide {
     justify-content: space-between;
     padding: 0 8px;
     border-radius: 6px;
-    border: 1px solid var(--neutral-200);
+    border: 1px solid var(--neutral-100);
     overflow: hidden;
     font: var(--sm);
     font-weight: 600;
@@ -290,7 +290,6 @@ svg.lucide {
         color: var(--neutral-50);
 
         svg.lucide {
-
             line,
             circle,
             rect,
@@ -303,7 +302,6 @@ svg.lucide {
             background-color: var(--neutral-700);
 
             svg.lucide {
-
                 line,
                 circle,
                 rect,
@@ -323,6 +321,10 @@ svg.lucide {
         }
     }
 
+    &.disabled {
+        cursor: not-allowed;
+    }
+
     a {
         height: 34px;
         line-height: 1;
@@ -330,11 +332,17 @@ svg.lucide {
 }
 
 @media (prefers-color-scheme: dark) {
-    [data-theme="dark"] {
-        .button {
-            &.danger {
-                color: var(--text-primary);
-            }
+    .button {
+        &.danger {
+            color: var(--text-primary);
+        }
+    }
+}
+
+[data-theme="dark"] {
+    .button {
+        &.danger {
+            color: var(--text-primary);
         }
     }
 }
