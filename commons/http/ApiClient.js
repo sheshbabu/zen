@@ -213,6 +213,29 @@ async function importFile(formData) {
   return await request('POST', '/api/import/', formData);
 }
 
+// Export
+
+async function exportNotes() {
+  const response = await fetch('/api/export/', {
+    method: 'GET',
+    headers: {}
+  });
+
+  if (!response.ok) {
+    throw new Error('Export failed');
+  }
+
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = response.headers.get('content-disposition')?.match(/filename="([^"]+)"/)?.[1] || 'zen-export.zip';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
+}
+
 // MCP Tokens
 
 async function getTokens() {
@@ -251,6 +274,7 @@ export default {
   uploadImage,
   search,
   importFile,
+  exportNotes,
   getTokens,
   createToken,
   deleteToken
