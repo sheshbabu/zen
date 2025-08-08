@@ -13,6 +13,7 @@
 * Organize with flexible tags, not rigid folders
 * Markdown features like tables, code blocks, task lists, highlights, and more
 * Full-text search with BM25 ranking
+* Import and export data with full portability
 * MCP support for searching, listing and reading notes
 * Minimal dependency footprint
 
