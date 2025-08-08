@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 	"zen/commons/utils"
+	"zen/features/images"
 	"zen/features/notes"
 	"zen/features/tags"
 )
@@ -91,19 +92,43 @@ func HandleExport(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllNotesForExport() ([]notes.Note, error) {
-	filter := notes.NewNotesFilter(1, 0, 0, false, false)
-	activeNotes, _, err := notes.GetAllNotes(filter)
+	allNotes := []notes.Note{}
+
+	activeNotes, err := getAllNotesByStatus(false)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching active notes: %w", err)
 	}
+	allNotes = append(allNotes, activeNotes...)
 
-	archivedFilter := notes.NewNotesFilter(1, 0, 0, false, true)
-	archivedNotes, _, err := notes.GetAllNotes(archivedFilter)
+	archivedNotes, err := getAllNotesByStatus(true)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching archived notes: %w", err)
 	}
+	allNotes = append(allNotes, archivedNotes...)
 
-	allNotes := append(activeNotes, archivedNotes...)
+	return allNotes, nil
+}
+
+func getAllNotesByStatus(isArchived bool) ([]notes.Note, error) {
+	allNotes := []notes.Note{}
+	page := 1
+
+	for {
+		filter := notes.NewNotesFilter(page, 0, 0, false, isArchived)
+		pageNotes, total, err := notes.GetAllNotes(filter)
+		if err != nil {
+			return nil, fmt.Errorf("error fetching notes for page %d: %w", page, err)
+		}
+
+		allNotes = append(allNotes, pageNotes...)
+
+		if len(allNotes) >= total || len(pageNotes) == 0 {
+			break
+		}
+
+		page++
+	}
+
 	return allNotes, nil
 }
 
@@ -228,37 +253,46 @@ func createTagsJSONFile(zipWriter *zip.Writer, allTags []tags.Tag) error {
 }
 
 func createImagesFolder(zipWriter *zip.Writer, allNotes []notes.Note) error {
-	imageSet := make(map[string]bool)
+	allImages, err := getAllImagesForExport()
+	if err != nil {
+		return fmt.Errorf("error fetching images for export: %w", err)
+	}
+
+	if len(allImages) == 0 {
+		return nil
+	}
+
+	referencedImages := make(map[string]bool)
 	imageRegex := regexp.MustCompile(`!\[.*?\]\(/images/([^)]+)\)`)
 
 	for _, note := range allNotes {
 		matches := imageRegex.FindAllStringSubmatch(note.Content, -1)
 		for _, match := range matches {
 			if len(match) > 1 {
-				imageSet[match[1]] = true
+				referencedImages[match[1]] = true
 			}
 		}
 	}
 
-	if len(imageSet) == 0 {
-		return nil
-	}
+	for _, image := range allImages {
+		if !referencedImages[image.Filename] {
+			continue
+		}
 
-	for filename := range imageSet {
-		imagePath := filepath.Join("images", filename)
-		
+		imagePath := filepath.Join("images", image.Filename)
+
 		if _, err := os.Stat(imagePath); os.IsNotExist(err) {
-			slog.Warn("Referenced image not found", "filename", filename)
+			slog.Warn("Referenced image not found", "filename", image.Filename)
 			continue
 		}
 
 		sourceFile, err := os.Open(imagePath)
 		if err != nil {
-			slog.Warn("Error opening image file", "filename", filename, "error", err)
+			slog.Warn("Error opening image file", "filename", image.Filename, "error", err)
 			continue
 		}
 
-		zipPath := "images/" + filename
+		zipPath := "images/" + image.Filename
 		imageWriter, err := zipWriter.Create(zipPath)
 		if err != nil {
 			sourceFile.Close()
@@ -273,6 +307,33 @@ func createImagesFolder(zipWriter *zip.Writer, allNotes []notes.Note) error {
 	}
 
 	return nil
+}
+
+func getAllImagesForExport() ([]images.Image, error) {
+	allImages := []images.Image{}
+	page := 1
+
+	for {
+		pageImages, total, err := getAllImagesByPage(page)
+		if err != nil {
+			return nil, fmt.Errorf("error fetching images for page %d: %w", page, err)
+		}
+
+		allImages = append(allImages, pageImages...)
+
+		if len(allImages) >= total || len(pageImages) == 0 {
+			break
+		}
+
+		page++
+	}
+
+	return allImages, nil
+}
+
+func getAllImagesByPage(page int) ([]images.Image, int, error) {
+	filter := images.NewImagesFilter(page, 0, 0)
+	return images.GetAllImages(filter)
 }
 
 func sanitizeFilename(title string, noteID int) string {

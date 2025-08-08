@@ -57,11 +57,11 @@ type ImagesFilter struct {
 	focusModeID int
 }
 
-func NewImagesFilter() ImagesFilter {
+func NewImagesFilter(page, tagID, focusModeID int) ImagesFilter {
 	return ImagesFilter{
-		page:        1,
-		tagID:       0,
-		focusModeID: 0,
+		page:        page,
+		tagID:       tagID,
+		focusModeID: focusModeID,
 	}
 }
 

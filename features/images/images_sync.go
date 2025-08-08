@@ -97,12 +97,11 @@ func isImageFile(filename string) bool {
 func getAllDatabaseImages() (map[string]Image, error) {
 	dbImages := make(map[string]Image)
 
-	filter := NewImagesFilter()
 	allImages := []Image{}
 	page := 1
 
 	for {
-		filter.page = page
+		filter := NewImagesFilter(page, 0, 0)
 		images, total, err := GetAllImages(filter)
 		if err != nil {
 			return nil, fmt.Errorf("error retrieving images: %w", err)
