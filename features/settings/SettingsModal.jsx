@@ -1,14 +1,16 @@
 import { h, render, useState } from "../../assets/preact.esm.js"
 import { ModalBackdrop, ModalContainer, ModalHeader } from "../../commons/components/Modal.jsx";
-import { CloseIcon, UploadIcon, DownloadIcon, ThemeIcon, BrainCircuitIcon } from "../../commons/components/Icon.jsx";
+import { UploadIcon, DownloadIcon, ThemeIcon, BrainCircuitIcon, SecurityIcon } from "../../commons/components/Icon.jsx";
 import ImportPane from "./ImportPane.jsx";
 import ExportPane from "./ExportPane.jsx";
 import AppearancePane from "./AppearancePane.jsx";
 import McpPane from "./McpPane.jsx";
+import SecurityPane from "./SecurityPane.jsx";
 import "./SettingsModal.css";
 
 const tabs = [
   { id: "appearance", label: "Appearance", icon: <ThemeIcon className="settings-tab-icon" />, content: <AppearancePane /> },
+  { id: "account", label: "Security", icon: <SecurityIcon className="settings-tab-icon" />, content: <SecurityPane /> },
   { id: "import", label: "Import", icon: <UploadIcon className="settings-tab-icon" />, content: <ImportPane /> },
   { id: "export", label: "Export", icon: <DownloadIcon className="settings-tab-icon" />, content: <ExportPane /> },
   { id: "mcp", label: "MCP", icon: <BrainCircuitIcon className="settings-tab-icon" />, content: <McpPane /> }

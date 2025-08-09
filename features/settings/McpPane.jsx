@@ -127,6 +127,8 @@ export default function McpPane() {
 
       {tokenDisplay}
 
+      <hr/>
+
       <div className="mcp-tokens-section">
         <h4>Active Tokens</h4>
         {tokensContent}

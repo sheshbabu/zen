@@ -6,6 +6,20 @@
     .settings-content {
         display: flex;
         height: 500px;
+
+        .settings-form {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .button {
+            margin-top: 16px;
+            align-self: flex-start;
+        }
+
+        hr {
+            border: 1px solid var(--neutral-100);
+            margin: 32px 0;
+        }
     }
 
     .settings-sidebar {
@@ -288,25 +302,25 @@
 
             .export-section {
                 margin: 16px 0;
-                
+
                 h4 {
                     margin: 12px 0;
                     color: var(--text-primary);
                 }
-                
+
                 .export-info-list {
                     margin: 0;
                     padding-left: 20px;
                     color: var(--text-secondary);
                     font: var(--sm);
-                    
+
                     li {
                         margin-bottom: 6px;
-                        
+
                         strong {
                             color: var(--text-primary);
                         }
-                        
+
                         code {
                             background-color: var(--neutral-100);
                             padding: 2px 4px;
@@ -317,7 +331,7 @@
                         }
                     }
                 }
-                
+
                 .export-tree {
                     background-color: var(--neutral-50);
                     border: 1px solid var(--neutral-200);
@@ -331,10 +345,6 @@
                     overflow-x: auto;
                     white-space: pre;
                 }
-            }
-
-            .export-actions {
-                margin-top: 24px;
             }
 
             .mcp-token-creator {

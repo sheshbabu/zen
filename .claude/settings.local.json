@@ -1,7 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "mcp__playwright__browser_*"
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_close",
+      "mcp__playwright__browser_install",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_tab_list",
+      "mcp__playwright__browser_tab_new",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_type",
+      "Bash(make:*)"
     ],
     "deny": []
   }
