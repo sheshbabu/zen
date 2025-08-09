@@ -1,4 +1,5 @@
 import { h, render, useEffect, useRef, useState, useCallback, Fragment } from "../../assets/preact.esm.js";
+import { ModalBackdrop, ModalContainer } from "../../commons/components/Modal.jsx";
 import "./ImageGallery.css";
 
 const MIN_COLUMN_WIDTH = 300;
@@ -187,11 +188,6 @@ function Lightbox({ selectedImage, imageDetails, onClose }) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [currentImage, imageDetails, onClose]);
 
-  function handleBackdropClick(e) {
-    if (e.target.classList.contains("modal-backdrop-container")) {
-      onClose();
-    }
-  }
 
   function handleImageClick() {
     if (shouldShowZoom) {
@@ -200,8 +196,8 @@ function Lightbox({ selectedImage, imageDetails, onClose }) {
   }
 
   return (
-    <div className="modal-backdrop-container is-centered" onClick={handleBackdropClick}>
-      <div className={`modal-content-container lightbox ${isZoomed ? 'zoomed' : ''}`}>
+    <ModalBackdrop onClose={onClose} isCentered={true}>
+      <ModalContainer className={`lightbox ${isZoomed ? 'zoomed' : ''}`}>
         <div className="lightbox-image-container">
           <img 
             src={currentImage.url} 
@@ -210,7 +206,7 @@ function Lightbox({ selectedImage, imageDetails, onClose }) {
             onClick={handleImageClick}
           />
         </div>
-      </div>
-    </div>
+      </ModalContainer>
+    </ModalBackdrop>
   );
 }

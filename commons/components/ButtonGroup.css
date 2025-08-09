@@ -1,0 +1,54 @@
+.button-group {
+    display: flex;
+    gap: 4px;
+
+    &.is-mobile {
+        display: none;
+    }
+
+    /* Icon button styling within groups */
+    .icon-button {
+        padding: 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 500ms;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            background-color: var(--neutral-100);
+        }
+
+        svg.lucide {
+            width: 20px;
+            height: 20px;
+            transition-property: stroke;
+            transition-duration: 500ms;
+
+            line,
+            circle,
+            rect,
+            path {
+                stroke: var(--neutral-500);
+            }
+
+            &:hover {
+                line,
+                circle,
+                rect,
+                path {
+                    stroke: var(--neutral-900);
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 948px) {
+    .button-group {
+        &.is-mobile {
+            display: flex;
+        }
+    }
+}

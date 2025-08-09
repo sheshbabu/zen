@@ -1,16 +1,17 @@
 import { h } from "../../assets/preact.esm.js"
 import { ListViewIcon, CardViewIcon, GalleryViewIcon, HamburgerIcon } from "../../commons/components/Icon.jsx";
+import ButtonGroup from "../../commons/components/ButtonGroup.jsx";
 import "./NotesListToolbar.css";
 
 export default function NotesListToolbar({ onListViewClick, onCardViewClick, onGalleryViewClick, onSidebarToggle }) {
   return (
     <div className="notes-list-toolbar">
-      <div className="button-group is-mobile">
+      <ButtonGroup isMobile={true}>
         <div onClick={() => onSidebarToggle()}>
           <HamburgerIcon />
         </div>
-      </div>
-      <div className="button-group">
+      </ButtonGroup>
+      <ButtonGroup>
         <div onClick={() => onListViewClick()}>
           <ListViewIcon />
         </div>
@@ -20,7 +21,7 @@ export default function NotesListToolbar({ onListViewClick, onCardViewClick, onG
         <div onClick={() => onGalleryViewClick()}>
           <GalleryViewIcon />
         </div>
-      </div>
+      </ButtonGroup>
     </div>
   );
 }

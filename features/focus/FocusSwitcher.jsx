@@ -1,6 +1,7 @@
 import { h, render, useEffect, useState, useRef } from "../../assets/preact.esm.js"
 import FocusDetailsModal from './FocusDetailsModal.jsx';
 import { ArrowDownIcon, PencilIcon } from "../../commons/components/Icon.jsx";
+import Button from "../../commons/components/Button.jsx";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import useSearchParams from "../../commons/components/useSearchParams.jsx";
 
@@ -74,10 +75,10 @@ export default function FocusSwitcher({ focusModes }) {
 
   return (
     <div ref={dropdownRef} className="sidebar-focus-switcher">
-      <div className="dropdown-button button" onClick={handleDropdownClick}>
+      <Button className="dropdown-button" onClick={handleDropdownClick}>
         {selectedFocusMode.name}
         <ArrowDownIcon />
-      </div>
+      </Button>
       <div className={`dropdown-container ${isDropdownOpen ? 'open' : ''}`}>
         <ul className="dropdown-menu">
           {items}

@@ -1,4 +1,5 @@
 import { h, render, useState } from "../../assets/preact.esm.js"
+import { ModalBackdrop, ModalContainer, ModalHeader } from "../../commons/components/Modal.jsx";
 import { CloseIcon, UploadIcon, DownloadIcon, ThemeIcon, BrainCircuitIcon } from "../../commons/components/Icon.jsx";
 import ImportPane from "./ImportPane.jsx";
 import ExportPane from "./ExportPane.jsx";
@@ -15,12 +16,6 @@ const tabs = [
 
 export default function SettingsModal() {
   const [activeTab, setActiveTab] = useState("appearance");
-
-  function handleBackdropClick(e) {
-    if (e.target.classList.contains("modal-backdrop-container")) {
-      closeModal();
-    }
-  }
 
   function closeModal() {
     render(null, document.querySelector('.modal-root'));
@@ -40,12 +35,9 @@ export default function SettingsModal() {
   const paneContent = tabs.find(tab => tab.id === activeTab).content || null;
 
   return (
-    <div className="modal-backdrop-container is-centered" onClick={handleBackdropClick}>
-      <div className="modal-content-container settings-modal">
-        <div className="modal-header">
-          <h3 className="modal-title">Settings</h3>
-          <CloseIcon className="notes-editor-toolbar-button-close" onClick={closeModal} />
-        </div>
+    <ModalBackdrop onClose={closeModal}>
+      <ModalContainer className="settings-modal">
+        <ModalHeader title="Settings" onClose={closeModal} />
         <div className="settings-content">
           <div className="settings-sidebar">
             {sidebar}
@@ -54,7 +46,7 @@ export default function SettingsModal() {
             {paneContent}
           </div>
         </div>
-      </div>
-    </div>
+      </ModalContainer>
+    </ModalBackdrop>
   );
 }

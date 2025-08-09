@@ -1,5 +1,6 @@
 import { h, useState, useEffect } from "../../assets/preact.esm.js";
 import Input from "../../commons/components/Input.jsx";
+import Button from "../../commons/components/Button.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import formatDate from "../../commons/utils/formatDate.js";
 
@@ -70,9 +71,9 @@ export default function McpPane() {
         <div className="mcp-token-name">{token.name}</div>
         <div className="mcp-token-date" title={token.createdAt}>{formatDate(new Date(token.createdAt))}</div>
       </div>
-      <button className="button danger" onClick={() => revokeToken(token.tokenId, token.name)}>
+      <Button variant="danger" onClick={() => revokeToken(token.tokenId, token.name)}>
         Revoke
-      </button>
+      </Button>
     </div>
   ));
 
@@ -119,9 +120,9 @@ export default function McpPane() {
           isDisabled={isCreating}
           onChange={handleNameChange}
         />
-        <button className="button primary" onClick={handleCreateToken} disabled={isCreating || !newTokenName.trim()}>
+        <Button variant="primary" onClick={handleCreateToken} isDisabled={isCreating || !newTokenName.trim()}>
           {buttonText}
-        </button>
+        </Button>
       </div>
 
       {tokenDisplay}

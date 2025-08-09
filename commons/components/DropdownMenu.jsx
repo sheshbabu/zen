@@ -1,4 +1,5 @@
 import { h, useState, useEffect, useRef } from "../../assets/preact.esm.js"
+import Button from "./Button.jsx";
 import { EllipsisIcon } from "../../commons/components/Icon.jsx";
 import "./DropdownMenu.css";
 
@@ -41,7 +42,7 @@ export default function DropdownMenu({ actions }) {
 
   return (
     <div ref={dropdownRef}>
-      <div className="ghost-button" onClick={handleDropdownClick}><EllipsisIcon /></div>
+      <Button variant="ghost" onClick={handleDropdownClick}><EllipsisIcon /></Button>
       <div className={`dropdown-container ${isDropdownOpen ? 'open' : ''}`}>
         <ul className="dropdown-menu">
           {items}

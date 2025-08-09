@@ -2,6 +2,7 @@ import { h, render, useEffect, useState, useRef } from "../../assets/preact.esm.
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon, TagIcon } from "../../commons/components/Icon.jsx";
+import { ModalBackdrop, ModalContainer } from "../../commons/components/Modal.jsx";
 import "./SearchMenu.css";
 
 const SEARCH_HISTORY_KEY = 'search-history';
@@ -85,11 +86,6 @@ export default function SearchMenu() {
     closeModal();
   }
 
-  function handleBackdropClick(e) {
-    if (e.target.classList.contains("modal-backdrop-container")) {
-      closeModal();
-    }
-  }
 
   let historySection = null;
   let notesSection = null;
@@ -144,8 +140,8 @@ export default function SearchMenu() {
   }
 
   return (
-    <div className="modal-backdrop-container" onClick={handleBackdropClick}>
-      <div className="modal-content-container search-modal">
+    <ModalBackdrop onClose={closeModal} isCentered={false}>
+      <ModalContainer className="search-modal">
         <div className="search-input-container">
           <SearchIcon />
           <input
@@ -162,8 +158,8 @@ export default function SearchMenu() {
           {notesSection}
           {tagsSection}
         </div>
-      </div>
-    </div>
+      </ModalContainer>
+    </ModalBackdrop>
   );
 }
 
