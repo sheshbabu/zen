@@ -85,7 +85,8 @@
         border-radius: 0;
 
         .search-results-container {
-            max-height: 90vh;
+            /* Show some background so user can dismiss search */
+            max-height: 70vh;
 
             .search-result-item {
                 .search-result-item-content {

@@ -129,7 +129,7 @@ export default function SecurityPane() {
 
       <hr/>
 
-      <h3>Sessions</h3>
+      <h3>Session Management</h3>
       <p>Log out of your account. You'll need to sign in again.</p>
 
       <Button onClick={handleLogout} isDisabled={isLogoutLoading}>
