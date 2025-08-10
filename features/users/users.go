@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/mail"
 	"strings"
+	"time"
 	"zen/commons/session"
 	"zen/commons/utils"
 )
@@ -186,6 +187,32 @@ func HandleUpdatePassword(w http.ResponseWriter, r *http.Request) {
 		utils.SendErrorResponse(w, "PASSWORD_UPDATE_FAILED", "Failed to update password", err, http.StatusInternalServerError)
 		return
 	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func HandleLogout(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("session_token")
+	if err != nil && errors.Is(err, http.ErrNoCookie) {
+		utils.SendErrorResponse(w, "NO_SESSION", "Session not found", err, http.StatusUnauthorized)
+		return
+	}
+
+	sessionID := cookie.Value
+	err = session.DeleteSession(sessionID)
+	if err != nil {
+		utils.SendErrorResponse(w, "LOGOUT_FAILED", "Failed to logout", err, http.StatusInternalServerError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    "",
+		Path:     "/",
+		Expires:  time.Time{},
+		MaxAge:   -1,
+		HttpOnly: true,
+	})
 
 	w.WriteHeader(http.StatusOK)
 }

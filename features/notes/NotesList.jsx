@@ -2,6 +2,7 @@ import { h, render, Fragment } from "../../assets/preact.esm.js"
 import NotesListToolbar from './NotesListToolbar.jsx';
 import Link from '../../commons/components/Link.jsx';
 import Spinner from '../../commons/components/Spinner.jsx';
+import Button from '../../commons/components/Button.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import formatDate from '../../commons/utils/formatDate.js';
 import isMobile from "../../commons/utils/isMobile.js";
@@ -123,7 +124,7 @@ function LoadMoreButton({ items, total, onLoadMoreClick }) {
     return null;
   }
 
-  return <div className="notes-list-load-more-button" onClick={onLoadMoreClick}>Load more</div>
+  return <Button className="notes-list-load-more-button" onClick={onLoadMoreClick}>Load more</Button>
 }
 
 function EmptyList({ items, view }) {

@@ -1,5 +1,6 @@
 import { h, useState, useEffect, Fragment } from "../../assets/preact.esm.js"
 import Input from "../../commons/components/Input.jsx";
+import Button from "../../commons/components/Button.jsx";
 import { ArrowRightIcon } from "../../commons/components/Icon.jsx";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import ApiClient from "../../commons/http/ApiClient.js";
@@ -80,7 +81,7 @@ export default function LoginPage({ isOnboarding = false }) {
         {header}
         <Input id="email" label="Email" type="email" placeholder="Enter your email address" value={email} hint="" error={emailError} isDisabled={false} onChange={handleEmailChange} />
         <Input id="password" label="Password" type="password" placeholder="Enter your password" value={password} hint="" error={passwordError} isDisabled={false} onChange={handlePasswordChange} />
-        <button className="button primary" type="submit" onClick={handleLoginClick}>{buttonText}<ArrowRightIcon /></button>
+        <Button variant="primary" type="submit" onClick={handleLoginClick}>{buttonText}<ArrowRightIcon /></Button>
       </form>
       <div className="toast-root"></div>
     </>

@@ -8,9 +8,11 @@ import LoginPage from './features/users/LoginPage.jsx';
 import navigateTo from './commons/utils/navigateTo.js';
 import SearchMenu from './features/search/SearchMenu.jsx';
 import OfflineIndicator from './commons/components/OfflineIndicator.jsx';
+import Tooltip from './commons/components/Tooltip.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   setUserPreferredTheme();
+  Tooltip.init();
   render(
     <App />,
     document.body

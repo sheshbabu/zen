@@ -9,16 +9,16 @@ export default function NotesEditorFormattingToolbar({ isEditable, onFormat }) {
   return (
     <div className="formatting-toolbar">
       <div className="formatting-toolbar-group">
-        <button type="button" className="formatting-button" onClick={() => onFormat("bold", "bold text")} title="Bold (Ctrl+B)">
+        <button type="button" className="formatting-button" onClick={() => onFormat("bold", "bold text")} title="Bold <div>Ctrl+B</div>">
           <BoldIcon />
         </button>
-        <button type="button" className="formatting-button" onClick={() => onFormat("italic", "italic text")} title="Italic (Ctrl+I)">
+        <button type="button" className="formatting-button" onClick={() => onFormat("italic", "italic text")} title="Italic <div>Ctrl+I</div>">
           <ItalicIcon />
         </button>
         <button type="button" className="formatting-button" onClick={() => onFormat("strikethrough", "strikethrough text")} title="Strikethrough">
           <StrikethroughIcon />
         </button>
-        <button type="button" className="formatting-button" onClick={() => onFormat("highlight", "highlight text")} title="Highlight (Ctrl+Shift+H)">
+        <button type="button" className="formatting-button" onClick={() => onFormat("highlight", "highlight text")} title="Highlight <div>Ctrl+Shift+H</div>">
           <HighlightIcon />
         </button>
         <button type="button" className="formatting-button" onClick={() => onFormat("code", "code")} title="Inline Code">

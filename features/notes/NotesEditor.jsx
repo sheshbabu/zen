@@ -7,6 +7,7 @@ import navigateTo from '../../commons/utils/navigateTo.js';
 import isMobile from '../../commons/utils/isMobile.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
 import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
+import Button from '../../commons/components/Button.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
 import "./NotesEditor.css";
 import { CloseIcon, SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
@@ -556,38 +557,38 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExp
 
   if (isFloating) {
     rightToolbarActions.push(
-      <div className="ghost-button" onClick={onCloseClick}><CloseIcon /></div>
+      <Button variant="ghost" onClick={onCloseClick}><CloseIcon /></Button>
     );
   }
 
   if (!isFloating && !isMobile()) {
     if (isExpanded) {
       leftToolbarActions.push(
-        <div className="ghost-button" onClick={onExpandToggleClick}><SidebarCloseIcon /></div>
+        <Button variant="ghost" onClick={onExpandToggleClick}><SidebarCloseIcon /></Button>
       );
     } else {
       leftToolbarActions.push(
-        <div className="ghost-button" onClick={onExpandToggleClick}><SidebarOpenIcon /></div>
+        <Button variant="ghost" onClick={onExpandToggleClick}><SidebarOpenIcon /></Button>
       );
     }
   }
 
   if (isMobile() && !isNewNote) {
     leftToolbarActions.push(
-      <div className="ghost-button" onClick={() => window.history.back()}><BackIcon /></div>
+      <Button variant="ghost" onClick={() => window.history.back()}><BackIcon /></Button>
     );
   }
 
   if (isEditable) {
     rightToolbarActions.push(
-      <div className="ghost-button" disabled={isSaveLoading} onClick={onSaveClick}>{saveButtonText}</div>
+      <Button variant="ghost" isDisabled={isSaveLoading} onClick={onSaveClick}>{saveButtonText}</Button>
     );
     rightToolbarActions.push(
-      <div className="ghost-button" onClick={onEditCancelClick}>Cancel</div>
+      <Button variant="ghost" onClick={onEditCancelClick}>Cancel</Button>
     );
   } else {
     rightToolbarActions.push(
-      <div className="ghost-button" onClick={onEditClick}>Edit</div>
+      <Button variant="ghost" onClick={onEditClick}>Edit</Button>
     );
   }
 

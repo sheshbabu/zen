@@ -2,6 +2,7 @@ import { h, useState } from "../../assets/preact.esm.js"
 import { DownloadIcon } from "../../commons/components/Icon.jsx";
 import { showToast } from "../../commons/components/Toast.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
+import Button from "../../commons/components/Button.jsx";
 
 export default function ExportPane() {
   const [isExporting, setIsExporting] = useState(false);
@@ -53,13 +54,13 @@ export default function ExportPane() {
       </div>
 
       <div className="export-actions">
-        <button 
-          className={`button primary ${isExporting ? 'disabled' : ''}`}
+        <Button 
+          variant={`primary ${isExporting ? 'disabled' : ''}`}
           onClick={handleExportClick}
-          disabled={isExporting}
+          isDisabled={isExporting}
         >
           {isExporting ? 'Exporting...' : 'Export'}
-        </button>
+        </Button>
       </div>
     </div>
   )

@@ -98,6 +98,19 @@ func GetUserID(sessionID string) (string, error) {
 	return userID, nil
 }
 
+func DeleteSession(sessionID string) error {
+	query := "DELETE FROM sessions WHERE session_id = ?"
+	_, err := sqlite.DB.Exec(query, sessionID)
+
+	if err != nil {
+		err = fmt.Errorf("error deleting session: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
 func DeleteExpiredSessions() {
 	query := "DELETE FROM sessions WHERE expires_at < ?"
 	_, err := sqlite.DB.Exec(query, time.Now().Format(expiresAtFormat))

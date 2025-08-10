@@ -79,6 +79,14 @@ async function login(payload) {
   return await request('POST', '/api/users/login', payload);
 }
 
+async function updatePassword(payload) {
+  return await request('POST', '/api/users/me/password', payload);
+}
+
+async function logout() {
+  return await request('POST', '/api/users/logout');
+}
+
 // Focus Modes
 
 async function getFocusModes() {
@@ -255,6 +263,8 @@ export default {
   checkUser,
   createUser,
   login,
+  updatePassword,
+  logout,
   getFocusModes,
   createFocusMode,
   updateFocusMode,
