@@ -4,7 +4,7 @@
   <p align="center">Minimal Notes App</p>
 </p>
 
-<p align="center"><img src="https://github.com/sheshbabu/zen/blob/master/docs/screenshot.jpg?raw=true"/></p>
+<p align="center"><img src="https://github.com/sheshbabu/zen/blob/master/docs/screenshot.png?raw=true"/></p>
 
 ### Features
 * Single Go binary or Docker Compose
