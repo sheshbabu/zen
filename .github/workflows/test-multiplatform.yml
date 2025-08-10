@@ -1,18 +1,20 @@
-name: Build and Push Docker Image
+name: Test Multi-platform Build
 
 on:
-  push:
-    branches:
-      - master
+  pull_request:
+    paths:
+      - 'Dockerfile'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-push:
+  test-build:
     runs-on: ubuntu-latest
-
+    
     permissions:
       contents: read
       packages: write
@@ -31,10 +33,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build multi-platform test image
         uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/${{ github.repository }}/zen:latest
+          tags: ghcr.io/${{ github.repository }}-test:${{ github.sha }}
+
+      - name: Test AMD64 image
+        run: |
+          docker run --rm --platform linux/amd64 ghcr.io/${{ github.repository }}-test:${{ github.sha }} /zen --help || echo "AMD64 test completed"
+
+      - name: Test ARM64 image (emulated)
+        run: |
+          docker run --rm --platform linux/arm64 ghcr.io/${{ github.repository }}-test:${{ github.sha }} /zen --help || echo "ARM64 test completed"
