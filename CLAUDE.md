@@ -152,5 +152,12 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
 
 #### CSS Classes
 - BEM-like naming: `notes-editor-toolbar`, `left-toolbar`
+- Use CSS nesting with `&` for modifiers and pseudo-elements: `&.visible`, `&:hover`, `&::before`
+- Child classes and elements nested directly without `&`: `.child-class`, `svg.lucide`
 - Conditional classes using template literals
 - Minimal inline styles, prefer CSS classes
+- Use semantic z-index layering system:
+  - `z-index: 1` - Basic overlays (editor components, dropdown menus)
+  - `z-index: 2` - Modal backdrops, mobile navbar, sidebar overlay
+  - `z-index: 3` - Interactive content (toast notifications, sidebar content, tooltips)
+  - `z-index: 4` - Critical notifications (offline indicator)

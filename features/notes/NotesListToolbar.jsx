@@ -12,13 +12,13 @@ export default function NotesListToolbar({ onListViewClick, onCardViewClick, onG
         </div>
       </ButtonGroup>
       <ButtonGroup>
-        <div onClick={() => onListViewClick()}>
+        <div onClick={() => onListViewClick()} title="List View">
           <ListViewIcon />
         </div>
-        <div onClick={() => onCardViewClick()}>
+        <div onClick={() => onCardViewClick()} title="Card View">
           <CardViewIcon />
         </div>
-        <div onClick={() => onGalleryViewClick()}>
+        <div onClick={() => onGalleryViewClick()} title="Gallery View">
           <GalleryViewIcon />
         </div>
       </ButtonGroup>

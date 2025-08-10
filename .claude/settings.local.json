@@ -10,7 +10,11 @@
       "mcp__playwright__browser_tab_new",
       "mcp__playwright__browser_take_screenshot",
       "mcp__playwright__browser_type",
-      "Bash(make:*)"
+      "mcp__playwright__browser_hover",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_evaluate",
+      "Bash(make:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

@@ -5,4 +5,6 @@
 /tmp
 /images
 /assets/bundle.js
+/assets/bundle.js.map
 /assets/bundle.css
+/assets/bundle.css.map
