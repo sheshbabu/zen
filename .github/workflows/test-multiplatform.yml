@@ -1,6 +1,9 @@
 name: Test Multi-platform Build
 
 on:
+  push:
+    branches:
+      - multi-platform-docker
   pull_request:
     paths:
       - 'Dockerfile'
