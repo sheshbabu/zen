@@ -1,7 +1,11 @@
 <p align="center">
   <img width="256" src="assets/android-chrome-512x512.png">
   <h1 align="center">Zen</h1>
-  <p align="center">Minimal Notes App</p>
+  <p align="center">
+    <a href="https://zendemo.fly.dev">Live Demo</a> •
+    <a href="http://sheshbabu.com/zen/">Features</a> •
+    <a href="https://x.com/sheshbabu">Updates</a>
+  </p>
 </p>
 
 <p align="center"><img src="https://github.com/sheshbabu/zen/blob/master/docs/screenshot.png?raw=true"/></p>
