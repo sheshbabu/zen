@@ -54,6 +54,13 @@ $ make watch
 * Use the format `<version>_<title>.sql`
 
 
+### Image Versioning
+```bash
+$ git tag x.y.z
+$ git push origin x.y.z
+```
+
+
 ### Contributions
 This is a personal project built for my own use. The codebase is available for forking and modifications. Note that I may not actively review pull requests or respond to issues due to time constraints.
 
