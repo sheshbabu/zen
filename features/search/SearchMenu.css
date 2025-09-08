@@ -62,6 +62,11 @@
 
                 .title {
                     font-weight: 600;
+
+                    mark {
+                        color: var(--yellow-500);
+                        background-color: unset;
+                    }
                 }
 
                 .subtitle {
@@ -72,6 +77,12 @@
                     height: 20px;
                     text-overflow: ellipsis;
                     white-space: nowrap;
+
+                    mark {
+                        color: var(--yellow-500);
+                        background-color: unset;
+                        font-weight: 500;
+                    }
                 }
             }
         }

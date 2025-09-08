@@ -166,7 +166,7 @@ export default function SearchMenu() {
 function SearchResultItem({ item, isSelected, onClick }) {
   let icon = <NoteIcon />
   let title = item.title || item.name
-  let subtitle = item.snippet || ""
+  let subtitle = ""
 
   if (item.tagId) {
     icon = <TagIcon />
@@ -177,12 +177,21 @@ function SearchResultItem({ item, isSelected, onClick }) {
     icon = <TrashIcon />
   }
 
+  const displayTitle = item.highlightedTitle || title
+
+  let displaySubtitle = subtitle
+  if (item.highlightedContent) {
+    displaySubtitle = getHighlightedSnippet(item.highlightedContent)
+  } else if (item.content) {
+    displaySubtitle = item.content
+  }
+
   return (
     <div className={`search-result-item ${isSelected ? "is-selected" : ""}`} onClick={onClick}>
       {icon}
       <div className="search-result-item-content">
-        <p className="title">{title}</p>
-        <p className="subtitle">{subtitle}</p>
+        <p className="title" dangerouslySetInnerHTML={{ __html: displayTitle }}></p>
+        <p className="subtitle" dangerouslySetInnerHTML={{ __html: displaySubtitle }}></p>
       </div>
     </div>
   );
@@ -220,4 +229,37 @@ function saveToSearchHistory(item) {
   } catch {
     // Ignore localStorage errors
   }
+}
+
+function getHighlightedSnippet(highlightedContent) {
+  if (!highlightedContent || !highlightedContent.includes('<mark>')) {
+    return highlightedContent;
+  }
+
+  const maxLength = 100;
+  const leftOffset = 10;
+  const markStart = highlightedContent.indexOf('<mark>');
+  const startPos = Math.max(0, markStart - leftOffset);
+
+  let snippet = highlightedContent.substring(startPos, startPos + maxLength);
+
+  const lastMarkStart = snippet.lastIndexOf('<mark>');
+  const lastMarkEnd = snippet.lastIndexOf('</mark>');
+
+  if (lastMarkStart > lastMarkEnd) {
+    const remainingContent = highlightedContent.substring(startPos + maxLength);
+    const nextMarkEnd = remainingContent.indexOf('</mark>');
+    if (nextMarkEnd !== -1) {
+      snippet += remainingContent.substring(0, nextMarkEnd + 7);
+    }
+  }
+
+  if (startPos > 0) {
+    snippet = '...' + snippet;
+  }
+  if (startPos + snippet.length < highlightedContent.length) {
+    snippet += '...';
+  }
+
+  return snippet;
 }
