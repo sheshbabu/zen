@@ -15,14 +15,16 @@ type ResponseEnvelope struct {
 }
 
 type Note struct {
-	NoteID     int        `json:"noteId"`
-	Title      string     `json:"title"`
-	Snippet    string     `json:"snippet"`
-	Content    string     `json:"content"`
-	UpdatedAt  time.Time  `json:"updatedAt"`
-	Tags       []tags.Tag `json:"tags"`
-	IsArchived bool       `json:"isArchived"`
-	IsDeleted  bool       `json:"isDeleted"`
+	NoteID             int        `json:"noteId"`
+	Title              string     `json:"title"`
+	Snippet            string     `json:"snippet"`
+	Content            string     `json:"content"`
+	HighlightedTitle   string     `json:"highlightedTitle,omitempty"`
+	HighlightedContent string     `json:"highlightedContent,omitempty"`
+	UpdatedAt          time.Time  `json:"updatedAt"`
+	Tags               []tags.Tag `json:"tags"`
+	IsArchived         bool       `json:"isArchived"`
+	IsDeleted          bool       `json:"isDeleted"`
 }
 
 type NotesFilter struct {

@@ -606,6 +606,8 @@ func SearchNotes(term string, limit int) ([]Note, error) {
 	query := `
 		SELECT
 			n.note_id,
+			highlight(notes_search, 0, '<mark>', '</mark>') AS highlighted_title,
+			highlight(notes_search, 1, '<mark>', '</mark>') AS highlighted_content,
 			n.title,
 			n.content,
 			SUBSTR(n.content, 0, 500) AS snippet,
@@ -645,7 +647,7 @@ func SearchNotes(term string, limit int) ([]Note, error) {
 		var note Note
 		var archivedAt sql.NullTime
 		var deletedAt sql.NullTime
-		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &archivedAt, &deletedAt)
+		err = rows.Scan(&note.NoteID, &note.HighlightedTitle, &note.HighlightedContent, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &archivedAt, &deletedAt)
 		if err != nil {
 			err = fmt.Errorf("error scanning note: %w", err)
 			slog.Error(err.Error())
