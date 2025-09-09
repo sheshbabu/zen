@@ -207,6 +207,7 @@ export default function NotesPage({ noteId }) {
       <div className="note-modal-root"></div>
       <div className="modal-root"></div>
       <div className="toast-root"></div>
+      <div className="toc-root"></div>
     </div>
   );
 }

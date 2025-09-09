@@ -2,6 +2,7 @@ import { h, render, useState, useRef, useEffect, useCallback } from "../../asset
 import ApiClient from '../../commons/http/ApiClient.js';
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import NotesEditorFormattingToolbar from './NotesEditorFormattingToolbar.jsx';
+import TableOfContents from './TableOfContents.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import isMobile from '../../commons/utils/isMobile.js';
@@ -536,6 +537,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       <div className="notes-editor-content">
         {contentArea}
       </div>
+      <TableOfContents content={content} isExpanded={isExpanded} isEditable={isEditable} isNewNote={isNewNote} />
     </div>
   );
 }

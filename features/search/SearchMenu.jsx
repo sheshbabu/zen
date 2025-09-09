@@ -177,7 +177,7 @@ function SearchResultItem({ item, isSelected, onClick }) {
     icon = <TrashIcon />
   }
 
-  const displayTitle = item.highlightedTitle || title
+  const displayTitle = item.highlightedTitle || title || ""
 
   let displaySubtitle = subtitle
   if (item.highlightedContent) {
