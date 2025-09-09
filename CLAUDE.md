@@ -140,6 +140,34 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
 - Consistent error handling with toast notifications
 - Skip toast for expected errors using `skipCodes` array
 
+#### Function Declarations
+- Use `function` keyword for event handlers, utility functions, and render functions
+- Use arrow functions only for inline callbacks in JSX and when lexical `this` binding is needed
+- Examples:
+  ```javascript
+  // Preferred: function declarations
+  function handleSaveClick() { ... }
+  function renderItems() { ... }
+  
+  // Acceptable: arrow functions for inline callbacks
+  onClick={() => handleSaveClick()}
+  items.map(item => ...)
+  ```
+
+#### Boolean Type Checking
+- Use explicit boolean comparisons instead of truthy/falsy checks
+- Examples:
+  ```javascript
+  // Preferred: explicit checks
+  if (isEnabled === true) { ... }
+  if (isEnabled !== true) { ... }
+  if (typeof value === 'boolean' && value) { ... }
+  
+  // Avoid: truthy/falsy checks
+  if (!isEnabled) { ... }
+  if (isEnabled) { ... }
+  ```
+
 #### Event Handling
 - Handler naming: `handle{Action}Click` (e.g., `handleSaveClick`)
 - Keyboard shortcuts with `preventDefault()`
