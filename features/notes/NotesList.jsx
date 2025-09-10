@@ -3,6 +3,7 @@ import NotesListToolbar from './NotesListToolbar.jsx';
 import Link from '../../commons/components/Link.jsx';
 import Spinner from '../../commons/components/Spinner.jsx';
 import Button from '../../commons/components/Button.jsx';
+import { PinIcon } from '../../commons/components/Icon.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import formatDate from '../../commons/utils/formatDate.js';
 import isMobile from "../../commons/utils/isMobile.js";
@@ -10,7 +11,7 @@ import ImageGallery from "./ImageGallery.jsx";
 import NotesEditorModal from './NotesEditorModal.jsx';
 import "./NotesList.css";
 
-export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onChange, onSidebarToggle }) {
+export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onChange, onPinToggle, onSidebarToggle }) {
   let listClassName = "notes-list";
   let items = notes.map(note => <NotesListItem note={note} key={note.noteId} />);
   let content = <div className="notes-list-spinner"><Spinner /></div>;
@@ -20,7 +21,7 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
 
   if (view === "card") {
     listClassName = "";
-    items = notes.map(note => <NotesGridItem note={note} key={note.noteId} onChange={onChange} />);
+    items = notes.map(note => <NotesGridItem note={note} key={note.noteId} onChange={onChange} onPinToggle={onPinToggle} />);
     items = (
       <div className="notes-grid">
         {items}
@@ -69,8 +70,14 @@ function NotesListItem({ note }) {
   }
 
   return (
-    <Link to={link} className="notes-list-item" activeClassName="is-active" shouldPreserveSearchParams>
-      {title}
+    <Link to={link} className={`notes-list-item ${note.isPinned ? 'pinned' : ''}`} activeClassName="is-active" shouldPreserveSearchParams>
+      <div className="notes-list-item-header">
+        {title}
+        <PinIcon 
+          isPinned={note.isPinned}
+          className="notes-list-item-pin"
+        />
+      </div>
       <div className="notes-list-item-subcontainer">
         <div className="notes-list-item-tags">{tags}</div>
         <div className="notes-list-item-subtext" title={fullUpdatedAt}>{shortUpdatedAt}</div>
@@ -79,7 +86,7 @@ function NotesListItem({ note }) {
   );
 }
 
-function NotesGridItem({ note, onChange }) {
+function NotesGridItem({ note, onChange, onPinToggle }) {
   const link = `/notes/${note.noteId}`;
   const tags = note.tags?.map(tag => (<Link className="tag" key={tag.tagId} to={`/notes/?tagId=${tag.tagId}`} shouldPreserveSearchParams>{tag.name}</Link>));
   let title = <div className="notes-grid-item-title">{note.title}</div>
@@ -89,12 +96,19 @@ function NotesGridItem({ note, onChange }) {
   }
 
   function handleClick() {
-    render(<NotesEditorModal note={note} onChange={onChange} />, document.querySelector('.note-modal-root'));
+    render(<NotesEditorModal note={note} onChange={onChange} onPinToggle={onPinToggle} />, document.querySelector('.note-modal-root'));
   }
+
 
   const content = (
     <>
-      {title}
+      <div className="notes-grid-item-header">
+        {title}
+        <PinIcon 
+          isPinned={note.isPinned}
+          className="notes-grid-item-pin"
+        />
+      </div>
       <div className="notes-grid-item-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(note.snippet) }} />
       <div className="notes-grid-item-tags">{tags}</div>
     </>
@@ -102,14 +116,14 @@ function NotesGridItem({ note, onChange }) {
 
   if (isMobile()) {
     return (
-      <Link className="notes-grid-item" to={link} shouldPreserveSearchParams>
+      <Link className={`notes-grid-item ${note.isPinned ? 'pinned' : ''}`} to={link} shouldPreserveSearchParams>
         {content}
       </Link>
     );
   }
 
   return (
-    <div className="notes-grid-item" onClick={handleClick}>
+    <div className={`notes-grid-item ${note.isPinned ? 'pinned' : ''}`} onClick={handleClick}>
       {content}
     </div>
   );

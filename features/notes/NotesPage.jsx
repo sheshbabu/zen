@@ -146,11 +146,31 @@ export default function NotesPage({ noteId }) {
       });
   }
 
-  // Update notes, tags, and focus modes when a note is created/updated/deleted
+  // Update notes, tags, and focus modes when a note is created/updated/deleted/pinned
   function handleNoteChange() {
     refreshNotes();
     refreshImages();
     refreshTags();
+  }
+
+  function handlePinToggle(noteId, isPinned) {
+    if (isPinned === true) {
+      ApiClient.unpinNote(noteId)
+        .then(() => {
+          setNotes(notes.map(note => note.noteId === noteId ? { ...note, isPinned: false } : note));
+        })
+        .catch(error => {
+          console.error('Error unpinning note:', error);
+        });
+    } else {
+      ApiClient.pinNote(noteId)
+        .then(() => {
+          setNotes(notes.map(note => note.noteId === noteId ? { ...note, isPinned: true } : note));
+        })
+        .catch(error => {
+          console.error('Error pinning note:', error);
+        });
+    }
   }
 
   function handleViewChange(newView) {
@@ -194,12 +214,13 @@ export default function NotesPage({ noteId }) {
           onLoadMoreClick={handleLoadMoreClick}
           onLoadMoreImagesClick={handleLoadMoreImagesClick}
           onChange={handleNoteChange}
+          onPinToggle={handlePinToggle}
           onSidebarToggle={() => setIsSidebarOpen(!isSidebarOpen)}
         />
       </div>
 
       <div className={editorClassName} data-page={noteId === undefined ? "notes" : "editor"}>
-        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.noteId} onChange={handleNoteChange} />
+        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.noteId} onChange={handleNoteChange} onPinToggle={handlePinToggle} />
       </div>
 
       <MobileNavbar />

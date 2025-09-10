@@ -158,6 +158,14 @@ async function unarchiveNote(noteId) {
   return await request('PUT', `/api/notes/${noteId}/unarchive/`);
 }
 
+async function pinNote(noteId) {
+  return await request('PUT', `/api/notes/${noteId}/pin/`);
+}
+
+async function unpinNote(noteId) {
+  return await request('PUT', `/api/notes/${noteId}/unpin/`);
+}
+
 // Tags
 
 async function getTags(focusId) {
@@ -276,6 +284,8 @@ export default {
   restoreNote,
   archiveNote,
   unarchiveNote,
+  pinNote,
+  unpinNote,
   getTags,
   searchTags,
   updateTag,

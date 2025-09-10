@@ -25,6 +25,7 @@ type Note struct {
 	Tags               []tags.Tag `json:"tags"`
 	IsArchived         bool       `json:"isArchived"`
 	IsDeleted          bool       `json:"isDeleted"`
+	IsPinned           bool       `json:"isPinned"`
 }
 
 type NotesFilter struct {
@@ -247,6 +248,40 @@ func HandleUnarchiveNote(w http.ResponseWriter, r *http.Request) {
 	err = UnarchiveNote(noteID)
 	if err != nil {
 		utils.SendErrorResponse(w, "NOTES_UNARCHIVE_FAILED", "Error unarchiving note.", err, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func HandlePinNote(w http.ResponseWriter, r *http.Request) {
+	noteIDStr := r.PathValue("noteId")
+	noteID, err := strconv.Atoi(noteIDStr)
+	if err != nil {
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", "Invalid note ID", err, http.StatusBadRequest)
+		return
+	}
+
+	err = PinNote(noteID)
+	if err != nil {
+		utils.SendErrorResponse(w, "NOTES_PIN_FAILED", "Error pinning note.", err, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func HandleUnpinNote(w http.ResponseWriter, r *http.Request) {
+	noteIDStr := r.PathValue("noteId")
+	noteID, err := strconv.Atoi(noteIDStr)
+	if err != nil {
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", "Invalid note ID", err, http.StatusBadRequest)
+		return
+	}
+
+	err = UnpinNote(noteID)
+	if err != nil {
+		utils.SendErrorResponse(w, "NOTES_UNPIN_FAILED", "Error unpinning note.", err, http.StatusInternalServerError)
 		return
 	}
 

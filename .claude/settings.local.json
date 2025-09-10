@@ -16,9 +16,11 @@
       "mcp__playwright__browser_press_key",
       "mcp__playwright__browser_console_messages",
       "mcp__playwright__browser_network_requests",
+      "WebSearch",
       "Bash(make:*)",
       "Bash(pkill:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(lsof:*)"
     ],
     "deny": []
   }

@@ -13,7 +13,7 @@ import { showToast } from '../../commons/components/Toast.jsx';
 import "./NotesEditor.css";
 import { CloseIcon, SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
 
-export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange, onClose }) {
+export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange, onClose, onPinToggle }) {
   if (!isNewNote && selectedNote === null) {
     return null;
   }
@@ -345,6 +345,20 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     }
   }
 
+  function handlePinClick() {
+    if (onPinToggle && selectedNote) {
+      onPinToggle(selectedNote.noteId, selectedNote.isPinned);
+      onChange();
+    }
+  }
+
+  function handleUnpinClick() {
+    if (onPinToggle && selectedNote) {
+      onPinToggle(selectedNote.noteId, selectedNote.isPinned);
+      onChange();
+    }
+  }
+
   function uploadImage(file) {
     const formData = new FormData();
     formData.append('image', file);
@@ -523,6 +537,8 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         onUnarchiveClick={handleUnarchiveClick}
         onRestoreClick={handleRestoreClick}
         onExpandToggleClick={handleExpandToggleClick}
+        onPinClick={handlePinClick}
+        onUnpinClick={handleUnpinClick}
       />
       <div className="notes-editor-header">
         <div className="notes-editor-title" contentEditable={isEditable} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
@@ -542,7 +558,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   );
 }
 
-function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExpanded, onSaveClick, onEditClick, onEditCancelClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick }) {
+function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExpanded, onSaveClick, onEditClick, onEditCancelClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick, onPinClick, onUnpinClick }) {
   const rightToolbarActions = [];
   const leftToolbarActions = [];
   const menuActions = [];
@@ -595,6 +611,16 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExp
   }
 
   if (!isNewNote) {
+    if (note.isPinned === true) {
+      menuActions.push(
+        <div style="width: 80px;" onClick={onUnpinClick}>Unpin</div>
+      );
+    } else {
+      menuActions.push(
+        <div style="width: 80px;" onClick={onPinClick}>Pin</div>
+      );
+    }
+
     if (note.isArchived) {
       menuActions.push(
         <div style="width: 80px;" onClick={onUnarchiveClick}>Unarchive</div>

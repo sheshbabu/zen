@@ -35,6 +35,12 @@
             background-color: var(--bg-secondary);
         }
 
+        .notes-list-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         .notes-list-item-title {
             font-weight: 500;
             white-space: nowrap;
@@ -42,6 +48,30 @@
 
             &.untitled {
                 color: var(--neutral-300);
+            }
+        }
+
+        .notes-list-item-pin {
+            opacity: 0;
+            width: 16px;
+            height: 16px;
+            transform: translateY(-5px);
+            transition: opacity, transform 300ms;
+
+            &.pinned {
+                opacity: 1;
+                margin-left: 4px;
+                flex-shrink: 0;
+                transform: translateY(0);
+
+                line,
+                circle,
+                rect,
+                path {
+                    stroke-width: 2;
+                    stroke: var(--neutral-300);
+                    fill: var(--neutral-300);
+                }
             }
         }
 
@@ -104,12 +134,42 @@
             cursor: pointer;
             zoom: 0.6;
 
+            .notes-grid-item-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+            }
+
             .notes-grid-item-title {
                 font: var(--h4);
-                margin-bottom: 12px;
 
                 &.untitled {
                     color: var(--neutral-400);
+                }
+            }
+
+            .notes-grid-item-pin {
+                opacity: 0;
+                width: 24px;
+                height: 24px;
+                transform: translateY(-10px);
+                transition: opacity, transform 300ms;
+
+                &.pinned {
+                    opacity: 1;
+                    margin-left: 4px;
+                    flex-shrink: 0;
+                    transform: translateY(0);
+
+                    line,
+                    circle,
+                    rect,
+                    path {
+                        stroke-width: 2;
+                        stroke: var(--neutral-300);
+                        fill: var(--neutral-300);
+                    }
                 }
             }
 
