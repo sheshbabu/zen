@@ -348,14 +348,12 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   function handlePinClick() {
     if (onPinToggle && selectedNote) {
       onPinToggle(selectedNote.noteId, selectedNote.isPinned);
-      onChange();
     }
   }
 
   function handleUnpinClick() {
     if (onPinToggle && selectedNote) {
       onPinToggle(selectedNote.noteId, selectedNote.isPinned);
-      onChange();
     }
   }
 
