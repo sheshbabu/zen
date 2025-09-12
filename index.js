@@ -4,6 +4,7 @@ import Route from './commons/components/Route.jsx';
 import useAuth from './commons/auth/useAuth.jsx';
 import LoadingPage from './commons/components/LoadingPage.jsx';
 import NotesPage from "./features/notes/NotesPage.jsx";
+import TemplatesPage from "./features/templates/TemplatesPage.jsx";
 import LoginPage from './features/users/LoginPage.jsx';
 import navigateTo from './commons/utils/navigateTo.js';
 import SearchMenu from './features/search/SearchMenu.jsx';
@@ -61,6 +62,8 @@ function App() {
         <Route path="/" component={NotesPage} />
         <Route path="/notes/" component={NotesPage} />
         <Route path="/notes/:noteId" component={NotesPage} />
+        <Route path="/templates/" component={TemplatesPage} />
+        <Route path="/templates/:templateId" component={TemplatesPage} />
       </Router>
     </>
   );

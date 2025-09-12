@@ -62,11 +62,11 @@ export default function Sidebar({ isOpen, onSidebarClose, focusModes, tags }) {
           {/* <Link className="sidebar-button" to="/">
           <BoardIcon />
           Boards
-        </Link>
-        <div className="sidebar-button" activeClassName="is-active" to="/archives" shouldPreserveSearchParams>
-          <TemplatesIcon />
-          Templates
-        </div>*/}
+        </Link>*/}
+          <Link className="sidebar-button templates" activeClassName="is-active" to="/templates/">
+            <TemplatesIcon />
+            Templates
+          </Link>
           <Link className="sidebar-button archives" activeClassName="is-active" to="/notes/?isArchived=true">
             <ArchiveIcon />
             Archives

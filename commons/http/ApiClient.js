@@ -15,7 +15,7 @@ async function request(method, url, payload) {
 
   try {
     const response = await fetch(url, options);
-    
+
     if (!response.ok) {
       throw response;
     }
@@ -28,11 +28,11 @@ async function request(method, url, payload) {
       console.error("Network error:", error);
       throw error;
     }
-    
+
     if (error instanceof TypeError && (
       error.message.includes('fetch') ||
       error.message.includes('Load failed') ||
-      error.message.includes('NetworkError') 
+      error.message.includes('NetworkError')
     )) {
       showToast("Connection failed.");
       console.error("Fetch error:", error);
@@ -41,7 +41,7 @@ async function request(method, url, payload) {
 
     if (error instanceof Response) {
       const isJsonResponse = error.headers.get('content-type')?.includes('application/json');
-      
+
       if (isJsonResponse) {
         const body = await error.json();
         const err = new Error(error.statusText);
@@ -53,7 +53,7 @@ async function request(method, url, payload) {
           showToast(message);
         }
         console.error('API error:', body);
-        
+
         throw err;
       }
 
@@ -252,6 +252,37 @@ async function exportNotes() {
   window.URL.revokeObjectURL(url);
 }
 
+// Templates
+
+async function getTemplates() {
+  return await request('GET', "/api/templates/");
+}
+
+async function getTemplateById(templateId) {
+  return await request('GET', `/api/templates/${templateId}`);
+}
+
+async function createTemplate(template) {
+  return await request('POST', '/api/templates/', template);
+}
+
+async function updateTemplate(templateId, template) {
+  return await request('PUT', `/api/templates/${templateId}`, template);
+}
+
+async function deleteTemplate(templateId) {
+  return await request('DELETE', `/api/templates/${templateId}`);
+}
+
+async function getRecommendedTemplates() {
+  return await request('GET', "/api/templates/recommended/");
+}
+
+async function incrementTemplateUsage(templateId) {
+  return await request('PUT', `/api/templates/${templateId}/usage/`);
+}
+
+
 // MCP Tokens
 
 async function getTokens() {
@@ -295,6 +326,13 @@ export default {
   search,
   importFile,
   exportNotes,
+  getTemplates,
+  getTemplateById,
+  createTemplate,
+  updateTemplate,
+  deleteTemplate,
+  getRecommendedTemplates,
+  incrementTemplateUsage,
   getTokens,
   createToken,
   deleteToken

@@ -20,6 +20,7 @@ import (
 	"zen/features/search"
 	"zen/features/settings"
 	"zen/features/tags"
+	"zen/features/templates"
 	"zen/features/users"
 )
 
@@ -116,6 +117,14 @@ func newRouter() *http.ServeMux {
 	addPrivateRoute(mux, "DELETE /api/mcp/tokens/{tokenId}/", mcp.HandleRevokeMCPToken)
 
 	addPrivateRoute(mux, "GET /api/search/", search.HandleSearch)
+
+	addPrivateRoute(mux, "GET /api/templates/", templates.HandleGetTemplates)
+	addPrivateRoute(mux, "GET /api/templates/{templateId}/", templates.HandleGetTemplate)
+	addPrivateRoute(mux, "POST /api/templates/", templates.HandleCreateTemplate)
+	addPrivateRoute(mux, "PUT /api/templates/{templateId}/", templates.HandleUpdateTemplate)
+	addPrivateRoute(mux, "DELETE /api/templates/{templateId}/", templates.HandleDeleteTemplate)
+	addPrivateRoute(mux, "GET /api/templates/recommended/", templates.HandleGetRecommendedTemplates)
+	addPrivateRoute(mux, "PUT /api/templates/{templateId}/usage/", templates.HandleIncrementTemplateUsage)
 
 	mux.HandleFunc("POST /mcp", mcp.HandleMCP)
 	mux.HandleFunc("OPTIONS /mcp", mcp.HandleMCP)

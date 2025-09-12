@@ -1,0 +1,31 @@
+.templates-list-toolbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  margin: 6px 12px 0 4px;
+
+  .templates-list-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    svg.lucide {
+      cursor: pointer;
+      width: 20px;
+      height: 20px;
+      margin: 8px;
+      margin-right: 0;
+      transition-property: stroke;
+      transition-duration: 500ms;
+
+      &:hover {
+
+        rect,
+        path,
+        circle {
+          stroke: var(--neutral-900);
+        }
+      }
+    }
+  }
+}

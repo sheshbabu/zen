@@ -73,10 +73,7 @@ function NotesListItem({ note }) {
     <Link to={link} className={`notes-list-item ${note.isPinned ? 'pinned' : ''}`} activeClassName="is-active" shouldPreserveSearchParams>
       <div className="notes-list-item-header">
         {title}
-        <PinIcon 
-          isPinned={note.isPinned}
-          className="notes-list-item-pin"
-        />
+        <PinIcon isPinned={note.isPinned} className="notes-list-item-pin" />
       </div>
       <div className="notes-list-item-subcontainer">
         <div className="notes-list-item-tags">{tags}</div>
@@ -104,7 +101,7 @@ function NotesGridItem({ note, onChange, onPinToggle }) {
     <>
       <div className="notes-grid-item-header">
         {title}
-        <PinIcon 
+        <PinIcon
           isPinned={note.isPinned}
           className="notes-grid-item-pin"
         />

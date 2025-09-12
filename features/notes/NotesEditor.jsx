@@ -3,6 +3,7 @@ import ApiClient from '../../commons/http/ApiClient.js';
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import NotesEditorFormattingToolbar from './NotesEditorFormattingToolbar.jsx';
 import TableOfContents from './TableOfContents.jsx';
+import TemplatePicker from '../templates/TemplatePicker.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import isMobile from '../../commons/utils/isMobile.js';
@@ -35,7 +36,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
 
   useEffect(() => {
     if (isNewNote || (isEditable && titleRef.current?.textContent === "")) {
-      titleRef.current.focus();
+      titleRef.current?.focus();
     }
 
     if (!isNewNote) {
@@ -357,6 +358,27 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     }
   }
 
+  function handleTemplateApply(templateTitle, templateContent, templateTags) {
+    if (templateTitle && templateTitle.trim() !== "") {
+      setTitle(templateTitle);
+    }
+
+    setContent(templateContent);
+
+    if (templateTags && templateTags.length > 0) {
+      setTags(templateTags);
+    }
+
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        const length = templateContent.length;
+        textareaRef.current.selectionStart = length;
+        textareaRef.current.selectionEnd = length;
+      }
+    }, 0);
+  }
+
   function uploadImage(file) {
     const formData = new FormData();
     formData.append('image', file);
@@ -516,6 +538,11 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     );
   });
 
+  let templatePicker = null;
+  if (isNewNote === true && isEditable === true && title === "" && content === "") {
+    templatePicker = <TemplatePicker onTemplateApply={handleTemplateApply} />;
+  }
+
   // TODO: remove "is-editable" CSS and use JS
   return (
     <div className={`notes-editor ${isEditable ? "is-editable" : ""}`} tabIndex="0" onPaste={handlePaste}>
@@ -551,6 +578,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       <div className="notes-editor-content">
         {contentArea}
       </div>
+      {templatePicker}
       <TableOfContents content={content} isExpanded={isExpanded} isEditable={isEditable} isNewNote={isNewNote} />
     </div>
   );

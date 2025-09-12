@@ -1,0 +1,133 @@
+.templates-editor-container {
+  flex: 1;
+  padding: 24px;
+  padding-top: 0;
+  border-left: 1px solid var(--neutral-100);
+}
+
+.templates-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-primary);
+
+  .templates-editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    background: var(--bg-primary);
+
+    .templates-editor-header-left {
+      display: flex;
+      align-items: center;
+      flex-direction: row-reverse;
+    }
+
+    .templates-editor-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .templates-editor-header-right {
+      display: flex;
+      align-items: center;
+      flex-direction: row-reverse;
+
+      svg.lucide {
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+        margin-right: 0;
+        transition-property: stroke;
+        transition-duration: 500ms;
+
+        &:hover {
+          rect,
+          path {
+            stroke: var(--neutral-900);
+          }
+        }
+      }
+    }
+  }
+
+  .templates-editor-content {
+    flex: 1;
+    overflow-y: auto;
+
+    .input-container {
+      margin-bottom: 24px;
+    }
+
+    .form-field-container .notes-editor-tags {
+      margin-top: var(--spacing-xs);
+    }
+
+    .templates-editor-field {
+      margin-bottom: 24px;
+    }
+
+    .templates-editor-textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 12px;
+      border: 1px solid var(--neutral-200);
+      border-radius: 4px;
+      font-family: var(--font-family-code);
+      font-size: 16px;
+      line-height: 1.5;
+      resize: vertical;
+      background: var(--bg-primary);
+      color: var(--text-color);
+      transition: border-color 200ms;
+
+      &:focus {
+        outline: none;
+        border-color: var(--blue-500);
+      }
+    }
+
+    .templates-editor-help {
+      margin-top: var(--spacing-md);
+
+      h4 {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      pre {
+        background-color: var(--neutral-50);
+        border: 1px solid var(--neutral-200);
+        border-radius: 6px;
+        padding: 12px;
+        font-family: var(--font-family-code);
+        font-size: 12px;
+        line-height: 1.4;
+        color: var(--neutral-600);
+        margin-top: var(--spacing-xs);
+        overflow-x: auto;
+        white-space: pre;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .templates-editor {
+    .templates-editor-content {
+      padding: 12px;
+
+      .templates-editor-field {
+        margin-bottom: 20px;
+      }
+    }
+
+    .templates-editor-header {
+      .templates-editor-title {
+        font-size: 18px;
+      }
+    }
+  }
+}

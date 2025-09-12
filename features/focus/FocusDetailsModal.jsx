@@ -1,6 +1,5 @@
 import { h, render, useState } from "../../assets/preact.esm.js"
 import Input from "../../commons/components/Input.jsx";
-import { CloseIcon } from "../../commons/components/Icon.jsx";
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import Button from "../../commons/components/Button.jsx";
 import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent } from "../../commons/components/Modal.jsx";

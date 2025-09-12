@@ -6,7 +6,10 @@ export default function TableOfContents({ content, isExpanded, isEditable, isNew
   const hideTimeoutRef = useRef(null);
 
   if (isExpanded !== true || isEditable === true || isNewNote === true || headings.length === 0) {
-    render(null, document.querySelector('.toc-root'));
+    const tocRoot = document.querySelector('.toc-root');
+    if (tocRoot) {
+      render(null, tocRoot);
+    }
     return null;
   }
 
@@ -15,11 +18,17 @@ export default function TableOfContents({ content, isExpanded, isEditable, isNew
       clearTimeout(hideTimeoutRef.current);
       hideTimeoutRef.current = null;
     }
-    render(<TableOfContentsPopover headings={headings} onMouseEnter={handlePopoverMouseEnter} onMouseLeave={handlePopoverMouseLeave} />, document.querySelector('.modal-root'));
+    const modalRoot = document.querySelector('.modal-root');
+    if (modalRoot) {
+      render(<TableOfContentsPopover headings={headings} onMouseEnter={handlePopoverMouseEnter} onMouseLeave={handlePopoverMouseLeave} />, modalRoot);
+    }
   }
 
   function hidePopover() {
-    render(null, document.querySelector('.modal-root'));
+    const modalRoot = document.querySelector('.modal-root');
+    if (modalRoot) {
+      render(null, modalRoot);
+    }
   }
 
   function handleMouseEnter() {
@@ -57,7 +66,10 @@ export default function TableOfContents({ content, isExpanded, isEditable, isNew
     </div>
   );
 
-  render(sidebarElement, document.querySelector('.toc-root'));
+  const tocRoot = document.querySelector('.toc-root');
+  if (tocRoot) {
+    render(sidebarElement, tocRoot);
+  }
   return null;
 }
 
@@ -77,7 +89,10 @@ function TableOfContentsPopover({ headings, onMouseEnter, onMouseLeave }) {
       targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    render(null, document.querySelector('.modal-root'));
+    const modalRoot = document.querySelector('.modal-root');
+    if (modalRoot) {
+      render(null, modalRoot);
+    }
   }
 
   const minLevel = Math.min(...headings.map(h => h.level));

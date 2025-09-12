@@ -20,7 +20,9 @@
       "Bash(make:*)",
       "Bash(pkill:*)",
       "Bash(rm:*)",
-      "Bash(lsof:*)"
+      "Bash(lsof:*)",
+      "Bash(curl:*)",
+      "Bash(xargs kill:*)"
     ],
     "deny": []
   }
