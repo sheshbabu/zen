@@ -13,6 +13,7 @@ import Button from '../../commons/components/Button.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
 import { closeModal, openModal } from '../../commons/components/Modal.jsx';
 import { useNotes } from "../../contexts/NotesContext.jsx";
+import { useVisibleHeadings } from "./useVisibleHeadings.js";
 import "./NotesEditor.css";
 import { CloseIcon, SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
 
@@ -35,15 +36,18 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
   const titleRef = useRef(null);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
+  const contentRef = useRef(null);
+
+  const visibleHeadings = useVisibleHeadings(contentRef, content, isEditable, isExpanded);
 
   let contentArea = null;
 
   useEffect(() => {
-    if (isNewNote || (isEditable && titleRef.current?.textContent === "")) {
+    if (isNewNote === true || (isEditable === true && titleRef.current?.textContent === "")) {
       titleRef.current?.focus();
     }
 
-    if (!isNewNote) {
+    if (isNewNote !== true) {
       document.title = title === "" ? "Zen" : title;
     }
   }, []);
@@ -51,6 +55,7 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
   useEffect(() => {
     handleTextAreaHeight();
   }, [content, isEditable]);
+
 
   const handleSaveClick = useCallback(() => {
     const currentTitle = titleRef.current?.textContent || "";
@@ -95,7 +100,7 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
 
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault();
-      if (isEditable) {
+      if (isEditable === true) {
         handleSaveClick();
       } else {
         handleEditClick();
@@ -104,7 +109,7 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
 
     if (e.key === 'Escape') {
       e.preventDefault();
-      if (isFloating) {
+      if (isFloating === true) {
         handleCloseClick();
       }
     }
@@ -530,7 +535,7 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
     );
   } else {
     contentArea = (
-      <div className="notes-editor-rendered" dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }} />
+      <div className="notes-editor-rendered" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }} />
     );
   }
 
@@ -545,6 +550,7 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
   if (isNewNote === true && isEditable === true && title === "" && content === "") {
     templatePicker = <TemplatePicker onTemplateApply={handleTemplateApply} />;
   }
+
 
   // TODO: remove "is-editable" CSS and use JS
   return (
@@ -582,7 +588,7 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
         {contentArea}
       </div>
       {templatePicker}
-      <TableOfContents content={content} isExpanded={isExpanded} isEditable={isEditable} isNewNote={isNewNote} />
+      <TableOfContents content={content} isExpanded={isExpanded} isEditable={isEditable} isNewNote={isNewNote} visibleHeadings={visibleHeadings} />
     </div>
   );
 }

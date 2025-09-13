@@ -2,7 +2,7 @@ import { h, render, useRef } from "../../assets/preact.esm.js"
 import { closeModal, openModal } from "../../commons/components/Modal.jsx";
 import "./TableOfContents.css";
 
-export default function TableOfContents({ content, isExpanded, isEditable, isNewNote }) {
+export default function TableOfContents({ content, isExpanded, isEditable, isNewNote, visibleHeadings = [] }) {
   const headings = extractHeadings(content);
   const hideTimeoutRef = useRef(null);
 
@@ -19,7 +19,7 @@ export default function TableOfContents({ content, isExpanded, isEditable, isNew
       clearTimeout(hideTimeoutRef.current);
       hideTimeoutRef.current = null;
     }
-    openModal(<TableOfContentsPopover headings={headings} onMouseEnter={handlePopoverMouseEnter} onMouseLeave={handlePopoverMouseLeave} />);
+    openModal(<TableOfContentsPopover headings={headings} visibleHeadings={visibleHeadings} onMouseEnter={handlePopoverMouseEnter} onMouseLeave={handlePopoverMouseLeave} />);
   }
 
   function hidePopover() {
@@ -49,9 +49,19 @@ export default function TableOfContents({ content, isExpanded, isEditable, isNew
     }, 100);
   }
 
-  const bars = headings.map((item, index) => (
-    <div key={`${item.level}-${index}`} className={`toc-bar toc-bar-level-${item.level}`} />
-  ));
+  function isHeadingVisible(heading) {
+    return visibleHeadings.some(visible => visible.index === heading.index);
+  }
+
+  const bars = headings.map((item) => {
+    const isVisible = isHeadingVisible(item);
+    return (
+      <div
+        key={`heading-${item.index}`}
+        className={`toc-bar toc-bar-level-${item.level} ${isVisible ? 'is-visible' : ''}`}
+      />
+    );
+  });
 
   const sidebarElement = (
     <div className="toc-sidebar" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
@@ -68,7 +78,7 @@ export default function TableOfContents({ content, isExpanded, isEditable, isNew
   return null;
 }
 
-function TableOfContentsPopover({ headings, onMouseEnter, onMouseLeave }) {
+function TableOfContentsPopover({ headings, visibleHeadings = [], onMouseEnter, onMouseLeave }) {
   function handleItemClick(heading) {
     const headingElements = document.querySelectorAll(`h${heading.level}`);
     let targetElement = null;
@@ -89,11 +99,23 @@ function TableOfContentsPopover({ headings, onMouseEnter, onMouseLeave }) {
 
   const minLevel = Math.min(...headings.map(h => h.level));
 
-  const items = headings.map((heading, index) => (
-    <div key={`${heading.level}-${index}`} className="toc-item" style={{ marginLeft: `${(heading.level - minLevel) * 8}px` }} onClick={() => handleItemClick(heading)} >
-      {heading.text}
-    </div>
-  ));
+  function isHeadingVisible(heading) {
+    return visibleHeadings.some(visible => visible.index === heading.index);
+  }
+
+  const items = headings.map((heading) => {
+    const isVisible = isHeadingVisible(heading);
+    return (
+      <div
+        key={`heading-${heading.index}`}
+        className={`toc-item ${isVisible ? 'is-visible' : ''}`}
+        style={{ marginLeft: `${(heading.level - minLevel) * 8}px` }}
+        onClick={() => handleItemClick(heading)}
+      >
+        {heading.text}
+      </div>
+    );
+  });
 
   return (
     <div className="toc-popover" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
@@ -115,6 +137,7 @@ function extractHeadings(content) {
   const lines = content.split('\n');
   let isInsideCodeBlock = false;
   let codeBlockMarker = '';
+  let headingIndex = 0;
 
   lines.forEach(line => {
     const trimmedLine = line.trim();
@@ -140,7 +163,8 @@ function extractHeadings(content) {
     if (match) {
       const level = match[1].length;
       const text = match[2].trim();
-      headings.push({ text, level });
+      headings.push({ text, level, index: headingIndex });
+      headingIndex++;
     }
   });
 

@@ -31,6 +31,10 @@
       width: 12px;
     }
 
+    .is-visible {
+      background: var(--neutral-600);
+    }
+
     &:hover {
       .toc-bar {
         background: var(--neutral-500);
@@ -75,6 +79,9 @@
           color: var(--neutral-100);
         }
 
+        &.is-visible {
+          font-weight: 600;
+        }
       }
     }
   }
