@@ -7,13 +7,12 @@ import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import "./FocusDetailsModal.css";
 
-export default function FocusDetailsModal({ mode, focusMode }) {
+export default function FocusDetailsModal({ mode, focusMode, refreshFocusModes, refreshTags }) {
   const [name, setName] = useState(focusMode ? focusMode.name : "");
   const [tags, setTags] = useState(focusMode ? focusMode.tags : []);
 
   let title = "Create Focus";
   let buttonName = "Create";
-
 
   function handleNameChange(e) {
     setName(e.target.value);
@@ -21,10 +20,12 @@ export default function FocusDetailsModal({ mode, focusMode }) {
 
   function handleAddTag(tag) {
     setTags((prevTags) => [...prevTags, tag]);
+    refreshTags();
   }
 
   function handleRemoveTag(tag) {
     setTags((prevTags) => prevTags.filter(t => t.tagId !== tag.tagId));
+    refreshTags();
   }
 
   function handleCreateClick() {
@@ -44,11 +45,11 @@ export default function FocusDetailsModal({ mode, focusMode }) {
 
     promise
       .then(newFocusMode => {
+        refreshFocusModes();
         closeModal();
         if (mode === "create") {
           navigateTo(`/notes/?focusId=${newFocusMode.focusId}`);
         }
-        window.location.reload();
       });
   }
 

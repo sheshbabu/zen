@@ -4,13 +4,17 @@ import { ArrowDownIcon, PencilIcon } from "../../commons/components/Icon.jsx";
 import Button from "../../commons/components/Button.jsx";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import useSearchParams from "../../commons/components/useSearchParams.jsx";
+import { useAppContext } from "../../contexts/AppContext.jsx";
 
-export default function FocusSwitcher({ focusModes }) {
-  if (focusModes.length === 0) {
-    focusModes = [{ focusId: 0, name: "Everything" }];
+export default function FocusSwitcher() {
+  const { focusModes, refreshFocusModes, refreshTags } = useAppContext();
+
+  let currentFocusModes = focusModes;
+  if (currentFocusModes.length === 0) {
+    currentFocusModes = [{ focusId: 0, name: "Everything" }];
   }
 
-  const [selectedFocusMode, setSelectedFocusMode] = useState(focusModes[0]);
+  const [selectedFocusMode, setSelectedFocusMode] = useState(currentFocusModes[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const dropdownRef = useRef(null);
@@ -32,8 +36,8 @@ export default function FocusSwitcher({ focusModes }) {
   }, [dropdownRef]);
 
   useEffect(() => {
-    setSelectedFocusMode(focusModes.find(focusMode => focusMode.focusId === parseInt(selectedFocusId, 10)) || focusModes[0]);
-  }, [selectedFocusId, focusModes]);
+    setSelectedFocusMode(currentFocusModes.find(focusMode => focusMode.focusId === parseInt(selectedFocusId, 10)) || currentFocusModes[0]);
+  }, [selectedFocusId, currentFocusModes]);
 
   function handleDropdownClick() {
     setIsDropdownOpen(prevIsDropdownOpen => !prevIsDropdownOpen);
@@ -50,19 +54,19 @@ export default function FocusSwitcher({ focusModes }) {
 
   function handleAddNewClick() {
     setIsDropdownOpen(false);
-    render(<FocusDetailsModal mode="create"/>, document.querySelector('.modal-root'));
+    render(<FocusDetailsModal mode="create" refreshFocusModes={refreshFocusModes} refreshTags={refreshTags} />, document.querySelector('.modal-root'));
   }
 
   function handleEditClick(e, focusMode) {
     e.stopPropagation();
     setIsDropdownOpen(false);
-    render(<FocusDetailsModal mode="edit" focusMode={focusMode}/>, document.querySelector('.modal-root'));
+    render(<FocusDetailsModal mode="edit" focusMode={focusMode} refreshFocusModes={refreshFocusModes} refreshTags={refreshTags} />, document.querySelector('.modal-root'));
   }
 
-  const items = focusModes.map(focusMode => {
+  const items = currentFocusModes.map(focusMode => {
     let editIcon = null;
     if (focusMode.focusId !== 0) {
-      editIcon = <PencilIcon onClick={e => handleEditClick(e, focusMode)}/>
+      editIcon = <PencilIcon onClick={e => handleEditClick(e, focusMode)} />
     }
     return (
       <li key={focusMode.focusId} className="dropdown-option" onClick={() => handleFocusModeClick(focusMode)}>

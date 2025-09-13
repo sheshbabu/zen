@@ -9,9 +9,11 @@ import formatDate from '../../commons/utils/formatDate.js';
 import isMobile from "../../commons/utils/isMobile.js";
 import ImageGallery from "./ImageGallery.jsx";
 import NotesEditorModal from './NotesEditorModal.jsx';
+import { useNotes, NotesProvider } from "../../contexts/NotesContext.jsx";
+import { AppProvider } from '../../contexts/AppContext.jsx';
 import "./NotesList.css";
 
-export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onChange, onPinToggle, onSidebarToggle }) {
+export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onSidebarToggle }) {
   let listClassName = "notes-list";
   let items = notes.map(note => <NotesListItem note={note} key={note.noteId} />);
   let content = <div className="notes-list-spinner"><Spinner /></div>;
@@ -21,7 +23,7 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
 
   if (view === "card") {
     listClassName = "";
-    items = notes.map(note => <NotesGridItem note={note} key={note.noteId} onChange={onChange} onPinToggle={onPinToggle} />);
+    items = notes.map(note => <NotesGridItem note={note} key={note.noteId} />);
     items = (
       <div className="notes-grid">
         {items}
@@ -83,7 +85,8 @@ function NotesListItem({ note }) {
   );
 }
 
-function NotesGridItem({ note, onChange, onPinToggle }) {
+function NotesGridItem({ note }) {
+  const { handleNoteChange, handlePinToggle } = useNotes();
   const link = `/notes/${note.noteId}`;
   const tags = note.tags?.map(tag => (<Link className="tag" key={tag.tagId} to={`/notes/?tagId=${tag.tagId}`} shouldPreserveSearchParams>{tag.name}</Link>));
   let title = <div className="notes-grid-item-title">{note.title}</div>
@@ -93,7 +96,14 @@ function NotesGridItem({ note, onChange, onPinToggle }) {
   }
 
   function handleClick() {
-    render(<NotesEditorModal note={note} onChange={onChange} onPinToggle={onPinToggle} />, document.querySelector('.note-modal-root'));
+    render(
+      <AppProvider>
+        <NotesProvider>
+          <NotesEditorModal note={note} />
+        </NotesProvider>
+      </AppProvider>,
+      document.querySelector('.note-modal-root')
+    );
   }
 
 

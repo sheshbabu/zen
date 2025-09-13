@@ -1,4 +1,4 @@
-import { h, render, Fragment } from './assets/preact.esm.js';
+import { h, render } from './assets/preact.esm.js';
 import Router from './commons/components/Router.jsx';
 import Route from './commons/components/Route.jsx';
 import useAuth from './commons/auth/useAuth.jsx';
@@ -10,6 +10,7 @@ import navigateTo from './commons/utils/navigateTo.js';
 import SearchMenu from './features/search/SearchMenu.jsx';
 import OfflineIndicator from './commons/components/OfflineIndicator.jsx';
 import Tooltip from './commons/components/Tooltip.js';
+import { AppProvider } from './contexts/AppContext.jsx';
 
 document.addEventListener('DOMContentLoaded', () => {
   setUserPreferredTheme();
@@ -56,7 +57,7 @@ function App() {
   }
 
   return (
-    <>
+    <AppProvider>
       <OfflineIndicator />
       <Router>
         <Route path="/" component={NotesPage} />
@@ -65,7 +66,7 @@ function App() {
         <Route path="/templates/" component={TemplatesPage} />
         <Route path="/templates/:templateId" component={TemplatesPage} />
       </Router>
-    </>
+    </AppProvider>
   );
 }
 
@@ -73,7 +74,7 @@ function setUserPreferredTheme() {
   const savedThemeId = localStorage.getItem('theme-preference');
   const darkBgColor = "#121212";
   const lightBgColor = "#FFF";
-  
+
   if (savedThemeId && savedThemeId !== 'system') {
     document.documentElement.setAttribute('data-theme', savedThemeId);
     const themeColor = savedThemeId === 'dark' ? darkBgColor : lightBgColor;

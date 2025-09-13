@@ -4,19 +4,20 @@ import TemplatesList from './TemplatesList.jsx';
 import TemplateEditor from './TemplateEditor.jsx';
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
+import { useAppContext } from "../../contexts/AppContext.jsx";
 
 export default function TemplatesPage({ templateId }) {
   const [templates, setTemplates] = useState([]);
   const [isTemplatesLoading, setIsTemplatesLoading] = useState(true);
-  const [tags, setTags] = useState([]);
-  const [focusModes, setFocusModes] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+
+  const { refreshTags, refreshFocusModes } = useAppContext();
 
   useEffect(() => {
     refreshTemplates();
     refreshTags();
     refreshFocusModes();
-  }, []);
+  }, [refreshTags, refreshFocusModes]);
 
   useEffect(() => {
     if (templateId === "new") {
@@ -55,25 +56,6 @@ export default function TemplatesPage({ templateId }) {
       });
   }
 
-  function refreshTags() {
-    ApiClient.getTags()
-      .then(newTags => {
-        setTags(newTags);
-      })
-      .catch(error => {
-        console.error('Error loading tags:', error);
-      });
-  }
-
-  function refreshFocusModes() {
-    ApiClient.getFocusModes()
-      .then(focusModes => {
-        setFocusModes(focusModes);
-      })
-      .catch(error => {
-        console.error('Error loading focus modes:', error);
-      });
-  }
 
   function handleTemplateChange() {
     refreshTemplates();
@@ -90,10 +72,10 @@ export default function TemplatesPage({ templateId }) {
 
   return (
     <div className="page-container">
-      <Sidebar isOpen={true} onSidebarClose={() => { }} focusModes={focusModes} tags={tags} />
+      <Sidebar isOpen={true} onSidebarClose={() => { }} />
 
       <div className="templates-list-container">
-        <TemplatesList templates={templates} isLoading={isTemplatesLoading} onNewTemplateClick={handleNewTemplateClick} onChange={handleTemplateChange} />
+        <TemplatesList templates={templates} isLoading={isTemplatesLoading} onNewTemplateClick={handleNewTemplateClick} />
       </div>
 
       <div className="templates-editor-container">

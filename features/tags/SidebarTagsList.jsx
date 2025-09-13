@@ -2,8 +2,11 @@ import { h, render } from "../../assets/preact.esm.js"
 import Link from "../../commons/components/Link.jsx"
 import { PencilIcon } from "../../commons/components/Icon.jsx";
 import TagDetailModal from "./TagDetailModal.jsx";
+import { useAppContext } from "../../contexts/AppContext.jsx";
 
-export default function SidebarTagsList({ tags = [] }) {
+export default function SidebarTagsList() {
+  const { tags, refreshTags } = useAppContext();
+
   if (tags.length === 0) {
     return null;
   }
@@ -17,14 +20,14 @@ export default function SidebarTagsList({ tags = [] }) {
       activeClassName="is-active"
     >
       {tag.name}
-      <PencilIcon onClick={e => handleEditClick(e, tag)}/>
+      <PencilIcon onClick={e => handleEditClick(e, tag)} />
     </Link>
   ));
 
   function handleEditClick(e, tag) {
     e.stopPropagation();
     e.preventDefault();
-    render(<TagDetailModal tag={tag}/>, document.querySelector('.modal-root'));
+    render(<TagDetailModal tag={tag} refreshTags={refreshTags} />, document.querySelector('.modal-root'));
   }
 
   return (

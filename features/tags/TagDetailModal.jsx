@@ -1,6 +1,5 @@
 import { h, render, useState } from "../../assets/preact.esm.js"
 import Input from "../../commons/components/Input.jsx";
-import { CloseIcon } from "../../commons/components/Icon.jsx";
 import Button from "../../commons/components/Button.jsx";
 import ButtonGroup from "../../commons/components/ButtonGroup.jsx";
 import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent } from "../../commons/components/Modal.jsx";
@@ -8,9 +7,8 @@ import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import "./TagDetailModal.css";
 
-export default function TagDetailModal({ tag }) {
+export default function TagDetailModal({ tag, refreshTags }) {
   const [name, setName] = useState(tag.name);
-
 
   function handleNameChange(e) {
     setName(e.target.value);
@@ -24,14 +22,15 @@ export default function TagDetailModal({ tag }) {
 
     ApiClient.updateTag(payload)
       .then(() => {
+        refreshTags();
         closeModal();
-        navigateTo(`/notes/?tagId=${tag.tagId}`);
       });
   }
 
   function handleDeleteClick() {
     ApiClient.deleteTag(tag.tagId)
       .then(() => {
+        refreshTags();
         closeModal();
         navigateTo("/notes/");
       });

@@ -11,10 +11,13 @@ import NoteDeleteModal from './NoteDeleteModal.jsx';
 import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
 import Button from '../../commons/components/Button.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
+import { useNotes } from "../../contexts/NotesContext.jsx";
 import "./NotesEditor.css";
 import { CloseIcon, SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
 
-export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange, onClose, onPinToggle }) {
+export default function NotesEditor({ isNewNote, isFloating, onClose }) {
+  const { selectedNote, handleNoteChange, handlePinToggle } = useNotes();
+
   if (!isNewNote && selectedNote === null) {
     return null;
   }
@@ -79,12 +82,12 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
           navigateTo(`/notes/${note.noteId}`, true);
         }
 
-        onChange();
+        handleNoteChange();
       })
       .finally(() => {
         setIsSaveLoading(false);
       });
-  }, [content, tags, isNewNote, selectedNote, onChange]);
+  }, [content, tags, isNewNote, selectedNote, handleNoteChange]);
 
   const handleKeyDown = useCallback(e => {
     const isTextAreaFocused = document.activeElement.className == "notes-editor-textarea";
@@ -305,7 +308,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         } else {
           navigateTo("/", true);
         }
-        onChange();
+        handleNoteChange();
       });
   }
 
@@ -317,7 +320,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     ApiClient.archiveNote(selectedNote.noteId)
       .then(() => {
         showToast("Note archived.");
-        onChange();
+        handleNoteChange();
       });
   }
 
@@ -325,14 +328,14 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     ApiClient.unarchiveNote(selectedNote.noteId)
       .then(() => {
         showToast("Note unarchived.");
-        onChange();
+        handleNoteChange();
       });
   }
 
   function handleRestoreClick() {
     ApiClient.restoreNote(selectedNote.noteId)
       .then(() => {
-        onChange();
+        handleNoteChange();
       });
   }
 
@@ -347,14 +350,14 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }
 
   function handlePinClick() {
-    if (onPinToggle && selectedNote) {
-      onPinToggle(selectedNote.noteId, selectedNote.isPinned);
+    if (handlePinToggle && selectedNote) {
+      handlePinToggle(selectedNote.noteId, selectedNote.isPinned);
     }
   }
 
   function handleUnpinClick() {
-    if (onPinToggle && selectedNote) {
-      onPinToggle(selectedNote.noteId, selectedNote.isPinned);
+    if (handlePinToggle && selectedNote) {
+      handlePinToggle(selectedNote.noteId, selectedNote.isPinned);
     }
   }
 
