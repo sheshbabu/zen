@@ -92,6 +92,7 @@ func newRouter() *http.ServeMux {
 	addPrivateRoute(mux, "PUT /api/notes/{noteId}/", notes.HandleUpdateNote)
 	addPrivateRoute(mux, "POST /api/notes/", notes.HandleCreateNote)
 	addPrivateRoute(mux, "DELETE /api/notes/{noteId}/", notes.HandleSoftDeleteNote)
+	addPrivateRoute(mux, "DELETE /api/notes/", notes.HandleDeleteNotes)
 	addPrivateRoute(mux, "PUT /api/notes/{noteId}/restore/", notes.HandleRestoreDeletedNote)
 	addPrivateRoute(mux, "PUT /api/notes/{noteId}/archive/", notes.HandleArchiveNote)
 	addPrivateRoute(mux, "PUT /api/notes/{noteId}/unarchive/", notes.HandleUnarchiveNote)
@@ -195,7 +196,7 @@ func runBackgroundTasks() {
 
 	go func() {
 		for range time.Tick(trashCleanupFrequency) {
-			notes.EmptyTrash()
+			notes.EmptyTrash(true)
 		}
 	}()
 

@@ -287,3 +287,17 @@ func HandleUnpinNote(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 }
+
+func HandleDeleteNotes(w http.ResponseWriter, r *http.Request) {
+	isDeleted := r.URL.Query().Get("isDeleted")
+
+	if isDeleted == "true" {
+		err := EmptyTrash(false)
+		if err != nil {
+			utils.SendErrorResponse(w, "TRASH_EMPTY_FAILED", "Error emptying trash.", err, http.StatusInternalServerError)
+			return
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

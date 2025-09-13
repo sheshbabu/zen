@@ -50,7 +50,8 @@
 
                 circle,
                 rect,
-                path {
+                path,
+                line {
                     stroke: var(--neutral-900);
                 }
             }

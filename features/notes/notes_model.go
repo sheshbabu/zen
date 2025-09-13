@@ -686,16 +686,28 @@ func SearchNotes(term string, limit int) ([]Note, error) {
 	return notes, nil
 }
 
-func EmptyTrash() error {
-	query := `
-		SELECT
-			note_id
-		FROM
-			notes
-		WHERE
-			deleted_at IS NOT NULL AND
-			deleted_at < datetime('now', '-30 days')
-	`
+func EmptyTrash(shouldOnlyClearExpired bool) error {
+	var query string
+	if shouldOnlyClearExpired {
+		query = `
+			SELECT
+				note_id
+			FROM
+				notes
+			WHERE
+				deleted_at IS NOT NULL AND
+				deleted_at < datetime('now', '-30 days')
+		`
+	} else {
+		query = `
+			SELECT
+				note_id
+			FROM
+				notes
+			WHERE
+				deleted_at IS NOT NULL
+		`
+	}
 
 	rows, err := sqlite.DB.Query(query)
 	if err != nil {

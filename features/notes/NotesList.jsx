@@ -1,5 +1,6 @@
 import { h, Fragment } from "../../assets/preact.esm.js"
 import NotesListToolbar from './NotesListToolbar.jsx';
+import TrashListToolbar from './TrashListToolbar.jsx';
 import Link from '../../commons/components/Link.jsx';
 import Spinner from '../../commons/components/Spinner.jsx';
 import Button from '../../commons/components/Button.jsx';
@@ -14,7 +15,7 @@ import { AppProvider } from '../../contexts/AppContext.jsx';
 import { openModal } from '../../commons/components/Modal.jsx';
 import "./NotesList.css";
 
-export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onSidebarToggle }) {
+export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onSidebarToggle, isTrashPage }) {
   let listClassName = "notes-list";
   let items = notes.map(note => <NotesListItem note={note} key={note.noteId} />);
   let content = <div className="notes-list-spinner"><Spinner /></div>;
@@ -48,9 +49,17 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
     )
   }
 
+  let toolbar = null;
+
+  if (isTrashPage === true) {
+    toolbar = <TrashListToolbar onSidebarToggle={onSidebarToggle} />
+  } else {
+    toolbar = <NotesListToolbar onListViewClick={() => onViewChange("list")} onCardViewClick={() => onViewChange("card")} onGalleryViewClick={() => onViewChange("gallery")} onSidebarToggle={onSidebarToggle} />
+  };
+
   return (
     <>
-      <NotesListToolbar onListViewClick={() => onViewChange("list")} onCardViewClick={() => onViewChange("card")} onGalleryViewClick={() => onViewChange("gallery")} onSidebarToggle={onSidebarToggle} />
+      {toolbar}
       {content}
     </>
   );
@@ -87,7 +96,6 @@ function NotesListItem({ note }) {
 }
 
 function NotesGridItem({ note }) {
-  const { handleNoteChange, handlePinToggle } = useNotes();
   const link = `/notes/${note.noteId}`;
   const tags = note.tags?.map(tag => (<Link className="tag" key={tag.tagId} to={`/notes/?tagId=${tag.tagId}`} shouldPreserveSearchParams>{tag.name}</Link>));
   let title = <div className="notes-grid-item-title">{note.title}</div>

@@ -166,6 +166,10 @@ async function unpinNote(noteId) {
   return await request('PUT', `/api/notes/${noteId}/unpin/`);
 }
 
+async function clearTrash() {
+  return await request('DELETE', '/api/notes/?isDeleted=true');
+}
+
 // Tags
 
 async function getTags(focusId) {
@@ -317,6 +321,7 @@ export default {
   unarchiveNote,
   pinNote,
   unpinNote,
+  clearTrash,
   getTags,
   searchTags,
   updateTag,
