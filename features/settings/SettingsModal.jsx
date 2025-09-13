@@ -1,5 +1,5 @@
-import { h, render, useState } from "../../assets/preact.esm.js"
-import { ModalBackdrop, ModalContainer, ModalHeader } from "../../commons/components/Modal.jsx";
+import { h, useState } from "../../assets/preact.esm.js"
+import { ModalBackdrop, ModalContainer, ModalHeader, closeModal } from "../../commons/components/Modal.jsx";
 import { UploadIcon, DownloadIcon, ThemeIcon, BrainCircuitIcon, SecurityIcon } from "../../commons/components/Icon.jsx";
 import ImportPane from "./ImportPane.jsx";
 import ExportPane from "./ExportPane.jsx";
@@ -19,9 +19,6 @@ const tabs = [
 export default function SettingsModal() {
   const [activeTab, setActiveTab] = useState("appearance");
 
-  function closeModal() {
-    render(null, document.querySelector('.modal-root'));
-  }
 
   function handleTabClick(tabId) {
     setActiveTab(tabId);

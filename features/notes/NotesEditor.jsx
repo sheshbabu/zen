@@ -1,4 +1,4 @@
-import { h, render, useState, useRef, useEffect, useCallback } from "../../assets/preact.esm.js"
+import { h, useState, useRef, useEffect, useCallback } from "../../assets/preact.esm.js"
 import ApiClient from '../../commons/http/ApiClient.js';
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import NotesEditorFormattingToolbar from './NotesEditorFormattingToolbar.jsx';
@@ -11,6 +11,7 @@ import NoteDeleteModal from './NoteDeleteModal.jsx';
 import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
 import Button from '../../commons/components/Button.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
+import { closeModal, openModal } from '../../commons/components/Modal.jsx';
 import { useNotes } from "../../contexts/NotesContext.jsx";
 import "./NotesEditor.css";
 import { CloseIcon, SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
@@ -291,12 +292,11 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
   }
 
   function handleDeleteClick() {
-    render(
+    openModal(
       <NoteDeleteModal
         onDeleteClick={handleDeleteConfirmClick}
         onCloseClick={handleDeleteCloseClick}
-      />,
-      document.querySelector('.modal-root'));
+      />);
   }
 
   function handleDeleteConfirmClick() {
@@ -313,7 +313,7 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
   }
 
   function handleDeleteCloseClick() {
-    render(null, document.querySelector('.modal-root'));
+    closeModal();
   }
 
   function handleArchiveClick() {

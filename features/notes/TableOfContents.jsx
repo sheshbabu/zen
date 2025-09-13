@@ -1,4 +1,5 @@
 import { h, render, useRef } from "../../assets/preact.esm.js"
+import { closeModal, openModal } from "../../commons/components/Modal.jsx";
 import "./TableOfContents.css";
 
 export default function TableOfContents({ content, isExpanded, isEditable, isNewNote }) {
@@ -18,17 +19,11 @@ export default function TableOfContents({ content, isExpanded, isEditable, isNew
       clearTimeout(hideTimeoutRef.current);
       hideTimeoutRef.current = null;
     }
-    const modalRoot = document.querySelector('.modal-root');
-    if (modalRoot) {
-      render(<TableOfContentsPopover headings={headings} onMouseEnter={handlePopoverMouseEnter} onMouseLeave={handlePopoverMouseLeave} />, modalRoot);
-    }
+    openModal(<TableOfContentsPopover headings={headings} onMouseEnter={handlePopoverMouseEnter} onMouseLeave={handlePopoverMouseLeave} />);
   }
 
   function hidePopover() {
-    const modalRoot = document.querySelector('.modal-root');
-    if (modalRoot) {
-      render(null, modalRoot);
-    }
+    closeModal();
   }
 
   function handleMouseEnter() {
@@ -89,10 +84,7 @@ function TableOfContentsPopover({ headings, onMouseEnter, onMouseLeave }) {
       targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    const modalRoot = document.querySelector('.modal-root');
-    if (modalRoot) {
-      render(null, modalRoot);
-    }
+    closeModal();
   }
 
   const minLevel = Math.min(...headings.map(h => h.level));

@@ -1,8 +1,8 @@
-import { h, render, useEffect, useState, useRef } from "../../assets/preact.esm.js"
+import { h, useEffect, useState, useRef } from "../../assets/preact.esm.js"
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon, TagIcon } from "../../commons/components/Icon.jsx";
-import { ModalBackdrop, ModalContainer } from "../../commons/components/Modal.jsx";
+import { ModalBackdrop, ModalContainer, closeModal } from "../../commons/components/Modal.jsx";
 import "./SearchMenu.css";
 
 const SEARCH_HISTORY_KEY = 'search-history';
@@ -72,9 +72,6 @@ export default function SearchMenu() {
     }
   }
 
-  function closeModal() {
-    render(null, document.querySelector('.modal-root'));
-  }
 
   function handleResultClick(item) {
     saveToSearchHistory(item);

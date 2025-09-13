@@ -1,8 +1,8 @@
-import { h, render, useState } from "../../assets/preact.esm.js"
+import { h, useState } from "../../assets/preact.esm.js"
 import Input from "../../commons/components/Input.jsx";
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import Button from "../../commons/components/Button.jsx";
-import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent } from "../../commons/components/Modal.jsx";
+import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent, closeModal } from "../../commons/components/Modal.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import "./FocusDetailsModal.css";
@@ -53,9 +53,6 @@ export default function FocusDetailsModal({ mode, focusMode, refreshFocusModes, 
       });
   }
 
-  function closeModal() {
-    render(null, document.querySelector('.modal-root'));
-  }
 
   if (mode === "edit") {
     title = "Edit Focus";

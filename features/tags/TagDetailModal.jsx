@@ -1,8 +1,8 @@
-import { h, render, useState } from "../../assets/preact.esm.js"
+import { h, useState } from "../../assets/preact.esm.js"
 import Input from "../../commons/components/Input.jsx";
 import Button from "../../commons/components/Button.jsx";
 import ButtonGroup from "../../commons/components/ButtonGroup.jsx";
-import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent } from "../../commons/components/Modal.jsx";
+import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent, closeModal } from "../../commons/components/Modal.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import "./TagDetailModal.css";
@@ -36,9 +36,6 @@ export default function TagDetailModal({ tag, refreshTags }) {
       });
   }
 
-  function closeModal() {
-    render(null, document.querySelector('.modal-root'));
-  }
 
   return (
     <ModalBackdrop onClose={closeModal} isCentered={true}>

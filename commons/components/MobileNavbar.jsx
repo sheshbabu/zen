@@ -1,12 +1,13 @@
-import { h, render } from "../../assets/preact.esm.js"
+import { h } from "../../assets/preact.esm.js"
 import Link from './Link.jsx';
 import SearchMenu from "../../features/search/SearchMenu.jsx";
+import { openModal } from "./Modal.jsx";
 import { NotesIcon, SearchIcon, NewIcon } from "./Icon.jsx";
 import "./MobileNavbar.css";
 
 export default function MobileNavbar() {
   function handleSearchClick() {
-    render(<SearchMenu />, document.querySelector('.modal-root'));
+    openModal(<SearchMenu />);
   }
 
   return (

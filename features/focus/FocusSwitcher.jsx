@@ -1,5 +1,6 @@
-import { h, render, useEffect, useState, useRef } from "../../assets/preact.esm.js"
+import { h, useEffect, useState, useRef } from "../../assets/preact.esm.js"
 import FocusDetailsModal from './FocusDetailsModal.jsx';
+import { openModal } from "../../commons/components/Modal.jsx";
 import { ArrowDownIcon, PencilIcon } from "../../commons/components/Icon.jsx";
 import Button from "../../commons/components/Button.jsx";
 import navigateTo from "../../commons/utils/navigateTo.js";
@@ -54,13 +55,13 @@ export default function FocusSwitcher() {
 
   function handleAddNewClick() {
     setIsDropdownOpen(false);
-    render(<FocusDetailsModal mode="create" refreshFocusModes={refreshFocusModes} refreshTags={refreshTags} />, document.querySelector('.modal-root'));
+    openModal(<FocusDetailsModal mode="create" refreshFocusModes={refreshFocusModes} refreshTags={refreshTags} />);
   }
 
   function handleEditClick(e, focusMode) {
     e.stopPropagation();
     setIsDropdownOpen(false);
-    render(<FocusDetailsModal mode="edit" focusMode={focusMode} refreshFocusModes={refreshFocusModes} refreshTags={refreshTags} />, document.querySelector('.modal-root'));
+    openModal(<FocusDetailsModal mode="edit" focusMode={focusMode} refreshFocusModes={refreshFocusModes} refreshTags={refreshTags} />);
   }
 
   const items = currentFocusModes.map(focusMode => {

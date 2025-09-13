@@ -1,10 +1,11 @@
-import { h, render, useState, useCallback } from "../../assets/preact.esm.js"
+import { h, useState, useCallback } from "../../assets/preact.esm.js"
 import ApiClient from '../../commons/http/ApiClient.js';
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import Button from '../../commons/components/Button.jsx';
 import Input from '../../commons/components/Input.jsx';
 import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
+import { closeModal, openModal } from '../../commons/components/Modal.jsx';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import TemplateDeleteModal from './TemplateDeleteModal.jsx';
 import "./TemplateEditor.css";
@@ -103,9 +104,7 @@ export default function TemplateEditor({ selectedTemplate, isNewTemplate, onChan
   }
 
   function handleDeleteClick() {
-    render(
-      <TemplateDeleteModal onDeleteClick={handleDeleteConfirmClick} onCloseClick={handleDeleteCloseClick} />,
-      document.querySelector('.modal-root'));
+    openModal(<TemplateDeleteModal onDeleteClick={handleDeleteConfirmClick} onCloseClick={handleDeleteCloseClick} />);
   }
 
   function handleDeleteConfirmClick() {
@@ -120,7 +119,7 @@ export default function TemplateEditor({ selectedTemplate, isNewTemplate, onChan
   }
 
   function handleDeleteCloseClick() {
-    render(null, document.querySelector('.modal-root'));
+    closeModal();
   }
 
   function getMenuActions() {

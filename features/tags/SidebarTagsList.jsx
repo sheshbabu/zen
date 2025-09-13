@@ -1,7 +1,8 @@
-import { h, render } from "../../assets/preact.esm.js"
+import { h } from "../../assets/preact.esm.js"
 import Link from "../../commons/components/Link.jsx"
 import { PencilIcon } from "../../commons/components/Icon.jsx";
 import TagDetailModal from "./TagDetailModal.jsx";
+import { openModal } from "../../commons/components/Modal.jsx";
 import { useAppContext } from "../../contexts/AppContext.jsx";
 
 export default function SidebarTagsList() {
@@ -27,7 +28,7 @@ export default function SidebarTagsList() {
   function handleEditClick(e, tag) {
     e.stopPropagation();
     e.preventDefault();
-    render(<TagDetailModal tag={tag} refreshTags={refreshTags} />, document.querySelector('.modal-root'));
+    openModal(<TagDetailModal tag={tag} refreshTags={refreshTags} />);
   }
 
   return (

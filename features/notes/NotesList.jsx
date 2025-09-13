@@ -1,4 +1,4 @@
-import { h, render, Fragment } from "../../assets/preact.esm.js"
+import { h, Fragment } from "../../assets/preact.esm.js"
 import NotesListToolbar from './NotesListToolbar.jsx';
 import Link from '../../commons/components/Link.jsx';
 import Spinner from '../../commons/components/Spinner.jsx';
@@ -11,6 +11,7 @@ import ImageGallery from "./ImageGallery.jsx";
 import NotesEditorModal from './NotesEditorModal.jsx';
 import { useNotes, NotesProvider } from "../../contexts/NotesContext.jsx";
 import { AppProvider } from '../../contexts/AppContext.jsx';
+import { openModal } from '../../commons/components/Modal.jsx';
 import "./NotesList.css";
 
 export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onSidebarToggle }) {
@@ -96,13 +97,13 @@ function NotesGridItem({ note }) {
   }
 
   function handleClick() {
-    render(
+    openModal(
       <AppProvider>
         <NotesProvider>
           <NotesEditorModal note={note} />
         </NotesProvider>
       </AppProvider>,
-      document.querySelector('.note-modal-root')
+      '.note-modal-root'
     );
   }
 

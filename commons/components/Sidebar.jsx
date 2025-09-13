@@ -1,9 +1,10 @@
-import { h, render, useEffect, Fragment } from "../../assets/preact.esm.js"
+import { h, useEffect, Fragment } from "../../assets/preact.esm.js"
 import Link from './Link.jsx';
 import SidebarTagsList from "../../features/tags/SidebarTagsList.jsx";
 import FocusSwitcher from "../../features/focus/FocusSwitcher.jsx";
 import SearchMenu from "../../features/search/SearchMenu.jsx";
 import SettingsModal from "../../features/settings/SettingsModal.jsx";
+import { openModal } from "./Modal.jsx";
 import { NotesIcon, SearchIcon, NewIcon, ArchiveIcon, TrashIcon, BoardIcon, SettingsIcon, TemplatesIcon } from "./Icon.jsx";
 import { useAppContext } from "../../contexts/AppContext.jsx";
 import "./Sidebar.css";
@@ -25,11 +26,11 @@ export default function Sidebar({ isOpen, onSidebarClose }) {
   }, [isOpen, onSidebarClose]);
 
   function handleSearchClick() {
-    render(<SearchMenu />, document.querySelector('.modal-root'));
+    openModal(<SearchMenu />);
   }
 
   function handleSettingsClick() {
-    render(<SettingsModal />, document.querySelector('.modal-root'));
+    openModal(<SettingsModal />);
   }
 
   function handleBackdropClick() {

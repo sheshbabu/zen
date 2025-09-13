@@ -1,5 +1,5 @@
-import { h, render, useEffect, useRef, useState, useCallback, Fragment } from "../../assets/preact.esm.js";
-import { ModalBackdrop, ModalContainer } from "../../commons/components/Modal.jsx";
+import { h, useEffect, useRef, useState, useCallback, Fragment } from "../../assets/preact.esm.js";
+import { ModalBackdrop, ModalContainer, closeModal, openModal } from "../../commons/components/Modal.jsx";
 import "./ImageGallery.css";
 
 const MIN_COLUMN_WIDTH = 300;
@@ -111,14 +111,11 @@ export default function ImageGallery({ images }) {
   }
 
   function handleImageClick(selectedImage) {
-    render(
-      <Lightbox selectedImage={selectedImage} imageDetails={imageDetails} onClose={closeLightbox} />,
-      document.querySelector('.modal-root')
-    );
+    openModal(<Lightbox selectedImage={selectedImage} imageDetails={imageDetails} onClose={closeLightbox} />);
   }
 
   function closeLightbox() {
-    render(null, document.querySelector('.modal-root'));
+    closeModal();
   }
 
   const items = imageDetails.map((image, index) => {
