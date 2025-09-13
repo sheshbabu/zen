@@ -16,6 +16,10 @@ export default function SearchMenu() {
 
   const inputRef = useRef(null);
 
+  function handleCloseModal() {
+    closeModal();
+  }
+
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
@@ -137,7 +141,7 @@ export default function SearchMenu() {
   }
 
   return (
-    <ModalBackdrop onClose={closeModal} isCentered={false}>
+    <ModalBackdrop onClose={handleCloseModal} isCentered={false}>
       <ModalContainer className="search-modal">
         <div className="search-input-container">
           <SearchIcon />

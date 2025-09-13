@@ -36,11 +36,15 @@ export default function TagDetailModal({ tag, refreshTags }) {
       });
   }
 
+  function handleCancelClick() {
+    closeModal();
+  }
+
 
   return (
-    <ModalBackdrop onClose={closeModal} isCentered={true}>
+    <ModalBackdrop onClose={handleCancelClick} isCentered={true}>
       <ModalContainer className="tag-dialog">
-        <ModalHeader title="Manage Tag" onClose={closeModal} />
+        <ModalHeader title="Manage Tag" onClose={handleCancelClick} />
         <ModalContent>
           <p className="modal-description">Edit the tag name or <b>permanently delete</b> this tag. Deleting the tag will remove it from all notes.</p>
           <Input id="tag-name" label="Tag Name" type="text" placeholder="Name your Tag" value={name} hint="" error="" isDisabled={false} onChange={handleNameChange} />
@@ -48,7 +52,7 @@ export default function TagDetailModal({ tag, refreshTags }) {
         <div className="model-footer-container">
           <Button variant="danger" onClick={handleDeleteClick}>Delete</Button>
           <ButtonGroup>
-            <Button onClick={closeModal}>Cancel</Button>
+            <Button onClick={handleCancelClick}>Cancel</Button>
             <Button variant="primary" onClick={handleUpdateClick}>Update</Button>
           </ButtonGroup>
         </div>

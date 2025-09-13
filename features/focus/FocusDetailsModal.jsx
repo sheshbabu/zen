@@ -28,6 +28,10 @@ export default function FocusDetailsModal({ mode, focusMode, refreshFocusModes, 
     refreshTags();
   }
 
+  function handleCancelClick() {
+    closeModal();
+  }
+
   function handleCreateClick() {
     let promise = null;
 
@@ -60,9 +64,9 @@ export default function FocusDetailsModal({ mode, focusMode, refreshFocusModes, 
   }
 
   return (
-    <ModalBackdrop onClose={closeModal} isCentered={true}>
+    <ModalBackdrop onClose={handleCancelClick} isCentered={true}>
       <ModalContainer className="focus-dialog">
-        <ModalHeader title={title} onClose={closeModal} />
+        <ModalHeader title={title} onClose={handleCancelClick} />
         <ModalContent>
           <p className="modal-description">Define your Focus to concentrate on what matters most. Add tags to view only the relevant notes for this topic and work without distraction.</p>
           <Input id="focus-name" label="Focus Name" type="text" placeholder="Name your Focus" value={name} hint="" error="" isDisabled={false} onChange={handleNameChange} />
@@ -72,7 +76,7 @@ export default function FocusDetailsModal({ mode, focusMode, refreshFocusModes, 
           </div>
         </ModalContent>
         <div className="model-footer-container right-aligned">
-          <Button onClick={closeModal}>Cancel</Button>
+          <Button onClick={handleCancelClick}>Cancel</Button>
           <Button variant="primary" onClick={handleCreateClick}>{buttonName}</Button>
         </div>
       </ModalContainer>

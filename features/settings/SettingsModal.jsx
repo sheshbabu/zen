@@ -19,6 +19,9 @@ const tabs = [
 export default function SettingsModal() {
   const [activeTab, setActiveTab] = useState("appearance");
 
+  function handleCloseModal() {
+    closeModal();
+  }
 
   function handleTabClick(tabId) {
     setActiveTab(tabId);
@@ -34,9 +37,9 @@ export default function SettingsModal() {
   const paneContent = tabs.find(tab => tab.id === activeTab).content || null;
 
   return (
-    <ModalBackdrop onClose={closeModal}>
+    <ModalBackdrop onClose={handleCloseModal}>
       <ModalContainer className="settings-modal">
-        <ModalHeader title="Settings" onClose={closeModal} />
+        <ModalHeader title="Settings" onClose={handleCloseModal} />
         <div className="settings-content">
           <div className="settings-sidebar">
             {sidebar}
