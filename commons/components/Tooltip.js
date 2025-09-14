@@ -1,3 +1,4 @@
+import isMobile from '../utils/isMobile';
 import './Tooltip.css';
 
 let activeTooltip = null;
@@ -75,7 +76,7 @@ function processNewElements(element) {
 
 function showTooltip(element) {
     clearTimeout(hideTimeout);
-    
+
     showTimeout = setTimeout(() => {
         const tooltipText = element.getAttribute('data-tooltip');
         if (!tooltipText) {
@@ -99,13 +100,13 @@ function showTooltip(element) {
         requestAnimationFrame(() => {
             tooltip.classList.add('visible');
         });
-    }, 500);
+    }, 100);
 }
 
 function hideTooltip() {
     clearTimeout(showTimeout);
     clearTimeout(hideTimeout);
-    
+
     if (activeTooltip) {
         const tooltip = activeTooltip;
         if (tooltip.parentNode) {
@@ -184,6 +185,10 @@ function constrainToViewport(position, tooltipRect, viewport) {
 }
 
 function init() {
+    if (isMobile()) {
+        return
+    }
+
     addGlobalEventListeners();
     observeElements();
 }
