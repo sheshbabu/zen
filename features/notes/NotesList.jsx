@@ -1,6 +1,5 @@
 import { h, Fragment } from "../../assets/preact.esm.js"
 import NotesListToolbar from './NotesListToolbar.jsx';
-import TrashListToolbar from './TrashListToolbar.jsx';
 import Link from '../../commons/components/Link.jsx';
 import Spinner from '../../commons/components/Spinner.jsx';
 import Button from '../../commons/components/Button.jsx';
@@ -10,12 +9,12 @@ import formatDate from '../../commons/utils/formatDate.js';
 import isMobile from "../../commons/utils/isMobile.js";
 import ImageGallery from "./ImageGallery.jsx";
 import NotesEditorModal from './NotesEditorModal.jsx';
-import { useNotes, NotesProvider } from "../../contexts/NotesContext.jsx";
+import { NotesProvider } from "../../contexts/NotesContext.jsx";
 import { AppProvider } from '../../contexts/AppContext.jsx';
 import { openModal } from '../../commons/components/Modal.jsx';
 import "./NotesList.css";
 
-export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onSidebarToggle, isTrashPage }) {
+export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onSidebarToggle }) {
   let listClassName = "notes-list";
   let items = notes.map(note => <NotesListItem note={note} key={note.noteId} />);
   let content = <div className="notes-list-spinner"><Spinner /></div>;
@@ -49,17 +48,9 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
     )
   }
 
-  let toolbar = null;
-
-  if (isTrashPage === true) {
-    toolbar = <TrashListToolbar onSidebarToggle={onSidebarToggle} />
-  } else {
-    toolbar = <NotesListToolbar onListViewClick={() => onViewChange("list")} onCardViewClick={() => onViewChange("card")} onGalleryViewClick={() => onViewChange("gallery")} onSidebarToggle={onSidebarToggle} />
-  };
-
   return (
     <>
-      {toolbar}
+      <NotesListToolbar onViewChange={onViewChange} onSidebarToggle={onSidebarToggle} />
       {content}
     </>
   );

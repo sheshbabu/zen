@@ -141,7 +141,6 @@ function NotesPageContent({ noteId }) {
           onLoadMoreClick={handleLoadMoreNotes}
           onLoadMoreImagesClick={handleLoadMoreImages}
           onSidebarToggle={() => setIsSidebarOpen(!isSidebarOpen)}
-          isTrashPage={isTrashPage}
         />
       </div>
 
