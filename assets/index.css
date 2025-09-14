@@ -50,12 +50,15 @@
     --sm: normal 0.889rem/1.4 var(--font-family);
     --code: normal 0.889rem/1.4 var(--font-family-code);
 
-    /* spacing */
+    /* spacing - 4px-based system */
     /* https://medium.com/dwarves-design/the-principle-of-spacing-in-ui-design-part-1-3354d0d65e51 */
-    --spacing-xs: 6px;
-    --spacing-sm: 12px;
-    --spacing-md: 24px;
-    --spacing-lg: 48px;
+    --spacing-1: 4px;
+    --spacing-2: 8px;
+    --spacing-3: 12px;
+    --spacing-4: 16px;
+    --spacing-5: 20px;
+    --spacing-6: 24px;
+    --spacing-8: 32px;
 
     /* elevation */
     --shadow-1: rgba(0, 0, 0, 0.01) 0px 1px 3px 0px, rgba(0, 0, 0, 0.10) 0px 1px 3px 0px;
@@ -262,9 +265,9 @@ svg.lucide {
 .tag {
     display: inline-flex;
     align-items: center;
-    padding: 4px 8px;
-    margin-right: 4px;
-    margin-bottom: 4px;
+    padding: var(--spacing-1) var(--spacing-2);
+    margin-right: var(--spacing-1);
+    margin-bottom: var(--spacing-1);
     border-radius: 4px;
     font-weight: 500;
     color: var(--neutral-400);
@@ -279,7 +282,7 @@ svg.lucide {
     svg.lucide {
         height: 14px;
         width: 14px;
-        margin-left: 4px;
+        margin-left: var(--spacing-1);
 
         line,
         circle,

@@ -8,7 +8,7 @@
     z-index: var(--z-critical);
     left: calc(50% - 75px);
     width: 150px;
-    padding: 4px;
+    padding: var(--spacing-1);
     border-radius: 4px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;

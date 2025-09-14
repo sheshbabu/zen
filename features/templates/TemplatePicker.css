@@ -1,14 +1,14 @@
 .templates-picker {
-  padding: 16px;
+  padding: var(--spacing-4);
   background-color: var(--neutral-50);
   border-radius: 4px;
-  margin: 16px 0;
+  margin: var(--spacing-4) 0;
 
   .templates-picker-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: var(--spacing-2);
+    margin-bottom: var(--spacing-3);
     font-size: 14px;
     font-weight: 500;
     color: var(--neutral-600);
@@ -16,7 +16,7 @@
 
   .templates-picker-list {
     display: flex;
-    gap: 12px;
+    gap: var(--spacing-3);
     overflow-x: auto;
     padding-bottom: 4px;
 
@@ -27,7 +27,7 @@
     .templates-picker-item {
       flex-shrink: 0;
       width: 200px;
-      padding: 12px;
+      padding: var(--spacing-3);
       border: 1px dashed var(--neutral-300);
       border-radius: 6px;
       text-align: left;

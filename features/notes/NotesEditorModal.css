@@ -15,7 +15,7 @@
         height: 100%;
         border: none;
         border-radius: 0;
-        padding: 32px;
+        padding: var(--spacing-8);
         padding-top: 0;
         overflow-y: auto;
     }

@@ -70,7 +70,7 @@
     .sidebar-section {
         cursor: pointer;
         padding: 0 8px;
-        margin-top: 24px;
+        margin-top: var(--spacing-6);
         margin-left: 8px;
 
         .sidebar-section-title {
@@ -78,13 +78,13 @@
             color: var(--neutral-500);
             font-size: 12px;
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: var(--spacing-1);
         }
 
         a.sidebar-tag-link {
             display: flex;
             justify-content: space-between;
-            padding: 4px 0;
+            padding: var(--spacing-1) 0;
             cursor: pointer;
             text-decoration: none;
             font-size: 14px;
@@ -112,7 +112,7 @@
                 display: none;
                 width: 20px;
                 height: 20px;
-                padding: 4px;
+                padding: var(--spacing-1);
                 transition: background-color var(--transition-normal);
 
                 line,

@@ -2,7 +2,7 @@
   display: flex;
   background: var(--bg-primary);
   border-bottom: 1px solid var(--neutral-100);
-  padding: 16px;
+  padding: var(--spacing-4);
   transition: background-color 200ms ease;
   text-decoration: none;
   color: inherit;
@@ -18,7 +18,7 @@
   }
 
   .templates-list-item-header {
-    margin-bottom: 8px;
+    margin-bottom: var(--spacing-2);
   }
 
   .templates-list-item-title {
@@ -39,7 +39,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 8px;
+    margin-top: var(--spacing-2);
   }
 
   .templates-list-item-tags {

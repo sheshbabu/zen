@@ -1,6 +1,6 @@
 .notes-editor-container {
     flex: 1;
-    padding: 24px;
+    padding: var(--spacing-6);
     padding-top: 0;
     border-left: 1px solid var(--neutral-100);
     transition-property: opacity, transform;
@@ -89,7 +89,7 @@
     .notes-editor-container {
         &.is-visible {
             width: 100%;
-            padding: 16px;
+            padding: var(--spacing-4);
             padding-top: 0;
             height: calc(100% - (var(--mobile-navbar-height) + var(--safe-area-bottom)));
             position: absolute;
@@ -114,8 +114,8 @@
         .notes-editor-image-dropzone {
             display: block;
             border: 1px dashed var(--neutral-300);
-            padding: 16px;
-            margin: 8px 0;
+            padding: var(--spacing-4);
+            margin: var(--spacing-2) 0;
             border-radius: 4px;
             text-align: left;
             font-weight: 500;
@@ -158,7 +158,7 @@
             border: 1px solid var(--neutral-200);
             background-color: var(--bg-primary);
             color: var(--text-primary);
-            padding: 16px;
+            padding: var(--spacing-4);
             border-radius: 4px;
         }
 
@@ -173,7 +173,7 @@
 
     .notes-editor-empty-text {
         font: var(--sm);
-        padding: 16px;
+        padding: var(--spacing-4);
         color: var(--neutral-400);
         display: flex;
         justify-content: center;
@@ -186,7 +186,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 32px;
+    margin-bottom: var(--spacing-8);
 }
 
 .notes-editor-title {
@@ -197,16 +197,16 @@
         border-bottom: 1px solid var(--neutral-200);
         padding-bottom: 4px;
         width: 100%;
-        margin-right: 16px;
+        margin-right: var(--spacing-4);
     }
 }
 
 .notes-editor-tags {
-    margin-bottom: 16px;
+    margin-bottom: var(--spacing-4);
 }
 
 .notes-editor-tags-input {
-    padding: 2px 8px;
+    padding: 2px var(--spacing-2);
     outline: none;
     font-weight: 500;
     color: var(--neutral-400);
@@ -301,12 +301,12 @@
         font: var(--code);
         background-color: var(--neutral-50);
         border-radius: 4px;
-        padding: 4px 8px;
+        padding: var(--spacing-1) var(--spacing-2);
     }
 
     pre {
         margin: 4px 0;
-        padding: 12px;
+        padding: var(--spacing-3);
         background-color: var(--neutral-50);
         border-radius: 4px;
         overflow: scroll;
@@ -369,7 +369,7 @@
     .task-item-content {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--spacing-2);
     }
 
     .task-list-item-checkbox {
@@ -436,8 +436,8 @@
 .formatting-toolbar {
     display: none;
     flex-wrap: wrap;
-    gap: 8px;
-    margin: 12px 0;
+    gap: var(--spacing-2);
+    margin: var(--spacing-3) 0;
     border: 1px solid var(--neutral-300);
     border-radius: 4px;
     align-items: center;
@@ -448,7 +448,7 @@
 
     .formatting-toolbar-group {
         display: flex;
-        padding-right: 8px;
+        padding-right: var(--spacing-2);
 
         &:last-child {
             border-right: none;
@@ -459,7 +459,7 @@
             background: none;
             border: none;
             border-radius: 4px;
-            padding: 6px 8px;
+            padding: 6px var(--spacing-2);
             cursor: pointer;
             font-size: 12px;
             font-weight: 500;

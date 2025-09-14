@@ -1,8 +1,8 @@
 .notes-list-toolbar {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
-    margin: 6px 12px 0 4px;
+    padding: var(--spacing-2) 0;
+    margin: 6px var(--spacing-3) 0 4px;
 
     .button-group {
         display: flex;
@@ -16,7 +16,7 @@
         cursor: pointer;
         width: 20px;
         height: 20px;
-        margin: 8px;
+        margin: var(--spacing-2);
         margin-right: 0;
         transition-property: stroke;
         transition-duration: 500ms;

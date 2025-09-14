@@ -1,6 +1,6 @@
 .button-group {
     display: flex;
-    gap: 4px;
+    gap: var(--spacing-1);
 
     &.is-mobile {
         display: none;
@@ -8,7 +8,7 @@
 
     /* Icon button styling within groups */
     .icon-button {
-        padding: 8px;
+        padding: var(--spacing-2);
         border-radius: 4px;
         cursor: pointer;
         transition: background-color 500ms;

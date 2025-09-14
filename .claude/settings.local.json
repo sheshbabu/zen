@@ -22,7 +22,8 @@
       "Bash(rm:*)",
       "Bash(lsof:*)",
       "Bash(curl:*)",
-      "Bash(xargs kill:*)"
+      "Bash(xargs kill:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

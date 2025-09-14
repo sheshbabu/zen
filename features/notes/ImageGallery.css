@@ -1,5 +1,5 @@
 .notes-gallery {
-    margin-left: 12px;
+    margin-left: var(--spacing-3);
 
     .image-gallery {
         position: relative;

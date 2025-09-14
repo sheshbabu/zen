@@ -17,13 +17,13 @@
 
     .notes-list-title {
         font: var(--h3);
-        padding: 16px;
+        padding: var(--spacing-4);
         font-weight: normal;
     }
 
     a.notes-list-item {
         display: block;
-        padding: 16px;
+        padding: var(--spacing-4);
         border-bottom: 1px solid var(--neutral-100);
         text-decoration: none;
         color: inherit;
@@ -250,7 +250,7 @@
 
     .notes-list-empty-text {
         font: var(--sm);
-        padding: 16px;
+        padding: var(--spacing-4);
         color: var(--neutral-400);
         display: flex;
         justify-content: center;
