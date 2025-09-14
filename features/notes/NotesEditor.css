@@ -87,8 +87,10 @@
 @media screen and (max-width: 948px) {
 
     .notes-editor-container {
-        &[data-page="editor"] {
+        &.is-visible {
             width: 100%;
+            padding: 16px;
+            padding-top: 0;
             height: calc(100% - (var(--mobile-navbar-height) + var(--safe-area-bottom)));
             position: absolute;
             top: 0;
@@ -99,7 +101,7 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        &:not([data-page="editor"]) {
+        &.is-hidden {
             display: none;
         }
     }

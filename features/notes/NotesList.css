@@ -270,7 +270,7 @@
 
     .notes-list-container,
     .notes-grid-container {
-        &[data-page="notes"] {
+        &.is-visible {
             width: 100%;
             height: calc(100% - (var(--mobile-navbar-height) + var(--safe-area-bottom)));
             position: absolute;
@@ -282,7 +282,7 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        &:not([data-page="notes"]) {
+        &.is-hidden {
             display: none;
         }
     }

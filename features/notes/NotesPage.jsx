@@ -124,11 +124,21 @@ function NotesPageContent({ noteId }) {
     }
   }
 
+  if (isMobile()) {
+    if (noteId !== undefined) {
+      listClassName += " is-hidden";
+      editorClassName = editorClassName.replace(" is-hidden", "") + " is-visible";
+    } else {
+      listClassName += " is-visible";
+      editorClassName += " is-hidden";
+    }
+  }
+
   return (
     <div className="page-container">
       <Sidebar isOpen={isSidebarOpen} onSidebarClose={() => setIsSidebarOpen(false)} />
 
-      <div className={listClassName} data-page={noteId === undefined ? "notes" : "editor"}>
+      <div className={listClassName}>
         <NotesList
           notes={notes}
           total={notesTotal}
@@ -144,7 +154,7 @@ function NotesPageContent({ noteId }) {
         />
       </div>
 
-      <div className={editorClassName} data-page={noteId === undefined ? "notes" : "editor"}>
+      <div className={editorClassName}>
         <NotesEditor isNewNote={noteId === "new"} key={selectedNote?.noteId} />
       </div>
 
