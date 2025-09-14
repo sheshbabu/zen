@@ -2,7 +2,7 @@ import { h, useState } from "../../assets/preact.esm.js"
 import Input from "../../commons/components/Input.jsx";
 import Button from "../../commons/components/Button.jsx";
 import ButtonGroup from "../../commons/components/ButtonGroup.jsx";
-import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent, closeModal } from "../../commons/components/Modal.jsx";
+import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent, ModalFooter, closeModal } from "../../commons/components/Modal.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import "./TagDetailModal.css";
@@ -49,13 +49,13 @@ export default function TagDetailModal({ tag, refreshTags }) {
           <p className="modal-description">Edit the tag name or <b>permanently delete</b> this tag. Deleting the tag will remove it from all notes.</p>
           <Input id="tag-name" label="Tag Name" type="text" placeholder="Name your Tag" value={name} hint="" error="" isDisabled={false} onChange={handleNameChange} />
         </ModalContent>
-        <div className="model-footer-container">
+        <ModalFooter>
           <Button variant="danger" onClick={handleDeleteClick}>Delete</Button>
           <ButtonGroup>
             <Button onClick={handleCancelClick}>Cancel</Button>
             <Button variant="primary" onClick={handleUpdateClick}>Update</Button>
           </ButtonGroup>
-        </div>
+        </ModalFooter>
       </ModalContainer>
     </ModalBackdrop>
   )

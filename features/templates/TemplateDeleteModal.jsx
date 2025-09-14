@@ -1,5 +1,5 @@
 import { h } from "../../assets/preact.esm.js"
-import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent } from "../../commons/components/Modal.jsx";
+import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent, ModalFooter } from "../../commons/components/Modal.jsx";
 import Button from "../../commons/components/Button.jsx";
 
 export default function TemplateDeleteModal({ onDeleteClick, onCloseClick }) {
@@ -10,10 +10,10 @@ export default function TemplateDeleteModal({ onDeleteClick, onCloseClick }) {
         <ModalContent>
           <p className="modal-description">This template will be <b>permanently deleted</b>. This action cannot be undone.</p>
         </ModalContent>
-        <div className="model-footer-container right-aligned">
+        <ModalFooter isRightAligned>
           <Button onClick={onCloseClick}>Cancel</Button>
           <Button variant="danger" onClick={onDeleteClick}>Delete</Button>
-        </div>
+        </ModalFooter>
       </ModalContainer>
     </ModalBackdrop>
   );

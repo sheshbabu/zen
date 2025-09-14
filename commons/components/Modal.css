@@ -64,6 +64,24 @@
     }
 }
 
+.model-footer-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding: 16px;
+    padding-left: 8px;
+    background-color: var(--neutral-50);
+    box-shadow: inset var(--shadow-2);
+
+    &.right-aligned {
+        justify-content: flex-end;
+    }
+
+    .button {
+        margin-left: 8px;
+    }
+}
+
 @keyframes modal-zoom-out {
     0% {
         transform: scale(1.1);

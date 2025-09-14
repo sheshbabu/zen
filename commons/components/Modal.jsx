@@ -57,3 +57,13 @@ export function ModalContent({ children, className = '' }) {
     </div>
   );
 }
+
+export function ModalFooter({ children, isRightAligned = false }) {
+  const footerClasses = `model-footer-container ${isRightAligned ? 'right-aligned' : ''}`.trim();
+
+  return (
+    <div className={footerClasses}>
+      {children}
+    </div>
+  );
+}
