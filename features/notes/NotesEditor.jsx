@@ -358,18 +358,18 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExp
 
   if (isFloating) {
     rightToolbarActions.push(
-      <Button variant="ghost" onClick={onCloseClick}><CloseIcon /></Button>
+      <Button variant="ghost" onClick={onCloseClick} title="<div>Esc</div>"><CloseIcon /></Button>
     );
   }
 
   if (!isFloating && !isMobile()) {
     if (isExpanded) {
       leftToolbarActions.push(
-        <Button variant="ghost" onClick={onExpandToggleClick}><SidebarCloseIcon /></Button>
+        <Button variant="ghost" onClick={onExpandToggleClick} title="<div>⌘ \</div>"><SidebarCloseIcon /></Button>
       );
     } else {
       leftToolbarActions.push(
-        <Button variant="ghost" onClick={onExpandToggleClick}><SidebarOpenIcon /></Button>
+        <Button variant="ghost" onClick={onExpandToggleClick} title="<div>⌘ \</div>"><SidebarOpenIcon /></Button>
       );
     }
   }
@@ -382,14 +382,14 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExp
 
   if (isEditable) {
     rightToolbarActions.push(
-      <Button variant="ghost" isDisabled={isSaveLoading} onClick={onSaveClick}>{saveButtonText}</Button>
+      <Button variant="ghost" isDisabled={isSaveLoading} onClick={onSaveClick} title="<div>⌘ Enter</div>">{saveButtonText}</Button>
     );
     rightToolbarActions.push(
       <Button variant="ghost" onClick={onEditCancelClick}>Cancel</Button>
     );
   } else {
     rightToolbarActions.push(
-      <Button variant="ghost" onClick={onEditClick}>Edit</Button>
+      <Button variant="ghost" onClick={onEditClick} title="<div>⌘ Enter</div>">Edit</Button>
     );
   }
 

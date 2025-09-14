@@ -26,9 +26,13 @@
         color: var(--neutral-300);
         border-radius: 4px;
         padding: 0px 4px;
-        margin-left: 10px;
         font-size: 12px;
         border: 1px solid var(--neutral-500);
         font-weight: 600;
+    }
+
+    /* If the left text is absent and div is first child */
+    div:not(:first-child) {
+        margin-left: 10px;
     }
 }
