@@ -5,7 +5,7 @@
     color: white;
     text-align: center;
     font: var(--sm);
-    z-index: 4;
+    z-index: var(--z-critical);
     left: calc(50% - 75px);
     width: 150px;
     padding: 4px;

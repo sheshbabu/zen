@@ -1,6 +1,6 @@
 .tooltip {
     position: absolute;
-    z-index: 3;
+    z-index: var(--z-popover);
     display: flex;
     align-items: center;
     padding: 4px 12px;
@@ -15,6 +15,7 @@
     opacity: 0;
     transform: translateY(-8px);
     transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+    will-change: transform, opacity;
 
     &.visible {
         opacity: 1;

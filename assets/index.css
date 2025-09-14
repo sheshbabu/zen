@@ -72,6 +72,21 @@
     --mobile-navbar-height: 60px;
     --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 
+    /* z-index layers */
+    --z-base: 1;
+    --z-modal: 2;
+    --z-popover: 3;
+    --z-critical: 4;
+
+    /* layout dimensions */
+    --sidebar-width: 220px;
+    --notes-list-width: 280px;
+    --notes-editor-max-width: 850px;
+
+    /* transitions */
+    --transition-fast: 150ms;
+    --transition-normal: 300ms;
+
     /* text colors */
     --text-primary: var(--neutral-700);
     --text-secondary: var(--neutral-400);
@@ -256,7 +271,7 @@ svg.lucide {
     background-color: var(--neutral-100);
     font-size: 14px;
     transition-property: color, background-color;
-    transition-duration: 500ms;
+    transition-duration: var(--transition-normal);
     cursor: pointer;
     text-decoration: none;
     user-select: none;
@@ -281,6 +296,6 @@ svg.lucide {
 
     &:active {
         transform: scale(0.97);
-        transition: transform 150ms ease-out;
+        transition: transform var(--transition-fast) ease-out;
     }
 }

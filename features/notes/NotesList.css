@@ -1,7 +1,7 @@
 .notes-list-container {
-    width: 280px;
+    width: var(--notes-list-width);
     transition-property: background-color;
-    transition-duration: 500ms;
+    transition-duration: var(--transition-normal);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     max-height: 100%;
@@ -28,7 +28,7 @@
         text-decoration: none;
         color: inherit;
         transition-property: background-color;
-        transition-duration: 500ms;
+        transition-duration: var(--transition-normal);
 
         &:hover,
         &.is-active {
@@ -122,7 +122,7 @@
             height: 500px;
             overflow: hidden;
             transition-property: box-shadow;
-            transition-duration: 500ms;
+            transition-duration: var(--transition-normal);
             box-shadow: var(--shadow-2);
             border-radius: 8px;
             padding: 20px;
@@ -229,7 +229,7 @@
 
             &:active {
                 transform: scale(0.98);
-                transition: transform 150ms ease-out;
+                transition: transform var(--transition-fast) ease-out;
             }
         }
     }

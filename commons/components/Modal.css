@@ -4,7 +4,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 2;
+    z-index: var(--z-modal);
     backdrop-filter: blur(2px);
     background-color: rgba(0, 0, 0, 0.8);
 
@@ -21,6 +21,7 @@
     border-radius: 4px;
     box-shadow: var(--shadow-5);
     animation: modal-slide-down 0.3s ease-out;
+    will-change: transform, opacity;
 
     .modal-title {
         font-weight: 600;
@@ -49,7 +50,7 @@
         padding: 8px;
         cursor: pointer;
         border-radius: 4px;
-        transition: background-color 500ms;
+        transition: background-color var(--transition-normal);
 
         &:hover {
             background-color: var(--neutral-100);

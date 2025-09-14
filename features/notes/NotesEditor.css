@@ -33,7 +33,7 @@
 
         /* Don't take up full width */
         .notes-editor {
-            width: 850px;
+            width: var(--notes-editor-max-width);
             margin: 0 auto;
         }
     }
@@ -48,7 +48,7 @@
         width: 100%;
         top: 0;
         background: var(--bg-primary);
-        z-index: 1;
+        z-index: var(--z-base);
 
         .right-toolbar,
         .left-toolbar {
@@ -66,7 +66,7 @@
             height: 20px;
             margin-right: 0;
             transition-property: stroke;
-            transition-duration: 500ms;
+            transition-duration: var(--transition-normal);
 
             &:hover {
 
@@ -123,7 +123,7 @@
             font-size: 14px;
             cursor: pointer;
             transition-property: background-color, border-color;
-            transition-duration: 500ms;
+            transition-duration: var(--transition-normal);
 
             &:hover {
                 background-color: var(--neutral-50);
