@@ -14,6 +14,9 @@ import { showToast } from '../../commons/components/Toast.jsx';
 import { closeModal, openModal } from '../../commons/components/Modal.jsx';
 import { useNotes } from "../../contexts/NotesContext.jsx";
 import { useVisibleHeadings } from "./useVisibleHeadings.js";
+import useEditorKeyboardShortcuts from "./useEditorKeyboardShortcuts.js";
+import useImageUpload from "./useImageUpload.js";
+import useMarkdownFormatter from "./useMarkdownFormatter.js";
 import "./NotesEditor.css";
 import { CloseIcon, SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
 
@@ -28,17 +31,32 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
   const [title, setTitle] = useState(selectedNote?.title || "");
   const [content, setContent] = useState(selectedNote?.content || "");
   const [tags, setTags] = useState(selectedNote?.tags || []);
-  const [isDraggingOver, setIsDraggingOver] = useState(false);
-  const [attachments, setAttachments] = useState([]);
   const [isSaveLoading, setIsSaveLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const titleRef = useRef(null);
   const textareaRef = useRef(null);
-  const fileInputRef = useRef(null);
   const contentRef = useRef(null);
 
   const visibleHeadings = useVisibleHeadings(contentRef, content, isEditable, isExpanded);
+
+  const { insertAtCursor, formatSelectedText, applyMarkdownFormat } = useMarkdownFormatter({
+    textareaRef,
+    setContent
+  });
+
+  const {
+    isDraggingOver,
+    attachments,
+    fileInputRef,
+    handlePaste,
+    handleDragOver,
+    handleDragLeave,
+    handleImageDrop,
+    handleDropzoneClick,
+    handleFileInputChange,
+    resetAttachments
+  } = useImageUpload({ insertAtCursor });
 
   let contentArea = null;
 
@@ -55,7 +73,6 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
   useEffect(() => {
     handleTextAreaHeight();
   }, [content, isEditable]);
-
 
   const handleSaveClick = useCallback(() => {
     const currentTitle = titleRef.current?.textContent || "";
@@ -82,7 +99,7 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
     promise
       .then(note => {
         setIsEditable(false);
-        setAttachments([]); // reset
+        resetAttachments();
 
         if (isNewNote && !onClose) {
           navigateTo(`/notes/${note.noteId}`, true);
@@ -93,101 +110,20 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
       .finally(() => {
         setIsSaveLoading(false);
       });
-  }, [content, tags, isNewNote, selectedNote, handleNoteChange]);
+  }, [content, tags, isNewNote, selectedNote, handleNoteChange, resetAttachments]);
 
-  const handleKeyDown = useCallback(e => {
-    const isTextAreaFocused = document.activeElement.className == "notes-editor-textarea";
-
-    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-      e.preventDefault();
-      if (isEditable === true) {
-        handleSaveClick();
-      } else {
-        handleEditClick();
-      }
-    }
-
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      if (isFloating === true) {
-        handleCloseClick();
-      }
-    }
-
-    if ((e.metaKey || e.ctrlKey) && e.key === '\\') {
-      e.preventDefault();
-      handleExpandToggleClick();
-    }
-
-    if (isTextAreaFocused && e.key === 'Tab' && !e.shiftKey) {
-      e.preventDefault();
-      insertAtCursor('  ');
-    }
-
-    if (isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'h') {
-      e.preventDefault();
-      formatSelectedText("highlight");
-    }
-
-    if (isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.key === 'b') {
-      e.preventDefault();
-      formatSelectedText("bold");
-    }
-
-    if (isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.key === 'i') {
-      e.preventDefault();
-      formatSelectedText("italic");
-    }
-
-    if (isTextAreaFocused && e.key === 'Enter' && !e.metaKey && !e.ctrlKey) {
-      const textarea = textareaRef.current;
-      const cursorPos = textarea.selectionStart;
-      const textBeforeCursor = textarea.value.substring(0, cursorPos);
-      const lines = textBeforeCursor.split('\n');
-      const currentLine = lines[lines.length - 1];
-
-      // Check for list patterns: unordered lists, todo items, ordered lists
-      const listPatterns = [
-        /^(\s*)(- \[ \] )/,  // Todo items: "- [ ] "
-        /^(\s*)(- \[x\] )/,  // Completed todo items: "- [x] "
-        /^(\s*)(- )/,        // Unordered lists: "- "
-        /^(\s*)(\* )/,       // Unordered lists: "* "
-        /^(\s*)(\+ )/,       // Unordered lists: "+ "
-        /^(\s*)(\d+\. )/,    // Ordered lists: "1. ", "2. ", etc.
-      ];
-
-      for (const pattern of listPatterns) {
-        const match = currentLine.match(pattern);
-        if (match) {
-          e.preventDefault();
-          const indentation = match[1];
-          let prefix = match[2];
-
-          // For completed todos, create a new unchecked todo
-          if (prefix === "- [x] ") {
-            prefix = "- [ ] ";
-          }
-          // For ordered lists, increment the number
-          else if (/^\d+\. $/.test(prefix)) {
-            const num = parseInt(prefix.match(/^(\d+)/)[1]) + 1;
-            prefix = `${num}. `;
-          }
-
-          const newLineText = `\n${indentation}${prefix}`;
-          insertAtCursor(newLineText);
-          return;
-        }
-      }
-    }
-  }, [isEditable, isFloating, isExpanded, handleSaveClick, handleExpandToggleClick]);
-
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [handleKeyDown]);
+  const { handleKeyDown } = useEditorKeyboardShortcuts({
+    isEditable,
+    isFloating,
+    isExpanded,
+    textareaRef,
+    onSave: handleSaveClick,
+    onEdit: handleEditClick,
+    onClose: handleCloseClick,
+    onExpandToggle: handleExpandToggleClick,
+    onInsertAtCursor: insertAtCursor,
+    onFormatText: formatSelectedText
+  });
 
   function handleTextAreaHeight() {
     if (textareaRef.current === null) {
@@ -229,63 +165,6 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
 
   function handleRemoveTag(tag) {
     setTags((prevTags) => prevTags.filter(t => t.tagId !== tag.tagId));
-  }
-
-  function handlePaste(e) {
-    const items = e.clipboardData.items;
-
-    // Ignore if it doesn't contain any images
-    if (Array.from(items).every(item => item.type.indexOf('image') === -1)) {
-      return;
-    }
-
-    e.preventDefault();
-    for (let item of items) {
-      if (item.type.indexOf('image') !== -1) {
-        const file = item.getAsFile();
-        setAttachments((prevAttachments) => [...prevAttachments, file]);
-        uploadImage(file);
-      }
-    }
-  }
-
-  function handleDragOver(e) {
-    e.preventDefault();
-    setIsDraggingOver(true);
-  }
-
-  function handleDragLeave(e) {
-    e.preventDefault();
-    setIsDraggingOver(false);
-  }
-
-  function handleImageDrop(e) {
-    e.preventDefault();
-    setIsDraggingOver(false);
-
-    const files = e.dataTransfer.files;
-    processImageFiles(files);
-  }
-
-  function handleDropzoneClick() {
-    fileInputRef.current?.click();
-  }
-
-  function handleFileInputChange(e) {
-    const files = e.target.files;
-    if (files) {
-      processImageFiles(files);
-      e.target.value = '';
-    }
-  }
-
-  function processImageFiles(files) {
-    for (let file of files) {
-      if (file.type.startsWith('image/')) {
-        setAttachments((prevAttachments) => [...prevAttachments, file]);
-        uploadImage(file);
-      }
-    }
   }
 
   function handleCloseClick() {
@@ -387,136 +266,6 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
     }, 0);
   }
 
-  function uploadImage(file) {
-    const formData = new FormData();
-    formData.append('image', file);
-    ApiClient.uploadImage(formData)
-      .then(result => {
-        const imageUrl = `![](/images/${result.filename})`;
-        insertAtCursor(imageUrl);
-      });
-  }
-
-  function insertAtCursor(text) {
-    if (textareaRef.current === null) {
-      return;
-    }
-
-    const textarea = textareaRef.current;
-    const startPos = textarea.selectionStart;
-    const endPos = textarea.selectionEnd;
-    const beforeText = textarea.value.substring(0, startPos);
-    const afterText = textarea.value.substring(endPos);
-
-    setContent(beforeText + text + afterText);
-
-    // Use setTimeout to ensure cursor position is set after DOM update
-    const newPosition = startPos + text.length;
-    setTimeout(() => {
-      if (textareaRef.current) {
-        textareaRef.current.selectionStart = newPosition;
-        textareaRef.current.selectionEnd = newPosition;
-        textareaRef.current.focus();
-      }
-    }, 0);
-  }
-
-  function formatSelectedText(format) {
-    applyMarkdownFormat(format);
-  }
-
-  function applyMarkdownFormat(format, placeholder = "") {
-    if (textareaRef.current === null) {
-      return;
-    }
-
-    const textarea = textareaRef.current;
-    const startPos = textarea.selectionStart;
-    const endPos = textarea.selectionEnd;
-    const beforeText = textarea.value.substring(0, startPos);
-    const afterText = textarea.value.substring(endPos);
-    const selectedText = textarea.value.substring(startPos, endPos);
-
-    let formattedText = "";
-    let cursorOffset = 0;
-
-    switch (format) {
-      case "bold":
-        formattedText = `**${selectedText || placeholder}**`;
-        cursorOffset = selectedText ? formattedText.length : 2;
-        break;
-      case "italic":
-        formattedText = `*${selectedText || placeholder}*`;
-        cursorOffset = selectedText ? formattedText.length : 1;
-        break;
-      case "strikethrough":
-        formattedText = `~~${selectedText || placeholder}~~`;
-        cursorOffset = selectedText ? formattedText.length : 2;
-        break;
-      case "highlight":
-        formattedText = `==${selectedText || placeholder}==`;
-        cursorOffset = selectedText ? formattedText.length : 2;
-        break;
-      case "code":
-        formattedText = `\`${selectedText || placeholder}\``;
-        cursorOffset = selectedText ? formattedText.length : 1;
-        break;
-      case "h1":
-        formattedText = `# ${selectedText || placeholder}`;
-        cursorOffset = selectedText ? formattedText.length : 2;
-        break;
-      case "h2":
-        formattedText = `## ${selectedText || placeholder}`;
-        cursorOffset = selectedText ? formattedText.length : 3;
-        break;
-      case "h3":
-        formattedText = `### ${selectedText || placeholder}`;
-        cursorOffset = selectedText ? formattedText.length : 4;
-        break;
-      case "ul":
-        formattedText = `- ${selectedText || placeholder}`;
-        cursorOffset = selectedText ? formattedText.length : 2;
-        break;
-      case "ol":
-        formattedText = `1. ${selectedText || placeholder}`;
-        cursorOffset = selectedText ? formattedText.length : 3;
-        break;
-      case "todo":
-        formattedText = `- [ ] ${selectedText || placeholder}`;
-        cursorOffset = selectedText ? formattedText.length : 6;
-        break;
-      case "quote":
-        formattedText = `> ${selectedText || placeholder}`;
-        cursorOffset = selectedText ? formattedText.length : 2;
-        break;
-      case "hr":
-        formattedText = `\n---\n`;
-        cursorOffset = formattedText.length;
-        break;
-      case "link":
-        if (selectedText) {
-          formattedText = `[${selectedText}](url)`;
-          cursorOffset = formattedText.length - 4; // Position cursor at "url"
-        } else {
-          formattedText = `[${placeholder}](url)`;
-          cursorOffset = 1; // Position cursor at placeholder
-        }
-        break;
-    }
-
-    setContent(beforeText + formattedText + afterText);
-
-    // Set cursor position after content update
-    setTimeout(() => {
-      if (textareaRef.current) {
-        const newPosition = startPos + cursorOffset;
-        textareaRef.current.selectionStart = newPosition;
-        textareaRef.current.selectionEnd = newPosition;
-        textareaRef.current.focus();
-      }
-    }, 0);
-  }
-
   if (isEditable) {
     contentArea = (
       <textarea
@@ -550,7 +299,6 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
   if (isNewNote === true && isEditable === true && title === "" && content === "") {
     templatePicker = <TemplatePicker onTemplateApply={handleTemplateApply} />;
   }
-
 
   // TODO: remove "is-editable" CSS and use JS
   return (
