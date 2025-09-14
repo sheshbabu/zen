@@ -1,7 +1,7 @@
 import { h } from "../../assets/preact.esm.js"
 import NotesEditor from './NotesEditor.jsx';
 import { ModalBackdrop, ModalContainer, ModalContent, closeModal } from "../../commons/components/Modal.jsx";
-import { useNotes } from "../../contexts/NotesContext.jsx";
+import { useNotes } from "../../commons/contexts/NotesContext.jsx";
 import "./NotesEditorModal.css";
 
 export default function NotesEditorModal({ note }) {

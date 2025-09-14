@@ -4,7 +4,7 @@ import TemplatesList from './TemplatesList.jsx';
 import TemplateEditor from './TemplateEditor.jsx';
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
-import { useAppContext } from "../../contexts/AppContext.jsx";
+import { useAppContext } from "../../commons/contexts/AppContext.jsx";
 
 export default function TemplatesPage({ templateId }) {
   const [templates, setTemplates] = useState([]);

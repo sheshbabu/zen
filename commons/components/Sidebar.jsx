@@ -6,7 +6,7 @@ import SearchMenu from "../../features/search/SearchMenu.jsx";
 import SettingsModal from "../../features/settings/SettingsModal.jsx";
 import { openModal } from "./Modal.jsx";
 import { NotesIcon, SearchIcon, NewIcon, ArchiveIcon, TrashIcon, BoardIcon, SettingsIcon, TemplatesIcon } from "./Icon.jsx";
-import { useAppContext } from "../../contexts/AppContext.jsx";
+import { useAppContext } from "../../commons/contexts/AppContext.jsx";
 import "./Sidebar.css";
 
 export default function Sidebar({ isOpen, onSidebarClose }) {

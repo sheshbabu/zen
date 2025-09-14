@@ -5,7 +5,7 @@ import { ArrowDownIcon, PencilIcon } from "../../commons/components/Icon.jsx";
 import Button from "../../commons/components/Button.jsx";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import useSearchParams from "../../commons/components/useSearchParams.jsx";
-import { useAppContext } from "../../contexts/AppContext.jsx";
+import { useAppContext } from "../../commons/contexts/AppContext.jsx";
 
 export default function FocusSwitcher() {
   const { focusModes, refreshFocusModes, refreshTags } = useAppContext();

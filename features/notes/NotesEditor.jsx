@@ -12,7 +12,7 @@ import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
 import Button from '../../commons/components/Button.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
 import { closeModal, openModal } from '../../commons/components/Modal.jsx';
-import { useNotes } from "../../contexts/NotesContext.jsx";
+import { useNotes } from "../../commons/contexts/NotesContext.jsx";
 import { useVisibleHeadings } from "./useVisibleHeadings.js";
 import useEditorKeyboardShortcuts from "./useEditorKeyboardShortcuts.js";
 import useImageUpload from "./useImageUpload.js";

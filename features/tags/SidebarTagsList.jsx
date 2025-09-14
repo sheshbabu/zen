@@ -3,7 +3,7 @@ import Link from "../../commons/components/Link.jsx"
 import { PencilIcon } from "../../commons/components/Icon.jsx";
 import TagDetailModal from "./TagDetailModal.jsx";
 import { openModal } from "../../commons/components/Modal.jsx";
-import { useAppContext } from "../../contexts/AppContext.jsx";
+import { useAppContext } from "../../commons/contexts/AppContext.jsx";
 
 export default function SidebarTagsList() {
   const { tags, refreshTags } = useAppContext();

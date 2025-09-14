@@ -2,8 +2,8 @@ import { h } from "../../assets/preact.esm.js"
 import { ListViewIcon, CardViewIcon, GalleryViewIcon, BrushCleaningIcon } from "../../commons/components/Icon.jsx";
 import useSearchParams from "../../commons/components/useSearchParams.jsx";
 import { openModal } from "../../commons/components/Modal.jsx";
-import { AppProvider } from '../../contexts/AppContext.jsx';
-import { NotesProvider, useNotes } from "../../contexts/NotesContext.jsx";
+import { AppProvider } from '../../commons/contexts/AppContext.jsx';
+import { NotesProvider, useNotes } from "../../commons/contexts/NotesContext.jsx";
 import { HamburgerIcon } from '../../commons/components/Icon.jsx';
 import ButtonGroup from '../../commons/components/ButtonGroup.jsx';
 import TrashClearModal from "./TrashClearModal.jsx"

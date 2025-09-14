@@ -6,8 +6,8 @@ import MobileNavbar from '../../commons/components/MobileNavbar.jsx';
 import ApiClient from "../../commons/http/ApiClient.js";
 import isMobile from "../../commons/utils/isMobile.js";
 import useSearchParams from "../../commons/components/useSearchParams.jsx";
-import { useAppContext } from "../../contexts/AppContext.jsx";
-import { NotesProvider, useNotes } from "../../contexts/NotesContext.jsx";
+import { useAppContext } from "../../commons/contexts/AppContext.jsx";
+import { NotesProvider, useNotes } from "../../commons/contexts/NotesContext.jsx";
 
 export default function NotesPage({ noteId }) {
   return (

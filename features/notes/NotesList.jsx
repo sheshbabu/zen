@@ -9,8 +9,8 @@ import formatDate from '../../commons/utils/formatDate.js';
 import isMobile from "../../commons/utils/isMobile.js";
 import ImageGallery from "./ImageGallery.jsx";
 import NotesEditorModal from './NotesEditorModal.jsx';
-import { NotesProvider } from "../../contexts/NotesContext.jsx";
-import { AppProvider } from '../../contexts/AppContext.jsx';
+import { NotesProvider } from "../../commons/contexts/NotesContext.jsx";
+import { AppProvider } from '../../commons/contexts/AppContext.jsx';
 import { openModal } from '../../commons/components/Modal.jsx';
 import "./NotesList.css";
 

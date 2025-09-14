@@ -1,5 +1,5 @@
-import { h, createContext, useContext, useState, useCallback } from '../assets/preact.esm.js';
-import ApiClient from '../commons/http/ApiClient.js';
+import { h, createContext, useContext, useState, useCallback } from '../../assets/preact.esm.js';
+import ApiClient from '../../commons/http/ApiClient.js';
 import { useAppContext } from './AppContext.jsx';
 
 const NotesContext = createContext();
@@ -14,12 +14,12 @@ export function NotesProvider({ children }) {
   const [imagesTotal, setImagesTotal] = useState(0);
   const [imagesPageNumber, setImagesPageNumber] = useState(1);
   const [isImagesLoading, setIsImagesLoading] = useState(true);
-  
+
   const { refreshTags, refreshFocusModes } = useAppContext();
-  
+
   const refreshNotes = useCallback((tagId, focusId, isArchived, isDeleted, pageNumber = 1) => {
     setIsNotesLoading(true);
-    
+
     return ApiClient.getNotes(tagId, focusId, isArchived, isDeleted, pageNumber)
       .then(res => {
         if (pageNumber > 1) {
@@ -39,7 +39,7 @@ export function NotesProvider({ children }) {
 
   const refreshImages = useCallback((tagId, focusId, pageNumber = 1) => {
     setIsImagesLoading(true);
-    
+
     return ApiClient.getImages(tagId, focusId, pageNumber)
       .then(res => {
         if (pageNumber > 1) {
@@ -56,21 +56,21 @@ export function NotesProvider({ children }) {
         setIsImagesLoading(false);
       });
   }, []);
-  
+
   const handleNoteChange = useCallback((selectedFocusId) => {
     refreshNotes();
     refreshImages();
     refreshTags(selectedFocusId);
     refreshFocusModes();
   }, [refreshNotes, refreshImages, refreshTags, refreshFocusModes]);
-  
+
   const handlePinToggle = useCallback((noteId, isPinned) => {
     const apiCall = isPinned ? ApiClient.unpinNote(noteId) : ApiClient.pinNote(noteId);
-    
+
     return apiCall
       .then(() => {
-        setNotes(prevNotes => 
-          prevNotes.map(note => 
+        setNotes(prevNotes =>
+          prevNotes.map(note =>
             note.noteId === noteId ? { ...note, isPinned: !isPinned } : note
           )
         );
@@ -95,7 +95,7 @@ export function NotesProvider({ children }) {
     setImages([]);
     setSelectedNote(null);
   }, []);
-  
+
   return (
     <NotesContext.Provider value={{
       // Notes state
@@ -106,14 +106,14 @@ export function NotesProvider({ children }) {
       notesPageNumber,
       setNotesPageNumber,
       isNotesLoading,
-      
+
       // Images state  
       images,
       imagesTotal,
       imagesPageNumber,
       setImagesPageNumber,
       isImagesLoading,
-      
+
       // Functions
       refreshNotes,
       refreshImages,
