@@ -20,7 +20,7 @@
     border: 1px solid var(--neutral-100);
     border-radius: 4px;
     box-shadow: var(--shadow-5);
-    animation: modal-zoom-out 0.3s ease-out;
+    animation: modal-slide-down 0.3s ease-out;
 
     .modal-title {
         font-weight: 600;
@@ -82,13 +82,14 @@
     }
 }
 
-@keyframes modal-zoom-out {
+@keyframes modal-slide-down {
     0% {
-        transform: scale(1.1);
+        transform: translateY(-10px);
         opacity: 0;
     }
+
     100% {
-        transform: scale(1);
+        transform: translateY(0);
         opacity: 1;
     }
 }
