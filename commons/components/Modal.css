@@ -64,7 +64,7 @@
     }
 }
 
-.model-footer-container {
+.modal-footer-container {
     display: flex;
     justify-content: space-between;
     margin-top: 16px;
