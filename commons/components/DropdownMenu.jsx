@@ -43,7 +43,7 @@ export default function DropdownMenu({ actions }) {
   return (
     <div ref={dropdownRef}>
       <Button variant="ghost" onClick={handleDropdownClick}><EllipsisIcon /></Button>
-      <div className={`dropdown-container ${isDropdownOpen ? 'open' : ''}`}>
+      <div className={`dropdown-container ${isDropdownOpen ? 'is-open' : ''}`}>
         <ul className="dropdown-menu">
           {items}
         </ul>

@@ -396,31 +396,31 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExp
   if (!isNewNote) {
     if (note.isPinned === true) {
       menuActions.push(
-        <div style="width: 80px;" onClick={onUnpinClick}>Unpin</div>
+        <div onClick={onUnpinClick}>Unpin</div>
       );
     } else {
       menuActions.push(
-        <div style="width: 80px;" onClick={onPinClick}>Pin</div>
+        <div onClick={onPinClick}>Pin</div>
       );
     }
 
     if (note.isArchived) {
       menuActions.push(
-        <div style="width: 80px;" onClick={onUnarchiveClick}>Unarchive</div>
+        <div onClick={onUnarchiveClick}>Unarchive</div>
       );
     } else if (!note.isDeleted) {
       menuActions.push(
-        <div style="width: 80px;" onClick={onArchiveClick}>Archive</div>
+        <div onClick={onArchiveClick}>Archive</div>
       );
     }
 
     if (note.isDeleted) {
       menuActions.push(
-        <div style="width: 80px;" onClick={onRestoreClick}>Restore</div>
+        <div onClick={onRestoreClick}>Restore</div>
       );
     } else {
       menuActions.push(
-        <div style="width: 80px;" onClick={onDeleteClick}>Delete</div>
+        <div onClick={onDeleteClick}>Delete</div>
       );
     }
   }

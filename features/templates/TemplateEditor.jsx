@@ -128,7 +128,7 @@ export default function TemplateEditor({ selectedTemplate, isNewTemplate, onChan
     }
 
     return [
-      <div style="width: 80px;" onClick={handleDeleteClick}>Delete</div>
+      <div onClick={handleDeleteClick}>Delete</div>
     ];
   }
 

@@ -84,7 +84,7 @@ export default function FocusSwitcher() {
         {selectedFocusMode.name}
         <ArrowDownIcon />
       </Button>
-      <div className={`dropdown-container ${isDropdownOpen ? 'open' : ''}`}>
+      <div className={`dropdown-container ${isDropdownOpen ? 'is-open' : ''}`}>
         <ul className="dropdown-menu">
           {items}
         </ul>
