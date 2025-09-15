@@ -342,9 +342,6 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
 }
 
 function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExpanded, onSaveClick, onEditClick, onEditCancelClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick, onPinClick, onUnpinClick }) {
-  const rightToolbarActions = [];
-  const leftToolbarActions = [];
-  const menuActions = [];
   const saveButtonText = isSaveLoading ? "Saving..." : "Save";
 
   function handleClick(e) {
@@ -356,74 +353,82 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExp
     document.querySelector(".notes-editor-container").scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  if (isFloating) {
-    rightToolbarActions.push(
-      <Button variant="ghost" onClick={onCloseClick}><CloseIcon /></Button>
-    );
-  }
+  const actions = {
+    left: [
+      {
+        key: 'expand',
+        condition: !isFloating && !isMobile(),
+        component: <Button variant="ghost" onClick={onExpandToggleClick}>
+          {isExpanded ? <SidebarCloseIcon /> : <SidebarOpenIcon />}
+        </Button>
+      },
+      {
+        key: 'back',
+        condition: isMobile() && !isNewNote,
+        component: <Button variant="ghost" onClick={() => window.history.back()}><BackIcon /></Button>
+      }
+    ],
+    right: [
+      {
+        key: 'close',
+        condition: isFloating,
+        component: <Button variant="ghost" onClick={onCloseClick}><CloseIcon /></Button>
+      },
+      {
+        key: 'save',
+        condition: isEditable,
+        component: <Button variant="ghost" isDisabled={isSaveLoading} onClick={onSaveClick}>{saveButtonText}</Button>
+      },
+      {
+        key: 'cancel',
+        condition: isEditable,
+        component: <Button variant="ghost" onClick={onEditCancelClick}>Cancel</Button>
+      },
+      {
+        key: 'edit',
+        condition: !isEditable,
+        component: <Button variant="ghost" onClick={onEditClick}>Edit</Button>
+      }
+    ],
+    menu: [
+      {
+        key: 'pin',
+        condition: !isNewNote && !note?.isDeleted && !note?.isArchived,
+        component: <div onClick={note?.isPinned ? onUnpinClick : onPinClick}>
+          {note?.isPinned ? 'Unpin' : 'Pin'}
+        </div>
+      },
+      {
+        key: 'archive',
+        condition: !isNewNote && !note?.isDeleted,
+        component: <div onClick={note?.isArchived ? onUnarchiveClick : onArchiveClick}>
+          {note?.isArchived ? 'Unarchive' : 'Archive'}
+        </div>
+      },
+      {
+        key: 'restore',
+        condition: !isNewNote && note?.isDeleted,
+        component: <div onClick={onRestoreClick}>Restore</div>
+      },
+      {
+        key: 'delete',
+        condition: !isNewNote && !note?.isDeleted,
+        component: <div onClick={onDeleteClick}>Delete</div>
+      }
+    ]
+  };
 
-  if (!isFloating && !isMobile()) {
-    if (isExpanded) {
-      leftToolbarActions.push(
-        <Button variant="ghost" onClick={onExpandToggleClick}><SidebarCloseIcon /></Button>
-      );
-    } else {
-      leftToolbarActions.push(
-        <Button variant="ghost" onClick={onExpandToggleClick}><SidebarOpenIcon /></Button>
-      );
-    }
-  }
+  const leftToolbarActions = actions.left
+    .filter(action => action.condition)
+    .map(action => action.component);
 
-  if (isMobile() && !isNewNote) {
-    leftToolbarActions.push(
-      <Button variant="ghost" onClick={() => window.history.back()}><BackIcon /></Button>
-    );
-  }
+  const rightToolbarActions = actions.right
+    .filter(action => action.condition)
+    .map(action => action.component);
 
-  if (isEditable) {
-    rightToolbarActions.push(
-      <Button variant="ghost" isDisabled={isSaveLoading} onClick={onSaveClick}>{saveButtonText}</Button>
-    );
-    rightToolbarActions.push(
-      <Button variant="ghost" onClick={onEditCancelClick}>Cancel</Button>
-    );
-  } else {
-    rightToolbarActions.push(
-      <Button variant="ghost" onClick={onEditClick}>Edit</Button>
-    );
-  }
-
-  if (!isNewNote) {
-    if (note.isPinned === true) {
-      menuActions.push(
-        <div onClick={onUnpinClick}>Unpin</div>
-      );
-    } else {
-      menuActions.push(
-        <div onClick={onPinClick}>Pin</div>
-      );
-    }
-
-    if (note.isArchived) {
-      menuActions.push(
-        <div onClick={onUnarchiveClick}>Unarchive</div>
-      );
-    } else if (!note.isDeleted) {
-      menuActions.push(
-        <div onClick={onArchiveClick}>Archive</div>
-      );
-    }
-
-    if (note.isDeleted) {
-      menuActions.push(
-        <div onClick={onRestoreClick}>Restore</div>
-      );
-    } else {
-      menuActions.push(
-        <div onClick={onDeleteClick}>Delete</div>
-      );
-    }
-  }
+  const menuActions = actions.menu
+    .filter(action => action.condition)
+    .map(action => action.component);
 
   return (
     <div className="notes-editor-toolbar" onClick={handleClick}>
