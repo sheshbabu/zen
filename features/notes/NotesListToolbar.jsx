@@ -65,8 +65,8 @@ export default function NotesListToolbar({ onSidebarToggle, onViewChange }) {
 }
 
 function Toolbar({ actions, onSidebarToggle, className }) {
-  const buttons = actions.map((action, index) => (
-    <div key={index} {...action}>
+  const buttons = actions.map(action => (
+    <div key={action.title} {...action}>
       <action.icon />
     </div>
   ));

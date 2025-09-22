@@ -1,7 +1,7 @@
 import { h, useEffect, useState, useRef } from "../../assets/preact.esm.js"
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
-import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon, TagIcon } from "../../commons/components/Icon.jsx";
+import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon, TagIcon, GalleryViewIcon } from "../../commons/components/Icon.jsx";
 import { ModalBackdrop, ModalContainer, closeModal } from "../../commons/components/Modal.jsx";
 import "./SearchMenu.css";
 
@@ -10,7 +10,7 @@ const MAX_HISTORY_ENTRIES = 5;
 
 export default function SearchMenu() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState({ notes: [], tags: [] });
+  const [results, setResults] = useState({ lexical_notes: [], semantic_notes: [], semantic_images: [], tags: [] });
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchHistory, setSearchHistory] = useState([]);
 
@@ -32,7 +32,7 @@ export default function SearchMenu() {
     setQuery(value);
 
     if (value.trim() === "") {
-      setResults({ notes: [], tags: [] });
+      setResults({ lexical_notes: [], semantic_notes: [], semantic_images: [], tags: [] });
       setSelectedItem(searchHistory.length > 0 ? searchHistory[0] : null);
       return;
     }
@@ -40,7 +40,7 @@ export default function SearchMenu() {
     ApiClient.search(value)
       .then(searchResults => {
         setResults(searchResults);
-        const allItems = [...searchResults.notes, ...searchResults.tags];
+        const allItems = [...searchResults.lexical_notes, ...searchResults.semantic_notes, ...searchResults.semantic_images, ...searchResults.tags];
         if (allItems.length > 0) {
           setSelectedItem(allItems[0]);
         }
@@ -48,7 +48,12 @@ export default function SearchMenu() {
   }
 
   function handleKeyUp(e) {
-    const allItems = query.trim() === "" ? searchHistory : [...results.notes, ...results.tags];
+    let allItems = [];
+    if (query.trim() === "") {
+      allItems = searchHistory;
+    } else {
+      allItems = [...results.lexical_notes, ...results.semantic_notes, ...results.semantic_images, ...results.tags];
+    }
 
     if (e.key === "ArrowDown") {
       const nextIndex = allItems.indexOf(selectedItem) + 1;
@@ -78,18 +83,26 @@ export default function SearchMenu() {
 
 
   function handleResultClick(item) {
-    saveToSearchHistory(item);
     if (item.noteId) {
+      saveToSearchHistory(item);
       navigateTo(`/notes/${item.noteId}`);
+      closeModal();
     } else if (item.tagId) {
+      saveToSearchHistory(item);
       navigateTo(`/?tagId=${item.tagId}`);
+      closeModal();
+    } else if (item.filename) {
+      // For semantic image results, we don't navigate anywhere yet
+      // This could be enhanced later to show image details or navigate to related notes
+      closeModal();
     }
-    closeModal();
   }
 
 
   let historySection = null;
-  let notesSection = null;
+  let lexicalNotesSection = null;
+  let semanticNotesSection = null;
+  let semanticImagesSection = null;
   let tagsSection = null;
 
   if (query.trim() === "" && searchHistory.length > 0) {
@@ -107,18 +120,50 @@ export default function SearchMenu() {
       </div>
     );
   } else {
-    if (results.notes.length > 0) {
-      const noteItems = results.notes.map((item, index) => {
+    if (results.lexical_notes.length > 0) {
+      const noteItems = results.lexical_notes.map((item, index) => {
         const isSelected = item.noteId === selectedItem?.noteId;
         return (
-          <SearchResultItem key={`note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
+          <SearchResultItem key={`lexical-note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
         )
       });
 
-      notesSection = (
+      lexicalNotesSection = (
         <div className="search-section">
           <h4 className="search-section-title">Notes</h4>
           {noteItems}
+        </div>
+      );
+    }
+
+    if (results.semantic_notes.length > 0) {
+      const noteItems = results.semantic_notes.map((item, index) => {
+        const isSelected = item.noteId === selectedItem?.noteId;
+        return (
+          <SearchResultItem key={`semantic-note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
+        )
+      });
+
+      semanticNotesSection = (
+        <div className="search-section">
+          <h4 className="search-section-title">Similar Notes</h4>
+          {noteItems}
+        </div>
+      );
+    }
+
+    if (results.semantic_images.length > 0) {
+      const imageItems = results.semantic_images.map((item, index) => {
+        const isSelected = item.filename === selectedItem?.filename;
+        return (
+          <SearchResultItem key={`semantic-image-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
+        )
+      });
+
+      semanticImagesSection = (
+        <div className="search-section">
+          <h4 className="search-section-title">Similar Images</h4>
+          {imageItems}
         </div>
       );
     }
@@ -156,7 +201,9 @@ export default function SearchMenu() {
         </div>
         <div className="search-results-container">
           {historySection}
-          {notesSection}
+          {lexicalNotesSection}
+          {semanticNotesSection}
+          {semanticImagesSection}
           {tagsSection}
         </div>
       </ModalContainer>
@@ -172,6 +219,10 @@ function SearchResultItem({ item, isSelected, onClick }) {
   if (item.tagId) {
     icon = <TagIcon />
     subtitle = "Tag"
+  } else if (item.filename) {
+    icon = <GalleryViewIcon />
+    title = "Image"
+    subtitle = item.description || "Image"
   } else if (item.isArchived) {
     icon = <ArchiveIcon />
   } else if (item.isDeleted) {
@@ -185,6 +236,12 @@ function SearchResultItem({ item, isSelected, onClick }) {
     displaySubtitle = getHighlightedSnippet(item.highlightedContent)
   } else if (item.content) {
     displaySubtitle = item.content
+  } else if (item.matchText) {
+    // For semantic note results
+    displaySubtitle = item.matchText
+  } else if (item.filename && item.description) {
+    // For semantic image results
+    displaySubtitle = subtitle
   }
 
   return (

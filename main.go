@@ -15,6 +15,7 @@ import (
 	"zen/commons/sqlite"
 	"zen/features/focus"
 	"zen/features/images"
+	"zen/features/intelligence"
 	"zen/features/mcp"
 	"zen/features/notes"
 	"zen/features/search"
@@ -119,6 +120,10 @@ func newRouter() *http.ServeMux {
 
 	addPrivateRoute(mux, "GET /api/search/", search.HandleSearch)
 
+	addPrivateRoute(mux, "GET /api/intelligence/availability/", intelligence.HandleAvailability)
+	addPrivateRoute(mux, "POST /api/intelligence/index/", intelligence.HandleIndexAllContent)
+	addPrivateRoute(mux, "GET /api/intelligence/queue/", intelligence.HandleQueueStats)
+
 	addPrivateRoute(mux, "GET /api/templates/", templates.HandleGetTemplates)
 	addPrivateRoute(mux, "GET /api/templates/{templateId}/", templates.HandleGetTemplate)
 	addPrivateRoute(mux, "POST /api/templates/", templates.HandleCreateTemplate)
@@ -190,9 +195,10 @@ func addPrivateRoute(mux *http.ServeMux, pattern string, handlerFunc func(w http
 }
 
 func runBackgroundTasks() {
-	trashCleanupFrequency := 30 * 24 * time.Hour // 30 days
-	sessionCleanupFrequency := 24 * time.Hour    // 24 hours
-	imageSyncFrequency := 24 * time.Hour         // 24 hours
+	trashCleanupFrequency := 30 * 24 * time.Hour       // 30 days
+	sessionCleanupFrequency := 24 * time.Hour          // 24 hours
+	imageSyncFrequency := 24 * time.Hour               // 24 hours
+	intelligenceProcessingFrequency := 5 * time.Minute // 5 minutes
 
 	go func() {
 		for range time.Tick(trashCleanupFrequency) {
@@ -209,6 +215,12 @@ func runBackgroundTasks() {
 	go func() {
 		for range time.Tick(imageSyncFrequency) {
 			images.SyncImagesFromDisk()
+		}
+	}()
+
+	go func() {
+		for range time.Tick(intelligenceProcessingFrequency) {
+			intelligence.ProcessQueues()
 		}
 	}()
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"strings"
 	"zen/commons/sqlite"
 	"zen/features/tags"
 )
@@ -177,11 +178,15 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 			slog.Error(err.Error())
 			return notes, total, err
 		}
-		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
-		if err != nil {
-			err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
-			slog.Error(err.Error())
+		if strings.TrimSpace(tagsJSON) == "" || tagsJSON == "null" {
 			note.Tags = []tags.Tag{}
+		} else {
+			err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+			if err != nil {
+				err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+				slog.Error(err.Error())
+				note.Tags = []tags.Tag{}
+			}
 		}
 		note.IsArchived = archivedAt.Valid
 		note.IsDeleted = deletedAt.Valid
@@ -236,11 +241,15 @@ func GetNoteByID(noteID int) (Note, error) {
 		slog.Error(err.Error())
 		return note, err
 	}
-	err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
-	if err != nil {
-		err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
-		slog.Error(err.Error())
+	if strings.TrimSpace(tagsJSON) == "" || tagsJSON == "null" {
 		note.Tags = []tags.Tag{}
+	} else {
+		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+		if err != nil {
+			err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+			slog.Error(err.Error())
+			note.Tags = []tags.Tag{}
+		}
 	}
 	note.IsArchived = archivedAt.Valid
 	note.IsDeleted = deletedAt.Valid
@@ -468,16 +477,22 @@ func UpdateNote(note Note) (Note, error) {
 	`
 	row = tx.QueryRow(query, note.NoteID)
 	err = row.Scan(&tagsJSON)
-	if err != nil {
+	if err == sql.ErrNoRows {
+		note.Tags = []tags.Tag{}
+	} else if err != nil {
 		err = fmt.Errorf("error retrieving tags for note %d: %w", note.NoteID, err)
 		slog.Error(err.Error())
 		note.Tags = []tags.Tag{}
 	}
-	err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
-	if err != nil {
-		err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
-		slog.Error(err.Error())
+	if strings.TrimSpace(tagsJSON) == "" || tagsJSON == "null" {
 		note.Tags = []tags.Tag{}
+	} else {
+		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+		if err != nil {
+			err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+			slog.Error(err.Error())
+			note.Tags = []tags.Tag{}
+		}
 	}
 
 	err = tx.Commit()
@@ -830,4 +845,26 @@ func GetNotesWithImages() ([]Note, error) {
 	}
 
 	return notes, nil
+}
+
+func GetNotesCount(isDeleted, isArchived bool) (int, error) {
+	var count int
+	var query string
+
+	if isDeleted {
+		query = "SELECT COUNT(*) FROM notes WHERE deleted_at IS NOT NULL"
+	} else if isArchived {
+		query = "SELECT COUNT(*) FROM notes WHERE archived_at IS NOT NULL"
+	} else {
+		query = "SELECT COUNT(*) FROM notes WHERE deleted_at IS NULL AND archived_at IS NULL"
+	}
+
+	err := sqlite.DB.QueryRow(query).Scan(&count)
+	if err != nil {
+		err = fmt.Errorf("error getting notes count: %w", err)
+		slog.Error(err.Error())
+		return 0, err
+	}
+
+	return count, nil
 }

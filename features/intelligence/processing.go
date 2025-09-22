@@ -1,0 +1,77 @@
+package intelligence
+
+import (
+	"log/slog"
+	"sync"
+	"zen/commons/queue"
+)
+
+var processingMutex sync.Mutex
+
+func ProcessQueues() {
+	if !processingMutex.TryLock() {
+		slog.Debug("Intelligence queue processing already running, skipping")
+		return
+	}
+	defer processingMutex.Unlock()
+
+	if !isIntelligenceAvailable() {
+		return
+	}
+
+	// Process queues in priority order: deletions first, then additions
+	// Deletion queues must be processed first because:
+	// 1. When a note is deleted, RemoveAllTasksForNote() clears pending tasks but running tasks may still complete
+	// 2. If PROCESS runs after a note is deleted, it wastes LLM resources on deleted content
+	// 3. If DELETE runs after PROCESS, it correctly cleans up the embeddings
+	// 4. This prevents race conditions and ensures efficient resource usage
+	queueTypes := []string{
+		queue.QUEUE_NOTE_DELETE,
+		queue.QUEUE_IMAGE_DELETE,
+		queue.QUEUE_NOTE_PROCESS,
+		queue.QUEUE_IMAGE_PROCESS,
+	}
+
+	for {
+		hasWork := false
+
+		for _, queueType := range queueTypes {
+			task, err := queue.GetNextTask(queueType, queue.STATUS_QUEUED)
+			if err != nil {
+				continue // No tasks
+			}
+
+			hasWork = true
+			queue.UpdateTaskStatus(task.ID, queue.STATUS_PROCESSING)
+
+			// Parse payload to get entity info
+			entityID, ok := queue.ParseTaskPayload(task)
+			if !ok {
+				continue
+			}
+			var processingErr error
+			switch queueType {
+			case queue.QUEUE_NOTE_PROCESS:
+				processingErr = ProcessNoteForEmbedding(entityID)
+			case queue.QUEUE_NOTE_DELETE:
+				processingErr = DeleteNoteEmbeddings(entityID)
+			case queue.QUEUE_IMAGE_PROCESS:
+				processingErr = ProcessImageForEmbedding(entityID)
+			case queue.QUEUE_IMAGE_DELETE:
+				processingErr = DeleteImageEmbeddings(entityID)
+			}
+
+			if processingErr != nil {
+				slog.Error("Failed to process task", "queueType", queueType, "taskID", task.ID, "entityID", entityID, "error", processingErr)
+				queue.MarkTaskFailed(task.ID, processingErr.Error())
+			} else {
+				slog.Debug("Processed task", "queueType", queueType, "taskID", task.ID, "entityID", entityID)
+				queue.RemoveTask(task.ID)
+			}
+		}
+
+		if !hasWork {
+			break
+		}
+	}
+}

@@ -316,3 +316,17 @@ func GetLinkedNotesByImage(filename string) ([]int, error) {
 
 	return noteIDs, nil
 }
+
+func GetImagesCount() (int, error) {
+	var count int
+	query := "SELECT COUNT(*) FROM images"
+
+	err := sqlite.DB.QueryRow(query).Scan(&count)
+	if err != nil {
+		err = fmt.Errorf("error getting images count: %w", err)
+		slog.Error(err.Error())
+		return 0, err
+	}
+
+	return count, nil
+}

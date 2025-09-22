@@ -1,0 +1,72 @@
+**Instructions:**
+
+You will receive a note as input. Your task is to break it down into meaningful, self-contained chunks optimized for embedding in a vector database. Each chunk should be semantically coherent while preserving the original information accurately.
+
+**Output Format:**
+
+Return a JSON array of strings. Each string represents a chunk with resolved entity references:
+
+["Self-contained chunk with clear entity references", "Another chunk with resolved pronouns and references"]
+
+**Critical Rule - Entity Resolution:**
+
+You MUST resolve ambiguous entity references to ensure each chunk is self-contained and searchable. This is essential for embedding quality - each chunk must be understandable without reading other chunks.
+
+**Chunking Rules:**
+
+1.  **Preserve Original Content:** Use the exact text from the note. Only modify to resolve ambiguous entity references using information available in the note. Never invent details not present in the original.
+
+2.  **Strategic Entity Resolution:** Replace ambiguous references to ensure each chunk is self-contained:
+
+**People References (HIGH PRIORITY):**
+    * Replace pronouns like "he," "she," "they," "him," "her" with the person's name
+    * Replace family terms: "Mom," "Dad" can become "my mother," "my father"
+    * Focus on cross-chunk people references first
+
+**Technical/Object References:**
+    * Replace "it" with the specific system, tool, or object when multiple items mentioned
+    * Replace "the system" with the specific system name when multiple systems discussed
+    * Replace "the fix," "the solution," "the approach" with more specific descriptions
+    * Replace "this," "that" with the specific item being referenced
+
+**Temporal References:**
+    * Replace "the previous version," "the earlier meeting" with specific versions/events when mentioned
+
+3.  **Safe Entity Clarification:** Only add context that is explicitly stated in the note:
+    * Keep specific terms as written: "the database" stays "the database"
+    * Keep roles as mentioned: "the team lead" stays "the team lead"
+    * Keep places as written: "the coffee shop" stays "the coffee shop"
+    * Preserve original descriptors exactly: "the new approach" stays "the new approach"
+
+4.  **Topic Segmentation:** Split on clear topic changes while maintaining complete thoughts within each chunk.
+
+5.  **Complete Thoughts:** Ensure chunks contain complete ideas. Combine related sentences when they form a single thought or event.
+
+6.  **Granularity Balance:** Create focused chunks that are self-contained with clear entity references.
+
+**Resolution Priority:**
+1. **Cross-chunk references** (when entity is in different chunk) - ALWAYS resolve
+2. **Multiple entity contexts** (when note mentions multiple people/systems) - ALWAYS resolve
+3. **Distant references** (when entity mentioned far earlier) - ALWAYS resolve
+4. **Same-chunk clarity** (when it improves searchability) - Consider resolving
+
+**Critical Rules:**
+- FIRST PRIORITY: Make each chunk understandable without other chunks
+- ALWAYS resolve ambiguous references when the specific entity is mentioned elsewhere in the note
+- NEVER add information not present in the original note
+- NEVER change descriptive language or tone beyond entity resolution
+- DO scan the entire note first to identify all entities before chunking
+
+**Common Ambiguous Patterns to Resolve:**
+- Pronouns: "he," "she," "it," "they," "this," "that"
+- Vague nouns: "the system," "the fix," "the approach," "the issue," "the meeting"
+- Family terms: "Mom," "Dad," "my brother" (when names are available)
+- Temporal: "the previous version," "the earlier discussion," "the recent update"
+
+**Avoid:**
+- Leaving references that require other chunks to understand
+- Adding information not stated in the original note
+- Inventing specific details, names, or technical specifications
+- Changing tone or meaning beyond entity clarification
+
+**Input Note:**

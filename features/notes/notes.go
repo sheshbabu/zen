@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"zen/commons/queue"
 	"zen/commons/utils"
 	"zen/features/tags"
 )
@@ -140,6 +141,8 @@ func HandleCreateNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	queue.AddNoteTask(note.NoteID, queue.QUEUE_NOTE_PROCESS, "process")
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(note)
 }
@@ -164,6 +167,8 @@ func HandleUpdateNote(w http.ResponseWriter, r *http.Request) {
 		utils.SendErrorResponse(w, "NOTES_UPDATE_FAILED", "Error saving note.", err, http.StatusInternalServerError)
 		return
 	}
+
+	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_PROCESS, "process")
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(note)
@@ -200,6 +205,9 @@ func HandleSoftDeleteNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	queue.RemoveAllNoteTasks(noteID)
+	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_DELETE, "delete")
+
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -217,6 +225,9 @@ func HandleRestoreDeletedNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	queue.RemoveAllNoteTasks(noteID)
+	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_PROCESS, "process")
+
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -233,6 +244,9 @@ func HandleArchiveNote(w http.ResponseWriter, r *http.Request) {
 		utils.SendErrorResponse(w, "NOTES_ARCHIVE_FAILED", "Error archiving note.", err, http.StatusInternalServerError)
 		return
 	}
+
+	queue.RemoveAllNoteTasks(noteID)
+	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_DELETE, "delete")
 
 	w.WriteHeader(http.StatusOK)
 }
