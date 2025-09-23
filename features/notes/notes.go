@@ -168,6 +168,7 @@ func HandleUpdateNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	queue.RemoveAllNoteTasks(noteID)
 	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_PROCESS, "process")
 
 	w.Header().Set("Content-Type", "application/json")

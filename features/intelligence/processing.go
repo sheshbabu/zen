@@ -1,6 +1,8 @@
 package intelligence
 
 import (
+	"database/sql"
+	"errors"
 	"log/slog"
 	"sync"
 	"zen/commons/queue"
@@ -14,6 +16,10 @@ func ProcessQueues() {
 		return
 	}
 	defer processingMutex.Unlock()
+
+	if !isIntelligenceEnabled {
+		queue.Clear()
+	}
 
 	if !isIntelligenceAvailable() {
 		return
@@ -63,7 +69,13 @@ func ProcessQueues() {
 
 			if processingErr != nil {
 				slog.Error("Failed to process task", "queueType", queueType, "taskID", task.ID, "entityID", entityID, "error", processingErr)
-				queue.MarkTaskFailed(task.ID, processingErr.Error())
+
+				err := queue.MarkTaskFailed(task.ID, processingErr.Error())
+				if err != nil && errors.Is(err, sql.ErrNoRows) {
+					slog.Debug("Task was deleted during processing, ignoring failure", "taskID", task.ID)
+				} else if err != nil {
+					slog.Error("Failed to mark task as failed", "taskID", task.ID, "error", err)
+				}
 			} else {
 				slog.Debug("Processed task", "queueType", queueType, "taskID", task.ID, "entityID", entityID)
 				queue.RemoveTask(task.ID)

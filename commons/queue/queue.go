@@ -324,3 +324,16 @@ func GetAllQueueStats() ([]QueueStats, error) {
 
 	return allStats, nil
 }
+
+func Clear() error {
+	query := `DELETE FROM queue`
+
+	_, err := sqlite.DB.Exec(query)
+	if err != nil {
+		err = fmt.Errorf("error clearing queue: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
