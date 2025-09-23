@@ -1,7 +1,7 @@
 .offline-indicator {
     position: fixed;
     top: 0;
-    background: var(--red-500);
+    background: var(--red-600);
     color: white;
     text-align: center;
     font: var(--sm);
