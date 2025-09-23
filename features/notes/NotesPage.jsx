@@ -108,10 +108,6 @@ function NotesPageContent({ noteId }) {
     setSelectedView(newView);
   }
 
-  function handleNoteChangeWithFocus() {
-    handleNoteChange(selectedFocusId);
-  }
-
   if (selectedView === "list") {
     listClassName = "notes-list-container"
     editorClassName = "notes-editor-container";

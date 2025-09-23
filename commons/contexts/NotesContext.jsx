@@ -1,5 +1,6 @@
 import { h, createContext, useContext, useState, useCallback } from '../../assets/preact.esm.js';
 import ApiClient from '../../commons/http/ApiClient.js';
+import useSearchParams from "../../commons/components/useSearchParams.jsx";
 import { useAppContext } from './AppContext.jsx';
 
 const NotesContext = createContext();
@@ -16,6 +17,12 @@ export function NotesProvider({ children }) {
   const [isImagesLoading, setIsImagesLoading] = useState(true);
 
   const { refreshTags, refreshFocusModes } = useAppContext();
+
+  const searchParams = useSearchParams();
+  const selectedTagId = searchParams.get("tagId");
+  const selectedFocusId = searchParams.get("focusId");
+  const isArchivesPage = searchParams.get("isArchived") === "true";
+  const isTrashPage = searchParams.get("isDeleted") === "true";
 
   const refreshNotes = useCallback((tagId, focusId, isArchived, isDeleted, pageNumber = 1) => {
     setIsNotesLoading(true);
@@ -57,9 +64,9 @@ export function NotesProvider({ children }) {
       });
   }, []);
 
-  const handleNoteChange = useCallback((selectedFocusId) => {
-    refreshNotes();
-    refreshImages();
+  const handleNoteChange = useCallback(() => {
+    refreshNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage);
+    refreshImages(selectedTagId, selectedFocusId);
     refreshTags(selectedFocusId);
     refreshFocusModes();
   }, [refreshNotes, refreshImages, refreshTags, refreshFocusModes]);
