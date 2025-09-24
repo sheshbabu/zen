@@ -59,13 +59,13 @@ func init() {
 		noteCollectionName := NOTE_COLLECTION_NAME
 		err := qdrant.CreateCollection(noteCollectionName, 768)
 		if err == nil {
-			slog.Info("Collection created", "collection", noteCollectionName)
+			slog.Info("Created collection", "collectionName:", noteCollectionName)
 		}
 
 		imageCollectionName := IMAGE_COLLECTION_NAME
 		err = qdrant.CreateCollection(imageCollectionName, 768)
 		if err == nil {
-			slog.Info("Collection created", "collection", imageCollectionName)
+			slog.Info("Created collection", "collectionName:", imageCollectionName)
 		}
 	}
 }
