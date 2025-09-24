@@ -7,7 +7,7 @@ dev:
 	DEV_MODE=true go run --tags "fts5" main.go
 
 watch:
-	INTELLIGENCE_ENABLED=true DEV_MODE=true air --build.cmd 'go build --tags "fts5" -o ./tmp/main .' & esbuild index.js --bundle --outfile=assets/bundle.js --loader:.js=jsx --jsx-factory=h --jsx-fragment=Fragment --watch
+	DEV_MODE=true air --build.cmd 'go build --tags "fts5" -o ./tmp/main .' & esbuild index.js --bundle --outfile=assets/bundle.js --loader:.js=jsx --jsx-factory=h --jsx-fragment=Fragment --watch
 
 # UI: http://localhost:6333/dashboard
 qdrant:

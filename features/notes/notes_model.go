@@ -533,6 +533,20 @@ func ForceDeleteNote(noteID int) error {
 
 	query = `
 		DELETE FROM
+			note_images
+		WHERE
+			note_id = ?
+	`
+
+	_, err = tx.Exec(query, noteID)
+	if err != nil {
+		err = fmt.Errorf("error deleting note images: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	query = `
+		DELETE FROM
 			notes
 		WHERE
 			note_id = ?
