@@ -6,6 +6,7 @@ import { AppProvider } from '../../commons/contexts/AppContext.jsx';
 import { NotesProvider, useNotes } from "../../commons/contexts/NotesContext.jsx";
 import { HamburgerIcon } from '../../commons/components/Icon.jsx';
 import ButtonGroup from '../../commons/components/ButtonGroup.jsx';
+import navigateTo from "../../commons/utils/navigateTo.js";
 import TrashClearModal from "./TrashClearModal.jsx"
 import "./NotesListToolbar.css";
 
@@ -16,6 +17,7 @@ export default function NotesListToolbar({ onSidebarToggle, onViewChange }) {
   const isTrashPage = searchParams.get("isDeleted") === "true";
 
   function handleTrashCleared() {
+    navigateTo("/notes/?isDeleted=true")
     refreshNotes(null, null, false, true);
   }
 
