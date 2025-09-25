@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	MaxContentLength = 6000
+	MaxContentLength = 4000
 	SingleChunkLimit = 1500
 )
 
@@ -20,6 +20,8 @@ var (
 	markdownUrlRegex = regexp.MustCompile(`!?\[([^\]]*)\]\([^)]+\)`)
 	urlRegex         = regexp.MustCompile(`https?://[^\s]+`)
 	headingRegex     = regexp.MustCompile(`(?m)^#{1,6}\s+.+$`)
+	codeFenceRegex   = regexp.MustCompile(`(?s)` + "```[^`]*```")
+	inlineCodeRegex  = regexp.MustCompile("`[^`]+`")
 )
 
 var chunkingPrompt string
@@ -37,27 +39,29 @@ func init() {
 // Long notes   -> Hierarchical recursive chunking (split by structure) -> Semantic chunking
 func ChunkNote(note notes.Note) ([]string, error) {
 	if note.Content == "" {
-		return nil, fmt.Errorf("chunking note %d: content is empty", note.NoteID)
-	}
-
-	content := filterUrls(note.Content)
-	content = strings.TrimSpace(content)
-
-	if content == "" {
-		slog.Debug("Note content is empty after URL filtering, skipping chunking", "noteID", note.NoteID)
+		slog.Info("note content is empty, skipping chunking", "noteID", note.NoteID)
 		return []string{}, nil
 	}
 
-	slog.Debug("Chunking note", "noteID", note.NoteID, "originalLength", len(note.Content), "filteredLength", len(content))
+	content := filterUrls(note.Content)
+	content = filterCodeBlocks(content)
+	content = strings.TrimSpace(content)
+
+	if content == "" {
+		slog.Info("note content is empty after filtering, skipping chunking", "noteID", note.NoteID)
+		return []string{}, nil
+	}
+
+	slog.Info("chunking note", "noteID", note.NoteID, "originalLength", len(note.Content), "filteredLength", len(content))
 
 	// Short notes
 	if len(content) <= SingleChunkLimit {
-		slog.Debug("Content is short, returning as single chunk", "noteID", note.NoteID, "length", len(content))
+		slog.Info("note content is short, returning as single chunk", "noteID", note.NoteID, "length", len(content))
 		return []string{content}, nil
 	}
 
 	// Medium notes
-	if len(content) <= MaxContentLength {
+	if len(content)+len(chunkingPrompt) <= MaxContentLength {
 		chunks, err := semanticChunk(content)
 		if err != nil {
 			return nil, err
@@ -71,12 +75,12 @@ func ChunkNote(note notes.Note) ([]string, error) {
 	}
 
 	// Long notes
-	slog.Debug("Content exceeds max length, splitting into sections", "noteID", note.NoteID, "length", len(content))
+	slog.Info("note content exceeds max length, splitting into sections", "noteID", note.NoteID, "length", len(content))
 	sections := splitLongContent(content)
 	var allChunks []string
 
 	for i, section := range sections {
-		slog.Debug("Processing section", "noteID", note.NoteID, "section", i+1, "totalSections", len(sections), "sectionLength", len(section))
+		slog.Info("processing section", "noteID", note.NoteID, "section", i+1, "total sections", len(sections), "section length", len(section))
 		sectionChunks, err := semanticChunk(section)
 		if err != nil {
 			slog.Error("Failed to chunk section", "noteID", note.NoteID, "section", i+1, "error", err)
@@ -95,18 +99,28 @@ func filterUrls(content string) string {
 	return content
 }
 
+func filterCodeBlocks(content string) string {
+	// Remove fenced code blocks (```lang\ncode\n``` or ```\ncode\n```)
+	content = codeFenceRegex.ReplaceAllString(content, "")
+	// Remove inline code (`code`)
+	content = inlineCodeRegex.ReplaceAllString(content, "")
+	return content
+}
+
 func splitLongContent(content string) []string {
 	var sections []string
 
 	if headingRegex.MatchString(content) {
+		slog.Info("splitting by headings")
 		sections = splitByHeadings(content)
 	} else {
+		slog.Info("splitting by paragraphs")
 		sections = splitByParagraphs(content)
 	}
 
 	var finalSections []string
 	for _, section := range sections {
-		if len(section) <= MaxContentLength {
+		if len(section)+len(chunkingPrompt) <= MaxContentLength {
 			finalSections = append(finalSections, section)
 		} else {
 			subSections := splitLongParagraph(section)
@@ -166,7 +180,7 @@ func splitByParagraphs(content string) []string {
 		}
 		testSection += paragraph
 
-		if len(testSection) <= MaxContentLength {
+		if len(testSection)+len(chunkingPrompt) <= MaxContentLength {
 			currentSection = testSection
 		} else {
 			if currentSection != "" {

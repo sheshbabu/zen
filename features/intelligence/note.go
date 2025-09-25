@@ -26,7 +26,7 @@ func ProcessNoteForEmbedding(noteIDStr string) error {
 	}
 
 	if note.IsDeleted || note.IsArchived {
-		slog.Debug("Skipping deleted or archived note", "noteID", noteID)
+		slog.Info("skipping deleted or archived note", "noteID", noteID)
 		return nil
 	}
 
@@ -43,7 +43,6 @@ func ProcessNoteForEmbedding(noteIDStr string) error {
 	}
 
 	if len(chunks) == 0 {
-		slog.Debug("Note has no meaningful content after chunking, skipping embedding", "noteID", noteID)
 		return nil
 	}
 
@@ -107,7 +106,6 @@ func DeleteNoteEmbeddings(noteIDStr string) error {
 	}
 
 	if len(results) == 0 {
-		slog.Debug("No points found for note", "noteID", noteID)
 		return nil
 	}
 
