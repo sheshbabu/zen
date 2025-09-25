@@ -63,12 +63,3 @@ $ git push origin x.y.z
 
 ### Contributions
 This is a personal project built for my own use. The codebase is available for forking and modifications. Note that I may not actively review pull requests or respond to issues due to time constraints.
-
-
-### Thanks
-* [go-sqlite3](https://github.com/mattn/go-sqlite3)
-* [Standalone Preact Builder](https://standalonepreact.satge.net)
-* [markdown-it](https://markdown-it.github.io)
-* [highlight.js](https://highlightjs.org)
-* [Lucide Icons](https://lucide.dev)
-* [CSS Reset](https://www.joshwcomeau.com/css/custom-css-reset/)
