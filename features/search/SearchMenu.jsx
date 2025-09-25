@@ -1,7 +1,7 @@
 import { h, useEffect, useState, useRef } from "../../assets/preact.esm.js"
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
-import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon, TagIcon, GalleryViewIcon } from "../../commons/components/Icon.jsx";
+import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon, TagIcon } from "../../commons/components/Icon.jsx";
 import { ModalBackdrop, ModalContainer, closeModal } from "../../commons/components/Modal.jsx";
 import "./SearchMenu.css";
 
@@ -153,17 +153,10 @@ export default function SearchMenu() {
     }
 
     if (results.semantic_images.length > 0) {
-      const imageItems = results.semantic_images.map((item, index) => {
-        const isSelected = item.filename === selectedItem?.filename;
-        return (
-          <SearchResultItem key={`semantic-image-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
-        )
-      });
-
       semanticImagesSection = (
         <div className="search-section">
           <h4 className="search-section-title">Similar Images</h4>
-          {imageItems}
+          <SearchResultImages items={results.semantic_images} onClick={handleResultClick} />
         </div>
       );
     }
@@ -219,10 +212,6 @@ function SearchResultItem({ item, isSelected, onClick }) {
   if (item.tagId) {
     icon = <TagIcon />
     subtitle = "Tag"
-  } else if (item.filename) {
-    icon = <GalleryViewIcon />
-    title = "Image"
-    subtitle = item.description || "Image"
   } else if (item.isArchived) {
     icon = <ArchiveIcon />
   } else if (item.isDeleted) {
@@ -239,9 +228,6 @@ function SearchResultItem({ item, isSelected, onClick }) {
   } else if (item.matchText) {
     // For semantic note results
     displaySubtitle = item.matchText
-  } else if (item.filename && item.description) {
-    // For semantic image results
-    displaySubtitle = subtitle
   }
 
   return (
@@ -251,6 +237,16 @@ function SearchResultItem({ item, isSelected, onClick }) {
         <p className="title" dangerouslySetInnerHTML={{ __html: displayTitle }}></p>
         <p className="subtitle" dangerouslySetInnerHTML={{ __html: displaySubtitle }}></p>
       </div>
+    </div>
+  );
+}
+
+function SearchResultImages({ items, onClick }) {
+  const images = items.map(item => <img src={`/images/${item.filename}`} key={item.filename} alt={item.description} onClick={() => onClick(item)} />)
+
+  return (
+    <div className="search-result-images">
+      {images}
     </div>
   );
 }

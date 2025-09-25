@@ -86,6 +86,36 @@
                 }
             }
         }
+
+        .search-result-images {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 10px;
+            padding-top: 0;
+
+            img {
+                height: 185px;
+                width: 185px;
+                margin: 6px 6px 0 0;
+                box-sizing: border-box;
+                object-fit: cover;
+                border-radius: 4px;
+                transition-property: box-shadow, opacity;
+                transition-duration: 500ms;
+                box-shadow: var(--shadow-2);
+                cursor: pointer;
+
+                &:hover {
+                    box-shadow: var(--shadow-4);
+                    opacity: 0.8;
+                }
+
+                &:active {
+                    transform: scale(0.98);
+                    transition: transform 150ms ease-out;
+                }
+            }
+        }
     }
 }
 
