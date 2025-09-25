@@ -16,28 +16,28 @@
       height: 2px;
       background: var(--neutral-300);
       transition: all 0.15s ease;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
 
     .toc-bar-level-1 {
-      width: 20px;
+      width: 10px;
     }
 
     .toc-bar-level-2 {
-      width: 16px;
+      width: 8px;
     }
 
     .toc-bar-level-3 {
-      width: 12px;
+      width: 6px;
     }
 
     .is-visible {
-      background: var(--neutral-600);
+      background: var(--neutral-400);
     }
 
     &:hover {
       .toc-bar {
-        background: var(--neutral-500);
+        background: var(--neutral-200);
       }
     }
   }
