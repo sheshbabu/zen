@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+const QDRANT_TIMEOUT = 500 * time.Millisecond
+
 var baseURL string
 var httpClient *http.Client
 
@@ -68,7 +70,7 @@ func init() {
 	}
 
 	httpClient = &http.Client{
-		Timeout: 500 * time.Millisecond,
+		Timeout: QDRANT_TIMEOUT,
 	}
 }
 

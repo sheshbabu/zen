@@ -8,7 +8,7 @@ import (
 )
 
 func SemanticNoteSearch(query string, limit int) ([]SemanticNoteResult, error) {
-	if !isIntelligenceAvailable() {
+	if !isIntelligenceEnabled {
 		return []SemanticNoteResult{}, nil
 	}
 
@@ -24,8 +24,8 @@ func SemanticNoteSearch(query string, limit int) ([]SemanticNoteResult, error) {
 	select {
 	case result := <-resultChan:
 		results, err = result.Results, result.Err
-	case <-time.After(200 * time.Millisecond):
-		err = fmt.Errorf("note vector search timeout after 200ms")
+	case <-time.After(SEARCH_TIMEOUT):
+		err = fmt.Errorf("note vector search timeout")
 	}
 
 	if err != nil {
@@ -36,7 +36,7 @@ func SemanticNoteSearch(query string, limit int) ([]SemanticNoteResult, error) {
 }
 
 func SemanticImageSearch(query string, limit int) ([]SemanticImageResult, error) {
-	if !isIntelligenceAvailable() {
+	if !isIntelligenceEnabled {
 		return []SemanticImageResult{}, nil
 	}
 
@@ -52,8 +52,8 @@ func SemanticImageSearch(query string, limit int) ([]SemanticImageResult, error)
 	select {
 	case result := <-resultChan:
 		results, err = result.Results, result.Err
-	case <-time.After(200 * time.Millisecond):
-		err = fmt.Errorf("image vector search timeout after 200ms")
+	case <-time.After(SEARCH_TIMEOUT):
+		err = fmt.Errorf("image vector search timeout")
 	}
 
 	if err != nil {

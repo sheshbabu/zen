@@ -1,5 +1,7 @@
 package intelligence
 
+import "time"
+
 // Models
 const CHUNKING_MODEL = "gemma3:12b-it-qat"
 const EMBEDDING_MODEL = "nomic-embed-text:latest"
@@ -14,3 +16,6 @@ const SEMANTIC_SCORE_THRESHOLD = 0.5
 
 // Image Analysis
 const MAX_IMAGE_SIZE = 512
+
+// Timeouts
+const SEARCH_TIMEOUT = 200 * time.Millisecond

@@ -12,6 +12,7 @@ import (
 )
 
 const CONTEXT_LENGTH = 8192
+const OLLAMA_TIMEOUT = 2 * time.Minute
 
 var baseURL string
 var httpClient *http.Client
@@ -86,7 +87,7 @@ func init() {
 	}
 
 	httpClient = &http.Client{
-		Timeout: 2 * time.Minute,
+		Timeout: OLLAMA_TIMEOUT,
 	}
 }
 
