@@ -80,6 +80,11 @@ type ListModelsResponse struct {
 	Models []ModelInfo `json:"models"`
 }
 
+type StopRequest struct {
+	Model     string `json:"model"`
+	KeepAlive string `json:"keep_alive"`
+}
+
 func init() {
 	baseURL = os.Getenv("OLLAMA_HOST")
 	if baseURL == "" {
@@ -187,6 +192,20 @@ func IsHealthy() error {
 	if err != nil {
 		return fmt.Errorf("health check failed: %w", err)
 	}
+	return nil
+}
+
+func StopModel(modelName string) error {
+	req := StopRequest{
+		Model:     modelName,
+		KeepAlive: "0",
+	}
+
+	_, err := request("POST", "/api/generate", req)
+	if err != nil {
+		return fmt.Errorf("stop model: %w", err)
+	}
+
 	return nil
 }
 

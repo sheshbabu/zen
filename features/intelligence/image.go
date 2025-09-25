@@ -1,9 +1,10 @@
 package intelligence
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
-	"path/filepath"
+	"net"
 	"zen/commons/ollama"
 	"zen/commons/qdrant"
 	"zen/features/images"
@@ -11,7 +12,8 @@ import (
 	"github.com/google/uuid"
 )
 
-const IMAGE_ANALYSIS_PROMPT = "Describe this image. Do not ask questions or add conversational comments."
+const IMAGE_ANALYSIS_PROMPT = "Generate a caption with all details of this image. Extract text if it exists. Do not add any introductory phrases like \"The image shows\" or \"This is a photo of\""
+const IMAGE_FALLBACK_PROMPT = "Generate a caption with all details of this image. Do not add any introductory phrases like \"The image shows\" or \"This is a photo of\""
 
 func ProcessImageForEmbedding(filename string) error {
 	if !isIntelligenceAvailable() {
@@ -42,7 +44,6 @@ func ProcessImageForEmbedding(filename string) error {
 		return fmt.Errorf("failed to store embedding: %w", err)
 	}
 
-	slog.Debug("Processed image for embedding", "path", filepath.Base(filename))
 	return nil
 }
 
@@ -58,7 +59,24 @@ func analyzeImage(filename string) (string, error) {
 
 	response, err := ollama.ChatCompletion(VISION_MODEL, "", IMAGE_ANALYSIS_PROMPT, imageData)
 	if err != nil {
-		return "", fmt.Errorf("failed to analyze image: %w", err)
+		var netErr net.Error
+		if errors.As(err, &netErr) && netErr.Timeout() {
+			slog.Error("Timeout while analyzing image, stopping model and retrying with fallback", "filename", filename, "error", err)
+
+			// Stop the model to free up resources
+			if stopErr := ollama.StopModel(VISION_MODEL); stopErr != nil {
+				slog.Error("Failed to stop model after timeout", "model", VISION_MODEL, "error", stopErr)
+			}
+
+			// Retry with fallback prompt
+			slog.Info("retrying image analysis with fallback prompt", "filename", filename)
+			response, err = ollama.ChatCompletion(VISION_MODEL, "", IMAGE_FALLBACK_PROMPT, imageData)
+			if err != nil {
+				return "", fmt.Errorf("fallback image analysis failed: %w", err)
+			}
+		} else {
+			return "", fmt.Errorf("failed to analyze image: %w", err)
+		}
 	}
 
 	return response.Message.Content, nil
@@ -98,7 +116,6 @@ func DeleteImageEmbeddings(filename string) error {
 	}
 
 	if len(results) == 0 {
-		slog.Debug("No points found for image", "filename", filename)
 		return nil
 	}
 
@@ -113,6 +130,6 @@ func DeleteImageEmbeddings(filename string) error {
 		return fmt.Errorf("failed to delete image embeddings: %w", err)
 	}
 
-	slog.Debug("Deleted image embeddings", "filename", filename)
+	slog.Info("deleted image embeddings", "filename", filename)
 	return nil
 }

@@ -17,7 +17,7 @@ func HandleIndexAllContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	slog.Info("Starting content indexing for all notes and images")
+	slog.Info("starting content indexing for all notes and images")
 
 	var totalTasks int
 
@@ -27,7 +27,7 @@ func HandleIndexAllContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	totalTasks += noteTasks
-	slog.Info("Added note indexing tasks to queue", "count", noteTasks)
+	slog.Info("added note indexing tasks to queue", "count", noteTasks)
 
 	imageTasks, err := indexAllImages()
 	if err != nil {
@@ -35,9 +35,9 @@ func HandleIndexAllContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	totalTasks += imageTasks
-	slog.Info("Added image indexing tasks to queue", "count", imageTasks)
+	slog.Info("added image indexing tasks to queue", "count", imageTasks)
 
-	slog.Info("Content indexing initiated", "totalTasks", totalTasks)
+	slog.Info("content indexing initiated", "totalTasks", totalTasks)
 	tasksAdded := totalTasks
 
 	response := ProcessNoteResponse{

@@ -12,7 +12,7 @@ var processingMutex sync.Mutex
 
 func ProcessQueues() {
 	if !processingMutex.TryLock() {
-		slog.Debug("Intelligence queue processing already running, skipping")
+		slog.Info("intelligence queue processing already running, skipping")
 		return
 	}
 	defer processingMutex.Unlock()
@@ -72,12 +72,12 @@ func ProcessQueues() {
 
 				err := queue.MarkTaskFailed(task.ID, processingErr.Error())
 				if err != nil && errors.Is(err, sql.ErrNoRows) {
-					slog.Debug("Task was deleted during processing, ignoring failure", "taskID", task.ID)
+					slog.Info("task was deleted during processing, ignoring failure", "taskID", task.ID)
 				} else if err != nil {
 					slog.Error("Failed to mark task as failed", "taskID", task.ID, "error", err)
 				}
 			} else {
-				slog.Debug("Processed task", "queueType", queueType, "taskID", task.ID, "entityID", entityID)
+				slog.Info("processed task", "queueType", queueType, "taskID", task.ID, "entityID", entityID)
 				queue.RemoveTask(task.ID)
 			}
 		}

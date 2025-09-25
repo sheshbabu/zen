@@ -100,9 +100,9 @@ func MarkTaskFailed(taskID int, errorMessage string) error {
 	// max_retries=3 means: 1 initial attempt + 3 retry attempts = 4 total attempts
 	if retryCount < maxRetries {
 		status = STATUS_QUEUED
-		slog.Info("Task will be retried", "taskID", taskID, "retryCount", retryCount, "maxRetries", maxRetries, "attemptsRemaining", maxRetries-retryCount)
+		slog.Info("task will be retried", "taskID", taskID, "retryCount", retryCount, "maxRetries", maxRetries, "attemptsRemaining", maxRetries-retryCount)
 	} else {
-		slog.Error("Task exceeded max retries, marking as failed", "taskID", taskID, "retryCount", retryCount, "maxRetries", maxRetries, "totalAttempts", retryCount+1)
+		slog.Error("task exceeded max retries, marking as failed", "taskID", taskID, "retryCount", retryCount, "maxRetries", maxRetries, "totalAttempts", retryCount+1)
 	}
 
 	updateQuery := `
@@ -263,7 +263,7 @@ func RetryFailedTask(taskID int) error {
 		return fmt.Errorf("task %d not found or not in failed state", taskID)
 	}
 
-	slog.Info("Task manually retried", "taskID", taskID)
+	slog.Info("task manually retried", "taskID", taskID)
 	return nil
 }
 

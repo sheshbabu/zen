@@ -54,18 +54,18 @@ func init() {
 	isIntelligenceEnabled = os.Getenv("INTELLIGENCE_ENABLED") == "true"
 
 	if isIntelligenceEnabled {
-		slog.Info("Intelligence service initialized")
+		slog.Info("intelligence feature enabled")
 
 		noteCollectionName := NOTE_COLLECTION_NAME
 		err := qdrant.CreateCollection(noteCollectionName, 768)
 		if err == nil {
-			slog.Info("Created collection", "collectionName:", noteCollectionName)
+			slog.Info("created collection", "collectionName", noteCollectionName)
 		}
 
 		imageCollectionName := IMAGE_COLLECTION_NAME
 		err = qdrant.CreateCollection(imageCollectionName, 768)
 		if err == nil {
-			slog.Info("Created collection", "collectionName:", imageCollectionName)
+			slog.Info("created collection", "collectionName", imageCollectionName)
 		}
 	}
 }
