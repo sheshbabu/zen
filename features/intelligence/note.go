@@ -11,10 +11,6 @@ import (
 )
 
 func ProcessNoteForEmbedding(noteIDStr string) error {
-	if !isIntelligenceAvailable() {
-		return fmt.Errorf("intelligence features are not available")
-	}
-
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
 		return fmt.Errorf("invalid note ID: %w", err)

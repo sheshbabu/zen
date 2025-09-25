@@ -16,10 +16,6 @@ const IMAGE_ANALYSIS_PROMPT = "Generate a caption with all details of this image
 const IMAGE_FALLBACK_PROMPT = "Generate a caption with all details of this image. Do not add any introductory phrases like \"The image shows\" or \"This is a photo of\""
 
 func ProcessImageForEmbedding(filename string) error {
-	if !isIntelligenceAvailable() {
-		return fmt.Errorf("intelligence features are not available")
-	}
-
 	err := DeleteImageEmbeddings(filename)
 	if err != nil {
 		slog.Error("Failed to delete existing image embeddings", "filename", filename, "error", err)

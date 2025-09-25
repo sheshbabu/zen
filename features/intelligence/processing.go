@@ -21,10 +21,6 @@ func ProcessQueues() {
 		queue.Clear()
 	}
 
-	if !isIntelligenceAvailable() {
-		return
-	}
-
 	// Process queues in priority order: deletions first, then additions
 	// Deletion queues must be processed first because:
 	// 1. When a note is deleted, RemoveAllTasksForNote() clears pending tasks but running tasks may still complete
@@ -42,6 +38,10 @@ func ProcessQueues() {
 		hasWork := false
 
 		for _, queueType := range queueTypes {
+			if !isIntelligenceAvailable() {
+				return
+			}
+
 			task, err := queue.GetNextTask(queueType, queue.STATUS_QUEUED)
 			if err != nil {
 				continue // No tasks
@@ -50,11 +50,11 @@ func ProcessQueues() {
 			hasWork = true
 			queue.UpdateTaskStatus(task.ID, queue.STATUS_PROCESSING)
 
-			// Parse payload to get entity info
 			entityID, ok := queue.ParseTaskPayload(task)
 			if !ok {
 				continue
 			}
+
 			var processingErr error
 			switch queueType {
 			case queue.QUEUE_NOTE_PROCESS:
