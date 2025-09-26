@@ -198,6 +198,7 @@ func splitByParagraphs(content string) []string {
 }
 
 func splitLongParagraph(paragraph string) []string {
+	slog.Info("splitting by long paragraphs")
 	sentences := strings.Split(paragraph, ". ")
 	var sections []string
 
@@ -241,7 +242,7 @@ func semanticChunk(content string) ([]string, error) {
 	response, err := ollama.ChatCompletion(CHUNKING_MODEL, "", userPrompt)
 	if err != nil {
 		slog.Error("Chunking request failed", "model", CHUNKING_MODEL, "contentLength", len(content), "error", err)
-		return nil, fmt.Errorf("chunking failed: %w", err)
+		return nil, fmt.Errorf("error chunking: %w", err)
 	}
 
 	responseContent := response.Message.Content
@@ -249,9 +250,8 @@ func semanticChunk(content string) ([]string, error) {
 
 	var chunks []string
 	if err := json.Unmarshal([]byte(responseContent), &chunks); err != nil {
-		slog.Error("Failed to parse chunking response, falling back to single chunk", "responseLength", len(responseContent), "response", responseContent, "error", err)
-		// Fall back to treating the original content as a single chunk
-		return []string{content}, nil
+		slog.Error("Failed to parse chunking response", "responseLength", len(responseContent), "response", responseContent, "error", err)
+		return nil, fmt.Errorf("error parsing chunk response: %w", err)
 	}
 
 	return chunks, nil

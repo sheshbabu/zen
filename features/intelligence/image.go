@@ -23,7 +23,7 @@ func ProcessImageForEmbedding(filename string) error {
 	}
 
 	description, err := analyzeImage(filename)
-	if err != nil {
+	if err != nil || description == "" {
 		slog.Error("Failed to analyze image", "filename", filename, "error", err)
 		return fmt.Errorf("failed to analyze image: %w", err)
 	}

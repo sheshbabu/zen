@@ -34,20 +34,17 @@ func ProcessQueues() {
 		queue.QUEUE_IMAGE_PROCESS,
 	}
 
-	for {
-		hasWork := false
-
-		for _, queueType := range queueTypes {
+	for _, queueType := range queueTypes {
+		for {
 			if !isIntelligenceAvailable() {
 				return
 			}
 
 			task, err := queue.GetNextTask(queueType, queue.STATUS_QUEUED)
 			if err != nil {
-				continue // No tasks
+				break // No more tasks
 			}
 
-			hasWork = true
 			queue.UpdateTaskStatus(task.ID, queue.STATUS_PROCESSING)
 
 			entityID, ok := queue.ParseTaskPayload(task)
@@ -80,10 +77,6 @@ func ProcessQueues() {
 				slog.Info("processed task", "queueType", queueType, "taskID", task.ID, "entityID", entityID)
 				queue.RemoveTask(task.ID)
 			}
-		}
-
-		if !hasWork {
-			break
 		}
 	}
 }
