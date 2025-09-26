@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const IMAGE_ANALYSIS_PROMPT = "Generate a caption with all details of this image. Extract text if it exists. Do not add any introductory phrases like \"The image shows\" or \"This is a photo of\""
+const IMAGE_ANALYSIS_PROMPT = "Generate a caption with all details of this image and then extract any readable text. Do not add any introductory phrases like \"The image shows\" or \"This is a photo of\""
 const IMAGE_FALLBACK_PROMPT = "Generate a caption with all details of this image. Do not add any introductory phrases like \"The image shows\" or \"This is a photo of\""
 
 func ProcessImageForEmbedding(filename string) error {
