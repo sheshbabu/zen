@@ -3,7 +3,6 @@ package intelligence
 import "time"
 
 // Models
-const CHUNKING_MODEL = "gemma3n:e4b"
 const EMBEDDING_MODEL = "nomic-embed-text:latest"
 const VISION_MODEL = "qwen2.5vl:7b"
 
