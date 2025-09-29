@@ -64,8 +64,10 @@
                     font-weight: 600;
 
                     mark {
+                        background: rgba(250, 204, 21, 0.1);
                         color: var(--yellow-500);
-                        background-color: unset;
+                        border-radius: 4px;
+                        padding: 2px;
                     }
                 }
 
@@ -79,8 +81,10 @@
                     white-space: nowrap;
 
                     mark {
+                        background: rgba(250, 204, 21, 0.1);
                         color: var(--yellow-500);
-                        background-color: unset;
+                        border-radius: 4px;
+                        padding: 2px;
                         font-weight: 500;
                     }
                 }
