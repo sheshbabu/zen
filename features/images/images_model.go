@@ -317,6 +317,44 @@ func GetLinkedNotesByImage(filename string) ([]int, error) {
 	return noteIDs, nil
 }
 
+func GetImageByFilename(filename string) (Image, error) {
+	var image Image
+	query := `
+		SELECT
+			filename,
+			width,
+			height,
+			format,
+			aspect_ratio,
+			file_size,
+			caption,
+			created_at
+		FROM
+			images
+		WHERE
+			filename = ?
+	`
+
+	err := sqlite.DB.QueryRow(query, filename).Scan(
+		&image.Filename,
+		&image.Width,
+		&image.Height,
+		&image.Format,
+		&image.AspectRatio,
+		&image.FileSize,
+		&image.Caption,
+		&image.CreatedAt,
+	)
+
+	if err != nil {
+		err = fmt.Errorf("error retrieving image: %w", err)
+		slog.Error(err.Error())
+		return image, err
+	}
+
+	return image, nil
+}
+
 func GetImagesCount() (int, error) {
 	var count int
 	query := "SELECT COUNT(*) FROM images"

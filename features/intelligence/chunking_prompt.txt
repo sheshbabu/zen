@@ -1,9 +1,0 @@
-You will receive a note as input. Your task is to break it down into meaningful, self-contained chunks optimized for embedding in a vector database. Each chunk should be semantically coherent while preserving the original information accurately.
-
-**Output Format:**
-
-Return a JSON array of strings. Each string represents a chunk with resolved entity references:
-
-["Self-contained chunk with clear entity references", "Another chunk with resolved pronouns and references"]
-
-**Input Note:**

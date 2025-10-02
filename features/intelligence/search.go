@@ -2,37 +2,57 @@ package intelligence
 
 import (
 	"fmt"
-	"sort"
 	"time"
-	"zen/commons/qdrant"
 )
+
+const SEARCH_TIMEOUT = 200 * time.Millisecond
+
+type SemanticNoteResult struct {
+	NoteID    int      `json:"noteId"`
+	ChunkID   string   `json:"chunkId"`
+	Title     string   `json:"title"`
+	MatchText string   `json:"matchText"`
+	Tags      []string `json:"tags"`
+	UpdatedAt string   `json:"updatedAt"`
+	Score     float32  `json:"score"`
+}
+
+type SemanticImageResult struct {
+	Filename    string  `json:"filename"`
+	Description string  `json:"description"`
+	Width       int     `json:"width"`
+	Height      int     `json:"height"`
+	AspectRatio float64 `json:"aspectRatio"`
+	FileSize    int64   `json:"fileSize"`
+	Format      string  `json:"format"`
+	Score       float32 `json:"score"`
+}
 
 func SemanticNoteSearch(query string, limit int) ([]SemanticNoteResult, error) {
 	if !isIntelligenceEnabled {
 		return []SemanticNoteResult{}, nil
 	}
 
-	resultChan := make(chan SemanticSearchResults, 1)
+	resultChan := make(chan []SemanticNoteResult, 1)
+	errorChan := make(chan error, 1)
 
 	go func() {
-		resultChan <- executeNoteVectorSearch(query, limit)
+		results, err := SearchNotes(query, limit)
+		if err != nil {
+			errorChan <- err
+			return
+		}
+		resultChan <- results
 	}()
 
-	var results []qdrant.SearchResult
-	var err error
-
 	select {
-	case result := <-resultChan:
-		results, err = result.Results, result.Err
-	case <-time.After(SEARCH_TIMEOUT):
-		err = fmt.Errorf("note vector search timeout")
-	}
-
-	if err != nil {
+	case results := <-resultChan:
+		return results, nil
+	case err := <-errorChan:
 		return []SemanticNoteResult{}, err
+	case <-time.After(SEARCH_TIMEOUT):
+		return []SemanticNoteResult{}, fmt.Errorf("note semantic search timeout")
 	}
-
-	return convertToNoteMatches(results), nil
 }
 
 func SemanticImageSearch(query string, limit int) ([]SemanticImageResult, error) {
@@ -40,152 +60,24 @@ func SemanticImageSearch(query string, limit int) ([]SemanticImageResult, error)
 		return []SemanticImageResult{}, nil
 	}
 
-	resultChan := make(chan SemanticSearchResults, 1)
+	resultChan := make(chan []SemanticImageResult, 1)
+	errorChan := make(chan error, 1)
 
 	go func() {
-		resultChan <- executeImageVectorSearch(query, limit)
+		results, err := SearchImages(query, limit)
+		if err != nil {
+			errorChan <- err
+			return
+		}
+		resultChan <- results
 	}()
 
-	var results []qdrant.SearchResult
-	var err error
-
 	select {
-	case result := <-resultChan:
-		results, err = result.Results, result.Err
-	case <-time.After(SEARCH_TIMEOUT):
-		err = fmt.Errorf("image vector search timeout")
-	}
-
-	if err != nil {
+	case results := <-resultChan:
+		return results, nil
+	case err := <-errorChan:
 		return []SemanticImageResult{}, err
-	}
-
-	return convertToImageMatches(results), nil
-}
-
-func executeNoteVectorSearch(query string, limit int) SemanticSearchResults {
-	queryEmbedding, err := embed(query)
-	if err != nil {
-		return SemanticSearchResults{Results: nil, Err: err}
-	}
-
-	collectionName := NOTE_COLLECTION_NAME
-	results, err := qdrant.SearchSimilar(collectionName, queryEmbedding, limit, nil)
-	if err != nil {
-		return SemanticSearchResults{Results: nil, Err: fmt.Errorf("failed to search similar note vectors: %w", err)}
-	}
-
-	return SemanticSearchResults{Results: results, Err: nil}
-}
-
-func executeImageVectorSearch(query string, limit int) SemanticSearchResults {
-	queryEmbedding, err := embed(query)
-	if err != nil {
-		return SemanticSearchResults{Results: nil, Err: err}
-	}
-
-	collectionName := IMAGE_COLLECTION_NAME
-	results, err := qdrant.SearchSimilar(collectionName, queryEmbedding, limit, nil)
-	if err != nil {
-		return SemanticSearchResults{Results: nil, Err: fmt.Errorf("failed to search similar image vectors: %w", err)}
-	}
-
-	return SemanticSearchResults{Results: results, Err: nil}
-}
-
-func convertToNoteMatches(results []qdrant.SearchResult) []SemanticNoteResult {
-	noteMap := make(map[int]*SemanticNoteResult)
-
-	for _, result := range results {
-		match := extractNoteMatch(result)
-		if match != nil && match.Score >= SEMANTIC_SCORE_THRESHOLD {
-			existing, exists := noteMap[match.NoteID]
-			if !exists || match.Score > existing.Score {
-				noteMap[match.NoteID] = match
-			}
-		}
-	}
-
-	matches := make([]SemanticNoteResult, 0, len(noteMap))
-	for _, match := range noteMap {
-		matches = append(matches, *match)
-	}
-
-	// Sort by score (highest first)
-	sort.Slice(matches, func(i, j int) bool {
-		return matches[i].Score > matches[j].Score
-	})
-
-	return matches
-}
-
-func convertToImageMatches(results []qdrant.SearchResult) []SemanticImageResult {
-	imageMap := make(map[string]*SemanticImageResult)
-
-	for _, result := range results {
-		match := extractImageMatch(result)
-		if match != nil && match.Score >= SEMANTIC_SCORE_THRESHOLD {
-			existing, exists := imageMap[match.Filename]
-			if !exists || match.Score > existing.Score {
-				imageMap[match.Filename] = match
-			}
-		}
-	}
-
-	matches := make([]SemanticImageResult, 0, len(imageMap))
-	for _, match := range imageMap {
-		matches = append(matches, *match)
-	}
-
-	// Sort by score (highest first)
-	sort.Slice(matches, func(i, j int) bool {
-		return matches[i].Score > matches[j].Score
-	})
-
-	return matches
-}
-
-func extractNoteMatch(result qdrant.SearchResult) *SemanticNoteResult {
-	noteID, ok := result.Payload["note_id"].(float64)
-	if !ok {
-		return nil
-	}
-
-	text, ok := result.Payload["text"].(string)
-	if !ok {
-		return nil
-	}
-
-	chunkID, _ := result.Payload["chunk_id"].(string)
-	title, _ := result.Payload["title"].(string)
-	tags, _ := result.Payload["tags"].([]any)
-	updatedAt, _ := result.Payload["updated_at"].(string)
-
-	return &SemanticNoteResult{
-		NoteID:    int(noteID),
-		ChunkID:   chunkID,
-		Title:     title,
-		MatchText: text,
-		Tags:      tags,
-		UpdatedAt: updatedAt,
-		Score:     result.Score,
-	}
-}
-
-func extractImageMatch(result qdrant.SearchResult) *SemanticImageResult {
-	description, ok := result.Payload["description"].(string)
-	if !ok {
-		return nil
-	}
-
-	filename, _ := result.Payload["filename"].(string)
-	if filename == "" {
-		filename = "Unknown Image"
-	}
-
-	return &SemanticImageResult{
-		Filename:    filename,
-		Description: description,
-		Score:       result.Score,
+	case <-time.After(SEARCH_TIMEOUT):
+		return []SemanticImageResult{}, fmt.Errorf("image semantic search timeout")
 	}
 }

@@ -2,11 +2,10 @@ package intelligence
 
 import (
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
-	"zen/commons/ollama"
-	"zen/commons/qdrant"
 	"zen/commons/queue"
 	"zen/commons/utils"
 )
@@ -14,40 +13,8 @@ import (
 var isIntelligenceEnabled bool
 
 type HealthStatus struct {
-	IsEnabled         bool `json:"is_enabled"`
-	IsOllamaAvailable bool `json:"is_ollama_available"`
-	IsQDrantAvailable bool `json:"is_qdrant_available"`
-}
-
-type ProcessRequest struct {
-	Content string `json:"content"`
-}
-
-type ProcessNoteResponse struct {
-	IsSuccess bool     `json:"success"`
-	Message   string   `json:"message"`
-	ChunkIDs  []string `json:"chunk_ids,omitempty"`
-}
-
-type SemanticNoteResult struct {
-	NoteID    int     `json:"noteId"`
-	ChunkID   string  `json:"chunkId"`
-	Title     string  `json:"title"`
-	MatchText string  `json:"matchText"`
-	Tags      []any   `json:"tags"`
-	UpdatedAt string  `json:"updatedAt"`
-	Score     float32 `json:"score"`
-}
-
-type SemanticImageResult struct {
-	Filename    string  `json:"filename"`
-	Description string  `json:"description"`
-	Score       float32 `json:"score"`
-}
-
-type SemanticSearchResults struct {
-	Results []qdrant.SearchResult
-	Err     error
+	IsEnabled   bool `json:"is_enabled"`
+	IsAvailable bool `json:"is_available"`
 }
 
 func init() {
@@ -55,29 +22,15 @@ func init() {
 
 	if isIntelligenceEnabled {
 		slog.Info("intelligence feature enabled")
-
-		noteCollectionName := NOTE_COLLECTION_NAME
-		err := qdrant.CreateCollection(noteCollectionName, 768)
-		if err == nil {
-			slog.Info("created collection", "name", noteCollectionName)
-		}
-
-		imageCollectionName := IMAGE_COLLECTION_NAME
-		err = qdrant.CreateCollection(imageCollectionName, 768)
-		if err == nil {
-			slog.Info("created collection", "name", imageCollectionName)
-		}
 	}
 }
 
 func HandleAvailability(w http.ResponseWriter, r *http.Request) {
-	isOllamaAvailable := ollama.IsHealthy() == nil
-	isQdrantAvailable := qdrant.IsHealthy() == nil
+	isIntelligenceServiceAvailable := IsHealthy() == nil
 
 	status := HealthStatus{
-		IsEnabled:         isIntelligenceEnabled,
-		IsOllamaAvailable: isOllamaAvailable,
-		IsQDrantAvailable: isQdrantAvailable,
+		IsEnabled:   isIntelligenceEnabled,
+		IsAvailable: isIntelligenceServiceAvailable,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -100,4 +53,45 @@ func HandleQueueStats(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(stats)
+}
+
+func HandleIndexAllContent(w http.ResponseWriter, r *http.Request) {
+	if !isIntelligenceAvailable() {
+		utils.SendErrorResponse(w, "INTELLIGENCE_UNAVAILABLE", "Intelligence features are not available", nil, http.StatusServiceUnavailable)
+		return
+	}
+
+	slog.Info("starting content indexing for all notes and images")
+
+	var totalTasks int
+
+	noteTasks, err := indexAllNotes()
+	if err != nil {
+		utils.SendErrorResponse(w, "INDEXING_FAILED", "Failed to index notes", err, http.StatusInternalServerError)
+		return
+	}
+	totalTasks += noteTasks
+	slog.Info("added note indexing tasks to queue", "count", noteTasks)
+
+	imageTasks, err := indexAllImages()
+	if err != nil {
+		utils.SendErrorResponse(w, "INDEXING_FAILED", "Failed to index images", err, http.StatusInternalServerError)
+		return
+	}
+	totalTasks += imageTasks
+	slog.Info("added image indexing tasks to queue", "count", imageTasks)
+
+	slog.Info("content indexing initiated", "totalTasks", totalTasks)
+	tasksAdded := totalTasks
+
+	response := map[string]interface{}{
+		"success": true,
+		"message": fmt.Sprintf("Content indexing initiated. Added %d tasks to queue.", tasksAdded),
+	}
+
+	ProcessQueues()
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
 }
