@@ -18,6 +18,8 @@
         height: 20px;
         margin: var(--spacing-2);
         margin-right: 0;
+        /* align with text in listview */
+        margin-left: 10px;
         transition-property: stroke;
         transition-duration: 500ms;
 

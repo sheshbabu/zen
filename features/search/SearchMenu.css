@@ -47,8 +47,9 @@
             align-items: center;
             text-decoration: none;
             color: inherit;
-            padding: 10px;
-            border-top: 1px solid var(--neutral-100);
+            padding: 6px;
+            margin: 4px;
+            border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.5s;
 
