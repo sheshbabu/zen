@@ -15,6 +15,7 @@ export default function SearchMenu() {
   const [searchHistory, setSearchHistory] = useState([]);
 
   const inputRef = useRef(null);
+  const debounceTimerRef = useRef(null);
 
   function handleCloseModal() {
     closeModal();
@@ -31,20 +32,26 @@ export default function SearchMenu() {
     const value = e.target.value;
     setQuery(value);
 
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
     if (value.trim() === "") {
       setResults({ lexical_notes: [], semantic_notes: [], semantic_images: [], tags: [] });
       setSelectedItem(searchHistory.length > 0 ? searchHistory[0] : null);
       return;
     }
 
-    ApiClient.search(value)
-      .then(searchResults => {
-        setResults(searchResults);
-        const allItems = [...searchResults.lexical_notes, ...searchResults.semantic_notes, ...searchResults.semantic_images, ...searchResults.tags];
-        if (allItems.length > 0) {
-          setSelectedItem(allItems[0]);
-        }
-      });
+    debounceTimerRef.current = setTimeout(() => {
+      ApiClient.search(value)
+        .then(searchResults => {
+          setResults(searchResults);
+          const allItems = [...searchResults.lexical_notes, ...searchResults.semantic_notes, ...searchResults.semantic_images, ...searchResults.tags];
+          if (allItems.length > 0) {
+            setSelectedItem(allItems[0]);
+          }
+        });
+    }, 200);
   }
 
   function handleKeyUp(e) {
