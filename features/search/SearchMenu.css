@@ -105,13 +105,11 @@
                 box-sizing: border-box;
                 object-fit: cover;
                 border-radius: 4px;
-                transition-property: box-shadow, opacity;
-                transition-duration: 500ms;
                 box-shadow: var(--shadow-2);
                 cursor: pointer;
+                transition: opacity 150ms;
 
                 &:hover {
-                    box-shadow: var(--shadow-4);
                     opacity: 0.8;
                 }
 
