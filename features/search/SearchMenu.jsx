@@ -2,7 +2,8 @@ import { h, useEffect, useState, useRef } from "../../assets/preact.esm.js"
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon, TagIcon } from "../../commons/components/Icon.jsx";
-import { ModalBackdrop, ModalContainer, closeModal } from "../../commons/components/Modal.jsx";
+import { ModalBackdrop, ModalContainer, closeModal, openModal } from "../../commons/components/Modal.jsx";
+import Lightbox from "../../commons/components/Lightbox.jsx";
 import "./SearchMenu.css";
 
 const SEARCH_HISTORY_KEY = 'search-history';
@@ -99,9 +100,17 @@ export default function SearchMenu() {
       navigateTo(`/?tagId=${item.tagId}`);
       closeModal();
     } else if (item.filename) {
-      // For semantic image results, we don't navigate anywhere yet
-      // This could be enhanced later to show image details or navigate to related notes
-      closeModal();
+      const imageDetails = results.semantic_images.map(image => ({
+        url: `/images/${image.filename}`,
+        width: image.width,
+        height: image.height,
+        aspectRatio: image.aspectRatio,
+        filename: image.filename,
+      }));
+
+      const selectedImage = imageDetails.find(img => img.filename === item.filename);
+
+      openModal(<Lightbox selectedImage={selectedImage} imageDetails={imageDetails} onClose={closeModal} />);
     }
   }
 

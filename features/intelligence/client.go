@@ -13,7 +13,7 @@ import (
 var baseURL string
 var httpClient *http.Client
 
-const CLIENT_TIMEOUT = 60 * time.Second
+const CLIENT_TIMEOUT = 5 * time.Minute
 
 type EmbedNoteRequest struct {
 	Title     string   `json:"title"`
