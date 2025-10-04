@@ -1,11 +1,14 @@
 import { h, useEffect, useState } from "../../assets/preact.esm.js";
 import { ModalBackdrop, ModalContainer } from "./Modal.jsx";
+import ApiClient from "../http/ApiClient.js";
 import "./Lightbox.css";
 
 export default function Lightbox({ selectedImage, imageDetails, onClose }) {
   const [currentImage, setCurrentImage] = useState(selectedImage);
   const [isZoomed, setIsZoomed] = useState(false);
   const [shouldShowZoom, setShouldShowZoom] = useState(false);
+  const [similarImages, setSimilarImages] = useState([]);
+  const [isSimilarImagesVisible, setIsSimilarImagesVisible] = useState(false);
 
   if (!currentImage) {
     return null;
@@ -20,6 +23,15 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
 
     setShouldShowZoom(scaledHeight > viewportHeight);
     setIsZoomed(false);
+
+    setSimilarImages([]);
+    ApiClient.getSimilarImages(currentImage.filename)
+      .then(results => {
+        setSimilarImages(results);
+      })
+      .catch(err => {
+        console.error('Failed to fetch similar images:', err);
+      });
   }, [currentImage]);
 
   useEffect(() => {
@@ -56,6 +68,52 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
     }
   }
 
+  function handleSimilarImagesClick() {
+    setIsSimilarImagesVisible(!isSimilarImagesVisible);
+  }
+
+  function handleSimilarImageClick(image) {
+    const imageWithUrl = {
+      url: `/images/${image.filename}`,
+      width: image.width,
+      height: image.height,
+      aspectRatio: image.aspectRatio,
+      filename: image.filename,
+    };
+    setCurrentImage(imageWithUrl);
+  }
+
+  let similarImagesButton = null;
+  if (similarImages.length > 0 && isZoomed === false) {
+    const buttonText = isSimilarImagesVisible === true ? "Hide Similar Images" : "Similar Images";
+    similarImagesButton = (
+      <div className="lightbox-button-container">
+        <button className="lightbox-similar-images-button" onClick={handleSimilarImagesClick}>
+          {buttonText}
+        </button>
+      </div>
+    );
+  }
+
+  let similarImagesGrid = null;
+  if (isSimilarImagesVisible === true && similarImages.length > 0 && isZoomed === false) {
+    const gridImages = similarImages.map(image => (
+      <img
+        key={image.filename}
+        src={`/images/${image.filename}`}
+        alt=""
+        className="lightbox-similar-image"
+        onClick={() => handleSimilarImageClick(image)}
+      />
+    ));
+
+    similarImagesGrid = (
+      <div className="lightbox-similar-images-grid">
+        {gridImages}
+      </div>
+    );
+  }
+
   return (
     <ModalBackdrop onClose={onClose} isCentered={true}>
       <ModalContainer className={`lightbox ${isZoomed ? 'zoomed' : ''}`}>
@@ -67,6 +125,8 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
             onClick={handleImageClick}
           />
         </div>
+        {similarImagesGrid}
+        {similarImagesButton}
       </ModalContainer>
     </ModalBackdrop>
   );

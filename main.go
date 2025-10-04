@@ -123,6 +123,7 @@ func newRouter() *http.ServeMux {
 	addPrivateRoute(mux, "GET /api/intelligence/availability/", intelligence.HandleAvailability)
 	addPrivateRoute(mux, "POST /api/intelligence/index/", intelligence.HandleIndexAllContent)
 	addPrivateRoute(mux, "GET /api/intelligence/queue/", intelligence.HandleQueueStats)
+	addPrivateRoute(mux, "GET /api/intelligence/similarity/images/{filename}/", intelligence.HandleSimilarImages)
 
 	addPrivateRoute(mux, "GET /api/templates/", templates.HandleGetTemplates)
 	addPrivateRoute(mux, "GET /api/templates/{templateId}/", templates.HandleGetTemplate)

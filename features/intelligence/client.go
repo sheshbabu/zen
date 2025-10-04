@@ -45,6 +45,10 @@ type ImageSearchResponse struct {
 	Results []SemanticImageResult `json:"results"`
 }
 
+type SimilarImagesResponse struct {
+	Results []SemanticImageResult `json:"results"`
+}
+
 func init() {
 	baseURL = os.Getenv("ZEN_INTELLIGENCE_URL")
 	if baseURL == "" {
@@ -217,6 +221,27 @@ func SearchImages(query string, limit int) ([]SemanticImageResult, error) {
 	}
 
 	return searchResponse.Results, nil
+}
+
+func FindSimilarImages(filename string, limit int, threshold float64) ([]SemanticImageResult, error) {
+	url := fmt.Sprintf("%s/similarity/images/%s?limit=%d&threshold=%.2f", baseURL, filename, limit, threshold)
+	resp, err := httpClient.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find similar images: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("failed to find similar images: status %d, body: %s", resp.StatusCode, string(body))
+	}
+
+	var similarResponse SimilarImagesResponse
+	if err := json.NewDecoder(resp.Body).Decode(&similarResponse); err != nil {
+		return nil, fmt.Errorf("failed to decode similar images response: %w", err)
+	}
+
+	return similarResponse.Results, nil
 }
 
 func IsHealthy() error {

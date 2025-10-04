@@ -227,6 +227,12 @@ async function search(query) {
   return await request('GET', `/api/search?query=${query}`);
 }
 
+// Intelligence
+
+async function getSimilarImages(filename) {
+  return await request('GET', `/api/intelligence/similarity/images/${filename}/`);
+}
+
 // Import
 
 async function importFile(formData) {
@@ -329,6 +335,7 @@ export default {
   getImages,
   uploadImage,
   search,
+  getSimilarImages,
   importFile,
   exportNotes,
   getTemplates,

@@ -1,22 +1,25 @@
 .lightbox {
     max-width: 95vw;
     max-height: 95vh;
-    overflow: hidden;
     background-color: transparent;
     border: none;
     box-shadow: none;
     animation-duration: 0.1s;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
 
     .lightbox-image-container {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 100%;
-        height: 100%;
+        flex-shrink: 0;
 
         .lightbox-image {
             max-width: 95vw;
-            max-height: 95vh;
+            max-height: calc(95vh - 48px);
             width: auto;
             height: auto;
             object-fit: contain;
@@ -28,16 +31,70 @@
         }
     }
 
+    .lightbox-button-container {
+        min-height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        .lightbox-similar-images-button {
+            padding: 6px 12px;
+            background-color: var(--neutral-50);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font: var(--sm);
+            font-weight: 500;
+            animation: fadeIn 300ms ease-in;
+            transition: background-color var(--transition-normal);
+
+            &:hover {
+                background-color: var(--neutral-200);
+            }
+
+            &:active {
+                transform: scale(0.98);
+            }
+        }
+    }
+
+    .lightbox-similar-images-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 10px 10px 0 10px;
+        justify-content: center;
+        animation: fadeIn 0.3s ease-in;
+
+        .lightbox-similar-image {
+            height: 100px;
+            width: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: var(--shadow-2);
+            transition: opacity 150ms;
+
+            &:hover {
+                opacity: 0.8;
+            }
+
+            &:active {
+                transform: scale(0.98);
+                transition: transform 150ms ease-out;
+            }
+        }
+    }
+
     &.zoomed {
         max-width: 80vw;
         max-height: 95vh;
-        overflow-y: auto;
-        overflow-x: hidden;
 
         .lightbox-image-container {
             align-items: flex-start;
             justify-content: center;
-            min-height: 100%;
 
             .lightbox-image {
                 width: 80vw;
@@ -51,5 +108,15 @@
                 }
             }
         }
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
     }
 }
