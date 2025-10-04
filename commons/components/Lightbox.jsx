@@ -81,22 +81,13 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
       filename: image.filename,
     };
     setCurrentImage(imageWithUrl);
+    setIsSimilarImagesVisible(false);
   }
 
-  let similarImagesButton = null;
-  if (similarImages.length > 0 && isZoomed === false) {
-    const buttonText = isSimilarImagesVisible === true ? "Hide Similar Images" : "Similar Images";
-    similarImagesButton = (
-      <div className="lightbox-button-container">
-        <button className="lightbox-similar-images-button" onClick={handleSimilarImagesClick}>
-          {buttonText}
-        </button>
-      </div>
-    );
-  }
+  let mainContent = null;
+  let buttonContainer = null;
 
-  let similarImagesGrid = null;
-  if (isSimilarImagesVisible === true && similarImages.length > 0 && isZoomed === false) {
+  if (isZoomed === false && isSimilarImagesVisible === true && similarImages.length > 0) {
     const gridImages = similarImages.map(image => (
       <img
         key={image.filename}
@@ -107,26 +98,47 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
       />
     ));
 
-    similarImagesGrid = (
+    mainContent = (
       <div className="lightbox-similar-images-grid">
         {gridImages}
       </div>
     );
+
+    buttonContainer = (
+      <div className="lightbox-button-container">
+        <button className="lightbox-similar-images-button" onClick={handleSimilarImagesClick}>
+          Back to Image
+        </button>
+      </div>
+    );
+  } else {
+    mainContent = (
+      <div className="lightbox-image-container">
+        <img
+          src={currentImage.url}
+          alt=""
+          className={shouldShowZoom === true ? 'lightbox-image zoomable' : 'lightbox-image'}
+          onClick={handleImageClick}
+        />
+      </div>
+    );
+
+    if (isZoomed === false && similarImages.length > 0) {
+      buttonContainer = (
+        <div className="lightbox-button-container">
+          <button className="lightbox-similar-images-button" onClick={handleSimilarImagesClick}>
+            Similar Images
+          </button>
+        </div>
+      );
+    }
   }
 
   return (
     <ModalBackdrop onClose={onClose} isCentered={true}>
-      <ModalContainer className={`lightbox ${isZoomed ? 'zoomed' : ''}`}>
-        <div className="lightbox-image-container">
-          <img
-            src={currentImage.url}
-            alt=""
-            className={`lightbox-image ${shouldShowZoom ? 'zoomable' : ''}`}
-            onClick={handleImageClick}
-          />
-        </div>
-        {similarImagesGrid}
-        {similarImagesButton}
+      <ModalContainer className={isZoomed === true ? 'lightbox zoomed' : 'lightbox'}>
+        {mainContent}
+        {buttonContainer}
       </ModalContainer>
     </ModalBackdrop>
   );
