@@ -45,10 +45,11 @@
 
 .toc-popover {
   position: fixed;
-  left: 60px;
+  left: 30px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 1;
+  animation: toc-slide-right 300ms ease-out;
 
   .toc-popover-content {
     background: var(--neutral-800);
@@ -75,7 +76,7 @@
         font-size: 12px;
 
         &:hover {
-          background: var(--neutral-700);
+          background-color: var(--neutral-700);
           color: var(--neutral-100);
         }
 
@@ -84,6 +85,18 @@
         }
       }
     }
+  }
+}
+
+@keyframes toc-slide-right {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
   }
 }
 
