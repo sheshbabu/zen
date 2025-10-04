@@ -157,7 +157,7 @@ func HandleIncrementTemplateUsage(w http.ResponseWriter, r *http.Request) {
 }
 
 func processTemplatePlaceholders(content string) string {
-	now := time.Now()
+	now := time.Now().Local()
 
 	// Handle custom date formats: {{date:01/02/2006}}
 	customDateRegex := regexp.MustCompile(`\{\{date:([^}]+)\}\}`)
