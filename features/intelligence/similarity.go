@@ -23,7 +23,8 @@ func HandleSimilarImages(w http.ResponseWriter, r *http.Request) {
 	results, err := FindSimilarImages(filename, 10, 0.5)
 	if err != nil {
 		slog.Error("failed to find similar images", "error", err, "filename", filename)
-		utils.SendErrorResponse(w, "INTELLIGENCE_ERROR", "failed to find similar images", err, http.StatusInternalServerError)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode([]SemanticImageResult{})
 		return
 	}
 
