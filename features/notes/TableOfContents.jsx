@@ -6,7 +6,7 @@ export default function TableOfContents({ content, isExpanded, isEditable, isNew
   const headings = extractHeadings(content);
   const hideTimeoutRef = useRef(null);
 
-  if (isExpanded !== true || isEditable === true || isNewNote === true || headings.length === 0) {
+  if (isExpanded !== true || isEditable === true || isNewNote === true || headings.length < 4) {
     const tocRoot = document.querySelector('.toc-root');
     if (tocRoot) {
       render(null, tocRoot);
