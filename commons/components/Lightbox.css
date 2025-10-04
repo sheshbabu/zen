@@ -16,6 +16,7 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
+        position: relative;
 
         .lightbox-image {
             max-width: 95vw;
@@ -28,6 +29,47 @@
             &.zoomable {
                 cursor: zoom-in;
             }
+        }
+
+        .lightbox-controls {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+            z-index: 1;
+
+
+            .lightbox-similar-button,
+            .lightbox-close-button {
+                padding: 8px;
+                cursor: pointer;
+                border-radius: 4px;
+                background-color: rgba(0, 0, 0, 0.5);
+                transition: background-color var(--transition-normal);
+
+                svg {
+                    width: 20px;
+                    height: 20px;
+
+                    line,
+                    circle,
+                    rect,
+                    path {
+                        stroke: white;
+                    }
+                }
+
+                &:hover {
+                    background-color: rgba(0, 0, 0, 0.7);
+                }
+            }
+        }
+
+        &:hover .lightbox-controls {
+            opacity: 1;
         }
     }
 

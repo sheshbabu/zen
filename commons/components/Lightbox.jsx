@@ -1,5 +1,6 @@
 import { h, useEffect, useState } from "../../assets/preact.esm.js";
 import { ModalBackdrop, ModalContainer } from "./Modal.jsx";
+import { CloseIcon, ImagesIcon } from "./Icon.jsx";
 import ApiClient from "../http/ApiClient.js";
 import "./Lightbox.css";
 
@@ -87,6 +88,8 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
   let mainContent = null;
   let buttonContainer = null;
 
+  const shouldShowSimilarImagesButton = similarImages.length > 0;
+
   if (isZoomed === false && isSimilarImagesVisible === true && similarImages.length > 0) {
     const gridImages = similarImages.map(image => (
       <img
@@ -112,6 +115,15 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
       </div>
     );
   } else {
+    let similarImagesButton = null;
+    if (shouldShowSimilarImagesButton === true) {
+      similarImagesButton = (
+        <div className="lightbox-similar-button" onClick={handleSimilarImagesClick}>
+          <ImagesIcon />
+        </div>
+      );
+    }
+
     mainContent = (
       <div className="lightbox-image-container">
         <img
@@ -120,18 +132,15 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
           className={shouldShowZoom === true ? 'lightbox-image zoomable' : 'lightbox-image'}
           onClick={handleImageClick}
         />
+        <div className="lightbox-controls">
+          {similarImagesButton}
+          <div className="lightbox-close-button" onClick={onClose}>
+            <CloseIcon />
+          </div>
+        </div>
       </div>
     );
 
-    if (isZoomed === false && similarImages.length > 0) {
-      buttonContainer = (
-        <div className="lightbox-button-container">
-          <button className="lightbox-similar-images-button" onClick={handleSimilarImagesClick}>
-            Similar Images
-          </button>
-        </div>
-      );
-    }
   }
 
   return (
