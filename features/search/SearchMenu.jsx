@@ -4,10 +4,8 @@ import navigateTo from "../../commons/utils/navigateTo.js";
 import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon, TagIcon } from "../../commons/components/Icon.jsx";
 import { ModalBackdrop, ModalContainer, closeModal, openModal } from "../../commons/components/Modal.jsx";
 import Lightbox from "../../commons/components/Lightbox.jsx";
+import SearchHistory from "../../commons/preferences/SearchHistory.js";
 import "./SearchMenu.css";
-
-const SEARCH_HISTORY_KEY = 'search-history';
-const MAX_HISTORY_ENTRIES = 5;
 
 export default function SearchMenu() {
   const [query, setQuery] = useState("");
@@ -26,7 +24,7 @@ export default function SearchMenu() {
     if (inputRef.current) {
       inputRef.current.focus();
     }
-    setSearchHistory(getSearchHistory());
+    setSearchHistory(SearchHistory.getItems());
   }, []);
 
   function handleChange(e) {
@@ -92,11 +90,11 @@ export default function SearchMenu() {
 
   function handleResultClick(item) {
     if (item.noteId) {
-      saveToSearchHistory(item);
+      SearchHistory.saveItem(item);
       navigateTo(`/notes/${item.noteId}`);
       closeModal();
     } else if (item.tagId) {
-      saveToSearchHistory(item);
+      SearchHistory.saveItem(item);
       navigateTo(`/?tagId=${item.tagId}`);
       closeModal();
     } else if (item.filename) {
@@ -265,40 +263,6 @@ function SearchResultImages({ items, onClick }) {
       {images}
     </div>
   );
-}
-
-function getSearchHistory() {
-  try {
-    const history = localStorage.getItem(SEARCH_HISTORY_KEY);
-    return history ? JSON.parse(history) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveToSearchHistory(item) {
-  try {
-    let history = getSearchHistory();
-
-    const existingIndex = history.findIndex(h =>
-      (h.noteId && h.noteId === item.noteId) ||
-      (h.tagId && h.tagId === item.tagId)
-    );
-
-    if (existingIndex !== -1) {
-      history.splice(existingIndex, 1);
-    }
-
-    history.unshift(item);
-
-    if (history.length > MAX_HISTORY_ENTRIES) {
-      history = history.slice(0, MAX_HISTORY_ENTRIES);
-    }
-
-    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
-  } catch {
-    // Ignore localStorage errors
-  }
 }
 
 function getHighlightedSnippet(highlightedContent) {

@@ -8,6 +8,7 @@ import isMobile from "../../commons/utils/isMobile.js";
 import useSearchParams from "../../commons/components/useSearchParams.jsx";
 import { useAppContext } from "../../commons/contexts/AppContext.jsx";
 import { NotesProvider, useNotes } from "../../commons/contexts/NotesContext.jsx";
+import ViewPreferences from "../../commons/preferences/ViewPreferences.js";
 
 export default function NotesPage({ noteId }) {
   return (
@@ -18,7 +19,6 @@ export default function NotesPage({ noteId }) {
 }
 
 function NotesPageContent({ noteId }) {
-  const [selectedView, setSelectedView] = useState("list"); // "list" || "card" || "gallery"
   const [isSidebarOpen, setIsSidebarOpen] = useState(isMobile() ? false : true);
 
   const { refreshTags, refreshFocusModes } = useAppContext();
@@ -48,6 +48,10 @@ function NotesPageContent({ noteId }) {
   const isArchivesPage = searchParams.get("isArchived") === "true";
   const isTrashPage = searchParams.get("isDeleted") === "true";
 
+  const [selectedView, setSelectedView] = useState(() => {
+    return ViewPreferences.getPreference(selectedFocusId, selectedTagId, isArchivesPage, isTrashPage);
+  });
+
   let listClassName = "notes-list-container";
   let editorClassName = "notes-editor-container";
 
@@ -65,6 +69,10 @@ function NotesPageContent({ noteId }) {
     refreshNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage);
     refreshImages(selectedTagId, selectedFocusId);
     refreshTags(selectedFocusId);
+
+    // Reload preference
+    const savedView = ViewPreferences.getPreference(selectedFocusId, selectedTagId, isArchivesPage, isTrashPage);
+    setSelectedView(savedView);
   }, [selectedTagId, selectedFocusId, isArchivesPage, isTrashPage, resetPagination, refreshNotes, refreshImages, refreshTags]);
 
   useEffect(() => {
@@ -106,6 +114,7 @@ function NotesPageContent({ noteId }) {
 
   function handleViewChange(newView) {
     setSelectedView(newView);
+    ViewPreferences.setPreference(newView, selectedFocusId, selectedTagId, isArchivesPage, isTrashPage);
   }
 
   if (selectedView === "list") {

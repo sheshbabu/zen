@@ -1,4 +1,5 @@
 import { h, useState, useEffect } from "../../assets/preact.esm.js";
+import ThemePreferences from "../../commons/preferences/ThemePreferences.js";
 
 const themes = [
   {
@@ -22,12 +23,12 @@ export default function AppearancePane() {
   const [selectedThemeId, setSelectedThemeId] = useState("system");
 
   useEffect(() => {
-    const savedThemeId = localStorage.getItem('theme-preference') || 'system';
+    const savedThemeId = ThemePreferences.getPreference();
     setSelectedThemeId(savedThemeId);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('theme-preference', selectedThemeId);
+    ThemePreferences.setPreference(selectedThemeId);
 
     if (selectedThemeId === 'system') {
       document.documentElement.removeAttribute('data-theme');
