@@ -1,4 +1,4 @@
-function createViewportManager(stage, layer) {
+function createViewportManager(stage, layer, onViewportChange) {
   let isPanning = false;
   let lastPos = null;
 
@@ -28,6 +28,10 @@ function createViewportManager(stage, layer) {
 
     stage.position(newPos);
     layer.draw();
+
+    if (onViewportChange) {
+      onViewportChange(clampedScale);
+    }
   }
 
   function startPan() {
@@ -61,6 +65,11 @@ function createViewportManager(stage, layer) {
     isPanning = false;
     lastPos = null;
     stage.container().style.cursor = 'default';
+
+    if (onViewportChange) {
+      onViewportChange(stage.scaleX());
+    }
+
     return true;
   }
 

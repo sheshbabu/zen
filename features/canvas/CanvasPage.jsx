@@ -44,14 +44,16 @@ export default function CanvasPage() {
     const layer = new window.Konva.Layer();
     stage.add(layer);
 
-    stage.scale({ x: 0.75, y: 0.75 });
-    setZoomLevel(0.75);
-
     layer.draw();
 
     stageRef.current = { stage, layer };
 
-    const viewportManager = ViewportManager.createViewportManager(stage, layer);
+    function handleViewportChange(scale) {
+      setZoomLevel(scale);
+      saveCanvasStateFromNodesRef();
+    }
+
+    const viewportManager = ViewportManager.createViewportManager(stage, layer, handleViewportChange);
     viewportManagerRef.current = viewportManager;
 
     const selectionManager = SelectionManager.createSelectionManager(stage, layer, nodesRef);
@@ -100,7 +102,13 @@ export default function CanvasPage() {
     const savedCanvas = CanvasStorage.loadCanvasState();
     const restored = JsonCanvas.fromJsonCanvas(savedCanvas);
 
-    viewportManager.setViewport(restored.viewport);
+    if (restored.viewport) {
+      viewportManager.setViewport(restored.viewport);
+      setZoomLevel(restored.viewport.scale);
+    } else {
+      stage.scale({ x: 0.75, y: 0.75 });
+      setZoomLevel(0.75);
+    }
 
     if (restored.nodes.length > 0) {
       const addedItemIds = new Set();
