@@ -2,7 +2,7 @@ import { h } from '../../assets/preact.esm.js';
 import { BackIcon, TrashIcon, ZoomInIcon, ZoomOutIcon, SidebarOpenIcon, SidebarCloseIcon, AlignStartHorizontalIcon, AlignStartVerticalIcon, AlignCenterHorizontalIcon, AlignCenterVerticalIcon, AlignEndHorizontalIcon, AlignEndVerticalIcon } from '../../commons/components/Icon.jsx';
 import './CanvasToolbar.css';
 
-export default function CanvasToolbar({ onBack, onDelete, onZoomIn, onZoomOut, onZoomReset, zoomLevel, onToggleSidebar, isSidebarOpen, onAlignTop, onAlignLeft, onAlignCenterHorizontal, onAlignCenterVertical, onAlignBottom, onAlignRight, hasMultiSelection }) {
+export default function CanvasToolbar({ onBack, onDelete, onZoom, zoomLevel, onToggleSidebar, isSidebarOpen, onAlign, hasMultiSelection }) {
   return (
     <div className="canvas-toolbar">
       <div className="canvas-toolbar-left">
@@ -17,35 +17,36 @@ export default function CanvasToolbar({ onBack, onDelete, onZoomIn, onZoomOut, o
         </button>
         <div className="canvas-toolbar-divider"></div>
         <div className="canvas-toolbar-alignment-group">
-          <button className="canvas-toolbar-button" onClick={onAlignLeft} disabled={hasMultiSelection !== true} title="Align Left">
+          <button className="canvas-toolbar-button" onClick={() => onAlign('left')} disabled={hasMultiSelection !== true} title="Align Left">
             <AlignStartVerticalIcon />
           </button>
-          <button className="canvas-toolbar-button" onClick={onAlignTop} disabled={hasMultiSelection !== true} title="Align Top">
+          <button className="canvas-toolbar-button" onClick={() => onAlign('top')} disabled={hasMultiSelection !== true} title="Align Top">
             <AlignStartHorizontalIcon />
           </button>
-          <button className="canvas-toolbar-button" onClick={onAlignBottom} disabled={hasMultiSelection !== true} title="Align Bottom">
+          <button className="canvas-toolbar-button" onClick={() => onAlign('bottom')} disabled={hasMultiSelection !== true} title="Align Bottom">
             <AlignEndHorizontalIcon />
           </button>
-          <button className="canvas-toolbar-button" onClick={onAlignRight} disabled={hasMultiSelection !== true} title="Align Right">
+          <button className="canvas-toolbar-button" onClick={() => onAlign('right')} disabled={hasMultiSelection !== true} title="Align Right">
             <AlignEndVerticalIcon />
           </button>
-          <button className="canvas-toolbar-button" onClick={onAlignCenterHorizontal} disabled={hasMultiSelection !== true} title="Align Center Horizontal">
+          <button className="canvas-toolbar-button" onClick={() => onAlign('center-horizontal')} disabled={hasMultiSelection !== true} title="Align Center Horizontal">
             <AlignCenterHorizontalIcon />
           </button>
-          <button className="canvas-toolbar-button" onClick={onAlignCenterVertical} disabled={hasMultiSelection !== true} title="Align Center Vertical">
+          <button className="canvas-toolbar-button" onClick={() => onAlign('center-vertical')} disabled={hasMultiSelection !== true} title="Align Center Vertical">
             <AlignCenterVerticalIcon />
           </button>
         </div>
         <div className="canvas-toolbar-divider"></div>
-        <button className="canvas-toolbar-button" onClick={onZoomOut}>
-          <ZoomOutIcon />
-        </button>
-        <button className="canvas-toolbar-button canvas-toolbar-zoom-level" onClick={onZoomReset}>
-          {Math.round(zoomLevel * 100)}%
-        </button>
-        <button className="canvas-toolbar-button" onClick={onZoomIn}>
+        <button className="canvas-toolbar-button" onClick={() => onZoom('in')}>
           <ZoomInIcon />
         </button>
+        <button className="canvas-toolbar-button canvas-toolbar-zoom-level" onClick={() => onZoom('reset')}>
+          {Math.round(zoomLevel * 100)}%
+        </button>
+        <button className="canvas-toolbar-button" onClick={() => onZoom('out')}>
+          <ZoomOutIcon />
+        </button>
+
         <div className="canvas-toolbar-divider"></div>
         <button className={`canvas-toolbar-button ${isSidebarOpen ? 'active' : ''}`} onClick={onToggleSidebar}>
           {isSidebarOpen ? <SidebarCloseIcon /> : <SidebarOpenIcon />}

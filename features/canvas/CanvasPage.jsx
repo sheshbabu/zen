@@ -275,38 +275,27 @@ export default function CanvasPage() {
     window.history.back();
   }
 
-  function handleZoomIn() {
+  function handleZoom(type) {
     if (stageRef.current === null) {
-      return
+      return;
     }
-    const stage = stageRef.current.stage;
-    const newScale = Math.min(5, stage.scaleX() * 1.2);
-    stage.scale({ x: newScale, y: newScale });
-    setZoomLevel(newScale);
-    stageRef.current.layer.draw();
-    saveCanvasStateFromNodesRef();
-  }
 
-  function handleZoomOut() {
-    if (stageRef.current === null) {
-      return
-    }
     const stage = stageRef.current.stage;
-    const newScale = Math.max(0.1, stage.scaleX() / 1.2);
-    stage.scale({ x: newScale, y: newScale });
-    setZoomLevel(newScale);
-    stageRef.current.layer.draw();
-    saveCanvasStateFromNodesRef();
-  }
 
-  function handleZoomReset() {
-    if (stageRef.current === null) {
-      return
+    if (type === 'in') {
+      const newScale = Math.min(5, stage.scaleX() * 1.2);
+      stage.scale({ x: newScale, y: newScale });
+      setZoomLevel(newScale);
+    } else if (type === 'out') {
+      const newScale = Math.max(0.1, stage.scaleX() / 1.2);
+      stage.scale({ x: newScale, y: newScale });
+      setZoomLevel(newScale);
+    } else if (type === 'reset') {
+      stage.scale({ x: 1, y: 1 });
+      stage.position({ x: 0, y: 0 });
+      setZoomLevel(1);
     }
-    const stage = stageRef.current.stage;
-    stage.scale({ x: 1, y: 1 });
-    stage.position({ x: 0, y: 0 });
-    setZoomLevel(1);
+
     stageRef.current.layer.draw();
     saveCanvasStateFromNodesRef();
   }
@@ -366,7 +355,7 @@ export default function CanvasPage() {
     );
   }
 
-  function handleAlignTop() {
+  function handleAlign(type) {
     if (selectionManagerRef.current === null || stageRef.current === null) {
       return;
     }
@@ -376,113 +365,27 @@ export default function CanvasPage() {
       return;
     }
 
-    const minY = Math.min(...selectedNodes.map(node => node.y()));
-
-    selectedNodes.forEach(node => {
-      node.y(minY);
-    });
-
-    stageRef.current.layer.draw();
-    saveCanvasStateFromNodesRef();
-  }
-
-  function handleAlignLeft() {
-    if (selectionManagerRef.current === null || stageRef.current === null) {
-      return;
+    if (type === 'top') {
+      const minY = Math.min(...selectedNodes.map(node => node.y()));
+      selectedNodes.forEach(node => node.y(minY));
+    } else if (type === 'left') {
+      const minX = Math.min(...selectedNodes.map(node => node.x()));
+      selectedNodes.forEach(node => node.x(minX));
+    } else if (type === 'center-horizontal') {
+      const ys = selectedNodes.map(node => node.y() + node.height() / 2);
+      const avgY = ys.reduce((sum, y) => sum + y, 0) / ys.length;
+      selectedNodes.forEach(node => node.y(avgY - node.height() / 2));
+    } else if (type === 'center-vertical') {
+      const xs = selectedNodes.map(node => node.x() + node.width() / 2);
+      const avgX = xs.reduce((sum, x) => sum + x, 0) / xs.length;
+      selectedNodes.forEach(node => node.x(avgX - node.width() / 2));
+    } else if (type === 'bottom') {
+      const maxY = Math.max(...selectedNodes.map(node => node.y() + node.height()));
+      selectedNodes.forEach(node => node.y(maxY - node.height()));
+    } else if (type === 'right') {
+      const maxX = Math.max(...selectedNodes.map(node => node.x() + node.width()));
+      selectedNodes.forEach(node => node.x(maxX - node.width()));
     }
-
-    const selectedNodes = Array.from(selectionManagerRef.current.getSelectedNodes());
-    if (selectedNodes.length < 2) {
-      return;
-    }
-
-    const minX = Math.min(...selectedNodes.map(node => node.x()));
-
-    selectedNodes.forEach(node => {
-      node.x(minX);
-    });
-
-    stageRef.current.layer.draw();
-    saveCanvasStateFromNodesRef();
-  }
-
-  function handleAlignCenterHorizontal() {
-    if (selectionManagerRef.current === null || stageRef.current === null) {
-      return;
-    }
-
-    const selectedNodes = Array.from(selectionManagerRef.current.getSelectedNodes());
-    if (selectedNodes.length < 2) {
-      return;
-    }
-
-    const ys = selectedNodes.map(node => node.y() + node.height() / 2);
-    const avgY = ys.reduce((sum, y) => sum + y, 0) / ys.length;
-
-    selectedNodes.forEach(node => {
-      node.y(avgY - node.height() / 2);
-    });
-
-    stageRef.current.layer.draw();
-    saveCanvasStateFromNodesRef();
-  }
-
-  function handleAlignCenterVertical() {
-    if (selectionManagerRef.current === null || stageRef.current === null) {
-      return;
-    }
-
-    const selectedNodes = Array.from(selectionManagerRef.current.getSelectedNodes());
-    if (selectedNodes.length < 2) {
-      return;
-    }
-
-    const xs = selectedNodes.map(node => node.x() + node.width() / 2);
-    const avgX = xs.reduce((sum, x) => sum + x, 0) / xs.length;
-
-    selectedNodes.forEach(node => {
-      node.x(avgX - node.width() / 2);
-    });
-
-    stageRef.current.layer.draw();
-    saveCanvasStateFromNodesRef();
-  }
-
-  function handleAlignBottom() {
-    if (selectionManagerRef.current === null || stageRef.current === null) {
-      return;
-    }
-
-    const selectedNodes = Array.from(selectionManagerRef.current.getSelectedNodes());
-    if (selectedNodes.length < 2) {
-      return;
-    }
-
-    const maxY = Math.max(...selectedNodes.map(node => node.y() + node.height()));
-
-    selectedNodes.forEach(node => {
-      node.y(maxY - node.height());
-    });
-
-    stageRef.current.layer.draw();
-    saveCanvasStateFromNodesRef();
-  }
-
-  function handleAlignRight() {
-    if (selectionManagerRef.current === null || stageRef.current === null) {
-      return;
-    }
-
-    const selectedNodes = Array.from(selectionManagerRef.current.getSelectedNodes());
-    if (selectedNodes.length < 2) {
-      return;
-    }
-
-    const maxX = Math.max(...selectedNodes.map(node => node.x() + node.width()));
-
-    selectedNodes.forEach(node => {
-      node.x(maxX - node.width());
-    });
 
     stageRef.current.layer.draw();
     saveCanvasStateFromNodesRef();
@@ -500,18 +403,11 @@ export default function CanvasPage() {
       <CanvasToolbar
         onBack={handleBack}
         onDelete={handleDeleteSelected}
-        onZoomIn={handleZoomIn}
-        onZoomOut={handleZoomOut}
-        onZoomReset={handleZoomReset}
+        onZoom={handleZoom}
         zoomLevel={zoomLevel}
         onToggleSidebar={handleToggleSidebar}
         isSidebarOpen={isSidebarOpen}
-        onAlignTop={handleAlignTop}
-        onAlignLeft={handleAlignLeft}
-        onAlignCenterHorizontal={handleAlignCenterHorizontal}
-        onAlignCenterVertical={handleAlignCenterVertical}
-        onAlignBottom={handleAlignBottom}
-        onAlignRight={handleAlignRight}
+        onAlign={handleAlign}
         hasMultiSelection={hasMultiSelection}
       />
       {content}
