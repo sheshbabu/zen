@@ -9,7 +9,7 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
     x,
     y,
   };
-  const thumbnailWidth = 376;
+  const thumbnailWidth = 500;
   const thumbnailHeight = thumbnailWidth / item.aspectRatio;
 
   const group = new window.Konva.Group({

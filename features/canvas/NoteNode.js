@@ -8,10 +8,10 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
     x,
     y,
   };
-  const nodeWidth = 376;
-  const padding = 12;
-  const headerHeight = 24;
-  const tagsHeight = 20;
+  const nodeWidth = 500;
+  const padding = 16;
+  const headerHeight = 28;
+  const tagsHeight = 24;
 
   const group = new window.Konva.Group({
     x: note.x,
@@ -19,7 +19,7 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
     draggable: true,
   });
 
-  const cardHeight = note.title && note.title.length > 0 ? 280 : 260;
+  const cardHeight = note.title && note.title.length > 0 ? 360 : 340;
 
   const background = new window.Konva.Rect({
     width: nodeWidth,
@@ -57,7 +57,7 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
       x: padding + 4,
       y: padding,
       text: note.title,
-      fontSize: 14,
+      fontSize: 20,
       fontStyle: 'bold',
       fill: '#404040',
       width: nodeWidth - (padding * 2) - 4,
@@ -72,7 +72,7 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
       x: padding + 4,
       y: textYPosition,
       text: tagsText,
-      fontSize: 11,
+      fontSize: 14,
       fill: '#A3A3A3',
       width: nodeWidth - (padding * 2) - 4,
     });
@@ -85,7 +85,7 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
     x: padding + 4,
     y: textYPosition,
     text: note.text,
-    fontSize: 13,
+    fontSize: 18,
     fill: '#525252',
     width: nodeWidth - (padding * 2) - 4,
     height: availableHeight,

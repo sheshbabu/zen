@@ -42,6 +42,9 @@ export default function CanvasPage() {
     const layer = new window.Konva.Layer();
     stage.add(layer);
 
+    stage.scale({ x: 0.75, y: 0.75 });
+    setZoomLevel(0.75);
+
     layer.draw();
 
     stageRef.current = { stage, layer };
@@ -206,8 +209,8 @@ export default function CanvasPage() {
     const { layer, stage } = stageRef.current;
 
     if (item.noteId) {
-      const nodeWidth = 376;
-      const cardHeight = item.title && item.title.length > 0 ? 280 : 260;
+      const nodeWidth = 500;
+      const cardHeight = item.title && item.title.length > 0 ? 360 : 340;
       const { x, y } = NodePositioning.findRandomUnoccupiedPosition(stage, nodesRef, nodeWidth, cardHeight);
 
       const group = NoteNode.create(layer, item, x, y, saveCanvasStateFromNodesRef, handleNodeClick, handleNoteDoubleClick);
@@ -217,7 +220,7 @@ export default function CanvasPage() {
       nodesRef.current.push({ id: itemId, group, item, type: 'note' });
       saveCanvasStateFromNodesRef();
     } else if (item.filename) {
-      const thumbnailWidth = 376;
+      const thumbnailWidth = 500;
       const thumbnailHeight = thumbnailWidth / item.aspectRatio;
       const { x, y } = NodePositioning.findRandomUnoccupiedPosition(stage, nodesRef, thumbnailWidth, thumbnailHeight);
 
