@@ -23,7 +23,8 @@
       "Bash(lsof:*)",
       "Bash(curl:*)",
       "Bash(xargs kill:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(cat:*)"
     ],
     "deny": []
   }

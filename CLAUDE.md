@@ -25,18 +25,24 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
 - **Entry Point**: `main.go` - Sets up HTTP server, routes, and background tasks
 - **Database**: SQLite with FTS5 for full-text search, migrations in `./migrations/`
 - **Feature-based Structure**: Each feature has its own directory under `features/`
-  - `notes/` - Core note management (CRUD, archive, trash)
+  - `notes/` - Core note management (CRUD, archive, trash, pin/unpin)
   - `tags/` - Tag management and organization
   - `focus/` - Focus modes for filtered views
   - `search/` - Full-text search with BM25 ranking
   - `images/` - Image upload and management
   - `users/` - Authentication and user management
   - `settings/` - Import/export functionality
+  - `templates/` - Template management with usage tracking and placeholders
+  - `intelligence/` - AI-powered indexing and similarity search (optional, requires zen-intelligence)
+  - `mcp/` - Model Context Protocol server for external integrations
 - **Commons**: Shared utilities in `commons/`
   - `auth/` - Authentication middleware
   - `session/` - Session management
   - `sqlite/` - Database connection and migrations
   - `utils/` - HTTP utilities
+  - `queue/` - Generic task queue for background processing
+  - `preferences/` - User preferences (theme, view, search history)
+  - `contexts/` - Preact context providers (AppContext, NotesContext)
 
 ### Frontend (Preact)
 - **Entry Point**: `index.js` - Main app initialization and routing
@@ -55,17 +61,19 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
 ### Database Schema
 - Migrations are sequential SQL files in `./migrations/` with format `<version>_<title>.sql`
 - Uses SQLite with FTS5 extension for full-text search
-- Main entities: users, notes, tags, focus_modes, sessions, images
+- Main entities: users, notes, tags, focus_modes, sessions, images, templates, mcp_tokens, queues
 
 ### Environment Variables
 - `DEV_MODE=true` - Development mode with file system assets
 - `PORT` - Server port (default: 8080)
 - `IMAGES_FOLDER` - Image storage path (default: ./images)
+- `INTELLIGENCE_ENABLED=true` - Enable optional AI features
 
 ### Background Tasks
 - Trash cleanup (30 days)
 - Session cleanup (24 hours)
 - Image sync from disk (24 hours)
+- Intelligence queue processing (5 minutes, requires zen-intelligence)
 
 ## Code Style Guidelines
 
@@ -135,7 +143,7 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
 
 #### API Calls
 - Use centralized `ApiClient` from `commons/http/ApiClient.js`
-- Use specific named methods (e.g., `ApiClient.createUser()`, `ApiClient.getTokens()`) rather than generic HTTP methods
+- Use specific named methods (e.g., `ApiClient.createUser()`, `ApiClient.getTemplates()`, `ApiClient.getSimilarImages()`) rather than generic HTTP methods
 - Promise chains with `.then()`, `.catch()`, `.finally()`
 - Consistent error handling with toast notifications
 - Skip toast for expected errors using `skipCodes` array
