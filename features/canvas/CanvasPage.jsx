@@ -27,7 +27,7 @@ export default function CanvasPage() {
       return;
     }
 
-    const canvasWidth = window.innerWidth - 400;
+    const canvasWidth = window.innerWidth;
     const stage = new window.Konva.Stage({
       container: containerRef.current,
       width: canvasWidth,
