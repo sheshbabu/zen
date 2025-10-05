@@ -59,13 +59,40 @@ function createTransformerManager(stage, layer, nodesRef, onTransformEnd) {
       if (nodeData && nodeData.type === 'image') {
         transformer.enabledAnchors(['top-left', 'top-right', 'bottom-left', 'bottom-right']);
         transformer.keepRatio(true);
+        transformer.boundBoxFunc(function (oldBox, newBox) {
+          if (newBox.width < 300 || newBox.height < 200 || newBox.width > 1000 || newBox.height > 1200) {
+            return oldBox;
+          }
+          return newBox;
+        });
+      } else if (nodeData && nodeData.type === 'sticky') {
+        transformer.enabledAnchors(['top-left', 'top-right', 'bottom-left', 'bottom-right', 'middle-left', 'middle-right', 'top-center', 'bottom-center']);
+        transformer.keepRatio(false);
+        transformer.boundBoxFunc(function (oldBox, newBox) {
+          if (newBox.width < 50 || newBox.height < 50) {
+            return oldBox;
+          }
+          return newBox;
+        });
       } else {
         transformer.enabledAnchors(['middle-left', 'middle-right', 'top-center', 'bottom-center']);
         transformer.keepRatio(false);
+        transformer.boundBoxFunc(function (oldBox, newBox) {
+          if (newBox.width < 300 || newBox.height < 200 || newBox.width > 1000 || newBox.height > 1200) {
+            return oldBox;
+          }
+          return newBox;
+        });
       }
     } else {
       transformer.enabledAnchors(['top-left', 'top-right', 'bottom-left', 'bottom-right', 'middle-left', 'middle-right']);
       transformer.keepRatio(false);
+      transformer.boundBoxFunc(function (oldBox, newBox) {
+        if (newBox.width < 300 || newBox.height < 200 || newBox.width > 1000 || newBox.height > 1200) {
+          return oldBox;
+        }
+        return newBox;
+      });
     }
 
     transformer.moveToTop();

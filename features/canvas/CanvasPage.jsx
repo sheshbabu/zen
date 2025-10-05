@@ -2,6 +2,7 @@ import { h, useEffect, useRef, useState } from '../../assets/preact.esm.js';
 import useKonva from './useKonva.js';
 import NoteNode from './NoteNode.js';
 import ImageNode from './ImageNode.js';
+import StickyNoteNode from './StickyNoteNode.js';
 import CanvasNotePicker from './CanvasNotePicker.jsx';
 import CanvasToolbar from './CanvasToolbar.jsx';
 import JsonCanvas from './JsonCanvas.js';
@@ -27,6 +28,7 @@ export default function CanvasPage() {
   const [hasMultiSelection, setHasMultiSelection] = useState(false);
   const [isPanMode, setIsPanMode] = useState(false);
   const nodesRef = useRef([]);
+  const stickyNoteCounterRef = useRef(0);
   const viewportManagerRef = useRef(null);
   const selectionManagerRef = useRef(null);
   const transformerManagerRef = useRef(null);
@@ -131,6 +133,9 @@ export default function CanvasPage() {
           const group = ImageNode.create(layer, nodeData.item, nodeData.x, nodeData.y, saveCanvasStateFromNodesRef, handleNodeClick, handleImageDoubleClick, nodeData.width, nodeData.height);
           addedItemIds.add(nodeData.item.filename);
           nodesRef.current.push({ id: nodeData.item.filename, group, item: nodeData.item, type: 'image' });
+        } else if (nodeData.type === 'sticky') {
+          const group = StickyNoteNode.create(layer, nodeData.x, nodeData.y, saveCanvasStateFromNodesRef, handleNodeClick, handleStickyNoteClick, nodeData.width, nodeData.height, nodeData.item.text);
+          nodesRef.current.push({ id: nodeData.item.id, group, item: nodeData.item, type: 'sticky' });
         }
       });
       setItems(addedItemIds);
@@ -149,6 +154,9 @@ export default function CanvasPage() {
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         handleToggleSidebar();
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+        e.preventDefault();
+        handleDuplicateSelected();
       }
     }
 
@@ -241,6 +249,94 @@ export default function CanvasPage() {
     saveCanvasStateFromNodesRef();
   }
 
+  function handleDuplicateSelected() {
+    if (selectionManagerRef.current === null || stageRef.current === null) {
+      return;
+    }
+
+    const selectedNodes = selectionManagerRef.current.getSelectedNodes();
+    if (selectedNodes.size === 0) {
+      return;
+    }
+
+    const { layer } = stageRef.current;
+    const nodesToDuplicate = Array.from(selectedNodes);
+    const newGroups = [];
+
+    selectionManagerRef.current.deselectAll();
+    if (transformerManagerRef.current !== null) {
+      transformerManagerRef.current.detach();
+    }
+
+    nodesToDuplicate.forEach(nodeGroup => {
+      const nodeData = nodesRef.current.find(n => n.group === nodeGroup);
+      if (nodeData !== undefined) {
+        const offsetX = 20;
+        const offsetY = 20;
+        const newX = nodeGroup.x() + offsetX;
+        const newY = nodeGroup.y() + offsetY;
+
+        let newGroup;
+        if (nodeData.type === 'note') {
+          newGroup = NoteNode.create(
+            layer,
+            nodeData.item,
+            newX,
+            newY,
+            saveCanvasStateFromNodesRef,
+            handleNodeClick,
+            handleNoteDoubleClick,
+            nodeGroup.width(),
+            nodeGroup.height()
+          );
+          nodesRef.current.push({ id: nodeData.item.noteId, group: newGroup, item: nodeData.item, type: 'note' });
+        } else if (nodeData.type === 'image') {
+          newGroup = ImageNode.create(
+            layer,
+            nodeData.item,
+            newX,
+            newY,
+            saveCanvasStateFromNodesRef,
+            handleNodeClick,
+            handleImageDoubleClick,
+            nodeGroup.width(),
+            nodeGroup.height()
+          );
+          nodesRef.current.push({ id: nodeData.item.filename, group: newGroup, item: nodeData.item, type: 'image' });
+        } else if (nodeData.type === 'sticky') {
+          const text = StickyNoteNode.getText(nodeGroup);
+          const newId = `sticky-${Date.now()}-${stickyNoteCounterRef.current++}`;
+          newGroup = StickyNoteNode.create(
+            layer,
+            newX,
+            newY,
+            saveCanvasStateFromNodesRef,
+            handleNodeClick,
+            handleStickyNoteClick,
+            nodeGroup.width(),
+            nodeGroup.height(),
+            text
+          );
+          nodesRef.current.push({ id: newId, group: newGroup, item: { id: newId, text }, type: 'sticky' });
+        }
+
+        if (newGroup !== undefined) {
+          newGroup.setSelected(true);
+          newGroups.push(newGroup);
+          selectionManagerRef.current.getSelectedNodes().add(newGroup);
+        }
+      }
+    });
+
+    if (transformerManagerRef.current !== null && newGroups.length > 0) {
+      transformerManagerRef.current.attachToNodes(newGroups);
+    }
+
+    setHasMultiSelection(newGroups.length >= 2);
+    layer.draw();
+    saveCanvasStateFromNodesRef();
+  }
+
   function handleAddNote(item) {
     if (stageRef.current === null) {
       return;
@@ -326,6 +422,95 @@ export default function CanvasPage() {
 
   function handleTogglePanMode() {
     setIsPanMode(prev => !prev);
+  }
+
+  function handleAddStickyNote() {
+    if (stageRef.current === null) {
+      return;
+    }
+
+    const { layer, stage } = stageRef.current;
+    const nodeWidth = 250;
+    const nodeHeight = 250;
+    const { x, y } = NodePositioning.findRandomUnoccupiedPosition(stage, nodesRef, nodeWidth, nodeHeight);
+
+    const id = `sticky-${Date.now()}-${stickyNoteCounterRef.current++}`;
+    const group = StickyNoteNode.create(layer, x, y, saveCanvasStateFromNodesRef, handleNodeClick, handleStickyNoteClick);
+
+    nodesRef.current.push({ id, group, item: { id, text: '' }, type: 'sticky' });
+    layer.draw();
+    saveCanvasStateFromNodesRef();
+  }
+
+  function handleStickyNoteClick(group, textNode) {
+    const stage = stageRef.current.stage;
+    stage.container().style.cursor = 'text';
+
+    const areaPosition = textNode.getAbsolutePosition();
+    const stageBox = stage.container().getBoundingClientRect();
+
+    textNode.hide();
+    stageRef.current.layer.draw();
+
+    const textarea = document.createElement('textarea');
+    document.body.appendChild(textarea);
+
+    textarea.value = textNode.text();
+    textarea.style.position = 'absolute';
+    textarea.style.top = `${areaPosition.y + stageBox.top}px`;
+    textarea.style.left = `${areaPosition.x + stageBox.left}px`;
+    textarea.style.width = `${textNode.width()}px`;
+    textarea.style.height = `${textNode.height()}px`;
+    textarea.style.fontSize = '18px';
+    textarea.style.border = 'none';
+    textarea.style.padding = '0';
+    textarea.style.margin = '0';
+    textarea.style.overflow = 'hidden';
+    textarea.style.background = 'transparent';
+    textarea.style.outline = 'none';
+    textarea.style.resize = 'none';
+    textarea.style.lineHeight = textNode.lineHeight();
+    textarea.style.fontFamily = textNode.fontFamily();
+    textarea.style.transformOrigin = 'left top';
+    textarea.style.textAlign = textNode.align();
+    textarea.style.color = textNode.fill();
+
+    const rotation = group.rotation();
+    let transform = '';
+    if (rotation) {
+      transform += `rotateZ(${rotation}deg)`;
+    }
+
+    const px = 0;
+    const py = 0;
+    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    if (isFirefox) {
+      transform += `translateY(-${py + 2}px)`;
+    }
+
+    textarea.style.transform = transform;
+    textarea.style.height = 'auto';
+
+    textarea.focus();
+
+    function removeTextarea() {
+      textarea.parentNode.removeChild(textarea);
+      stage.container().style.cursor = 'default';
+      textNode.text(textarea.value);
+      textNode.show();
+      StickyNoteNode.setText(group, textarea.value);
+      stageRef.current.layer.draw();
+      saveCanvasStateFromNodesRef();
+    }
+
+    textarea.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Escape') {
+        removeTextarea();
+      }
+    });
+
+    textarea.addEventListener('blur', removeTextarea);
   }
 
   function handleImageDoubleClick(imageItem) {
@@ -417,6 +602,7 @@ export default function CanvasPage() {
         isPanMode={isPanMode}
         onAlign={handleAlign}
         hasMultiSelection={hasMultiSelection}
+        onAddStickyNote={handleAddStickyNote}
       />
       {content}
       {isSidebarOpen && <CanvasNotePicker onAddNote={handleAddNote} addedItems={items} />}

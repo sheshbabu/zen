@@ -40,6 +40,22 @@ function toJsonCanvas(nodesData, viewport) {
           aspectRatio: node.item.aspectRatio,
         },
       };
+    } else if (node.type === 'sticky') {
+      const textNode = node.group.findOne('Text');
+      const text = textNode ? textNode.text() : node.item.text || '';
+
+      return {
+        id: node.item.id,
+        type: 'text',
+        x: pos.x,
+        y: pos.y,
+        width: size.width,
+        height: size.height,
+        text: text,
+        _zenMeta: {
+          isSticky: true,
+        },
+      };
     }
   });
 
@@ -74,6 +90,18 @@ function fromJsonCanvas(canvasData) {
           content: nodeData.text || '',
           tags: nodeData._zenMeta.tags || [],
           isPinned: nodeData._zenMeta.isPinned || false,
+        },
+      };
+    } else if (nodeData.type === 'text' && nodeData._zenMeta?.isSticky) {
+      return {
+        type: 'sticky',
+        x: nodeData.x,
+        y: nodeData.y,
+        width: nodeData.width,
+        height: nodeData.height,
+        item: {
+          id: nodeData.id,
+          text: nodeData.text || '',
         },
       };
     } else if (nodeData.type === 'file' && nodeData.file) {
