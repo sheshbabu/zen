@@ -194,6 +194,7 @@
                 &.new,
                 &.search,
                 &.settings,
+                &.canvas,
                 &.templates {
                     display: none;
                 }

@@ -62,10 +62,10 @@ export default function Sidebar({ isOpen, onSidebarClose }) {
             <NotesIcon />
             Notes
           </Link>
-          {/* <Link className="sidebar-button" to="/">
-          <BoardIcon />
-          Boards
-        </Link>*/}
+          <Link className="sidebar-button canvas" to="/canvas">
+            <BoardIcon />
+            Canvas
+          </Link>
           <Link className="sidebar-button templates" activeClassName="is-active" to="/templates/">
             <TemplatesIcon />
             Templates

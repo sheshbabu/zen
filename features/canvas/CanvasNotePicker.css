@@ -1,0 +1,174 @@
+.canvas-note-picker {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  background: var(--neutral-50);
+  border-left: 1px solid var(--neutral-100);
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+
+  .canvas-note-picker-input-container {
+    display: flex;
+    align-items: center;
+    padding-left: 2px;
+    margin: var(--spacing-2);
+    background-color: var(--neutral-100);
+    border-radius: 4px;
+
+    input {
+      border: 0;
+      outline: 0;
+      width: 100%;
+      height: 40px;
+      padding-left: 10px;
+      color: var(--text-primary);
+      background-color: var(--neutral-100);
+      border-radius: 4px;
+    }
+  }
+
+  svg.lucide {
+    padding: var(--spacing-2);
+  }
+
+  .canvas-note-picker-results {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 16px;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .canvas-note-picker-section {
+      margin-bottom: 20px;
+    }
+
+    .canvas-note-picker-section-title {
+      font: var(--sm);
+      font-size: 12px;
+      color: var(--neutral-400);
+      padding: 10px 0;
+      font-weight: 500;
+    }
+
+    .canvas-note-picker-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .canvas-note-card {
+      position: relative;
+      overflow: hidden;
+      transition-property: box-shadow;
+      transition-duration: var(--transition-normal);
+      box-shadow: var(--shadow-2);
+      border-radius: 8px;
+      padding: 12px;
+      background-color: var(--neutral-100);
+      transition: transform var(--transition-normal);
+      cursor: pointer;
+
+      &:hover {
+        transform: scale(1.01);
+      }
+
+      &:active {
+        transform: scale(0.98);
+        transition: transform var(--transition-fast) ease-out;
+      }
+
+      .canvas-note-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .canvas-note-card-title {
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+
+      .canvas-note-card-pin {
+        opacity: 0;
+        width: 16px;
+        height: 16px;
+        transform: translateY(-5px);
+        transition: opacity, transform 300ms;
+
+        &.pinned {
+          opacity: 1;
+          margin-left: 4px;
+          flex-shrink: 0;
+          transform: translateY(0);
+
+          line,
+          circle,
+          rect,
+          path {
+            stroke-width: 2;
+            stroke: var(--neutral-300);
+            fill: var(--neutral-300);
+          }
+        }
+      }
+
+      .canvas-note-card-content {
+        font-size: 12px;
+        line-height: 1.4;
+        color: var(--neutral-600);
+        max-height: 150px;
+        overflow: hidden;
+
+        mark {
+          background: rgba(250, 204, 21, 0.1);
+          color: var(--yellow-500);
+          border-radius: 4px;
+          padding: 2px;
+        }
+
+        hr {
+          margin-bottom: 10px;
+          visibility: hidden;
+        }
+      }
+
+      .canvas-note-card-tags {
+        margin-top: 8px;
+        font-size: 11px;
+        color: var(--neutral-400);
+      }
+    }
+
+    .canvas-note-picker-images {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .canvas-image-card {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform var(--transition-normal);
+      box-shadow: var(--shadow-2);
+
+      &:hover {
+        transform: scale(1.01);
+        box-shadow: var(--shadow-4);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+  }
+}

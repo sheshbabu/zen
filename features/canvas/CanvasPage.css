@@ -1,0 +1,23 @@
+.canvas-page {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  .canvas-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: var(--background-color);
+  }
+
+  .canvas-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 1.125rem;
+    color: var(--text-muted);
+  }
+}
