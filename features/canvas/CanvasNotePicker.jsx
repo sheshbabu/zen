@@ -1,21 +1,57 @@
 import { h, useEffect, useState, useRef } from "../../assets/preact.esm.js"
 import ApiClient from "../../commons/http/ApiClient.js";
 import { SearchIcon } from "../../commons/components/Icon.jsx";
-import renderMarkdown from "../../commons/utils/renderMarkdown.js";
 import "./CanvasNotePicker.css";
 
 export default function CanvasNotePicker({ onAddNote, addedItems }) {
+  const [activeTab, setActiveTab] = useState("search");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState({ lexical_notes: [], semantic_notes: [], semantic_images: [] });
+  const [browseNotes, setBrowseNotes] = useState([]);
+  const [browseImages, setBrowseImages] = useState([]);
+  const [notesPage, setNotesPage] = useState(1);
+  const [imagesPage, setImagesPage] = useState(1);
+  const [hasMoreNotes, setHasMoreNotes] = useState(true);
+  const [hasMoreImages, setHasMoreImages] = useState(true);
 
   const inputRef = useRef(null);
   const debounceTimerRef = useRef(null);
 
   useEffect(() => {
-    if (inputRef.current) {
+    if (activeTab === "search" && inputRef.current) {
       inputRef.current.focus();
+    } else if (activeTab === "notes" && browseNotes.length === 0) {
+      loadMoreNotes();
+    } else if (activeTab === "images" && browseImages.length === 0) {
+      loadMoreImages();
     }
-  }, []);
+  }, [activeTab]);
+
+  function loadMoreNotes() {
+    ApiClient.getNotes(null, null, false, false, notesPage)
+      .then(response => {
+        if (response.notes && response.notes.length > 0) {
+          setBrowseNotes(prev => [...prev, ...response.notes]);
+          setNotesPage(prev => prev + 1);
+          setHasMoreNotes(response.notes.length === 20);
+        } else {
+          setHasMoreNotes(false);
+        }
+      });
+  }
+
+  function loadMoreImages() {
+    ApiClient.getImages(null, null, imagesPage)
+      .then(response => {
+        if (response.images && response.images.length > 0) {
+          setBrowseImages(prev => [...prev, ...response.images]);
+          setImagesPage(prev => prev + 1);
+          setHasMoreImages(response.images.length === 20);
+        } else {
+          setHasMoreImages(false);
+        }
+      });
+  }
 
   function handleChange(e) {
     const value = e.target.value;
@@ -65,9 +101,7 @@ export default function CanvasNotePicker({ onAddNote, addedItems }) {
       lexicalNotesSection = (
         <div className="canvas-note-picker-section">
           <h4 className="canvas-note-picker-section-title">Notes</h4>
-          <div className="canvas-note-picker-grid">
-            {noteItems}
-          </div>
+          {noteItems}
         </div>
       );
     }
@@ -86,9 +120,7 @@ export default function CanvasNotePicker({ onAddNote, addedItems }) {
       semanticNotesSection = (
         <div className="canvas-note-picker-section">
           <h4 className="canvas-note-picker-section-title">Similar Notes</h4>
-          <div className="canvas-note-picker-grid">
-            {noteItems}
-          </div>
+          {noteItems}
         </div>
       );
     }
@@ -115,43 +147,129 @@ export default function CanvasNotePicker({ onAddNote, addedItems }) {
     }
   }
 
-  return (
-    <div className="canvas-note-picker">
-      <div className="canvas-note-picker-input-container">
-        <SearchIcon />
-        <input
-          type="text"
-          placeholder="Search..."
-          ref={inputRef}
-          value={query}
-          onInput={handleChange}
-        />
+  let tabContent;
+  if (activeTab === "search") {
+    tabContent = (
+      <div className="canvas-note-picker-tab-content">
+        <div className="canvas-note-picker-input-container">
+          <SearchIcon />
+          <input
+            type="text"
+            placeholder="Search..."
+            ref={inputRef}
+            value={query}
+            onInput={handleChange}
+          />
+        </div>
+        <div className="canvas-note-picker-results">
+          {lexicalNotesSection}
+          {semanticNotesSection}
+          {semanticImagesSection}
+        </div>
       </div>
-      <div className="canvas-note-picker-results">
-        {lexicalNotesSection}
-        {semanticNotesSection}
-        {semanticImagesSection}
+    );
+  } else if (activeTab === "notes") {
+    const filteredNotes = browseNotes.filter(item => !addedItems.has(item.noteId));
+    const noteItems = filteredNotes.map((item, index) => {
+      return (
+        <NoteCard key={`browse-note-${index}`} note={item} onClick={() => handleResultClick(item)} />
+      );
+    });
+
+    let notesContent;
+    if (filteredNotes.length === 0) {
+      notesContent = <div className="canvas-note-picker-empty">No notes available</div>;
+    } else {
+      notesContent = (
+        <div className="canvas-note-picker-results">
+          {noteItems}
+        </div>
+      );
+    }
+
+    tabContent = (
+      <div className="canvas-note-picker-tab-content">
+        {notesContent}
+        {hasMoreNotes === true && (
+          <button className="canvas-note-picker-load-more" onClick={loadMoreNotes}>
+            Load More
+          </button>
+        )}
       </div>
-    </div>
-  );
-}
+    );
+  } else if (activeTab === "images") {
+    const filteredImages = browseImages.filter(item => !addedItems.has(item.filename));
 
-function NoteCard({ note, onClick }) {
-  const hasTitle = note.title && note.title.length > 0;
+    let imagesContent;
+    if (filteredImages.length === 0) {
+      imagesContent = <div className="canvas-note-picker-empty">No images available</div>;
+    } else {
+      const imageItems = filteredImages.map((item, index) => {
+        return (
+          <ImageCardGrid key={`browse-image-${index}`} image={item} onClick={() => handleResultClick(item)} />
+        );
+      });
 
-  let header = null;
-  if (hasTitle) {
-    header = (
-      <div className="canvas-note-card-header">
-        <div className="canvas-note-card-title">{note.title}</div>
+      imagesContent = (
+        <div className="canvas-note-picker-images-grid">
+          {imageItems}
+        </div>
+      );
+    }
+
+    tabContent = (
+      <div className="canvas-note-picker-tab-content">
+        {imagesContent}
+        {hasMoreImages === true && (
+          <button className="canvas-note-picker-load-more" onClick={loadMoreImages}>
+            Load More
+          </button>
+        )}
       </div>
     );
   }
 
   return (
-    <div className="canvas-note-card" onClick={onClick}>
-      {header}
-      <div className="canvas-note-card-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(note.snippet || note.content || note.matchText || '') }} />
+    <div className="canvas-note-picker">
+      <div className="canvas-note-picker-tabs">
+        <button
+          className={activeTab === "search" ? "canvas-note-picker-tab active" : "canvas-note-picker-tab"}
+          onClick={() => setActiveTab("search")}
+        >
+          Search
+        </button>
+        <button
+          className={activeTab === "notes" ? "canvas-note-picker-tab active" : "canvas-note-picker-tab"}
+          onClick={() => setActiveTab("notes")}
+        >
+          Notes
+        </button>
+        <button
+          className={activeTab === "images" ? "canvas-note-picker-tab active" : "canvas-note-picker-tab"}
+          onClick={() => setActiveTab("images")}
+        >
+          Images
+        </button>
+      </div>
+      {tabContent}
+    </div>
+  );
+}
+
+function NoteCard({ note, onClick }) {
+  let title = <div className="notes-list-item-title">{note.title}</div>;
+
+  if (note.title === "") {
+    let preview = (note.snippet || note.content || note.matchText || "").split(" ").slice(0, 10).join(" ");
+    if (preview.startsWith("![](/images/")) {
+      preview = "Image";
+    }
+    title = <div className="notes-list-item-title untitled">{preview}</div>;
+  }
+
+  return (
+    <div className="notes-list-item" onClick={onClick}>
+      {title}
     </div>
   );
 }
@@ -161,6 +279,17 @@ function ImageCard({ image, onClick }) {
     <img
       src={`/images/${image.filename}`}
       className="canvas-image-card"
+      onClick={onClick}
+      loading="lazy"
+    />
+  );
+}
+
+function ImageCardGrid({ image, onClick }) {
+  return (
+    <img
+      src={`/images/${image.filename}`}
+      className="canvas-image-card-grid"
       onClick={onClick}
       loading="lazy"
     />

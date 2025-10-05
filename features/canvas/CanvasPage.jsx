@@ -136,9 +136,6 @@ export default function CanvasPage() {
     function handleKeyDown(e) {
       if (e.key === 'Delete' || e.key === 'Backspace') {
         handleDeleteSelected();
-      } else if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
-        e.preventDefault();
-        handleSelectAll();
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         handleToggleSidebar();
