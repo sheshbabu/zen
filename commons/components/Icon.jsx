@@ -536,3 +536,67 @@ export function ImagesIcon() {
     </svg>
   );
 }
+
+export function AlignStartHorizontalIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-align-start-horizontal-icon lucide-align-start-horizontal">
+      <rect width="6" height="16" x="4" y="6" rx="2"/>
+      <rect width="6" height="9" x="14" y="6" rx="2"/>
+      <path d="M22 2H2"/>
+    </svg>
+  );
+}
+
+export function AlignStartVerticalIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-align-start-vertical-icon lucide-align-start-vertical">
+      <rect width="9" height="6" x="6" y="14" rx="2"/>
+      <rect width="16" height="6" x="6" y="4" rx="2"/>
+      <path d="M2 2v20"/>
+    </svg>
+  );
+}
+
+export function AlignCenterHorizontalIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-align-center-horizontal-icon lucide-align-center-horizontal">
+      <path d="M2 12h20"/>
+      <path d="M10 16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4"/>
+      <path d="M10 8V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v4"/>
+      <path d="M20 16v1a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-1"/>
+      <path d="M14 8V7c0-1.1.9-2 2-2h2a2 2 0 0 1 2 2v1"/>
+    </svg>
+  );
+}
+
+export function AlignCenterVerticalIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-align-center-vertical-icon lucide-align-center-vertical">
+      <path d="M12 2v20"/>
+      <path d="M8 10H4a2 2 0 0 1-2-2V6c0-1.1.9-2 2-2h4"/>
+      <path d="M16 10h4a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-4"/>
+      <path d="M8 20H7a2 2 0 0 1-2-2v-2c0-1.1.9-2 2-2h1"/>
+      <path d="M16 14h1a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-1"/>
+    </svg>
+  );
+}
+
+export function AlignEndHorizontalIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-align-end-horizontal-icon lucide-align-end-horizontal">
+      <rect width="6" height="16" x="4" y="2" rx="2"/>
+      <rect width="6" height="9" x="14" y="9" rx="2"/>
+      <path d="M22 22H2"/>
+    </svg>
+  );
+}
+
+export function AlignEndVerticalIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-align-end-vertical-icon lucide-align-end-vertical">
+      <rect width="16" height="6" x="2" y="4" rx="2"/>
+      <rect width="9" height="6" x="9" y="14" rx="2"/>
+      <path d="M22 22V2"/>
+    </svg>
+  );
+}

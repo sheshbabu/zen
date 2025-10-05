@@ -58,10 +58,26 @@
       color: var(--text-primary);
     }
 
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+
+      &:hover {
+        background: transparent;
+        color: var(--text-secondary);
+      }
+    }
+
     svg {
       width: 18px;
       height: 18px;
     }
+  }
+
+  .canvas-toolbar-alignment-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
   }
 
   .canvas-toolbar-zoom-level {

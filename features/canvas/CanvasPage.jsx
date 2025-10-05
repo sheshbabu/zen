@@ -24,6 +24,7 @@ export default function CanvasPage() {
   const [items, setItems] = useState(new Set());
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [hasMultiSelection, setHasMultiSelection] = useState(false);
   const nodesRef = useRef([]);
   const viewportManagerRef = useRef(null);
   const selectionManagerRef = useRef(null);
@@ -96,7 +97,14 @@ export default function CanvasPage() {
         return;
       }
 
-      selectionManager.endSelection();
+      const hadSelection = selectionManager.endSelection();
+      if (hadSelection === true) {
+        const selectedNodes = selectionManager.getSelectedNodes();
+        if (transformerManagerRef.current !== null) {
+          transformerManagerRef.current.attachToNodes(Array.from(selectedNodes));
+        }
+        setHasMultiSelection(selectedNodes.size >= 2);
+      }
     });
 
     const savedCanvas = CanvasStorage.loadCanvasState();
@@ -183,6 +191,7 @@ export default function CanvasPage() {
     if (transformerManagerRef.current !== null) {
       const selectedNodes = selectionManagerRef.current.getSelectedNodes();
       transformerManagerRef.current.attachToNodes(Array.from(selectedNodes));
+      setHasMultiSelection(selectedNodes.size >= 2);
     }
 
     if (stageRef.current !== null) {
@@ -225,6 +234,7 @@ export default function CanvasPage() {
     if (transformerManagerRef.current !== null) {
       transformerManagerRef.current.detach();
     }
+    setHasMultiSelection(false);
     stageRef.current.layer.draw();
     saveCanvasStateFromNodesRef();
   }
@@ -356,6 +366,128 @@ export default function CanvasPage() {
     );
   }
 
+  function handleAlignTop() {
+    if (selectionManagerRef.current === null || stageRef.current === null) {
+      return;
+    }
+
+    const selectedNodes = Array.from(selectionManagerRef.current.getSelectedNodes());
+    if (selectedNodes.length < 2) {
+      return;
+    }
+
+    const minY = Math.min(...selectedNodes.map(node => node.y()));
+
+    selectedNodes.forEach(node => {
+      node.y(minY);
+    });
+
+    stageRef.current.layer.draw();
+    saveCanvasStateFromNodesRef();
+  }
+
+  function handleAlignLeft() {
+    if (selectionManagerRef.current === null || stageRef.current === null) {
+      return;
+    }
+
+    const selectedNodes = Array.from(selectionManagerRef.current.getSelectedNodes());
+    if (selectedNodes.length < 2) {
+      return;
+    }
+
+    const minX = Math.min(...selectedNodes.map(node => node.x()));
+
+    selectedNodes.forEach(node => {
+      node.x(minX);
+    });
+
+    stageRef.current.layer.draw();
+    saveCanvasStateFromNodesRef();
+  }
+
+  function handleAlignCenterHorizontal() {
+    if (selectionManagerRef.current === null || stageRef.current === null) {
+      return;
+    }
+
+    const selectedNodes = Array.from(selectionManagerRef.current.getSelectedNodes());
+    if (selectedNodes.length < 2) {
+      return;
+    }
+
+    const ys = selectedNodes.map(node => node.y() + node.height() / 2);
+    const avgY = ys.reduce((sum, y) => sum + y, 0) / ys.length;
+
+    selectedNodes.forEach(node => {
+      node.y(avgY - node.height() / 2);
+    });
+
+    stageRef.current.layer.draw();
+    saveCanvasStateFromNodesRef();
+  }
+
+  function handleAlignCenterVertical() {
+    if (selectionManagerRef.current === null || stageRef.current === null) {
+      return;
+    }
+
+    const selectedNodes = Array.from(selectionManagerRef.current.getSelectedNodes());
+    if (selectedNodes.length < 2) {
+      return;
+    }
+
+    const xs = selectedNodes.map(node => node.x() + node.width() / 2);
+    const avgX = xs.reduce((sum, x) => sum + x, 0) / xs.length;
+
+    selectedNodes.forEach(node => {
+      node.x(avgX - node.width() / 2);
+    });
+
+    stageRef.current.layer.draw();
+    saveCanvasStateFromNodesRef();
+  }
+
+  function handleAlignBottom() {
+    if (selectionManagerRef.current === null || stageRef.current === null) {
+      return;
+    }
+
+    const selectedNodes = Array.from(selectionManagerRef.current.getSelectedNodes());
+    if (selectedNodes.length < 2) {
+      return;
+    }
+
+    const maxY = Math.max(...selectedNodes.map(node => node.y() + node.height()));
+
+    selectedNodes.forEach(node => {
+      node.y(maxY - node.height());
+    });
+
+    stageRef.current.layer.draw();
+    saveCanvasStateFromNodesRef();
+  }
+
+  function handleAlignRight() {
+    if (selectionManagerRef.current === null || stageRef.current === null) {
+      return;
+    }
+
+    const selectedNodes = Array.from(selectionManagerRef.current.getSelectedNodes());
+    if (selectedNodes.length < 2) {
+      return;
+    }
+
+    const maxX = Math.max(...selectedNodes.map(node => node.x() + node.width()));
+
+    selectedNodes.forEach(node => {
+      node.x(maxX - node.width());
+    });
+
+    stageRef.current.layer.draw();
+    saveCanvasStateFromNodesRef();
+  }
+
   let content;
   if (isKonvaReady !== true) {
     content = <div className="canvas-loading">Loading...</div>;
@@ -374,6 +506,13 @@ export default function CanvasPage() {
         zoomLevel={zoomLevel}
         onToggleSidebar={handleToggleSidebar}
         isSidebarOpen={isSidebarOpen}
+        onAlignTop={handleAlignTop}
+        onAlignLeft={handleAlignLeft}
+        onAlignCenterHorizontal={handleAlignCenterHorizontal}
+        onAlignCenterVertical={handleAlignCenterVertical}
+        onAlignBottom={handleAlignBottom}
+        onAlignRight={handleAlignRight}
+        hasMultiSelection={hasMultiSelection}
       />
       {content}
       {isSidebarOpen && <CanvasNotePicker onAddNote={handleAddNote} addedItems={items} />}

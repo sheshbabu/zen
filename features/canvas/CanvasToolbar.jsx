@@ -1,8 +1,8 @@
 import { h } from '../../assets/preact.esm.js';
-import { BackIcon, TrashIcon, ZoomInIcon, ZoomOutIcon, SidebarOpenIcon, SidebarCloseIcon } from '../../commons/components/Icon.jsx';
+import { BackIcon, TrashIcon, ZoomInIcon, ZoomOutIcon, SidebarOpenIcon, SidebarCloseIcon, AlignStartHorizontalIcon, AlignStartVerticalIcon, AlignCenterHorizontalIcon, AlignCenterVerticalIcon, AlignEndHorizontalIcon, AlignEndVerticalIcon } from '../../commons/components/Icon.jsx';
 import './CanvasToolbar.css';
 
-export default function CanvasToolbar({ onBack, onDelete, onZoomIn, onZoomOut, onZoomReset, zoomLevel, onToggleSidebar, isSidebarOpen }) {
+export default function CanvasToolbar({ onBack, onDelete, onZoomIn, onZoomOut, onZoomReset, zoomLevel, onToggleSidebar, isSidebarOpen, onAlignTop, onAlignLeft, onAlignCenterHorizontal, onAlignCenterVertical, onAlignBottom, onAlignRight, hasMultiSelection }) {
   return (
     <div className="canvas-toolbar">
       <div className="canvas-toolbar-left">
@@ -15,6 +15,27 @@ export default function CanvasToolbar({ onBack, onDelete, onZoomIn, onZoomOut, o
         <button className="canvas-toolbar-button" onClick={onDelete}>
           <TrashIcon />
         </button>
+        <div className="canvas-toolbar-divider"></div>
+        <div className="canvas-toolbar-alignment-group">
+          <button className="canvas-toolbar-button" onClick={onAlignLeft} disabled={hasMultiSelection !== true} title="Align Left">
+            <AlignStartVerticalIcon />
+          </button>
+          <button className="canvas-toolbar-button" onClick={onAlignTop} disabled={hasMultiSelection !== true} title="Align Top">
+            <AlignStartHorizontalIcon />
+          </button>
+          <button className="canvas-toolbar-button" onClick={onAlignBottom} disabled={hasMultiSelection !== true} title="Align Bottom">
+            <AlignEndHorizontalIcon />
+          </button>
+          <button className="canvas-toolbar-button" onClick={onAlignRight} disabled={hasMultiSelection !== true} title="Align Right">
+            <AlignEndVerticalIcon />
+          </button>
+          <button className="canvas-toolbar-button" onClick={onAlignCenterHorizontal} disabled={hasMultiSelection !== true} title="Align Center Horizontal">
+            <AlignCenterHorizontalIcon />
+          </button>
+          <button className="canvas-toolbar-button" onClick={onAlignCenterVertical} disabled={hasMultiSelection !== true} title="Align Center Vertical">
+            <AlignCenterVerticalIcon />
+          </button>
+        </div>
         <div className="canvas-toolbar-divider"></div>
         <button className="canvas-toolbar-button" onClick={onZoomOut}>
           <ZoomOutIcon />
