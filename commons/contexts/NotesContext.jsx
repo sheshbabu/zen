@@ -19,10 +19,6 @@ export function NotesProvider({ children }) {
   const { refreshTags, refreshFocusModes } = useAppContext();
 
   const searchParams = useSearchParams();
-  const selectedTagId = searchParams.get("tagId");
-  const selectedFocusId = searchParams.get("focusId");
-  const isArchivesPage = searchParams.get("isArchived") === "true";
-  const isTrashPage = searchParams.get("isDeleted") === "true";
 
   const refreshNotes = useCallback((tagId, focusId, isArchived, isDeleted, pageNumber = 1) => {
     setIsNotesLoading(true);
@@ -65,11 +61,16 @@ export function NotesProvider({ children }) {
   }, []);
 
   const handleNoteChange = useCallback(() => {
+    const selectedTagId = searchParams.get("tagId");
+    const selectedFocusId = searchParams.get("focusId");
+    const isArchivesPage = searchParams.get("isArchived") === "true";
+    const isTrashPage = searchParams.get("isDeleted") === "true";
+
     refreshNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage);
     refreshImages(selectedTagId, selectedFocusId);
     refreshTags(selectedFocusId);
     refreshFocusModes();
-  }, [refreshNotes, refreshImages, refreshTags, refreshFocusModes]);
+  }, [searchParams, refreshNotes, refreshImages, refreshTags, refreshFocusModes]);
 
   const handlePinToggle = useCallback((noteId, isPinned) => {
     const apiCall = isPinned ? ApiClient.unpinNote(noteId) : ApiClient.pinNote(noteId);
