@@ -7,6 +7,7 @@ import CanvasToolbar from './CanvasToolbar.jsx';
 import JsonCanvas from './JsonCanvas.js';
 import ViewportManager from './ViewportManager.js';
 import SelectionManager from './SelectionManager.js';
+import TransformerManager from './TransformerManager.js';
 import NodePositioning from './NodePositioning.js';
 import CanvasStorage from './CanvasStorage.js';
 import Lightbox from '../../commons/components/Lightbox.jsx';
@@ -26,6 +27,7 @@ export default function CanvasPage() {
   const nodesRef = useRef([]);
   const viewportManagerRef = useRef(null);
   const selectionManagerRef = useRef(null);
+  const transformerManagerRef = useRef(null);
 
   useEffect(() => {
     if (containerRef.current === null || isKonvaReady !== true) {
@@ -56,6 +58,10 @@ export default function CanvasPage() {
     selectionManager.initialize();
     selectionManagerRef.current = selectionManager;
 
+    const transformerManager = TransformerManager.createTransformerManager(stage, layer, nodesRef, saveCanvasStateFromNodesRef);
+    transformerManager.initialize();
+    transformerManagerRef.current = transformerManager;
+
     stage.on('mousedown', (e) => {
       if (e.target !== stage) {
         return;
@@ -67,7 +73,10 @@ export default function CanvasPage() {
         viewportManager.startPan();
       } else {
         selectionManager.deselectAll();
-        const pos = stage.getPointerPosition();
+        if (transformerManagerRef.current !== null) {
+          transformerManagerRef.current.detach();
+        }
+        const pos = stage.getRelativePointerPosition();
         selectionManager.startSelection(pos);
       }
     });
@@ -97,11 +106,11 @@ export default function CanvasPage() {
       const addedItemIds = new Set();
       restored.nodes.forEach(nodeData => {
         if (nodeData.type === 'note') {
-          const group = NoteNode.create(layer, nodeData.item, nodeData.x, nodeData.y, saveCanvasStateFromNodesRef, handleNodeClick, handleNoteDoubleClick);
+          const group = NoteNode.create(layer, nodeData.item, nodeData.x, nodeData.y, saveCanvasStateFromNodesRef, handleNodeClick, handleNoteDoubleClick, nodeData.width, nodeData.height);
           addedItemIds.add(nodeData.item.noteId);
           nodesRef.current.push({ id: nodeData.item.noteId, group, item: nodeData.item, type: 'note' });
         } else if (nodeData.type === 'image') {
-          const group = ImageNode.create(layer, nodeData.item, nodeData.x, nodeData.y, saveCanvasStateFromNodesRef, handleNodeClick, handleImageDoubleClick);
+          const group = ImageNode.create(layer, nodeData.item, nodeData.x, nodeData.y, saveCanvasStateFromNodesRef, handleNodeClick, handleImageDoubleClick, nodeData.width, nodeData.height);
           addedItemIds.add(nodeData.item.filename);
           nodesRef.current.push({ id: nodeData.item.filename, group, item: nodeData.item, type: 'image' });
         }
@@ -162,7 +171,18 @@ export default function CanvasPage() {
   }
 
   function handleNodeClick(group, e) {
+    group.moveToTop();
+
     selectionManagerRef.current.handleNodeClick(group, e);
+
+    if (transformerManagerRef.current !== null) {
+      const selectedNodes = selectionManagerRef.current.getSelectedNodes();
+      transformerManagerRef.current.attachToNodes(Array.from(selectedNodes));
+    }
+
+    if (stageRef.current !== null) {
+      stageRef.current.layer.draw();
+    }
   }
 
   function handleDeleteSelected() {
@@ -197,6 +217,9 @@ export default function CanvasPage() {
     });
 
     selectionManagerRef.current.deselectAll();
+    if (transformerManagerRef.current !== null) {
+      transformerManagerRef.current.detach();
+    }
     stageRef.current.layer.draw();
     saveCanvasStateFromNodesRef();
   }
@@ -280,6 +303,11 @@ export default function CanvasPage() {
       node.group.setSelected(true);
       selectionManagerRef.current.getSelectedNodes().add(node.group);
     });
+
+    if (transformerManagerRef.current !== null) {
+      const selectedNodes = selectionManagerRef.current.getSelectedNodes();
+      transformerManagerRef.current.attachToNodes(Array.from(selectedNodes));
+    }
 
     if (stageRef.current !== null) {
       stageRef.current.layer.draw();

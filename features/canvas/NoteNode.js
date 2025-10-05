@@ -1,4 +1,4 @@
-function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
+function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidth, customHeight) {
   const note = {
     id: `note-${item.noteId}`,
     type: 'note',
@@ -8,7 +8,11 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
     x,
     y,
   };
-  const nodeWidth = 500;
+  const defaultWidth = 500;
+  const defaultHeight = note.title && note.title.length > 0 ? 360 : 340;
+
+  const nodeWidth = customWidth || defaultWidth;
+  const cardHeight = customHeight || defaultHeight;
   const padding = 16;
   const headerHeight = 28;
   const tagsHeight = 24;
@@ -17,9 +21,9 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
     x: note.x,
     y: note.y,
     draggable: true,
+    width: nodeWidth,
+    height: cardHeight,
   });
-
-  const cardHeight = note.title && note.title.length > 0 ? 360 : 340;
 
   const background = new window.Konva.Rect({
     width: nodeWidth,
@@ -136,6 +140,51 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
       onDragEnd();
     });
   }
+
+  group.on('transformend', (e) => {
+    const scaleX = group.scaleX();
+    const scaleY = group.scaleY();
+
+    const newWidth = Math.max(300, background.width() * scaleX);
+    const newHeight = Math.max(200, background.height() * scaleY);
+
+    group.scaleX(1);
+    group.scaleY(1);
+
+    group.width(newWidth);
+    group.height(newHeight);
+
+    background.width(newWidth);
+    background.height(newHeight);
+
+    selectionBorder.width(newWidth + 4);
+    selectionBorder.height(newHeight + 4);
+
+    const textWidth = newWidth - (padding * 2) - 4;
+    if (title) {
+      title.width(textWidth);
+    }
+    if (tags) {
+      tags.width(textWidth);
+    }
+    textContent.width(textWidth);
+
+    const availableHeight = newHeight - textYPosition - padding;
+    textContent.height(availableHeight);
+
+    if (e.currentTarget.getLayer()) {
+      const transformer = e.currentTarget.getLayer().findOne('Transformer');
+      if (transformer) {
+        transformer.forceUpdate();
+      }
+    }
+
+    layer.draw();
+
+    if (onDragEnd) {
+      setTimeout(() => onDragEnd(), 0);
+    }
+  });
 
   group.setSelected = (selected) => {
     isSelected = selected;

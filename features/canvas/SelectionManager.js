@@ -27,7 +27,7 @@ function createSelectionManager(stage, layer, nodesRef) {
       return false;
     }
 
-    const pos = stage.getPointerPosition();
+    const pos = stage.getRelativePointerPosition();
     const x1 = selectionStart.x;
     const y1 = selectionStart.y;
     const x2 = pos.x;

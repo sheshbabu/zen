@@ -1,4 +1,4 @@
-function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
+function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidth, customHeight) {
   const image = {
     id: `image-${item.filename}`,
     type: 'image',
@@ -9,13 +9,18 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
     x,
     y,
   };
-  const thumbnailWidth = 500;
-  const thumbnailHeight = thumbnailWidth / item.aspectRatio;
+  const defaultWidth = 500;
+  const defaultHeight = defaultWidth / item.aspectRatio;
+
+  const thumbnailWidth = customWidth || defaultWidth;
+  const thumbnailHeight = customHeight || defaultHeight;
 
   const group = new window.Konva.Group({
     x: image.x,
     y: image.y,
     draggable: true,
+    width: thumbnailWidth,
+    height: thumbnailHeight,
   });
 
   let isSelected = false;
@@ -78,6 +83,46 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
       onDragEnd();
     });
   }
+
+  group.on('transformend', (e) => {
+    const scaleX = group.scaleX();
+    const scaleY = group.scaleY();
+
+    const scale = Math.max(scaleX, scaleY);
+
+    const newWidth = Math.max(200, thumbnailWidth * scale);
+    const newHeight = newWidth / item.aspectRatio;
+
+    group.scaleX(1);
+    group.scaleY(1);
+
+    group.width(newWidth);
+    group.height(newHeight);
+
+    selectionBorder.width(newWidth + 4);
+    selectionBorder.height(newHeight + 4);
+
+    const children = group.getChildren();
+    children.forEach(child => {
+      if (child.className === 'Image') {
+        child.width(newWidth);
+        child.height(newHeight);
+      }
+    });
+
+    if (e.currentTarget.getLayer()) {
+      const transformer = e.currentTarget.getLayer().findOne('Transformer');
+      if (transformer) {
+        transformer.forceUpdate();
+      }
+    }
+
+    layer.draw();
+
+    if (onDragEnd) {
+      setTimeout(() => onDragEnd(), 0);
+    }
+  });
 
   group.setSelected = (selected) => {
     isSelected = selected;

@@ -2,7 +2,11 @@
 // Spec: https://jsoncanvas.org/spec/1.0/
 
 function toJsonCanvas(nodesData, viewport) {
-  const nodes = nodesData.map(node => {
+  const sortedNodes = [...nodesData].sort((a, b) => {
+    return a.group.zIndex() - b.group.zIndex();
+  });
+
+  const nodes = sortedNodes.map(node => {
     const pos = node.group.position();
     const size = node.group.size();
 
@@ -62,6 +66,8 @@ function fromJsonCanvas(canvasData) {
         type: 'note',
         x: nodeData.x,
         y: nodeData.y,
+        width: nodeData.width,
+        height: nodeData.height,
         item: {
           noteId: nodeData._zenMeta.noteId,
           title: nodeData._zenMeta.title || '',
@@ -76,6 +82,8 @@ function fromJsonCanvas(canvasData) {
         type: 'image',
         x: nodeData.x,
         y: nodeData.y,
+        width: nodeData.width,
+        height: nodeData.height,
         item: {
           filename: filename,
           aspectRatio: nodeData._zenMeta?.aspectRatio || 1.5,
