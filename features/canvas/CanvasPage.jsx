@@ -25,6 +25,7 @@ export default function CanvasPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [hasMultiSelection, setHasMultiSelection] = useState(false);
+  const [isPanMode, setIsPanMode] = useState(false);
   const nodesRef = useRef([]);
   const viewportManagerRef = useRef(null);
   const selectionManagerRef = useRef(null);
@@ -71,8 +72,9 @@ export default function CanvasPage() {
       }
 
       const isShiftPressed = e.evt.shiftKey;
+      const shouldPan = isPanMode || isShiftPressed;
 
-      if (isShiftPressed) {
+      if (shouldPan) {
         viewportManager.startPan();
       } else {
         selectionManager.deselectAll();
@@ -161,7 +163,7 @@ export default function CanvasPage() {
       nodesRef.current = [];
       stage.destroy();
     };
-  }, [isKonvaReady]);
+  }, [isKonvaReady, isPanMode]);
 
   useEffect(() => {
     if (stageRef.current === null) {
@@ -322,6 +324,10 @@ export default function CanvasPage() {
     setIsSidebarOpen(prev => !prev);
   }
 
+  function handleTogglePanMode() {
+    setIsPanMode(prev => !prev);
+  }
+
   function handleImageDoubleClick(imageItem) {
     const imageWithUrl = {
       url: `/images/${imageItem.filename}`,
@@ -407,6 +413,8 @@ export default function CanvasPage() {
         zoomLevel={zoomLevel}
         onToggleSidebar={handleToggleSidebar}
         isSidebarOpen={isSidebarOpen}
+        onTogglePanMode={handleTogglePanMode}
+        isPanMode={isPanMode}
         onAlign={handleAlign}
         hasMultiSelection={hasMultiSelection}
       />

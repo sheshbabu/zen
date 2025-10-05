@@ -1,8 +1,8 @@
 import { h } from '../../assets/preact.esm.js';
-import { BackIcon, TrashIcon, ZoomInIcon, ZoomOutIcon, SidebarOpenIcon, SidebarCloseIcon, AlignStartHorizontalIcon, AlignStartVerticalIcon, AlignCenterHorizontalIcon, AlignCenterVerticalIcon, AlignEndHorizontalIcon, AlignEndVerticalIcon } from '../../commons/components/Icon.jsx';
+import { BackIcon, TrashIcon, ZoomInIcon, ZoomOutIcon, SidebarOpenIcon, SidebarCloseIcon, AlignStartHorizontalIcon, AlignStartVerticalIcon, AlignCenterHorizontalIcon, AlignCenterVerticalIcon, AlignEndHorizontalIcon, AlignEndVerticalIcon, HandIcon, MousePointerIcon } from '../../commons/components/Icon.jsx';
 import './CanvasToolbar.css';
 
-export default function CanvasToolbar({ onBack, onDelete, onZoom, zoomLevel, onToggleSidebar, isSidebarOpen, onAlign, hasMultiSelection }) {
+export default function CanvasToolbar({ onBack, onDelete, onZoom, zoomLevel, onToggleSidebar, isSidebarOpen, onTogglePanMode, isPanMode, onAlign, hasMultiSelection }) {
   return (
     <div className="canvas-toolbar">
       <div className="canvas-toolbar-left">
@@ -14,6 +14,10 @@ export default function CanvasToolbar({ onBack, onDelete, onZoom, zoomLevel, onT
       <div className="canvas-toolbar-right">
         <button className="canvas-toolbar-button" onClick={onDelete}>
           <TrashIcon />
+        </button>
+        <div className="canvas-toolbar-divider"></div>
+        <button className={`canvas-toolbar-button ${isPanMode ? 'active' : ''}`} onClick={onTogglePanMode}>
+          {isPanMode ? <HandIcon /> : <MousePointerIcon />}
         </button>
         <div className="canvas-toolbar-divider"></div>
         <div className="canvas-toolbar-alignment-group">
