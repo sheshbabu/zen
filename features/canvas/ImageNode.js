@@ -1,4 +1,4 @@
-function create(layer, item, x, y, onDragEnd, onClick) {
+function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
   const image = {
     id: `image-${item.filename}`,
     type: 'image',
@@ -64,6 +64,12 @@ function create(layer, item, x, y, onDragEnd, onClick) {
   group.on('click', (e) => {
     if (onClick) {
       onClick(group, e);
+    }
+  });
+
+  group.on('dblclick', () => {
+    if (onDoubleClick) {
+      onDoubleClick(item);
     }
   });
 

@@ -9,6 +9,11 @@ import ViewportManager from './ViewportManager.js';
 import SelectionManager from './SelectionManager.js';
 import NodePositioning from './NodePositioning.js';
 import CanvasStorage from './CanvasStorage.js';
+import Lightbox from '../../commons/components/Lightbox.jsx';
+import NotesEditorModal from '../notes/NotesEditorModal.jsx';
+import { AppProvider } from '../../commons/contexts/AppContext.jsx';
+import { NotesProvider } from '../../commons/contexts/NotesContext.jsx';
+import { openModal, closeModal } from '../../commons/components/Modal.jsx';
 import './CanvasPage.css';
 
 export default function CanvasPage() {
@@ -89,11 +94,11 @@ export default function CanvasPage() {
       const addedItemIds = new Set();
       restored.nodes.forEach(nodeData => {
         if (nodeData.type === 'note') {
-          const group = NoteNode.create(layer, nodeData.item, nodeData.x, nodeData.y, saveCanvasStateFromNodesRef, handleNodeClick);
+          const group = NoteNode.create(layer, nodeData.item, nodeData.x, nodeData.y, saveCanvasStateFromNodesRef, handleNodeClick, handleNoteDoubleClick);
           addedItemIds.add(nodeData.item.noteId);
           nodesRef.current.push({ id: nodeData.item.noteId, group, item: nodeData.item, type: 'note' });
         } else if (nodeData.type === 'image') {
-          const group = ImageNode.create(layer, nodeData.item, nodeData.x, nodeData.y, saveCanvasStateFromNodesRef, handleNodeClick);
+          const group = ImageNode.create(layer, nodeData.item, nodeData.x, nodeData.y, saveCanvasStateFromNodesRef, handleNodeClick, handleImageDoubleClick);
           addedItemIds.add(nodeData.item.filename);
           nodesRef.current.push({ id: nodeData.item.filename, group, item: nodeData.item, type: 'image' });
         }
@@ -205,7 +210,7 @@ export default function CanvasPage() {
       const cardHeight = item.title && item.title.length > 0 ? 280 : 260;
       const { x, y } = NodePositioning.findRandomUnoccupiedPosition(stage, nodesRef, nodeWidth, cardHeight);
 
-      const group = NoteNode.create(layer, item, x, y, saveCanvasStateFromNodesRef, handleNodeClick);
+      const group = NoteNode.create(layer, item, x, y, saveCanvasStateFromNodesRef, handleNodeClick, handleNoteDoubleClick);
       layer.draw();
       const itemId = item.noteId;
       setItems(prev => new Set(prev).add(itemId));
@@ -216,7 +221,7 @@ export default function CanvasPage() {
       const thumbnailHeight = thumbnailWidth / item.aspectRatio;
       const { x, y } = NodePositioning.findRandomUnoccupiedPosition(stage, nodesRef, thumbnailWidth, thumbnailHeight);
 
-      const group = ImageNode.create(layer, item, x, y, saveCanvasStateFromNodesRef, handleNodeClick);
+      const group = ImageNode.create(layer, item, x, y, saveCanvasStateFromNodesRef, handleNodeClick, handleImageDoubleClick);
       layer.draw();
       const itemId = item.filename;
       setItems(prev => new Set(prev).add(itemId));
@@ -282,6 +287,39 @@ export default function CanvasPage() {
     setIsSidebarOpen(prev => !prev);
   }
 
+  function handleImageDoubleClick(imageItem) {
+    const imageWithUrl = {
+      url: `/images/${imageItem.filename}`,
+      width: imageItem.width,
+      height: imageItem.height,
+      aspectRatio: imageItem.aspectRatio,
+      filename: imageItem.filename,
+    };
+
+    function handleCloseLightbox() {
+      closeModal();
+    }
+
+    openModal(
+      <Lightbox
+        selectedImage={imageWithUrl}
+        imageDetails={[imageWithUrl]}
+        onClose={handleCloseLightbox}
+      />
+    );
+  }
+
+  function handleNoteDoubleClick(noteItem) {
+    openModal(
+      <AppProvider>
+        <NotesProvider>
+          <NotesEditorModal note={noteItem} />
+        </NotesProvider>
+      </AppProvider>,
+      '.note-modal-root'
+    );
+  }
+
   let content;
   if (isKonvaReady !== true) {
     content = <div className="canvas-loading">Loading...</div>;
@@ -303,6 +341,8 @@ export default function CanvasPage() {
       />
       {content}
       {isSidebarOpen && <CanvasNotePicker onAddNote={handleAddNote} addedItems={items} />}
+      <div className="note-modal-root"></div>
+      <div className="modal-root"></div>
     </div>
   );
 }

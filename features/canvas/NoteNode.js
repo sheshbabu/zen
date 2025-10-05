@@ -1,4 +1,4 @@
-function create(layer, item, x, y, onDragEnd, onClick) {
+function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick) {
   const note = {
     id: `note-${item.noteId}`,
     type: 'note',
@@ -122,6 +122,12 @@ function create(layer, item, x, y, onDragEnd, onClick) {
   group.on('click', (e) => {
     if (onClick) {
       onClick(group, e);
+    }
+  });
+
+  group.on('dblclick', () => {
+    if (onDoubleClick) {
+      onDoubleClick(item);
     }
   });
 
