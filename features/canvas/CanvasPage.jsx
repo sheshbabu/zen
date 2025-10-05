@@ -3,6 +3,7 @@ import useKonva from './useKonva.js';
 import NoteNode from './NoteNode.js';
 import ImageNode from './ImageNode.js';
 import CanvasNotePicker from './CanvasNotePicker.jsx';
+import CanvasToolbar from './CanvasToolbar.jsx';
 import JsonCanvas from './JsonCanvas.js';
 import ViewportManager from './ViewportManager.js';
 import SelectionManager from './SelectionManager.js';
@@ -15,6 +16,8 @@ export default function CanvasPage() {
   const stageRef = useRef(null);
   const isKonvaReady = useKonva();
   const [items, setItems] = useState(new Set());
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
   const nodesRef = useRef([]);
   const viewportManagerRef = useRef(null);
   const selectionManagerRef = useRef(null);
@@ -28,7 +31,7 @@ export default function CanvasPage() {
     const stage = new window.Konva.Stage({
       container: containerRef.current,
       width: canvasWidth,
-      height: window.innerHeight,
+      height: window.innerHeight - 48,
     });
 
     const layer = new window.Konva.Layer();
@@ -100,14 +103,20 @@ export default function CanvasPage() {
     }
 
     function handleResize() {
-      const newCanvasWidth = window.innerWidth - 400;
+      const newCanvasWidth = isSidebarOpen ? window.innerWidth - 400 : window.innerWidth;
       stage.width(newCanvasWidth);
-      stage.height(window.innerHeight);
+      stage.height(window.innerHeight - 48);
     }
 
     function handleKeyDown(e) {
       if (e.key === 'Delete' || e.key === 'Backspace') {
         handleDeleteSelected();
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+        e.preventDefault();
+        handleSelectAll();
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        handleToggleSidebar();
       }
     }
 
@@ -119,9 +128,20 @@ export default function CanvasPage() {
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('keydown', handleKeyDown);
+      nodesRef.current = [];
       stage.destroy();
     };
   }, [isKonvaReady]);
+
+  useEffect(() => {
+    if (stageRef.current === null) {
+      return
+    }
+    const stage = stageRef.current.stage;
+    const newCanvasWidth = isSidebarOpen ? window.innerWidth - 400 : window.innerWidth;
+    stage.width(newCanvasWidth);
+    stageRef.current.layer.draw();
+  }, [isSidebarOpen]);
 
   function saveCanvasStateFromNodesRef() {
     if (stageRef.current === null || viewportManagerRef.current === null) {
@@ -205,6 +225,63 @@ export default function CanvasPage() {
     }
   }
 
+  function handleBack() {
+    window.history.back();
+  }
+
+  function handleZoomIn() {
+    if (stageRef.current === null) {
+      return
+    }
+    const stage = stageRef.current.stage;
+    const newScale = Math.min(5, stage.scaleX() * 1.2);
+    stage.scale({ x: newScale, y: newScale });
+    setZoomLevel(newScale);
+    stageRef.current.layer.draw();
+    saveCanvasStateFromNodesRef();
+  }
+
+  function handleZoomOut() {
+    if (stageRef.current === null) {
+      return
+    }
+    const stage = stageRef.current.stage;
+    const newScale = Math.max(0.1, stage.scaleX() / 1.2);
+    stage.scale({ x: newScale, y: newScale });
+    setZoomLevel(newScale);
+    stageRef.current.layer.draw();
+    saveCanvasStateFromNodesRef();
+  }
+
+  function handleZoomReset() {
+    if (stageRef.current === null) {
+      return
+    }
+    const stage = stageRef.current.stage;
+    stage.scale({ x: 1, y: 1 });
+    stage.position({ x: 0, y: 0 });
+    setZoomLevel(1);
+    stageRef.current.layer.draw();
+    saveCanvasStateFromNodesRef();
+  }
+
+  function handleSelectAll() {
+    if (selectionManagerRef.current === null) return;
+
+    nodesRef.current.forEach(node => {
+      node.group.setSelected(true);
+      selectionManagerRef.current.getSelectedNodes().add(node.group);
+    });
+
+    if (stageRef.current !== null) {
+      stageRef.current.layer.draw();
+    }
+  }
+
+  function handleToggleSidebar() {
+    setIsSidebarOpen(prev => !prev);
+  }
+
   let content;
   if (isKonvaReady !== true) {
     content = <div className="canvas-loading">Loading...</div>;
@@ -214,8 +291,18 @@ export default function CanvasPage() {
 
   return (
     <div className="canvas-page">
+      <CanvasToolbar
+        onBack={handleBack}
+        onDelete={handleDeleteSelected}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onZoomReset={handleZoomReset}
+        zoomLevel={zoomLevel}
+        onToggleSidebar={handleToggleSidebar}
+        isSidebarOpen={isSidebarOpen}
+      />
       {content}
-      <CanvasNotePicker onAddNote={handleAddNote} addedItems={items} />
+      {isSidebarOpen && <CanvasNotePicker onAddNote={handleAddNote} addedItems={items} />}
     </div>
   );
 }

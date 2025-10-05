@@ -1,9 +1,9 @@
 .canvas-note-picker {
   position: fixed;
-  top: 0;
+  top: 48px;
   right: 0;
   width: 400px;
-  height: 100vh;
+  height: calc(100vh - 48px);
   background: var(--neutral-50);
   border-left: 1px solid var(--neutral-100);
   display: flex;
