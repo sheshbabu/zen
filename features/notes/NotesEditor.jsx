@@ -149,6 +149,10 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
         navigateTo("/", true);
       }
     } else {
+      // Reset current edits
+      setTitle(selectedNote?.title || "");
+      setContent(selectedNote?.content || "");
+      setTags(selectedNote?.tags || []);
       setIsEditable(false);
     }
   }
