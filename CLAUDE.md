@@ -35,6 +35,7 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
   - `templates/` - Template management with usage tracking and placeholders
   - `intelligence/` - AI-powered indexing and similarity search (optional, requires zen-intelligence)
   - `mcp/` - Model Context Protocol server for external integrations
+  - `canvas/` - Spatial organization with infinite canvas
 - **Commons**: Shared utilities in `commons/`
   - `auth/` - Authentication middleware
   - `session/` - Session management
@@ -51,6 +52,13 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
 - **Routing**: Custom router implementation in `commons/components/Router.jsx`
 - **State Management**: Local component state and hooks
 - **Styling**: Plain CSS with CSS custom properties for theming
+
+### Canvas
+- **Canvas Library**: Konva.js for 2D canvas rendering
+- **File Format**: JSON Canvas (jsoncanvas.org) for data storage
+- **Storage**: SessionStorage for canvas state persistence
+- **Node Types**: Note nodes, sticky notes, image nodes
+- **Features**: Pan/zoom viewport, selection, transformation, spatial organization
 
 ### Key Patterns
 - **API Routes**: RESTful endpoints prefixed with `/api/`
