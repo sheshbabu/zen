@@ -91,12 +91,13 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
   const shouldShowSimilarImagesButton = similarImages.length > 0 && isZoomed === false;
 
   if (isZoomed === false && isSimilarImagesVisible === true && similarImages.length > 0) {
-    const gridImages = similarImages.map(image => (
+    const gridImages = similarImages.map((image, index) => (
       <img
         key={image.filename}
         src={`/images/${image.filename}`}
         alt=""
-        className="lightbox-similar-image"
+        className="lightbox-similar-image reveal-animate"
+        style={`--reveal-index: ${index + 1}`}
         onClick={() => handleSimilarImageClick(image)}
       />
     ));

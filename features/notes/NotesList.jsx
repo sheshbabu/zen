@@ -24,7 +24,7 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
 
   if (view === "card") {
     listClassName = "";
-    items = notes.map(note => <NotesGridItem note={note} key={note.noteId} />);
+    items = notes.map((note, index) => <NotesGridItem note={note} key={note.noteId} index={index} />);
     items = (
       <div className="notes-grid">
         {items}
@@ -86,7 +86,7 @@ function NotesListItem({ note }) {
   );
 }
 
-function NotesGridItem({ note }) {
+function NotesGridItem({ note, index }) {
   const link = `/notes/${note.noteId}`;
   const tags = note.tags?.map(tag => (<Link className="tag" key={tag.tagId} to={`/notes/?tagId=${tag.tagId}`} shouldPreserveSearchParams>{tag.name}</Link>));
   let title = <div className="notes-grid-item-title">{note.title}</div>
@@ -123,14 +123,14 @@ function NotesGridItem({ note }) {
 
   if (isMobile()) {
     return (
-      <Link className={`notes-grid-item ${note.isPinned ? 'pinned' : ''}`} to={link} shouldPreserveSearchParams>
+      <Link className={`notes-grid-item ${note.isPinned ? 'pinned' : ''} reveal-animate`} to={link} shouldPreserveSearchParams style={`--reveal-index: ${index + 1}`}>
         {content}
       </Link>
     );
   }
 
   return (
-    <div className={`notes-grid-item ${note.isPinned ? 'pinned' : ''}`} onClick={handleClick}>
+    <div className={`notes-grid-item ${note.isPinned ? 'pinned' : ''} reveal-animate`} onClick={handleClick} style={`--reveal-index: ${index + 1}`}>
       {content}
     </div>
   );

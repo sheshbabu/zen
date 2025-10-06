@@ -134,6 +134,13 @@
             cursor: pointer;
             zoom: 0.6;
 
+            &.reveal-animate {
+                opacity: 0;
+                transform: translateY(20px);
+                animation: notes-grid-reveal 0.4s ease-out forwards;
+                animation-delay: calc(var(--reveal-index, 1) * 0.05s);
+            }
+
             .notes-grid-item-header {
                 display: flex;
                 justify-content: space-between;
@@ -263,6 +270,13 @@
         justify-content: center;
         align-items: center;
         margin-top: 64px;
+    }
+}
+
+@keyframes notes-grid-reveal {
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
