@@ -1,8 +1,9 @@
-import { h, render, useState, useRef, useEffect, useCallback } from "../../assets/preact.esm.js"
+import { h, useState, useRef, useEffect, useCallback } from "../../assets/preact.esm.js"
 import ApiClient from '../../commons/http/ApiClient.js';
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import NotesEditorFormattingToolbar from './NotesEditorFormattingToolbar.jsx';
 import TableOfContents from './TableOfContents.jsx';
+import TemplatePicker from '../templates/TemplatePicker.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import isMobile from '../../commons/utils/isMobile.js';
@@ -10,10 +11,18 @@ import NoteDeleteModal from './NoteDeleteModal.jsx';
 import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
 import Button from '../../commons/components/Button.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
+import { closeModal, openModal } from '../../commons/components/Modal.jsx';
+import { useNotes } from "../../commons/contexts/NotesContext.jsx";
+import { useVisibleHeadings } from "./useVisibleHeadings.js";
+import useEditorKeyboardShortcuts from "./useEditorKeyboardShortcuts.js";
+import useImageUpload from "./useImageUpload.js";
+import useMarkdownFormatter from "./useMarkdownFormatter.js";
 import "./NotesEditor.css";
 import { CloseIcon, SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
 
-export default function NotesEditor({ selectedNote, isNewNote, isFloating, onChange, onClose }) {
+export default function NotesEditor({ isNewNote, isFloating, onClose }) {
+  const { selectedNote, handleNoteChange, handlePinToggle } = useNotes();
+
   if (!isNewNote && selectedNote === null) {
     return null;
   }
@@ -22,23 +31,41 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   const [title, setTitle] = useState(selectedNote?.title || "");
   const [content, setContent] = useState(selectedNote?.content || "");
   const [tags, setTags] = useState(selectedNote?.tags || []);
-  const [isDraggingOver, setIsDraggingOver] = useState(false);
-  const [attachments, setAttachments] = useState([]);
   const [isSaveLoading, setIsSaveLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const titleRef = useRef(null);
   const textareaRef = useRef(null);
-  const fileInputRef = useRef(null);
+  const contentRef = useRef(null);
+
+  const visibleHeadings = useVisibleHeadings(contentRef, content, isEditable, isExpanded);
+
+  const { insertAtCursor, formatSelectedText, applyMarkdownFormat } = useMarkdownFormatter({
+    textareaRef,
+    setContent
+  });
+
+  const {
+    isDraggingOver,
+    attachments,
+    fileInputRef,
+    handlePaste,
+    handleDragOver,
+    handleDragLeave,
+    handleImageDrop,
+    handleDropzoneClick,
+    handleFileInputChange,
+    resetAttachments
+  } = useImageUpload({ insertAtCursor });
 
   let contentArea = null;
 
   useEffect(() => {
-    if (isNewNote || (isEditable && titleRef.current?.textContent === "")) {
-      titleRef.current.focus();
+    if (isNewNote === true || (isEditable === true && titleRef.current?.textContent === "")) {
+      titleRef.current?.focus();
     }
 
-    if (!isNewNote) {
+    if (isNewNote !== true) {
       document.title = title === "" ? "Zen" : title;
     }
   }, []);
@@ -72,112 +99,31 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     promise
       .then(note => {
         setIsEditable(false);
-        setAttachments([]); // reset
+        resetAttachments();
 
         if (isNewNote && !onClose) {
           navigateTo(`/notes/${note.noteId}`, true);
         }
 
-        onChange();
+        handleNoteChange();
       })
       .finally(() => {
         setIsSaveLoading(false);
       });
-  }, [content, tags, isNewNote, selectedNote, onChange]);
+  }, [content, tags, isNewNote, selectedNote, handleNoteChange, resetAttachments]);
 
-  const handleKeyDown = useCallback(e => {
-    const isTextAreaFocused = document.activeElement.className == "notes-editor-textarea";
-
-    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-      e.preventDefault();
-      if (isEditable) {
-        handleSaveClick();
-      } else {
-        handleEditClick();
-      }
-    }
-
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      if (isFloating) {
-        handleCloseClick();
-      }
-    }
-
-    if ((e.metaKey || e.ctrlKey) && e.key === '\\') {
-      e.preventDefault();
-      handleExpandToggleClick();
-    }
-
-    if (isTextAreaFocused && e.key === 'Tab' && !e.shiftKey) {
-      e.preventDefault();
-      insertAtCursor('  ');
-    }
-
-    if (isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'h') {
-      e.preventDefault();
-      formatSelectedText("highlight");
-    }
-
-    if (isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.key === 'b') {
-      e.preventDefault();
-      formatSelectedText("bold");
-    }
-
-    if (isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.key === 'i') {
-      e.preventDefault();
-      formatSelectedText("italic");
-    }
-
-    if (isTextAreaFocused && e.key === 'Enter' && !e.metaKey && !e.ctrlKey) {
-      const textarea = textareaRef.current;
-      const cursorPos = textarea.selectionStart;
-      const textBeforeCursor = textarea.value.substring(0, cursorPos);
-      const lines = textBeforeCursor.split('\n');
-      const currentLine = lines[lines.length - 1];
-
-      // Check for list patterns: unordered lists, todo items, ordered lists
-      const listPatterns = [
-        /^(\s*)(- \[ \] )/,  // Todo items: "- [ ] "
-        /^(\s*)(- \[x\] )/,  // Completed todo items: "- [x] "
-        /^(\s*)(- )/,        // Unordered lists: "- "
-        /^(\s*)(\* )/,       // Unordered lists: "* "
-        /^(\s*)(\+ )/,       // Unordered lists: "+ "
-        /^(\s*)(\d+\. )/,    // Ordered lists: "1. ", "2. ", etc.
-      ];
-
-      for (const pattern of listPatterns) {
-        const match = currentLine.match(pattern);
-        if (match) {
-          e.preventDefault();
-          const indentation = match[1];
-          let prefix = match[2];
-
-          // For completed todos, create a new unchecked todo
-          if (prefix === "- [x] ") {
-            prefix = "- [ ] ";
-          }
-          // For ordered lists, increment the number
-          else if (/^\d+\. $/.test(prefix)) {
-            const num = parseInt(prefix.match(/^(\d+)/)[1]) + 1;
-            prefix = `${num}. `;
-          }
-
-          const newLineText = `\n${indentation}${prefix}`;
-          insertAtCursor(newLineText);
-          return;
-        }
-      }
-    }
-  }, [isEditable, isFloating, isExpanded, handleSaveClick, handleExpandToggleClick]);
-
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [handleKeyDown]);
+  const { handleKeyDown } = useEditorKeyboardShortcuts({
+    isEditable,
+    isFloating,
+    isExpanded,
+    textareaRef,
+    onSave: handleSaveClick,
+    onEdit: handleEditClick,
+    onClose: handleCloseClick,
+    onExpandToggle: handleExpandToggleClick,
+    onInsertAtCursor: insertAtCursor,
+    onFormatText: formatSelectedText
+  });
 
   function handleTextAreaHeight() {
     if (textareaRef.current === null) {
@@ -221,63 +167,6 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     setTags((prevTags) => prevTags.filter(t => t.tagId !== tag.tagId));
   }
 
-  function handlePaste(e) {
-    const items = e.clipboardData.items;
-
-    // Ignore if it doesn't contain any images
-    if (Array.from(items).every(item => item.type.indexOf('image') === -1)) {
-      return;
-    }
-
-    e.preventDefault();
-    for (let item of items) {
-      if (item.type.indexOf('image') !== -1) {
-        const file = item.getAsFile();
-        setAttachments((prevAttachments) => [...prevAttachments, file]);
-        uploadImage(file);
-      }
-    }
-  }
-
-  function handleDragOver(e) {
-    e.preventDefault();
-    setIsDraggingOver(true);
-  }
-
-  function handleDragLeave(e) {
-    e.preventDefault();
-    setIsDraggingOver(false);
-  }
-
-  function handleImageDrop(e) {
-    e.preventDefault();
-    setIsDraggingOver(false);
-
-    const files = e.dataTransfer.files;
-    processImageFiles(files);
-  }
-
-  function handleDropzoneClick() {
-    fileInputRef.current?.click();
-  }
-
-  function handleFileInputChange(e) {
-    const files = e.target.files;
-    if (files) {
-      processImageFiles(files);
-      e.target.value = '';
-    }
-  }
-
-  function processImageFiles(files) {
-    for (let file of files) {
-      if (file.type.startsWith('image/')) {
-        setAttachments((prevAttachments) => [...prevAttachments, file]);
-        uploadImage(file);
-      }
-    }
-  }
-
   function handleCloseClick() {
     if (onClose) {
       onClose();
@@ -287,12 +176,11 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
   }
 
   function handleDeleteClick() {
-    render(
+    openModal(
       <NoteDeleteModal
         onDeleteClick={handleDeleteConfirmClick}
         onCloseClick={handleDeleteCloseClick}
-      />,
-      document.querySelector('.modal-root'));
+      />);
   }
 
   function handleDeleteConfirmClick() {
@@ -304,19 +192,19 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         } else {
           navigateTo("/", true);
         }
-        onChange();
+        handleNoteChange();
       });
   }
 
   function handleDeleteCloseClick() {
-    render(null, document.querySelector('.modal-root'));
+    closeModal();
   }
 
   function handleArchiveClick() {
     ApiClient.archiveNote(selectedNote.noteId)
       .then(() => {
         showToast("Note archived.");
-        onChange();
+        handleNoteChange();
       });
   }
 
@@ -324,14 +212,14 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     ApiClient.unarchiveNote(selectedNote.noteId)
       .then(() => {
         showToast("Note unarchived.");
-        onChange();
+        handleNoteChange();
       });
   }
 
   function handleRestoreClick() {
     ApiClient.restoreNote(selectedNote.noteId)
       .then(() => {
-        onChange();
+        handleNoteChange();
       });
   }
 
@@ -345,132 +233,35 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     }
   }
 
-  function uploadImage(file) {
-    const formData = new FormData();
-    formData.append('image', file);
-    ApiClient.uploadImage(formData)
-      .then(result => {
-        const imageUrl = `![](/images/${result.filename})`;
-        insertAtCursor(imageUrl);
-      });
+  function handlePinClick() {
+    if (handlePinToggle && selectedNote) {
+      handlePinToggle(selectedNote.noteId, selectedNote.isPinned);
+    }
   }
 
-  function insertAtCursor(text) {
-    if (textareaRef.current === null) {
-      return;
+  function handleUnpinClick() {
+    if (handlePinToggle && selectedNote) {
+      handlePinToggle(selectedNote.noteId, selectedNote.isPinned);
+    }
+  }
+
+  function handleTemplateApply(templateTitle, templateContent, templateTags) {
+    if (templateTitle && templateTitle.trim() !== "") {
+      setTitle(templateTitle);
     }
 
-    const textarea = textareaRef.current;
-    const startPos = textarea.selectionStart;
-    const endPos = textarea.selectionEnd;
-    const beforeText = textarea.value.substring(0, startPos);
-    const afterText = textarea.value.substring(endPos);
+    setContent(templateContent);
 
-    setContent(beforeText + text + afterText);
+    if (templateTags && templateTags.length > 0) {
+      setTags(templateTags);
+    }
 
-    // Use setTimeout to ensure cursor position is set after DOM update
-    const newPosition = startPos + text.length;
     setTimeout(() => {
       if (textareaRef.current) {
-        textareaRef.current.selectionStart = newPosition;
-        textareaRef.current.selectionEnd = newPosition;
         textareaRef.current.focus();
-      }
-    }, 0);
-  }
-
-  function formatSelectedText(format) {
-    applyMarkdownFormat(format);
-  }
-
-  function applyMarkdownFormat(format, placeholder = "") {
-    if (textareaRef.current === null) {
-      return;
-    }
-
-    const textarea = textareaRef.current;
-    const startPos = textarea.selectionStart;
-    const endPos = textarea.selectionEnd;
-    const beforeText = textarea.value.substring(0, startPos);
-    const afterText = textarea.value.substring(endPos);
-    const selectedText = textarea.value.substring(startPos, endPos);
-
-    let formattedText = "";
-    let cursorOffset = 0;
-
-    switch (format) {
-      case "bold":
-        formattedText = `**${selectedText || placeholder}**`;
-        cursorOffset = selectedText ? formattedText.length : 2;
-        break;
-      case "italic":
-        formattedText = `*${selectedText || placeholder}*`;
-        cursorOffset = selectedText ? formattedText.length : 1;
-        break;
-      case "strikethrough":
-        formattedText = `~~${selectedText || placeholder}~~`;
-        cursorOffset = selectedText ? formattedText.length : 2;
-        break;
-      case "highlight":
-        formattedText = `==${selectedText || placeholder}==`;
-        cursorOffset = selectedText ? formattedText.length : 2;
-        break;
-      case "code":
-        formattedText = `\`${selectedText || placeholder}\``;
-        cursorOffset = selectedText ? formattedText.length : 1;
-        break;
-      case "h1":
-        formattedText = `# ${selectedText || placeholder}`;
-        cursorOffset = selectedText ? formattedText.length : 2;
-        break;
-      case "h2":
-        formattedText = `## ${selectedText || placeholder}`;
-        cursorOffset = selectedText ? formattedText.length : 3;
-        break;
-      case "h3":
-        formattedText = `### ${selectedText || placeholder}`;
-        cursorOffset = selectedText ? formattedText.length : 4;
-        break;
-      case "ul":
-        formattedText = `- ${selectedText || placeholder}`;
-        cursorOffset = selectedText ? formattedText.length : 2;
-        break;
-      case "ol":
-        formattedText = `1. ${selectedText || placeholder}`;
-        cursorOffset = selectedText ? formattedText.length : 3;
-        break;
-      case "todo":
-        formattedText = `- [ ] ${selectedText || placeholder}`;
-        cursorOffset = selectedText ? formattedText.length : 6;
-        break;
-      case "quote":
-        formattedText = `> ${selectedText || placeholder}`;
-        cursorOffset = selectedText ? formattedText.length : 2;
-        break;
-      case "hr":
-        formattedText = `\n---\n`;
-        cursorOffset = formattedText.length;
-        break;
-      case "link":
-        if (selectedText) {
-          formattedText = `[${selectedText}](url)`;
-          cursorOffset = formattedText.length - 4; // Position cursor at "url"
-        } else {
-          formattedText = `[${placeholder}](url)`;
-          cursorOffset = 1; // Position cursor at placeholder
-        }
-        break;
-    }
-
-    setContent(beforeText + formattedText + afterText);
-
-    // Set cursor position after content update
-    setTimeout(() => {
-      if (textareaRef.current) {
-        const newPosition = startPos + cursorOffset;
-        textareaRef.current.selectionStart = newPosition;
-        textareaRef.current.selectionEnd = newPosition;
-        textareaRef.current.focus();
+        const length = templateContent.length;
+        textareaRef.current.selectionStart = length;
+        textareaRef.current.selectionEnd = length;
       }
     }, 0);
   }
@@ -493,7 +284,7 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
     );
   } else {
     contentArea = (
-      <div className="notes-editor-rendered" dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }} />
+      <div className="notes-editor-rendered" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }} />
     );
   }
 
@@ -503,6 +294,11 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       <img src={imageUrl} alt={`Attachment ${index}`} />
     );
   });
+
+  let templatePicker = null;
+  if (isNewNote === true && isEditable === true && title === "" && content === "") {
+    templatePicker = <TemplatePicker onTemplateApply={handleTemplateApply} />;
+  }
 
   // TODO: remove "is-editable" CSS and use JS
   return (
@@ -523,6 +319,8 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
         onUnarchiveClick={handleUnarchiveClick}
         onRestoreClick={handleRestoreClick}
         onExpandToggleClick={handleExpandToggleClick}
+        onPinClick={handlePinClick}
+        onUnpinClick={handleUnpinClick}
       />
       <div className="notes-editor-header">
         <div className="notes-editor-title" contentEditable={isEditable} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
@@ -537,15 +335,13 @@ export default function NotesEditor({ selectedNote, isNewNote, isFloating, onCha
       <div className="notes-editor-content">
         {contentArea}
       </div>
-      <TableOfContents content={content} isExpanded={isExpanded} isEditable={isEditable} isNewNote={isNewNote} />
+      {templatePicker}
+      <TableOfContents content={content} isExpanded={isExpanded} isEditable={isEditable} isNewNote={isNewNote} visibleHeadings={visibleHeadings} />
     </div>
   );
 }
 
-function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExpanded, onSaveClick, onEditClick, onEditCancelClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick }) {
-  const rightToolbarActions = [];
-  const leftToolbarActions = [];
-  const menuActions = [];
+function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExpanded, onSaveClick, onEditClick, onEditCancelClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick, onPinClick, onUnpinClick }) {
   const saveButtonText = isSaveLoading ? "Saving..." : "Save";
 
   function handleClick(e) {
@@ -557,64 +353,82 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExp
     document.querySelector(".notes-editor-container").scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  if (isFloating) {
-    rightToolbarActions.push(
-      <Button variant="ghost" onClick={onCloseClick}><CloseIcon /></Button>
-    );
-  }
+  const actions = {
+    left: [
+      {
+        key: 'expand',
+        condition: !isFloating && !isMobile(),
+        component: <Button variant="ghost" onClick={onExpandToggleClick}>
+          {isExpanded ? <SidebarCloseIcon /> : <SidebarOpenIcon />}
+        </Button>
+      },
+      {
+        key: 'back',
+        condition: isMobile() && !isNewNote,
+        component: <Button variant="ghost" onClick={() => window.history.back()}><BackIcon /></Button>
+      }
+    ],
+    right: [
+      {
+        key: 'close',
+        condition: isFloating,
+        component: <Button variant="ghost" onClick={onCloseClick}><CloseIcon /></Button>
+      },
+      {
+        key: 'save',
+        condition: isEditable,
+        component: <Button variant="ghost" isDisabled={isSaveLoading} onClick={onSaveClick}>{saveButtonText}</Button>
+      },
+      {
+        key: 'cancel',
+        condition: isEditable,
+        component: <Button variant="ghost" onClick={onEditCancelClick}>Cancel</Button>
+      },
+      {
+        key: 'edit',
+        condition: !isEditable,
+        component: <Button variant="ghost" onClick={onEditClick}>Edit</Button>
+      }
+    ],
+    menu: [
+      {
+        key: 'pin',
+        condition: !isNewNote && !note?.isDeleted && !note?.isArchived,
+        component: <div onClick={note?.isPinned ? onUnpinClick : onPinClick}>
+          {note?.isPinned ? 'Unpin' : 'Pin'}
+        </div>
+      },
+      {
+        key: 'archive',
+        condition: !isNewNote && !note?.isDeleted,
+        component: <div onClick={note?.isArchived ? onUnarchiveClick : onArchiveClick}>
+          {note?.isArchived ? 'Unarchive' : 'Archive'}
+        </div>
+      },
+      {
+        key: 'restore',
+        condition: !isNewNote && note?.isDeleted,
+        component: <div onClick={onRestoreClick}>Restore</div>
+      },
+      {
+        key: 'delete',
+        condition: !isNewNote && !note?.isDeleted,
+        component: <div onClick={onDeleteClick}>Delete</div>
+      }
+    ]
+  };
 
-  if (!isFloating && !isMobile()) {
-    if (isExpanded) {
-      leftToolbarActions.push(
-        <Button variant="ghost" onClick={onExpandToggleClick}><SidebarCloseIcon /></Button>
-      );
-    } else {
-      leftToolbarActions.push(
-        <Button variant="ghost" onClick={onExpandToggleClick}><SidebarOpenIcon /></Button>
-      );
-    }
-  }
+  const leftToolbarActions = actions.left
+    .filter(action => action.condition)
+    .map(action => action.component);
 
-  if (isMobile() && !isNewNote) {
-    leftToolbarActions.push(
-      <Button variant="ghost" onClick={() => window.history.back()}><BackIcon /></Button>
-    );
-  }
+  const rightToolbarActions = actions.right
+    .filter(action => action.condition)
+    .map(action => action.component);
 
-  if (isEditable) {
-    rightToolbarActions.push(
-      <Button variant="ghost" isDisabled={isSaveLoading} onClick={onSaveClick}>{saveButtonText}</Button>
-    );
-    rightToolbarActions.push(
-      <Button variant="ghost" onClick={onEditCancelClick}>Cancel</Button>
-    );
-  } else {
-    rightToolbarActions.push(
-      <Button variant="ghost" onClick={onEditClick}>Edit</Button>
-    );
-  }
-
-  if (!isNewNote) {
-    if (note.isArchived) {
-      menuActions.push(
-        <div style="width: 80px;" onClick={onUnarchiveClick}>Unarchive</div>
-      );
-    } else if (!note.isDeleted) {
-      menuActions.push(
-        <div style="width: 80px;" onClick={onArchiveClick}>Archive</div>
-      );
-    }
-
-    if (note.isDeleted) {
-      menuActions.push(
-        <div style="width: 80px;" onClick={onRestoreClick}>Restore</div>
-      );
-    } else {
-      menuActions.push(
-        <div style="width: 80px;" onClick={onDeleteClick}>Delete</div>
-      );
-    }
-  }
+  const menuActions = actions.menu
+    .filter(action => action.condition)
+    .map(action => action.component);
 
   return (
     <div className="notes-editor-toolbar" onClick={handleClick}>

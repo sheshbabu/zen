@@ -1,5 +1,5 @@
 .notes-gallery {
-    margin-left: 12px;
+    margin-left: var(--spacing-3);
 
     .image-gallery {
         position: relative;
@@ -44,58 +44,3 @@
     }
 }
 
-.lightbox {
-    max-width: 95vw;
-    max-height: 95vh;
-    overflow: hidden;
-    background-color: transparent;
-    border: none;
-    box-shadow: none;
-    animation-duration: 0.1s;
-
-    .lightbox-image-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-
-        .lightbox-image {
-            max-width: 95vw;
-            max-height: 95vh;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            border-radius: 4px;
-
-            &.zoomable {
-                cursor: zoom-in;
-            }
-        }
-    }
-
-    &.zoomed {
-        max-width: 80vw;
-        max-height: 95vh;
-        overflow-y: auto;
-        overflow-x: hidden;
-
-        .lightbox-image-container {
-            align-items: flex-start;
-            justify-content: center;
-            min-height: 100%;
-
-            .lightbox-image {
-                width: 80vw;
-                max-width: 80vw;
-                max-height: none;
-                height: auto;
-                object-fit: contain;
-
-                &.zoomable {
-                    cursor: zoom-out;
-                }
-            }
-        }
-    }
-}

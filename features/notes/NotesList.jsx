@@ -1,16 +1,20 @@
-import { h, render, Fragment } from "../../assets/preact.esm.js"
+import { h, Fragment } from "../../assets/preact.esm.js"
 import NotesListToolbar from './NotesListToolbar.jsx';
 import Link from '../../commons/components/Link.jsx';
 import Spinner from '../../commons/components/Spinner.jsx';
 import Button from '../../commons/components/Button.jsx';
+import { PinIcon } from '../../commons/components/Icon.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import formatDate from '../../commons/utils/formatDate.js';
 import isMobile from "../../commons/utils/isMobile.js";
 import ImageGallery from "./ImageGallery.jsx";
 import NotesEditorModal from './NotesEditorModal.jsx';
+import { NotesProvider } from "../../commons/contexts/NotesContext.jsx";
+import { AppProvider } from '../../commons/contexts/AppContext.jsx';
+import { openModal } from '../../commons/components/Modal.jsx';
 import "./NotesList.css";
 
-export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onChange, onSidebarToggle }) {
+export default function NotesList({ notes = [], total, isLoading, images = [], imagesTotal, isImagesLoading, view, onViewChange, onLoadMoreClick, onLoadMoreImagesClick, onSidebarToggle }) {
   let listClassName = "notes-list";
   let items = notes.map(note => <NotesListItem note={note} key={note.noteId} />);
   let content = <div className="notes-list-spinner"><Spinner /></div>;
@@ -20,7 +24,7 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
 
   if (view === "card") {
     listClassName = "";
-    items = notes.map(note => <NotesGridItem note={note} key={note.noteId} onChange={onChange} />);
+    items = notes.map((note, index) => <NotesGridItem note={note} key={note.noteId} index={index} />);
     items = (
       <div className="notes-grid">
         {items}
@@ -46,7 +50,7 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
 
   return (
     <>
-      <NotesListToolbar onListViewClick={() => onViewChange("list")} onCardViewClick={() => onViewChange("card")} onGalleryViewClick={() => onViewChange("gallery")} onSidebarToggle={onSidebarToggle} />
+      <NotesListToolbar onViewChange={onViewChange} onSidebarToggle={onSidebarToggle} />
       {content}
     </>
   );
@@ -69,8 +73,11 @@ function NotesListItem({ note }) {
   }
 
   return (
-    <Link to={link} className="notes-list-item" activeClassName="is-active" shouldPreserveSearchParams>
-      {title}
+    <Link to={link} className={`notes-list-item ${note.isPinned ? 'pinned' : ''}`} activeClassName="is-active" shouldPreserveSearchParams>
+      <div className="notes-list-item-header">
+        {title}
+        <PinIcon isPinned={note.isPinned} className="notes-list-item-pin" />
+      </div>
       <div className="notes-list-item-subcontainer">
         <div className="notes-list-item-tags">{tags}</div>
         <div className="notes-list-item-subtext" title={fullUpdatedAt}>{shortUpdatedAt}</div>
@@ -79,7 +86,7 @@ function NotesListItem({ note }) {
   );
 }
 
-function NotesGridItem({ note, onChange }) {
+function NotesGridItem({ note, index }) {
   const link = `/notes/${note.noteId}`;
   const tags = note.tags?.map(tag => (<Link className="tag" key={tag.tagId} to={`/notes/?tagId=${tag.tagId}`} shouldPreserveSearchParams>{tag.name}</Link>));
   let title = <div className="notes-grid-item-title">{note.title}</div>
@@ -89,12 +96,26 @@ function NotesGridItem({ note, onChange }) {
   }
 
   function handleClick() {
-    render(<NotesEditorModal note={note} onChange={onChange} />, document.querySelector('.note-modal-root'));
+    openModal(
+      <AppProvider>
+        <NotesProvider>
+          <NotesEditorModal note={note} />
+        </NotesProvider>
+      </AppProvider>,
+      '.note-modal-root'
+    );
   }
+
 
   const content = (
     <>
-      {title}
+      <div className="notes-grid-item-header">
+        {title}
+        <PinIcon
+          isPinned={note.isPinned}
+          className="notes-grid-item-pin"
+        />
+      </div>
       <div className="notes-grid-item-content" dangerouslySetInnerHTML={{ __html: renderMarkdown(note.snippet) }} />
       <div className="notes-grid-item-tags">{tags}</div>
     </>
@@ -102,14 +123,14 @@ function NotesGridItem({ note, onChange }) {
 
   if (isMobile()) {
     return (
-      <Link className="notes-grid-item" to={link} shouldPreserveSearchParams>
+      <Link className={`notes-grid-item ${note.isPinned ? 'pinned' : ''} reveal-animate`} to={link} shouldPreserveSearchParams style={`--reveal-index: ${index + 1}`}>
         {content}
       </Link>
     );
   }
 
   return (
-    <div className="notes-grid-item" onClick={handleClick}>
+    <div className={`notes-grid-item ${note.isPinned ? 'pinned' : ''} reveal-animate`} onClick={handleClick} style={`--reveal-index: ${index + 1}`}>
       {content}
     </div>
   );

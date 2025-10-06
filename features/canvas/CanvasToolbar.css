@@ -1,0 +1,97 @@
+.canvas-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: var(--neutral-50);
+  border-bottom: 1px solid var(--neutral-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 3;
+
+  .canvas-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .canvas-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .canvas-toolbar-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .canvas-toolbar-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+
+    &:hover {
+      background: var(--neutral-100);
+      color: var(--text-primary);
+    }
+
+    &:active {
+      background: var(--neutral-200);
+    }
+
+    &.active {
+      background: var(--neutral-200);
+      color: var(--text-primary);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+
+      &:hover {
+        background: transparent;
+        color: var(--text-secondary);
+      }
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .canvas-toolbar-alignment-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .canvas-toolbar-zoom-level {
+    font-size: 12px;
+    font-weight: 500;
+    min-width: 48px;
+    width: auto;
+    padding: 0 8px;
+  }
+
+  .canvas-toolbar-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--neutral-200);
+    margin: 0 4px;
+  }
+}

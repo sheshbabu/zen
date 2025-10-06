@@ -7,7 +7,7 @@
         display: flex;
         align-items: center;
         padding-left: 2px;
-        margin: 8px;
+        margin: var(--spacing-2);
         background-color: var(--neutral-100);
         border-radius: 4px;
 
@@ -24,7 +24,7 @@
     }
 
     svg.lucide {
-        padding: 8px;
+        padding: var(--spacing-2);
     }
 
     .search-results-container {
@@ -47,8 +47,9 @@
             align-items: center;
             text-decoration: none;
             color: inherit;
-            padding: 10px;
-            border-top: 1px solid var(--neutral-100);
+            padding: 6px;
+            margin: 4px;
+            border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.5s;
 
@@ -64,8 +65,10 @@
                     font-weight: 600;
 
                     mark {
+                        background: rgba(250, 204, 21, 0.1);
                         color: var(--yellow-500);
-                        background-color: unset;
+                        border-radius: 4px;
+                        padding: 2px;
                     }
                 }
 
@@ -79,10 +82,40 @@
                     white-space: nowrap;
 
                     mark {
+                        background: rgba(250, 204, 21, 0.1);
                         color: var(--yellow-500);
-                        background-color: unset;
+                        border-radius: 4px;
+                        padding: 2px;
                         font-weight: 500;
                     }
+                }
+            }
+        }
+
+        .search-result-images {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 10px;
+            padding-top: 0;
+
+            img {
+                height: 185px;
+                width: 185px;
+                margin: 6px 6px 0 0;
+                box-sizing: border-box;
+                object-fit: cover;
+                border-radius: 4px;
+                box-shadow: var(--shadow-2);
+                cursor: pointer;
+                transition: opacity 150ms;
+
+                &:hover {
+                    opacity: 0.8;
+                }
+
+                &:active {
+                    transform: scale(0.98);
+                    transition: transform 150ms ease-out;
                 }
             }
         }

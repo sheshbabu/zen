@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+	"zen/commons/queue"
 	"zen/commons/utils"
 )
 
@@ -140,7 +141,7 @@ func HandleUploadImage(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	imageInfo, err := getImageInfo(file, handler.Filename)
+	imageInfo, err := getImageInfo(file)
 	if err != nil {
 		utils.SendErrorResponse(w, "INVALID_IMAGE", "Invalid image format", err, http.StatusBadRequest)
 		return
@@ -187,11 +188,13 @@ func HandleUploadImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	queue.AddImageTask(filename, queue.QUEUE_IMAGE_PROCESS, "process")
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(image)
 }
 
-func getImageInfo(file io.Reader, filename string) (*ImageInfo, error) {
+func getImageInfo(file io.Reader) (*ImageInfo, error) {
 	img, format, err := image.Decode(file)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding image: %w", err)

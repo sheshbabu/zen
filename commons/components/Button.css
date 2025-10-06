@@ -10,7 +10,7 @@
     font: var(--sm);
     font-weight: 600;
     transition-property: background-color, box-shadow;
-    transition-duration: 500ms;
+    transition-duration: var(--transition-normal);
     text-decoration: none;
     box-shadow: var(--shadow-1);
     color: var(--text-primary);
@@ -30,7 +30,7 @@
         margin: 8px;
         margin-right: 0;
         transition-property: stroke;
-        transition-duration: 500ms;
+        transition-duration: var(--transition-normal);
 
         &:hover {
 
@@ -44,7 +44,7 @@
     &:active {
         box-shadow: none;
         transform: scale(0.98);
-        transition: transform 150ms ease-out;
+        transition: transform var(--transition-fast) ease-out;
     }
 
     &.primary {
@@ -98,10 +98,10 @@
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 4px 10px;
+    padding: var(--spacing-1) 10px;
     font: var(--sm);
     font-weight: 600;
-    transition: background-color 500ms;
+    transition: background-color var(--transition-normal);
     border: none;
     background: none;
     border-radius: 4px;
@@ -112,7 +112,7 @@
 
     &:active {
         transform: scale(0.98);
-        transition: transform 150ms ease-out;
+        transition: transform var(--transition-fast) ease-out;
     }
 
     &[disabled] {

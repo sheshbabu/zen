@@ -1,9 +1,9 @@
 .toast-root {
     position: fixed;
-    bottom: var(--spacing-md);
+    bottom: var(--spacing-6);
     left: 50%;
     transform: translateX(-50%);
-    z-index: 3;
+    z-index: var(--z-popover);
     pointer-events: none;
 
     .toast-container {
@@ -17,6 +17,7 @@
         max-width: 400px;
         pointer-events: auto;
         animation: toast-slide-up 0.2s ease-out;
+        will-change: transform, opacity;
 
         .toast-message {
             flex: 1;
@@ -25,12 +26,12 @@
         }
 
         .toast-close {
-            margin-left: var(--spacing-sm);
+            margin-left: var(--spacing-3);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 4px;
+            padding: var(--spacing-1);
             border-radius: 50px;
 
             svg.lucide {

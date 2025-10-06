@@ -23,6 +23,7 @@
     --red-600: #DC2626;
     --red-700: #B91C1C;
     --yellow-100: #FEF9C3;
+    --yellow-400: #FACC15;
     --yellow-500: #EAB308;
     --green-500: #22C55E;
     --green-600: #16A34A;
@@ -50,12 +51,15 @@
     --sm: normal 0.889rem/1.4 var(--font-family);
     --code: normal 0.889rem/1.4 var(--font-family-code);
 
-    /* spacing */
+    /* spacing - 4px-based system */
     /* https://medium.com/dwarves-design/the-principle-of-spacing-in-ui-design-part-1-3354d0d65e51 */
-    --spacing-xs: 6px;
-    --spacing-sm: 12px;
-    --spacing-md: 24px;
-    --spacing-lg: 48px;
+    --spacing-1: 4px;
+    --spacing-2: 8px;
+    --spacing-3: 12px;
+    --spacing-4: 16px;
+    --spacing-5: 20px;
+    --spacing-6: 24px;
+    --spacing-8: 32px;
 
     /* elevation */
     --shadow-1: rgba(0, 0, 0, 0.01) 0px 1px 3px 0px, rgba(0, 0, 0, 0.10) 0px 1px 3px 0px;
@@ -71,6 +75,21 @@
     /* globals */
     --mobile-navbar-height: 60px;
     --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+
+    /* z-index layers */
+    --z-base: 1;
+    --z-modal: 2;
+    --z-popover: 3;
+    --z-critical: 4;
+
+    /* layout dimensions */
+    --sidebar-width: 220px;
+    --notes-list-width: 280px;
+    --notes-editor-max-width: 850px;
+
+    /* transitions */
+    --transition-fast: 150ms;
+    --transition-normal: 300ms;
 
     /* text colors */
     --text-primary: var(--neutral-700);
@@ -160,6 +179,7 @@
     --red-600: #DC2626;
     --red-700: #B91C1C;
     --yellow-100: #FEF9C3;
+    --yellow-400: #CA8A04;
     --yellow-500: #EAB308;
     --green-500: #22C55E;
     --green-600: #16A34A;
@@ -247,16 +267,16 @@ svg.lucide {
 .tag {
     display: inline-flex;
     align-items: center;
-    padding: 4px 8px;
-    margin-right: 4px;
-    margin-bottom: 4px;
+    padding: var(--spacing-1) var(--spacing-2);
+    margin-right: var(--spacing-1);
+    margin-bottom: var(--spacing-1);
     border-radius: 4px;
     font-weight: 500;
     color: var(--neutral-400);
     background-color: var(--neutral-100);
     font-size: 14px;
     transition-property: color, background-color;
-    transition-duration: 500ms;
+    transition-duration: var(--transition-normal);
     cursor: pointer;
     text-decoration: none;
     user-select: none;
@@ -264,7 +284,7 @@ svg.lucide {
     svg.lucide {
         height: 14px;
         width: 14px;
-        margin-left: 4px;
+        margin-left: var(--spacing-1);
 
         line,
         circle,
@@ -281,107 +301,6 @@ svg.lucide {
 
     &:active {
         transform: scale(0.97);
-        transition: transform 150ms ease-out;
-    }
-}
-
-.modal-backdrop-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 2;
-    backdrop-filter: blur(2px);
-    background-color: rgba(0, 0, 0, 0.8);
-
-    &.is-centered {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-}
-
-.modal-content-container {
-    background-color: var(--bg-primary);
-    border: 1px solid var(--neutral-100);
-    border-radius: 4px;
-    box-shadow: var(--shadow-5);
-    animation: modal-zoom-out 0.3s ease-out;
-
-    .modal-title {
-        font-weight: 600;
-    }
-
-    .modal-content {
-        padding: 16px;
-
-        .modal-description {
-            font: var(--sm);
-            margin-top: 4px;
-            color: var(--neutral-500);
-        }
-    }
-}
-
-@keyframes modal-zoom-out {
-    from {
-        transform: scale(0.9);
-        opacity: 0;
-    }
-
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px;
-    padding-left: 16px;
-    border-bottom: 1px solid var(--neutral-200);
-
-    svg.lucide {
-        padding: 8px;
-        cursor: pointer;
-
-        line,
-        circle,
-        rect,
-        path {
-            stroke-width: 2.5;
-        }
-
-        &:hover {
-            background-color: var(--neutral-100);
-            border-radius: 4px;
-        }
-
-        &:active {
-            box-shadow: none;
-            transform: scale(0.95);
-            transition: transform 150ms ease-out;
-        }
-    }
-}
-
-.model-footer-container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 16px;
-    padding: 16px;
-    padding-left: 8px;
-    background-color: var(--neutral-50);
-    box-shadow: inset var(--shadow-2);
-
-    &.right-aligned {
-        justify-content: flex-end;
-    }
-
-    .button {
-        margin-left: 8px;
+        transition: transform var(--transition-fast) ease-out;
     }
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"zen/commons/queue"
 	"zen/commons/utils"
 	"zen/features/tags"
 )
@@ -25,6 +26,7 @@ type Note struct {
 	Tags               []tags.Tag `json:"tags"`
 	IsArchived         bool       `json:"isArchived"`
 	IsDeleted          bool       `json:"isDeleted"`
+	IsPinned           bool       `json:"isPinned"`
 }
 
 type NotesFilter struct {
@@ -139,6 +141,8 @@ func HandleCreateNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	queue.AddNoteTask(note.NoteID, queue.QUEUE_NOTE_PROCESS, "process")
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(note)
 }
@@ -163,6 +167,9 @@ func HandleUpdateNote(w http.ResponseWriter, r *http.Request) {
 		utils.SendErrorResponse(w, "NOTES_UPDATE_FAILED", "Error saving note.", err, http.StatusInternalServerError)
 		return
 	}
+
+	queue.RemoveAllNoteTasks(noteID)
+	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_PROCESS, "process")
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(note)
@@ -199,6 +206,9 @@ func HandleSoftDeleteNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	queue.RemoveAllNoteTasks(noteID)
+	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_DELETE, "delete")
+
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -215,6 +225,9 @@ func HandleRestoreDeletedNote(w http.ResponseWriter, r *http.Request) {
 		utils.SendErrorResponse(w, "NOTES_RESTORE_FAILED", "Error restoring note.", err, http.StatusInternalServerError)
 		return
 	}
+
+	queue.RemoveAllNoteTasks(noteID)
+	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_PROCESS, "process")
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -233,6 +246,9 @@ func HandleArchiveNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	queue.RemoveAllNoteTasks(noteID)
+	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_DELETE, "delete")
+
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -248,6 +264,57 @@ func HandleUnarchiveNote(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.SendErrorResponse(w, "NOTES_UNARCHIVE_FAILED", "Error unarchiving note.", err, http.StatusInternalServerError)
 		return
+	}
+
+	queue.RemoveAllNoteTasks(noteID)
+	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_PROCESS, "process")
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func HandlePinNote(w http.ResponseWriter, r *http.Request) {
+	noteIDStr := r.PathValue("noteId")
+	noteID, err := strconv.Atoi(noteIDStr)
+	if err != nil {
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", "Invalid note ID", err, http.StatusBadRequest)
+		return
+	}
+
+	err = PinNote(noteID)
+	if err != nil {
+		utils.SendErrorResponse(w, "NOTES_PIN_FAILED", "Error pinning note.", err, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func HandleUnpinNote(w http.ResponseWriter, r *http.Request) {
+	noteIDStr := r.PathValue("noteId")
+	noteID, err := strconv.Atoi(noteIDStr)
+	if err != nil {
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", "Invalid note ID", err, http.StatusBadRequest)
+		return
+	}
+
+	err = UnpinNote(noteID)
+	if err != nil {
+		utils.SendErrorResponse(w, "NOTES_UNPIN_FAILED", "Error unpinning note.", err, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func HandleDeleteNotes(w http.ResponseWriter, r *http.Request) {
+	isDeleted := r.URL.Query().Get("isDeleted")
+
+	if isDeleted == "true" {
+		err := EmptyTrash(false)
+		if err != nil {
+			utils.SendErrorResponse(w, "TRASH_EMPTY_FAILED", "Error emptying trash.", err, http.StatusInternalServerError)
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)

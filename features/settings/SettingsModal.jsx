@@ -1,5 +1,5 @@
-import { h, render, useState } from "../../assets/preact.esm.js"
-import { ModalBackdrop, ModalContainer, ModalHeader } from "../../commons/components/Modal.jsx";
+import { h, useState } from "../../assets/preact.esm.js"
+import { ModalBackdrop, ModalContainer, ModalHeader, closeModal } from "../../commons/components/Modal.jsx";
 import { UploadIcon, DownloadIcon, ThemeIcon, BrainCircuitIcon, SecurityIcon } from "../../commons/components/Icon.jsx";
 import ImportPane from "./ImportPane.jsx";
 import ExportPane from "./ExportPane.jsx";
@@ -19,8 +19,8 @@ const tabs = [
 export default function SettingsModal() {
   const [activeTab, setActiveTab] = useState("appearance");
 
-  function closeModal() {
-    render(null, document.querySelector('.modal-root'));
+  function handleCloseModal() {
+    closeModal();
   }
 
   function handleTabClick(tabId) {
@@ -37,9 +37,9 @@ export default function SettingsModal() {
   const paneContent = tabs.find(tab => tab.id === activeTab).content || null;
 
   return (
-    <ModalBackdrop onClose={closeModal}>
+    <ModalBackdrop onClose={handleCloseModal}>
       <ModalContainer className="settings-modal">
-        <ModalHeader title="Settings" onClose={closeModal} />
+        <ModalHeader title="Settings" onClose={handleCloseModal} />
         <div className="settings-content">
           <div className="settings-sidebar">
             {sidebar}

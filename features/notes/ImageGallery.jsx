@@ -1,5 +1,6 @@
-import { h, render, useEffect, useRef, useState, useCallback, Fragment } from "../../assets/preact.esm.js";
-import { ModalBackdrop, ModalContainer } from "../../commons/components/Modal.jsx";
+import { h, useEffect, useRef, useState, useCallback, Fragment } from "../../assets/preact.esm.js";
+import { closeModal, openModal } from "../../commons/components/Modal.jsx";
+import Lightbox from "../../commons/components/Lightbox.jsx";
 import "./ImageGallery.css";
 
 const MIN_COLUMN_WIDTH = 300;
@@ -111,14 +112,11 @@ export default function ImageGallery({ images }) {
   }
 
   function handleImageClick(selectedImage) {
-    render(
-      <Lightbox selectedImage={selectedImage} imageDetails={imageDetails} onClose={closeLightbox} />,
-      document.querySelector('.modal-root')
-    );
+    openModal(<Lightbox selectedImage={selectedImage} imageDetails={imageDetails} onClose={closeLightbox} />);
   }
 
   function closeLightbox() {
-    render(null, document.querySelector('.modal-root'));
+    closeModal();
   }
 
   const items = imageDetails.map((image, index) => {
@@ -141,72 +139,3 @@ export default function ImageGallery({ images }) {
   );
 }
 
-function Lightbox({ selectedImage, imageDetails, onClose }) {
-  const [currentImage, setCurrentImage] = useState(selectedImage);
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [shouldShowZoom, setShouldShowZoom] = useState(false);
-
-  if (!currentImage) {
-    return null;
-  }
-
-  useEffect(() => {
-    const viewportHeight = window.innerHeight * 0.95;
-    const viewportWidth = window.innerWidth * 0.95;
-    const imageAspectRatio = currentImage.aspectRatio;
-    
-    const scaledHeight = viewportWidth / imageAspectRatio;
-    
-    setShouldShowZoom(scaledHeight > viewportHeight);
-    setIsZoomed(false);
-  }, [currentImage]);
-
-  useEffect(() => {
-    function handleKeyDown(e) {
-      const currentIndex = imageDetails.findIndex(img => img.filename === currentImage.filename);
-      
-      switch (e.key) {
-        case 'Escape':
-          onClose();
-          break;
-        case 'ArrowLeft':
-          e.preventDefault();
-          if (currentIndex > 0) {
-            setCurrentImage(imageDetails[currentIndex - 1]);
-          }
-          break;
-        case 'ArrowRight':
-          e.preventDefault();
-          if (currentIndex < imageDetails.length - 1) {
-            setCurrentImage(imageDetails[currentIndex + 1]);
-          }
-          break;
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [currentImage, imageDetails, onClose]);
-
-
-  function handleImageClick() {
-    if (shouldShowZoom) {
-      setIsZoomed(!isZoomed);
-    }
-  }
-
-  return (
-    <ModalBackdrop onClose={onClose} isCentered={true}>
-      <ModalContainer className={`lightbox ${isZoomed ? 'zoomed' : ''}`}>
-        <div className="lightbox-image-container">
-          <img 
-            src={currentImage.url} 
-            alt="" 
-            className={`lightbox-image ${shouldShowZoom ? 'zoomable' : ''}`}
-            onClick={handleImageClick}
-          />
-        </div>
-      </ModalContainer>
-    </ModalBackdrop>
-  );
-}

@@ -1,50 +1,65 @@
-import { h, render, useEffect, useState, useRef } from "../../assets/preact.esm.js"
+import { h, useEffect, useState, useRef } from "../../assets/preact.esm.js"
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon, TagIcon } from "../../commons/components/Icon.jsx";
-import { ModalBackdrop, ModalContainer } from "../../commons/components/Modal.jsx";
+import { ModalBackdrop, ModalContainer, closeModal, openModal } from "../../commons/components/Modal.jsx";
+import Lightbox from "../../commons/components/Lightbox.jsx";
+import SearchHistory from "../../commons/preferences/SearchHistory.js";
 import "./SearchMenu.css";
-
-const SEARCH_HISTORY_KEY = 'search-history';
-const MAX_HISTORY_ENTRIES = 5;
 
 export default function SearchMenu() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState({ notes: [], tags: [] });
+  const [results, setResults] = useState({ lexical_notes: [], semantic_notes: [], semantic_images: [], tags: [] });
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchHistory, setSearchHistory] = useState([]);
 
   const inputRef = useRef(null);
+  const debounceTimerRef = useRef(null);
+
+  function handleCloseModal() {
+    closeModal();
+  }
 
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
-    setSearchHistory(getSearchHistory());
+    setSearchHistory(SearchHistory.getItems());
   }, []);
 
   function handleChange(e) {
     const value = e.target.value;
     setQuery(value);
 
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
     if (value.trim() === "") {
-      setResults({ notes: [], tags: [] });
+      setResults({ lexical_notes: [], semantic_notes: [], semantic_images: [], tags: [] });
       setSelectedItem(searchHistory.length > 0 ? searchHistory[0] : null);
       return;
     }
 
-    ApiClient.search(value)
-      .then(searchResults => {
-        setResults(searchResults);
-        const allItems = [...searchResults.notes, ...searchResults.tags];
-        if (allItems.length > 0) {
-          setSelectedItem(allItems[0]);
-        }
-      });
+    debounceTimerRef.current = setTimeout(() => {
+      ApiClient.search(value)
+        .then(searchResults => {
+          setResults(searchResults);
+          const allItems = [...searchResults.lexical_notes, ...searchResults.semantic_notes, ...searchResults.semantic_images, ...searchResults.tags];
+          if (allItems.length > 0) {
+            setSelectedItem(allItems[0]);
+          }
+        });
+    }, 200);
   }
 
   function handleKeyUp(e) {
-    const allItems = query.trim() === "" ? searchHistory : [...results.notes, ...results.tags];
+    let allItems = [];
+    if (query.trim() === "") {
+      allItems = searchHistory;
+    } else {
+      allItems = [...results.lexical_notes, ...results.semantic_notes, ...results.semantic_images, ...results.tags];
+    }
 
     if (e.key === "ArrowDown") {
       const nextIndex = allItems.indexOf(selectedItem) + 1;
@@ -72,23 +87,36 @@ export default function SearchMenu() {
     }
   }
 
-  function closeModal() {
-    render(null, document.querySelector('.modal-root'));
-  }
 
   function handleResultClick(item) {
-    saveToSearchHistory(item);
     if (item.noteId) {
+      SearchHistory.saveItem(item);
       navigateTo(`/notes/${item.noteId}`);
+      closeModal();
     } else if (item.tagId) {
+      SearchHistory.saveItem(item);
       navigateTo(`/?tagId=${item.tagId}`);
+      closeModal();
+    } else if (item.filename) {
+      const imageDetails = results.semantic_images.map(image => ({
+        url: `/images/${image.filename}`,
+        width: image.width,
+        height: image.height,
+        aspectRatio: image.aspectRatio,
+        filename: image.filename,
+      }));
+
+      const selectedImage = imageDetails.find(img => img.filename === item.filename);
+
+      openModal(<Lightbox selectedImage={selectedImage} imageDetails={imageDetails} onClose={closeModal} />);
     }
-    closeModal();
   }
 
 
   let historySection = null;
-  let notesSection = null;
+  let lexicalNotesSection = null;
+  let semanticNotesSection = null;
+  let semanticImagesSection = null;
   let tagsSection = null;
 
   if (query.trim() === "" && searchHistory.length > 0) {
@@ -106,18 +134,43 @@ export default function SearchMenu() {
       </div>
     );
   } else {
-    if (results.notes.length > 0) {
-      const noteItems = results.notes.map((item, index) => {
+    if (results.lexical_notes.length > 0) {
+      const noteItems = results.lexical_notes.map((item, index) => {
         const isSelected = item.noteId === selectedItem?.noteId;
         return (
-          <SearchResultItem key={`note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
+          <SearchResultItem key={`lexical-note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
         )
       });
 
-      notesSection = (
+      lexicalNotesSection = (
         <div className="search-section">
           <h4 className="search-section-title">Notes</h4>
           {noteItems}
+        </div>
+      );
+    }
+
+    if (results.semantic_notes.length > 0) {
+      const noteItems = results.semantic_notes.map((item, index) => {
+        const isSelected = item.noteId === selectedItem?.noteId;
+        return (
+          <SearchResultItem key={`semantic-note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
+        )
+      });
+
+      semanticNotesSection = (
+        <div className="search-section">
+          <h4 className="search-section-title">Similar Notes</h4>
+          {noteItems}
+        </div>
+      );
+    }
+
+    if (results.semantic_images.length > 0) {
+      semanticImagesSection = (
+        <div className="search-section">
+          <h4 className="search-section-title">Similar Images</h4>
+          <SearchResultImages items={results.semantic_images} onClick={handleResultClick} />
         </div>
       );
     }
@@ -140,7 +193,7 @@ export default function SearchMenu() {
   }
 
   return (
-    <ModalBackdrop onClose={closeModal} isCentered={false}>
+    <ModalBackdrop onClose={handleCloseModal} isCentered={false}>
       <ModalContainer className="search-modal">
         <div className="search-input-container">
           <SearchIcon />
@@ -155,7 +208,9 @@ export default function SearchMenu() {
         </div>
         <div className="search-results-container">
           {historySection}
-          {notesSection}
+          {lexicalNotesSection}
+          {semanticNotesSection}
+          {semanticImagesSection}
           {tagsSection}
         </div>
       </ModalContainer>
@@ -184,6 +239,9 @@ function SearchResultItem({ item, isSelected, onClick }) {
     displaySubtitle = getHighlightedSnippet(item.highlightedContent)
   } else if (item.content) {
     displaySubtitle = item.content
+  } else if (item.matchText) {
+    // For semantic note results
+    displaySubtitle = item.matchText
   }
 
   return (
@@ -197,38 +255,14 @@ function SearchResultItem({ item, isSelected, onClick }) {
   );
 }
 
-function getSearchHistory() {
-  try {
-    const history = localStorage.getItem(SEARCH_HISTORY_KEY);
-    return history ? JSON.parse(history) : [];
-  } catch {
-    return [];
-  }
-}
+function SearchResultImages({ items, onClick }) {
+  const images = items.map(item => <img src={`/images/${item.filename}`} key={item.filename} alt={item.description} onClick={() => onClick(item)} />)
 
-function saveToSearchHistory(item) {
-  try {
-    let history = getSearchHistory();
-
-    const existingIndex = history.findIndex(h =>
-      (h.noteId && h.noteId === item.noteId) ||
-      (h.tagId && h.tagId === item.tagId)
-    );
-
-    if (existingIndex !== -1) {
-      history.splice(existingIndex, 1);
-    }
-
-    history.unshift(item);
-
-    if (history.length > MAX_HISTORY_ENTRIES) {
-      history = history.slice(0, MAX_HISTORY_ENTRIES);
-    }
-
-    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
-  } catch {
-    // Ignore localStorage errors
-  }
+  return (
+    <div className="search-result-images">
+      {images}
+    </div>
+  );
 }
 
 function getHighlightedSnippet(highlightedContent) {

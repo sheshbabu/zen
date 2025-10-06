@@ -1,27 +1,25 @@
-import { h, render } from "../../assets/preact.esm.js"
+import { h } from "../../assets/preact.esm.js"
 import NotesEditor from './NotesEditor.jsx';
-import { CloseIcon } from "../../commons/components/Icon.jsx";
-import { ModalBackdrop, ModalContainer, ModalContent } from "../../commons/components/Modal.jsx";
+import { ModalBackdrop, ModalContainer, ModalContent, closeModal } from "../../commons/components/Modal.jsx";
+import { useNotes } from "../../commons/contexts/NotesContext.jsx";
 import "./NotesEditorModal.css";
 
-export default function NotesEditorModal({ note, onChange }) {
+export default function NotesEditorModal({ note }) {
+  const { setSelectedNote } = useNotes();
 
-  function closeModal() {
+  function handleCloseModal() {
     document.title = "Zen";
-    render(null, document.querySelector('.note-modal-root'));
+    closeModal('.note-modal-root');
   }
 
-  function handleEditorChange() {
-    if (onChange) {
-        onChange();
-    }
-  }
+  // Set the selected note when the modal opens
+  setSelectedNote(note);
 
   return (
-    <ModalBackdrop onClose={closeModal} isCentered={true}>
+    <ModalBackdrop onClose={handleCloseModal} isCentered={true}>
       <ModalContainer className="notes-editor-modal">
         <ModalContent className="notes-editor-container">
-          <NotesEditor selectedNote={note} isNewNote={false} isFloating={true} onChange={handleEditorChange} onClose={closeModal} />
+          <NotesEditor isNewNote={false} isFloating={true} onClose={handleCloseModal} />
         </ModalContent>
       </ModalContainer>
     </ModalBackdrop>

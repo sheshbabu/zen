@@ -1,13 +1,16 @@
-import { h, render, useEffect, Fragment } from "../../assets/preact.esm.js"
+import { h, useEffect, Fragment } from "../../assets/preact.esm.js"
 import Link from './Link.jsx';
 import SidebarTagsList from "../../features/tags/SidebarTagsList.jsx";
 import FocusSwitcher from "../../features/focus/FocusSwitcher.jsx";
 import SearchMenu from "../../features/search/SearchMenu.jsx";
 import SettingsModal from "../../features/settings/SettingsModal.jsx";
+import { openModal } from "./Modal.jsx";
 import { NotesIcon, SearchIcon, NewIcon, ArchiveIcon, TrashIcon, BoardIcon, SettingsIcon, TemplatesIcon } from "./Icon.jsx";
+import { useAppContext } from "../../commons/contexts/AppContext.jsx";
 import "./Sidebar.css";
 
-export default function Sidebar({ isOpen, onSidebarClose, focusModes, tags }) {
+export default function Sidebar({ isOpen, onSidebarClose }) {
+  const { focusModes, tags } = useAppContext();
   useEffect(() => {
     function handleNavigationChange() {
       if (isOpen) {
@@ -23,11 +26,11 @@ export default function Sidebar({ isOpen, onSidebarClose, focusModes, tags }) {
   }, [isOpen, onSidebarClose]);
 
   function handleSearchClick() {
-    render(<SearchMenu />, document.querySelector('.modal-root'));
+    openModal(<SearchMenu />);
   }
 
   function handleSettingsClick() {
-    render(<SettingsModal />, document.querySelector('.modal-root'));
+    openModal(<SettingsModal />);
   }
 
   function handleBackdropClick() {
@@ -59,14 +62,14 @@ export default function Sidebar({ isOpen, onSidebarClose, focusModes, tags }) {
             <NotesIcon />
             Notes
           </Link>
-          {/* <Link className="sidebar-button" to="/">
-          <BoardIcon />
-          Boards
-        </Link>
-        <div className="sidebar-button" activeClassName="is-active" to="/archives" shouldPreserveSearchParams>
-          <TemplatesIcon />
-          Templates
-        </div>*/}
+          <Link className="sidebar-button canvas" to="/canvas">
+            <BoardIcon />
+            Canvas
+          </Link>
+          <Link className="sidebar-button templates" activeClassName="is-active" to="/templates/">
+            <TemplatesIcon />
+            Templates
+          </Link>
           <Link className="sidebar-button archives" activeClassName="is-active" to="/notes/?isArchived=true">
             <ArchiveIcon />
             Archives

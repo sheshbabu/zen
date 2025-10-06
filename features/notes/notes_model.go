@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"strings"
 	"zen/commons/sqlite"
 	"zen/features/tags"
 )
@@ -35,6 +36,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 				) as tags_json,
 				n.archived_at,
 				n.deleted_at,
+				n.pinned_at,
 				COUNT(*) OVER() as total_count
 			FROM
 				notes n
@@ -51,7 +53,11 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 			GROUP BY
 				n.note_id
 			ORDER BY
-				n.updated_at DESC
+				CASE 
+					WHEN n.pinned_at IS NOT NULL THEN 1 
+					ELSE 2 
+				END,
+				COALESCE(n.pinned_at, n.updated_at) DESC
 			LIMIT
 				?
 			OFFSET
@@ -74,6 +80,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 				) as tags_json,
 				n.archived_at,
 				n.deleted_at,
+				n.pinned_at,
 				COUNT(*) OVER() as total_count
 			FROM
 				focus_mode_tags fmt
@@ -88,7 +95,11 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 			GROUP BY
 				n.note_id
 			ORDER BY
-				n.updated_at DESC
+				CASE 
+					WHEN n.pinned_at IS NOT NULL THEN 1 
+					ELSE 2 
+				END,
+				COALESCE(n.pinned_at, n.updated_at) DESC
 			LIMIT
 				?
 			OFFSET
@@ -122,6 +133,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 				END AS tags_json,
 				n.archived_at,
 				n.deleted_at,
+				n.pinned_at,
 				COUNT(*) OVER() as total_count
 			FROM
 				notes n
@@ -133,7 +145,11 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 			GROUP BY
 				n.note_id
 			ORDER BY
-				n.updated_at DESC
+				CASE 
+					WHEN n.pinned_at IS NOT NULL THEN 1 
+					ELSE 2 
+				END,
+				COALESCE(n.pinned_at, n.updated_at) DESC
 			LIMIT
 				?
 			OFFSET
@@ -155,20 +171,26 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 		var tagsJSON string
 		var archivedAt sql.NullTime
 		var deletedAt sql.NullTime
-		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &total)
+		var pinnedAt sql.NullTime
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt, &total)
 		if err != nil {
 			err = fmt.Errorf("error scanning note: %w", err)
 			slog.Error(err.Error())
 			return notes, total, err
 		}
-		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
-		if err != nil {
-			err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
-			slog.Error(err.Error())
+		if strings.TrimSpace(tagsJSON) == "" || tagsJSON == "null" {
 			note.Tags = []tags.Tag{}
+		} else {
+			err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+			if err != nil {
+				err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+				slog.Error(err.Error())
+				note.Tags = []tags.Tag{}
+			}
 		}
 		note.IsArchived = archivedAt.Valid
 		note.IsDeleted = deletedAt.Valid
+		note.IsPinned = pinnedAt.Valid
 		notes = append(notes, note)
 	}
 
@@ -197,7 +219,8 @@ func GetNoteByID(noteID int) (Note, error) {
 				ELSE '[]'
 			END AS tags_json,
 			n.archived_at,
-			n.deleted_at
+			n.deleted_at,
+			n.pinned_at
 		FROM
 			notes n
 		LEFT JOIN
@@ -206,23 +229,31 @@ func GetNoteByID(noteID int) (Note, error) {
 			tags t ON nt.tag_id = t.tag_id
 		WHERE
 			n.note_id = ?
+		GROUP BY
+			n.note_id
 	`
 
 	row := sqlite.DB.QueryRow(query, noteID)
-	err := row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt)
+	var pinnedAt sql.NullTime
+	err := row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt)
 	if err != nil {
 		err = fmt.Errorf("error retrieving note: %w", err)
 		slog.Error(err.Error())
 		return note, err
 	}
-	err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
-	if err != nil {
-		err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
-		slog.Error(err.Error())
+	if strings.TrimSpace(tagsJSON) == "" || tagsJSON == "null" {
 		note.Tags = []tags.Tag{}
+	} else {
+		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+		if err != nil {
+			err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+			slog.Error(err.Error())
+			note.Tags = []tags.Tag{}
+		}
 	}
 	note.IsArchived = archivedAt.Valid
 	note.IsDeleted = deletedAt.Valid
+	note.IsPinned = pinnedAt.Valid
 
 	return note, nil
 }
@@ -446,16 +477,22 @@ func UpdateNote(note Note) (Note, error) {
 	`
 	row = tx.QueryRow(query, note.NoteID)
 	err = row.Scan(&tagsJSON)
-	if err != nil {
+	if err == sql.ErrNoRows {
+		note.Tags = []tags.Tag{}
+	} else if err != nil {
 		err = fmt.Errorf("error retrieving tags for note %d: %w", note.NoteID, err)
 		slog.Error(err.Error())
 		note.Tags = []tags.Tag{}
 	}
-	err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
-	if err != nil {
-		err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
-		slog.Error(err.Error())
+	if strings.TrimSpace(tagsJSON) == "" || tagsJSON == "null" {
 		note.Tags = []tags.Tag{}
+	} else {
+		err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+		if err != nil {
+			err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+			slog.Error(err.Error())
+			note.Tags = []tags.Tag{}
+		}
 	}
 
 	err = tx.Commit()
@@ -490,6 +527,20 @@ func ForceDeleteNote(noteID int) error {
 	_, err = tx.Exec(query, noteID)
 	if err != nil {
 		err = fmt.Errorf("error deleting tags: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	query = `
+		DELETE FROM
+			note_images
+		WHERE
+			note_id = ?
+	`
+
+	_, err = tx.Exec(query, noteID)
+	if err != nil {
+		err = fmt.Errorf("error deleting note images: %w", err)
 		slog.Error(err.Error())
 		return err
 	}
@@ -613,7 +664,8 @@ func SearchNotes(term string, limit int) ([]Note, error) {
 			SUBSTR(n.content, 0, 500) AS snippet,
 			n.updated_at,
 			n.archived_at,
-			n.deleted_at
+			n.deleted_at,
+			n.pinned_at
 		FROM
 			notes n
 		JOIN
@@ -647,7 +699,8 @@ func SearchNotes(term string, limit int) ([]Note, error) {
 		var note Note
 		var archivedAt sql.NullTime
 		var deletedAt sql.NullTime
-		err = rows.Scan(&note.NoteID, &note.HighlightedTitle, &note.HighlightedContent, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &archivedAt, &deletedAt)
+		var pinnedAt sql.NullTime
+		err = rows.Scan(&note.NoteID, &note.HighlightedTitle, &note.HighlightedContent, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &archivedAt, &deletedAt, &pinnedAt)
 		if err != nil {
 			err = fmt.Errorf("error scanning note: %w", err)
 			slog.Error(err.Error())
@@ -655,22 +708,35 @@ func SearchNotes(term string, limit int) ([]Note, error) {
 		}
 		note.IsArchived = archivedAt.Valid
 		note.IsDeleted = deletedAt.Valid
+		note.IsPinned = pinnedAt.Valid
 		notes = append(notes, note)
 	}
 
 	return notes, nil
 }
 
-func EmptyTrash() error {
-	query := `
-		SELECT
-			note_id
-		FROM
-			notes
-		WHERE
-			deleted_at IS NOT NULL AND
-			deleted_at < datetime('now', '-30 days')
-	`
+func EmptyTrash(shouldOnlyClearExpired bool) error {
+	var query string
+	if shouldOnlyClearExpired {
+		query = `
+			SELECT
+				note_id
+			FROM
+				notes
+			WHERE
+				deleted_at IS NOT NULL AND
+				deleted_at < datetime('now', '-30 days')
+		`
+	} else {
+		query = `
+			SELECT
+				note_id
+			FROM
+				notes
+			WHERE
+				deleted_at IS NOT NULL
+		`
+	}
 
 	rows, err := sqlite.DB.Query(query)
 	if err != nil {
@@ -704,6 +770,46 @@ func EmptyTrash() error {
 	return nil
 }
 
+func PinNote(noteID int) error {
+	query := `
+		UPDATE
+			notes
+		SET
+			pinned_at = CURRENT_TIMESTAMP
+		WHERE
+			note_id = ?
+	`
+
+	_, err := sqlite.DB.Exec(query, noteID)
+	if err != nil {
+		err = fmt.Errorf("error pinning note: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func UnpinNote(noteID int) error {
+	query := `
+		UPDATE
+			notes
+		SET
+			pinned_at = NULL
+		WHERE
+			note_id = ?
+	`
+
+	_, err := sqlite.DB.Exec(query, noteID)
+	if err != nil {
+		err = fmt.Errorf("error unpinning note: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
 func GetNotesWithImages() ([]Note, error) {
 	var notes []Note
 	query := `
@@ -714,7 +820,8 @@ func GetNotesWithImages() ([]Note, error) {
 			SUBSTR(content, 0, 500) AS snippet,
 			updated_at,
 			archived_at,
-			deleted_at
+			deleted_at,
+			pinned_at
 		FROM
 			notes
 		WHERE
@@ -734,8 +841,9 @@ func GetNotesWithImages() ([]Note, error) {
 		var note Note
 		var archivedAt sql.NullTime
 		var deletedAt sql.NullTime
+		var pinnedAt sql.NullTime
 
-		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &archivedAt, &deletedAt)
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &archivedAt, &deletedAt, &pinnedAt)
 		if err != nil {
 			err = fmt.Errorf("error scanning note: %w", err)
 			slog.Error(err.Error())
@@ -744,10 +852,33 @@ func GetNotesWithImages() ([]Note, error) {
 
 		note.IsArchived = archivedAt.Valid
 		note.IsDeleted = deletedAt.Valid
+		note.IsPinned = pinnedAt.Valid
 		note.Tags = []tags.Tag{}
 
 		notes = append(notes, note)
 	}
 
 	return notes, nil
+}
+
+func GetNotesCount(isDeleted, isArchived bool) (int, error) {
+	var count int
+	var query string
+
+	if isDeleted {
+		query = "SELECT COUNT(*) FROM notes WHERE deleted_at IS NOT NULL"
+	} else if isArchived {
+		query = "SELECT COUNT(*) FROM notes WHERE archived_at IS NOT NULL"
+	} else {
+		query = "SELECT COUNT(*) FROM notes WHERE deleted_at IS NULL AND archived_at IS NULL"
+	}
+
+	err := sqlite.DB.QueryRow(query).Scan(&count)
+	if err != nil {
+		err = fmt.Errorf("error getting notes count: %w", err)
+		slog.Error(err.Error())
+		return 0, err
+	}
+
+	return count, nil
 }

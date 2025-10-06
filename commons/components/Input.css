@@ -1,5 +1,5 @@
 .input-container {
-    margin-top: var(--spacing-md);
+    margin-top: var(--spacing-6);
 
     input,
     textarea {
@@ -8,8 +8,8 @@
         border: 1px solid var(--neutral-200);
         background-color: var(--bg-primary);
         color: var(--text-primary);
-        padding: 8px;
-        margin-top: var(--spacing-xs);
+        padding: var(--spacing-2);
+        margin-top: var(--spacing-1);
         min-width: 320px;
         outline: none;
         transition: border-color 200ms;
@@ -50,7 +50,7 @@
 }
 
 .form-field-container {
-    margin-top: var(--spacing-md);
+    margin-top: var(--spacing-6);
 
     label {
         font-weight: 600;

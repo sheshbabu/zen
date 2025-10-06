@@ -1,7 +1,7 @@
 .notes-list-container {
-    width: 280px;
+    width: var(--notes-list-width);
     transition-property: background-color;
-    transition-duration: 500ms;
+    transition-duration: var(--transition-normal);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     max-height: 100%;
@@ -17,22 +17,28 @@
 
     .notes-list-title {
         font: var(--h3);
-        padding: 16px;
+        padding: var(--spacing-4);
         font-weight: normal;
     }
 
     a.notes-list-item {
         display: block;
-        padding: 16px;
+        padding: var(--spacing-4);
         border-bottom: 1px solid var(--neutral-100);
         text-decoration: none;
         color: inherit;
         transition-property: background-color;
-        transition-duration: 500ms;
+        transition-duration: var(--transition-normal);
 
         &:hover,
         &.is-active {
             background-color: var(--bg-secondary);
+        }
+
+        .notes-list-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .notes-list-item-title {
@@ -42,6 +48,30 @@
 
             &.untitled {
                 color: var(--neutral-300);
+            }
+        }
+
+        .notes-list-item-pin {
+            opacity: 0;
+            width: 16px;
+            height: 16px;
+            transform: translateY(-5px);
+            transition: opacity, transform 300ms;
+
+            &.pinned {
+                opacity: 1;
+                margin-left: 4px;
+                flex-shrink: 0;
+                transform: translateY(0);
+
+                line,
+                circle,
+                rect,
+                path {
+                    stroke-width: 2;
+                    stroke: var(--neutral-300);
+                    fill: var(--neutral-300);
+                }
             }
         }
 
@@ -92,7 +122,7 @@
             height: 500px;
             overflow: hidden;
             transition-property: box-shadow;
-            transition-duration: 500ms;
+            transition-duration: var(--transition-normal);
             box-shadow: var(--shadow-2);
             border-radius: 8px;
             padding: 20px;
@@ -104,12 +134,49 @@
             cursor: pointer;
             zoom: 0.6;
 
+            &.reveal-animate {
+                opacity: 0;
+                transform: translateY(20px);
+                animation: notes-grid-reveal 0.4s ease-out forwards;
+                animation-delay: calc(var(--reveal-index, 1) * 0.05s);
+            }
+
+            .notes-grid-item-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+            }
+
             .notes-grid-item-title {
                 font: var(--h4);
-                margin-bottom: 12px;
 
                 &.untitled {
                     color: var(--neutral-400);
+                }
+            }
+
+            .notes-grid-item-pin {
+                opacity: 0;
+                width: 24px;
+                height: 24px;
+                transform: translateY(-10px);
+                transition: opacity, transform 300ms;
+
+                &.pinned {
+                    opacity: 1;
+                    margin-left: 4px;
+                    flex-shrink: 0;
+                    transform: translateY(0);
+
+                    line,
+                    circle,
+                    rect,
+                    path {
+                        stroke-width: 2;
+                        stroke: var(--neutral-300);
+                        fill: var(--neutral-300);
+                    }
                 }
             }
 
@@ -169,7 +236,7 @@
 
             &:active {
                 transform: scale(0.98);
-                transition: transform 150ms ease-out;
+                transition: transform var(--transition-fast) ease-out;
             }
         }
     }
@@ -190,7 +257,7 @@
 
     .notes-list-empty-text {
         font: var(--sm);
-        padding: 16px;
+        padding: var(--spacing-4);
         color: var(--neutral-400);
         display: flex;
         justify-content: center;
@@ -206,11 +273,18 @@
     }
 }
 
+@keyframes notes-grid-reveal {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @media screen and (max-width: 948px) {
 
     .notes-list-container,
     .notes-grid-container {
-        &[data-page="notes"] {
+        &.is-visible {
             width: 100%;
             height: calc(100% - (var(--mobile-navbar-height) + var(--safe-area-bottom)));
             position: absolute;
@@ -222,7 +296,7 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        &:not([data-page="notes"]) {
+        &.is-hidden {
             display: none;
         }
     }

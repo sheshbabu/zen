@@ -8,7 +8,7 @@
         height: 500px;
 
         .settings-form {
-            margin-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-6);
         }
 
         .button {
@@ -26,14 +26,14 @@
         width: 200px;
         background-color: var(--bg-secondary);
         border-right: 1px solid var(--neutral-100);
-        padding: 8px 0;
+        padding: var(--spacing-2) 0;
 
         .settings-tab {
             display: flex;
             align-items: center;
             cursor: pointer;
             font-size: 14px;
-            margin: 2px 8px;
+            margin: 2px var(--spacing-2);
             border-radius: 4px;
             text-decoration: none;
             color: var(--neutral-900);
@@ -46,14 +46,14 @@
             }
 
             svg.lucide {
-                padding: 8px;
+                padding: var(--spacing-2);
             }
         }
     }
 
     .settings-main {
         flex: 1;
-        padding: 12px 24px;
+        padding: var(--spacing-3) 24px;
         overflow-y: auto;
 
         .settings-tab-content {
@@ -77,7 +77,7 @@
                 .file-upload-label {
                     display: flex;
                     align-items: center;
-                    gap: 8px;
+                    gap: var(--spacing-2);
                     padding: 12px 16px;
                     border: 1px dashed var(--neutral-300);
                     border-radius: 4px;
@@ -240,7 +240,7 @@
                     cursor: pointer;
                     border: 1px solid var(--neutral-200);
                     border-radius: 8px;
-                    padding: 12px;
+                    padding: var(--spacing-3);
                     transition: all 0.2s ease;
 
                     &:hover {
@@ -336,7 +336,7 @@
                     background-color: var(--neutral-50);
                     border: 1px solid var(--neutral-200);
                     border-radius: 6px;
-                    padding: 12px;
+                    padding: var(--spacing-3);
                     font-family: var(--font-family-code);
                     font-size: 12px;
                     line-height: 1.4;
@@ -352,7 +352,7 @@
                 margin-bottom: 48px;
 
                 .input-container {
-                    margin-bottom: var(--spacing-xs);
+                    margin-bottom: var(--spacing-1);
                 }
             }
 
@@ -364,18 +364,18 @@
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    margin-bottom: 12px;
+                    margin-bottom: var(--spacing-3);
                 }
 
                 .mcp-token-value {
                     display: flex;
                     align-items: center;
-                    gap: 12px;
-                    margin-bottom: 12px;
+                    gap: var(--spacing-3);
+                    margin-bottom: var(--spacing-3);
 
                     code {
                         flex: 1;
-                        padding: 12px;
+                        padding: var(--spacing-3);
                         background-color: var(--neutral-100);
                         border: 1px solid var(--neutral-200);
                         border-radius: 4px;
@@ -390,7 +390,7 @@
 
             .mcp-tokens-section {
                 h4 {
-                    margin-bottom: 12px;
+                    margin-bottom: var(--spacing-3);
                     color: var(--text-primary);
                 }
 

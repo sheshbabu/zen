@@ -1,0 +1,28 @@
+.templates-list-container {
+  width: 280px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .templates-list-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+  }
+
+  .templates-list {
+    padding: 0;
+
+    .templates-list-empty-text {
+      font: var(--sm);
+      padding: 16px;
+      color: var(--neutral-400);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 64px;
+    }
+  }
+}

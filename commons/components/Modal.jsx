@@ -1,6 +1,14 @@
-import { h } from '../../assets/preact.esm.js';
+import { h, render } from '../../assets/preact.esm.js';
 import { CloseIcon } from './Icon.jsx';
 import './Modal.css';
+
+export function closeModal(selector = '.modal-root') {
+  render(null, document.querySelector(selector));
+}
+
+export function openModal(component, selector = '.modal-root') {
+  render(component, document.querySelector(selector));
+}
 
 export function ModalBackdrop({ children, onClose, isCentered = true }) {
   function handleBackdropClick(e) {
@@ -20,7 +28,7 @@ export function ModalBackdrop({ children, onClose, isCentered = true }) {
 
 export function ModalContainer({ children, className = '' }) {
   const containerClasses = `modal-content-container ${className}`.trim();
-  
+
   return (
     <div className={containerClasses}>
       {children}
@@ -42,7 +50,7 @@ export function ModalHeader({ title, onClose, showCloseButton = true, children }
 
 export function ModalContent({ children, className = '' }) {
   const contentClasses = `modal-content ${className}`.trim();
-  
+
   return (
     <div className={contentClasses}>
       {children}
@@ -50,25 +58,12 @@ export function ModalContent({ children, className = '' }) {
   );
 }
 
-// Default export for backward compatibility
-export default function Modal({ 
-  title, 
-  children, 
-  onClose, 
-  isCentered = true,
-  showCloseButton = true,
-  className = ''
-}) {
+export function ModalFooter({ children, isRightAligned = false }) {
+  const footerClasses = `modal-footer-container ${isRightAligned ? 'right-aligned' : ''}`.trim();
+
   return (
-    <ModalBackdrop onClose={onClose} isCentered={isCentered}>
-      <ModalContainer className={className}>
-        {(title || showCloseButton) && (
-          <ModalHeader title={title} onClose={onClose} showCloseButton={showCloseButton} />
-        )}
-        <ModalContent>
-          {children}
-        </ModalContent>
-      </ModalContainer>
-    </ModalBackdrop>
+    <div className={footerClasses}>
+      {children}
+    </div>
   );
 }

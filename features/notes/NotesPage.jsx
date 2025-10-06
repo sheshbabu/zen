@@ -6,21 +6,41 @@ import MobileNavbar from '../../commons/components/MobileNavbar.jsx';
 import ApiClient from "../../commons/http/ApiClient.js";
 import isMobile from "../../commons/utils/isMobile.js";
 import useSearchParams from "../../commons/components/useSearchParams.jsx";
+import { useAppContext } from "../../commons/contexts/AppContext.jsx";
+import { NotesProvider, useNotes } from "../../commons/contexts/NotesContext.jsx";
+import ViewPreferences from "../../commons/preferences/ViewPreferences.js";
 
 export default function NotesPage({ noteId }) {
-  const [notes, setNotes] = useState([]);
-  const [notesTotal, setNotesTotal] = useState(0);
-  const [notesPageNumber, setNotesPageNumber] = useState(1);
-  const [isNotesLoading, setIsNotesLoading] = useState(true);
-  const [images, setImages] = useState([]);
-  const [imagesTotal, setImagesTotal] = useState(0);
-  const [imagesPageNumber, setImagesPageNumber] = useState(1);
-  const [isImagesLoading, setIsImagesLoading] = useState(true);
-  const [tags, setTags] = useState([]);
-  const [focusModes, setFocusModes] = useState([]);
-  const [selectedNote, setSelectedNote] = useState(null);
-  const [selectedView, setSelectedView] = useState("list"); // "list" || "card" || "gallery"
+  return (
+    <NotesProvider>
+      <NotesPageContent noteId={noteId} />
+    </NotesProvider>
+  );
+}
+
+function NotesPageContent({ noteId }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(isMobile() ? false : true);
+
+  const { refreshTags, refreshFocusModes } = useAppContext();
+  const {
+    notes,
+    selectedNote,
+    setSelectedNote,
+    notesTotal,
+    notesPageNumber,
+    isNotesLoading,
+    images,
+    imagesTotal,
+    imagesPageNumber,
+    isImagesLoading,
+    refreshNotes,
+    refreshImages,
+    handleNoteChange,
+    handlePinToggle,
+    handleLoadMoreNotes,
+    handleLoadMoreImages,
+    resetPagination
+  } = useNotes();
 
   const searchParams = useSearchParams();
   const selectedTagId = searchParams.get("tagId");
@@ -28,36 +48,40 @@ export default function NotesPage({ noteId }) {
   const isArchivesPage = searchParams.get("isArchived") === "true";
   const isTrashPage = searchParams.get("isDeleted") === "true";
 
+  const [selectedView, setSelectedView] = useState(() => {
+    return ViewPreferences.getPreference(selectedFocusId, selectedTagId, isArchivesPage, isTrashPage);
+  });
+
   let listClassName = "notes-list-container";
   let editorClassName = "notes-editor-container";
 
   useEffect(() => {
-    refreshNotes();
-    refreshImages();
-    refreshTags();
+    refreshNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage);
+    refreshImages(selectedTagId, selectedFocusId);
+    refreshTags(selectedFocusId);
     refreshFocusModes();
-  }, []);
+  }, [refreshNotes, refreshImages, refreshTags, refreshFocusModes]);
 
   useEffect(() => {
     // Reset to avoid showing incorrect notes
-    setNotesPageNumber(1);
-    setNotes([]);
-    setImagesPageNumber(1);
-    setImages([]);
-    setSelectedNote(null);
+    resetPagination();
 
-    refreshNotes();
-    refreshImages();
-    refreshTags();
-  }, [selectedTagId, selectedFocusId, isArchivesPage, isTrashPage]);
+    refreshNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage);
+    refreshImages(selectedTagId, selectedFocusId);
+    refreshTags(selectedFocusId);
 
-  useEffect(() => {
-    refreshNotes();
-  }, [notesPageNumber]);
+    // Reload preference
+    const savedView = ViewPreferences.getPreference(selectedFocusId, selectedTagId, isArchivesPage, isTrashPage);
+    setSelectedView(savedView);
+  }, [selectedTagId, selectedFocusId, isArchivesPage, isTrashPage, resetPagination, refreshNotes, refreshImages, refreshTags]);
 
   useEffect(() => {
-    refreshImages();
-  }, [imagesPageNumber]);
+    refreshNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage, notesPageNumber);
+  }, [notesPageNumber, selectedTagId, selectedFocusId, isArchivesPage, isTrashPage, refreshNotes]);
+
+  useEffect(() => {
+    refreshImages(selectedTagId, selectedFocusId, imagesPageNumber);
+  }, [imagesPageNumber, selectedTagId, selectedFocusId, refreshImages]);
 
   // TODO: Move this to NotesEditor
   useEffect(() => {
@@ -88,81 +112,9 @@ export default function NotesPage({ noteId }) {
 
   }, [noteId, notes]);
 
-  function refreshNotes() {
-    setIsNotesLoading(true);
-
-    ApiClient.getNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage, notesPageNumber)
-      .then(res => {
-        if (notesPageNumber > 1) {
-          setNotes(prevNotes => [...prevNotes, ...res.notes]);
-        } else {
-          setNotes(res.notes);
-        }
-        setNotesTotal(res.total);
-      })
-      .catch(error => {
-        console.error('Error loading notes:', error);
-      }).finally(() => {
-        setIsNotesLoading(false);
-      });
-  }
-
-  function refreshImages() {
-    setIsImagesLoading(true);
-
-    ApiClient.getImages(selectedTagId, selectedFocusId, imagesPageNumber)
-      .then(res => {
-        if (imagesPageNumber > 1) {
-          setImages(prevImages => [...prevImages, ...res.images]);
-        } else {
-          setImages(res.images);
-        }
-        setImagesTotal(res.total);
-      })
-      .catch(error => {
-        console.error('Error loading images:', error);
-      }).finally(() => {
-        setIsImagesLoading(false);
-      });
-  }
-
-  function refreshTags() {
-    ApiClient.getTags(selectedFocusId)
-      .then(newTags => {
-        setTags(newTags);
-      })
-      .catch(error => {
-        console.error('Error loading tags:', error);
-      });
-  }
-
-  function refreshFocusModes() {
-    ApiClient.getFocusModes()
-      .then(focusModes => {
-        setFocusModes(focusModes);
-      })
-      .catch(error => {
-        console.error('Error loading focus modes:', error);
-      });
-  }
-
-  // Update notes, tags, and focus modes when a note is created/updated/deleted
-  function handleNoteChange() {
-    refreshNotes();
-    refreshImages();
-    refreshTags();
-  }
-
   function handleViewChange(newView) {
     setSelectedView(newView);
-  }
-
-  function handleLoadMoreClick() {
-    setNotesPageNumber(notesPageNumber + 1);
-  }
-
-  function handleLoadMoreImagesClick() {
-    setImagesPageNumber(imagesPageNumber + 1);
+    ViewPreferences.setPreference(newView, selectedFocusId, selectedTagId, isArchivesPage, isTrashPage);
   }
 
   if (selectedView === "list") {
@@ -177,11 +129,21 @@ export default function NotesPage({ noteId }) {
     }
   }
 
+  if (isMobile()) {
+    if (noteId !== undefined) {
+      listClassName += " is-hidden";
+      editorClassName = editorClassName.replace(" is-hidden", "") + " is-visible";
+    } else {
+      listClassName += " is-visible";
+      editorClassName += " is-hidden";
+    }
+  }
+
   return (
     <div className="page-container">
-      <Sidebar isOpen={isSidebarOpen} onSidebarClose={() => setIsSidebarOpen(false)} focusModes={focusModes} tags={tags} />
+      <Sidebar isOpen={isSidebarOpen} onSidebarClose={() => setIsSidebarOpen(false)} />
 
-      <div className={listClassName} data-page={noteId === undefined ? "notes" : "editor"}>
+      <div className={listClassName}>
         <NotesList
           notes={notes}
           total={notesTotal}
@@ -191,15 +153,14 @@ export default function NotesPage({ noteId }) {
           isImagesLoading={isImagesLoading}
           view={selectedView}
           onViewChange={handleViewChange}
-          onLoadMoreClick={handleLoadMoreClick}
-          onLoadMoreImagesClick={handleLoadMoreImagesClick}
-          onChange={handleNoteChange}
+          onLoadMoreClick={handleLoadMoreNotes}
+          onLoadMoreImagesClick={handleLoadMoreImages}
           onSidebarToggle={() => setIsSidebarOpen(!isSidebarOpen)}
         />
       </div>
 
-      <div className={editorClassName} data-page={noteId === undefined ? "notes" : "editor"}>
-        <NotesEditor selectedNote={selectedNote} isNewNote={noteId === "new"} key={selectedNote?.noteId} onChange={handleNoteChange} />
+      <div className={editorClassName}>
+        <NotesEditor isNewNote={noteId === "new"} key={selectedNote?.noteId} />
       </div>
 
       <MobileNavbar />

@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"zen/commons/queue"
 	"zen/features/notes"
 )
 
@@ -153,6 +154,7 @@ func syncImageRecords(diskImages map[string]os.FileInfo, dbImages map[string]Ima
 				slog.Error("failed to create image record", "filename", filename, "error", err)
 				continue
 			}
+			queue.AddImageTask(filename, queue.QUEUE_IMAGE_PROCESS, "process")
 		}
 
 		if existsOnDisk {
@@ -188,6 +190,7 @@ func syncImageRecords(diskImages map[string]os.FileInfo, dbImages map[string]Ima
 			if err != nil {
 				slog.Error("failed to delete orphaned image", "filename", filename, "error", err)
 			}
+			queue.AddImageTask(filename, queue.QUEUE_IMAGE_DELETE, "delete")
 		}
 	}
 
@@ -204,7 +207,7 @@ func createImageRecordFromFile(filename string, fileInfo os.FileInfo) error {
 	}
 	defer file.Close()
 
-	imageInfo, err := getImageInfo(file, filename)
+	imageInfo, err := getImageInfo(file)
 	if err != nil {
 		err = fmt.Errorf("error getting image info: %w", err)
 		slog.Error(err.Error())

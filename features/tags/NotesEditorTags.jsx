@@ -133,7 +133,7 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddT
           onKeyUp={handleKeyUp}
           onInput={handleInput}
         />
-        <div ref={dropdownRef} className={`dropdown-container ${suggestions.length ? 'open' : ''}`}>
+        <div ref={dropdownRef} className={`dropdown-container ${suggestions.length ? 'is-open' : ''}`}>
           <ul className="dropdown-menu">
             {suggestionItems}
           </ul>

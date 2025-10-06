@@ -18,8 +18,18 @@
 * Markdown features like tables, code blocks, task lists, highlights, and more
 * Full-text search with BM25 ranking
 * Import and export data with full portability
-* MCP support for searching, listing and reading notes
+* Templates
+* Pinned notes
+* Archive and soft delete notes
 * Minimal dependency footprint
+
+
+### Experimental Features
+* Canvas for spatial organization of notes and images (stored as [JSON Canvas](https://jsoncanvas.org/docs/apps/))
+* Semantic search for notes and images (via [Zen Intelligence](https://github.com/sheshbabu/zen-intelligence))
+* Similar images (via [Zen Intelligence](https://github.com/sheshbabu/zen-intelligence))
+* MCP for searching, listing and reading notes
+
 
 
 ### Installation
@@ -72,3 +82,4 @@ This is a personal project built for my own use. The codebase is available for f
 * [highlight.js](https://highlightjs.org)
 * [Lucide Icons](https://lucide.dev)
 * [CSS Reset](https://www.joshwcomeau.com/css/custom-css-reset/)
+* [Konva.js](https://konvajs.org)

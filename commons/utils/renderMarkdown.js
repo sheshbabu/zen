@@ -8,7 +8,7 @@ export default function renderMarkdown(text) {
     highlight: function (str, lang) {
       if (lang && window.hljs.getLanguage(lang)) {
         try {
-          return window.hljs.highlight(lang, str).value;
+          return window.hljs.highlight(str, { language: lang }).value;
         } catch (__) { }
       }
       return '';
