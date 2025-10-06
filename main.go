@@ -202,6 +202,7 @@ func runBackgroundTasks() {
 	intelligenceProcessingFrequency := 5 * time.Minute // 5 minutes
 
 	go func() {
+		notes.EmptyTrash(true) // Run immediately on server start
 		for range time.Tick(trashCleanupFrequency) {
 			notes.EmptyTrash(true)
 		}
