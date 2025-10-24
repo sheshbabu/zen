@@ -81,11 +81,11 @@ func main() {
 func newRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /api/users/me", users.HandleCheckUser)
-	mux.HandleFunc("POST /api/users/login", users.HandleLogin)
-	addPrivateRoute(mux, "POST /api/users/new", users.HandleCreateUser)
+	mux.HandleFunc("GET /api/users/me", auth.HandleCheckUser)
+	mux.HandleFunc("POST /api/users/login", auth.HandleLogin)
+	addPrivateRoute(mux, "POST /api/users/new", auth.HandleCreateUser)
 	addPrivateRoute(mux, "POST /api/users/me/password", users.HandleUpdatePassword)
-	addPrivateRoute(mux, "POST /api/users/logout", users.HandleLogout)
+	addPrivateRoute(mux, "POST /api/users/logout", auth.HandleLogout)
 
 	addPrivateRoute(mux, "GET /api/notes/", notes.HandleGetNotes)
 	addPrivateRoute(mux, "GET /api/notes/{noteId}/", notes.HandleGetNote)
