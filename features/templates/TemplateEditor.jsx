@@ -123,12 +123,26 @@ export default function TemplateEditor({ selectedTemplate, isNewTemplate, onChan
     render(null, document.querySelector('.modal-root'));
   }
 
+  function handleDuplicateClick() {
+    ApiClient.duplicateTemplate(selectedTemplate.templateId)
+      .then((duplicatedTemplate) => {
+        showToast("Template duplicated");
+        navigateTo(`/templates/${duplicatedTemplate.templateId}`);
+        onChange();
+      })
+      .catch(error => {
+        console.error('Error duplicating template:', error);
+        showToast("Failed to duplicate template");
+      });
+  }
+
   function getMenuActions() {
     if (isNewTemplate) {
       return [];
     }
 
     return [
+      <div style="width: 100px;" onClick={handleDuplicateClick}>Duplicate</div>,
       <div style="width: 80px;" onClick={handleDeleteClick}>Delete</div>
     ];
   }

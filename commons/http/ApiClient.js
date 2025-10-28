@@ -282,6 +282,10 @@ async function incrementTemplateUsage(templateId) {
   return await request('PUT', `/api/templates/${templateId}/usage/`);
 }
 
+async function duplicateTemplate(templateId) {
+  return await request('POST', `/api/templates/${templateId}/duplicate/`);
+}
+
 
 // MCP Tokens
 
@@ -333,6 +337,7 @@ export default {
   deleteTemplate,
   getRecommendedTemplates,
   incrementTemplateUsage,
+  duplicateTemplate,
   getTokens,
   createToken,
   deleteToken

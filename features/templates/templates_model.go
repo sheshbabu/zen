@@ -317,7 +317,7 @@ func GetRecommendedTemplates(limit int) ([]Template, error) {
 			t.last_used_at,
 			COALESCE(
 				JSON_GROUP_ARRAY(
-					CASE 
+					CASE
 						WHEN tag.tag_id IS NOT NULL THEN JSON_OBJECT(
 							'tagId', tag.tag_id,
 							'name', tag.name
@@ -330,7 +330,7 @@ func GetRecommendedTemplates(limit int) ([]Template, error) {
 				WHEN t.last_used_at IS NULL THEN 0
 				ELSE MAX(0, 100 - (julianday('now') - julianday(t.last_used_at)) * 2)
 			END as recency_score,
-			t.usage_count * 0.6 + 
+			t.usage_count * 0.6 +
 			CASE
 				WHEN t.last_used_at IS NULL THEN 0
 				ELSE MAX(0, 100 - (julianday('now') - julianday(t.last_used_at)) * 2)
@@ -379,4 +379,32 @@ func GetRecommendedTemplates(limit int) ([]Template, error) {
 	}
 
 	return templates, nil
+}
+
+func DuplicateTemplate(templateID int) (Template, error) {
+	var duplicatedTemplate Template
+
+	// Get the original template
+	originalTemplate, err := GetTemplateByID(templateID)
+	if err != nil {
+		return duplicatedTemplate, err
+	}
+
+	// ISSUE 21: String concatenation without checking for max length
+	duplicatedTemplate.Name = originalTemplate.Name + " (Copy)"
+	duplicatedTemplate.Title = originalTemplate.Title
+	duplicatedTemplate.Content = originalTemplate.Content
+	duplicatedTemplate.Tags = originalTemplate.Tags
+
+	// ISSUE 22: Not resetting usage statistics for duplicated template
+	// Should set UsageCount to 0 and LastUsedAt to nil
+	duplicatedTemplate.UsageCount = originalTemplate.UsageCount
+	duplicatedTemplate.LastUsedAt = originalTemplate.LastUsedAt
+
+	err = CreateTemplate(&duplicatedTemplate)
+	if err != nil {
+		return duplicatedTemplate, err
+	}
+
+	return duplicatedTemplate, nil
 }

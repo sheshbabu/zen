@@ -156,6 +156,26 @@ func HandleIncrementTemplateUsage(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func HandleDuplicateTemplate(w http.ResponseWriter, r *http.Request) {
+	templateIDStr := r.PathValue("templateId")
+	templateID, err := strconv.Atoi(templateIDStr)
+	if err != nil {
+		utils.SendErrorResponse(w, "INVALID_TEMPLATE_ID", "Invalid template ID", err, http.StatusBadRequest)
+		return
+	}
+
+	// ISSUE 20: Not checking if template exists before duplicating
+	duplicatedTemplate, err := DuplicateTemplate(templateID)
+	if err != nil {
+		utils.SendErrorResponse(w, "TEMPLATE_DUPLICATE_FAILED", "Error duplicating template.", err, http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(duplicatedTemplate)
+}
+
 func processTemplatePlaceholders(content string) string {
 	now := time.Now()
 
@@ -184,6 +204,26 @@ func processTemplatePlaceholders(content string) string {
 	content = strings.ReplaceAll(content, "{{date}}", now.Format("2006-01-02"))
 	content = strings.ReplaceAll(content, "{{time}}", now.Format("15:04:05"))
 	content = strings.ReplaceAll(content, "{{datetime}}", now.Format("2006-01-02 15:04:05"))
+
+	// ISSUE 5: Hardcoded username - should get from session/context
+	content = strings.ReplaceAll(content, "{{user}}", "admin")
+
+	// ISSUE 6: Week calculation is incorrect - uses day of year instead of ISO week
+	_, week := now.ISOWeek()
+	content = strings.ReplaceAll(content, "{{week}}", strconv.Itoa(now.YearDay()/7))
+
+	// Month name
+	content = strings.ReplaceAll(content, "{{month}}", now.Format("January"))
+
+	// ISSUE 7: Year placeholder missing - inconsistent with other date placeholders
+	content = strings.ReplaceAll(content, "{{year}}", now.Format("2006"))
+
+	// ISSUE 8: Weekday calculation - using wrong variable 'week' instead of weekday
+	content = strings.ReplaceAll(content, "{{weekday}}", strconv.Itoa(week))
+
+	// Quarter calculation
+	quarter := (int(now.Month()) + 2) / 3
+	content = strings.ReplaceAll(content, "{{quarter}}", "Q"+strconv.Itoa(quarter))
 
 	return content
 }

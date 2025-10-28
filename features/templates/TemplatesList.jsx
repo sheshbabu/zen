@@ -4,7 +4,7 @@ import TemplateListItem from './TemplateListItem.jsx';
 import Spinner from '../../commons/components/Spinner.jsx';
 import "./TemplatesList.css";
 
-export default function TemplatesList({ templates = [], isLoading, onNewTemplateClick }) {
+export default function TemplatesList({ templates = [], isLoading, onNewTemplateClick, onToggleStats }) {
   let content = <div className="templates-list-spinner"><Spinner /></div>;
 
   if (!isLoading) {
@@ -20,7 +20,10 @@ export default function TemplatesList({ templates = [], isLoading, onNewTemplate
 
   return (
     <>
-      <TemplatesListToolbar onNewTemplateClick={onNewTemplateClick} />
+      <TemplatesListToolbar
+        onNewTemplateClick={onNewTemplateClick}
+        onToggleStats={onToggleStats}
+      />
       {content}
     </>
   );

@@ -2,6 +2,8 @@ import { h, useState, useEffect } from "../../assets/preact.esm.js"
 import Sidebar from '../../commons/components/Sidebar.jsx';
 import TemplatesList from './TemplatesList.jsx';
 import TemplateEditor from './TemplateEditor.jsx';
+import TemplateStats from './TemplateStats.jsx';
+import TemplateImportExport from './TemplateImportExport.jsx';
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 
@@ -11,6 +13,7 @@ export default function TemplatesPage({ templateId }) {
   const [tags, setTags] = useState([]);
   const [focusModes, setFocusModes] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [showStats, setShowStats] = useState(false);
 
   useEffect(() => {
     refreshTemplates();
@@ -88,16 +91,42 @@ export default function TemplatesPage({ templateId }) {
     navigateTo('/templates/');
   }
 
+  function handleToggleStats() {
+    setShowStats(!showStats);
+  }
+
   return (
     <div className="page-container">
       <Sidebar isOpen={true} onSidebarClose={() => { }} focusModes={focusModes} tags={tags} />
 
       <div className="templates-list-container">
-        <TemplatesList templates={templates} isLoading={isTemplatesLoading} onNewTemplateClick={handleNewTemplateClick} onChange={handleTemplateChange} />
+        <TemplatesList
+          templates={templates}
+          isLoading={isTemplatesLoading}
+          onNewTemplateClick={handleNewTemplateClick}
+          onChange={handleTemplateChange}
+          onToggleStats={handleToggleStats}
+        />
+
+        {showStats && (
+          <div className="templates-stats-container">
+            <TemplateStats templates={templates} />
+            <TemplateImportExport
+              templates={templates}
+              onImportComplete={handleTemplateChange}
+            />
+          </div>
+        )}
       </div>
 
       <div className="templates-editor-container">
-        <TemplateEditor selectedTemplate={selectedTemplate} isNewTemplate={templateId === "new"} key={selectedTemplate?.templateId || "new"} onChange={handleTemplateChange} onClose={handleCloseEditor} />
+        <TemplateEditor
+          selectedTemplate={selectedTemplate}
+          isNewTemplate={templateId === "new"}
+          key={selectedTemplate?.templateId || "new"}
+          onChange={handleTemplateChange}
+          onClose={handleCloseEditor}
+        />
       </div>
 
       <div className="modal-root"></div>
