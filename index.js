@@ -14,6 +14,58 @@ import Tooltip from './commons/components/Tooltip.js';
 import { AppProvider } from './commons/contexts/AppContext.jsx';
 import ThemePreferences from './commons/preferences/ThemePreferences.js';
 
+
+// Copy code button functionality
+function copyCode(button) {
+  const wrapper = button.closest('.code-block-wrapper');
+  if (!wrapper) return;
+  const pre = wrapper.querySelector('pre');
+  if (!pre) return;
+  const code = pre.innerText;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(() => {
+      const originalText = button.innerText;
+      button.innerText = 'Copied!';
+      setTimeout(() => {
+        button.innerText = originalText;
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+      // Fallback to execCommand
+      fallbackCopyTextToClipboard(code, button);
+    });
+  } else {
+    // Use fallback method
+    fallbackCopyTextToClipboard(code, button);
+  }
+}
+
+function fallbackCopyTextToClipboard(text, button) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.top = '-9999px';
+  textArea.style.left = '-9999px';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  try {
+    const successful = document.execCommand('copy');
+    if (successful) {
+      const originalText = button.innerText;
+      button.innerText = 'Copied!';
+      setTimeout(() => {
+        button.innerText = originalText;
+      }, 2000);
+    } else {
+      console.error('Fallback copy failed');
+    }
+  } catch (err) {
+    console.error('Fallback copy error: ', err);
+  }
+  document.body.removeChild(textArea);
+}
+window.copyCode = copyCode;
 document.addEventListener('DOMContentLoaded', () => {
   ThemePreferences.applyTheme();
   Tooltip.init();
