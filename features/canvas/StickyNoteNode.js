@@ -1,3 +1,5 @@
+const fontFamily = getComputedStyle(document.documentElement).getPropertyValue('--font-family').trim();
+
 function create(layer, x, y, onPositionChange, onClick, onDoubleClick, width = 250, height = 250, text = '') {
   const group = new window.Konva.Group({
     x: x,
@@ -32,7 +34,7 @@ function create(layer, x, y, onPositionChange, onClick, onDoubleClick, width = 2
     height: height - 24,
     text: text,
     fontSize: 18,
-    fontFamily: 'system-ui, -apple-system, sans-serif',
+    fontFamily: fontFamily,
     fill: '#713f12',
     align: 'left',
     verticalAlign: 'top',

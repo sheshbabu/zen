@@ -35,34 +35,8 @@
   }
 
   .canvas-note-picker-tabs {
-    display: flex;
+    padding: var(--spacing-2);
     border-bottom: 1px solid var(--neutral-100);
-    background-color: var(--bg-secondary);
-  }
-
-  .canvas-note-picker-tab {
-    padding: 4px 8px;
-    margin: 8px;
-    margin-right: 0;
-    border-radius: 4px;
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--neutral-600);
-    transition: color var(--transition-normal), border-color var(--transition-normal), background-color var(--transition-normal);
-
-    &:hover {
-      color: var(--text-primary);
-      background-color: var(--neutral-100);
-    }
-
-    &.active {
-      color: var(--text-primary);
-      background-color: var(--neutral-100);
-    }
   }
 
   .canvas-note-picker-tab-content {

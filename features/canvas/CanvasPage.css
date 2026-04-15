@@ -10,7 +10,7 @@
     flex: 1;
     position: relative;
     overflow: hidden;
-    background: var(--background-color);
+    background: var(--bg-primary);
   }
 
   .canvas-loading {
@@ -19,6 +19,6 @@
     justify-content: center;
     height: 100%;
     font-size: 1.125rem;
-    color: var(--text-muted);
+    color: var(--text-secondary);
   }
 }

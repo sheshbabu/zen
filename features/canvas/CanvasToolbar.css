@@ -29,6 +29,25 @@
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--text-secondary);
+    }
+  }
+
+  .canvas-toolbar-title-input {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    padding: 2px 6px;
+    border: 1px solid var(--neutral-300);
+    border-radius: 4px;
+    background: var(--bg-primary);
+    outline: none;
+    font-family: var(--font-family);
+    width: 200px;
   }
 
   .canvas-toolbar-button {

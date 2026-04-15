@@ -79,16 +79,14 @@ export default function FocusSwitcher() {
   items.push(<li className="dropdown-option" onClick={handleAddNewClick}>Add new...</li>);
 
   return (
-    <div ref={dropdownRef} className="sidebar-focus-switcher">
+    <div ref={dropdownRef} className={`sidebar-focus-switcher dropdown-container ${isDropdownOpen ? 'is-open' : ''}`}>
       <Button className="dropdown-button" onClick={handleDropdownClick}>
         {selectedFocusMode.name}
         <ArrowDownIcon />
       </Button>
-      <div className={`dropdown-container ${isDropdownOpen ? 'is-open' : ''}`}>
-        <ul className="dropdown-menu">
-          {items}
-        </ul>
-      </div>
+      <ul className="dropdown-menu">
+        {items}
+      </ul>
     </div>
   )
 }

@@ -15,14 +15,5 @@
   .templates-list {
     padding: 0;
 
-    .templates-list-empty-text {
-      font: var(--sm);
-      padding: 16px;
-      color: var(--neutral-400);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 64px;
-    }
   }
 }

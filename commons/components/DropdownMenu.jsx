@@ -41,13 +41,11 @@ export default function DropdownMenu({ actions }) {
 
 
   return (
-    <div ref={dropdownRef}>
+    <div ref={dropdownRef} className={`dropdown-container ${isDropdownOpen ? 'is-open' : ''}`}>
       <Button variant="ghost" onClick={handleDropdownClick}><EllipsisIcon /></Button>
-      <div className={`dropdown-container ${isDropdownOpen ? 'is-open' : ''}`}>
-        <ul className="dropdown-menu">
-          {items}
-        </ul>
-      </div>
+      <ul className="dropdown-menu">
+        {items}
+      </ul>
     </div>
   );
 }

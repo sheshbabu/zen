@@ -2,6 +2,7 @@ import { h, useState } from "../../assets/preact.esm.js"
 import Input from "../../commons/components/Input.jsx";
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import Button from "../../commons/components/Button.jsx";
+import ButtonGroup from "../../commons/components/ButtonGroup.jsx";
 import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent, ModalFooter, closeModal } from "../../commons/components/Modal.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
@@ -13,6 +14,13 @@ export default function FocusDetailsModal({ mode, focusMode, refreshFocusModes, 
 
   let title = "Create Focus";
   let buttonName = "Create";
+  let deleteButton = null;
+
+  if (mode === "edit") {
+    title = "Edit Focus";
+    buttonName = "Update";
+    deleteButton = <Button variant="danger" onClick={handleDeleteClick}>Delete</Button>;
+  }
 
   function handleNameChange(e) {
     setName(e.target.value);
@@ -57,10 +65,13 @@ export default function FocusDetailsModal({ mode, focusMode, refreshFocusModes, 
       });
   }
 
-
-  if (mode === "edit") {
-    title = "Edit Focus";
-    buttonName = "Update";
+  function handleDeleteClick() {
+    ApiClient.deleteFocusMode(focusMode.focusId)
+      .then(() => {
+        refreshFocusModes();
+        closeModal();
+        navigateTo("/notes/");
+      });
   }
 
   return (
@@ -75,9 +86,12 @@ export default function FocusDetailsModal({ mode, focusMode, refreshFocusModes, 
             <NotesEditorTags tags={tags} isEditable canCreateTag={false} onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
           </div>
         </ModalContent>
-        <ModalFooter isRightAligned>
-          <Button onClick={handleCancelClick}>Cancel</Button>
-          <Button variant="primary" onClick={handleCreateClick}>{buttonName}</Button>
+        <ModalFooter isRightAligned={mode === "create"}>
+          {deleteButton}
+          <ButtonGroup>
+            <Button onClick={handleCancelClick}>Cancel</Button>
+            <Button variant="primary" onClick={handleCreateClick}>{buttonName}</Button>
+          </ButtonGroup>
         </ModalFooter>
       </ModalContainer>
     </ModalBackdrop>

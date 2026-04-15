@@ -8,19 +8,21 @@ import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import isMobile from '../../commons/utils/isMobile.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
+import NotesEditorModal from './NotesEditorModal.jsx';
 import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
 import Button from '../../commons/components/Button.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
 import { closeModal, openModal } from '../../commons/components/Modal.jsx';
-import { useNotes } from "../../commons/contexts/NotesContext.jsx";
+import { useNotes, NotesProvider } from "../../commons/contexts/NotesContext.jsx";
+import { AppProvider } from '../../commons/contexts/AppContext.jsx';
 import { useVisibleHeadings } from "./useVisibleHeadings.js";
 import useEditorKeyboardShortcuts from "./useEditorKeyboardShortcuts.js";
 import useImageUpload from "./useImageUpload.js";
 import useMarkdownFormatter from "./useMarkdownFormatter.js";
 import "./NotesEditor.css";
-import { CloseIcon, SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
+import { SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
 
-export default function NotesEditor({ isNewNote, isFloating, onClose }) {
+export default function NotesEditor({ isNewNote, isModal, isExpanded, onExpandToggle, onClose }) {
   const { selectedNote, handleNoteChange, handlePinToggle } = useNotes();
 
   if (!isNewNote && selectedNote === null) {
@@ -32,7 +34,6 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
   const [content, setContent] = useState(selectedNote?.content || "");
   const [tags, setTags] = useState(selectedNote?.tags || []);
   const [isSaveLoading, setIsSaveLoading] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
 
   const titleRef = useRef(null);
   const textareaRef = useRef(null);
@@ -40,7 +41,7 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
 
   const visibleHeadings = useVisibleHeadings(contentRef, content, isEditable, isExpanded);
 
-  const { insertAtCursor, formatSelectedText, applyMarkdownFormat } = useMarkdownFormatter({
+  const { insertAtCursor, applyMarkdownFormat } = useMarkdownFormatter({
     textareaRef,
     setContent
   });
@@ -114,7 +115,7 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
 
   const { handleKeyDown } = useEditorKeyboardShortcuts({
     isEditable,
-    isFloating,
+    isModal,
     isExpanded,
     textareaRef,
     onSave: handleSaveClick,
@@ -122,7 +123,7 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
     onClose: handleCloseClick,
     onExpandToggle: handleExpandToggleClick,
     onInsertAtCursor: insertAtCursor,
-    onFormatText: formatSelectedText
+    onFormatText: applyMarkdownFormat
   });
 
   function handleTextAreaHeight() {
@@ -149,6 +150,10 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
         navigateTo("/", true);
       }
     } else {
+      // Reset current edits
+      setTitle(selectedNote?.title || "");
+      setContent(selectedNote?.content || "");
+      setTags(selectedNote?.tags || []);
       setIsEditable(false);
     }
   }
@@ -224,13 +229,29 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
   }
 
   function handleExpandToggleClick() {
-    setIsExpanded((prev) => !prev);
-    const editor = document.querySelector('.notes-editor-container');
-    if (isExpanded) {
-      editor.classList.remove('is-expanded');
-    } else {
-      editor.classList.add('is-expanded');
+    if (onExpandToggle) {
+      onExpandToggle();
     }
+  }
+
+  function handleInternalNoteLinkClick(e) {
+    const link = e.target.closest('a[data-note-id]');
+    if (link === null) {
+      return;
+    }
+    e.preventDefault();
+    const noteId = link.getAttribute('data-note-id');
+    ApiClient.getNoteById(noteId)
+      .then(note => {
+        openModal(
+          <AppProvider>
+            <NotesProvider>
+              <NotesEditorModal note={note} />
+            </NotesProvider>
+          </AppProvider>,
+          '.note-modal-root'
+        );
+      });
   }
 
   function handlePinClick() {
@@ -284,7 +305,7 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
     );
   } else {
     contentArea = (
-      <div className="notes-editor-rendered" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }} />
+      <div className="notes-editor-rendered" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }} onClick={handleInternalNoteLinkClick} />
     );
   }
 
@@ -300,20 +321,44 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
     templatePicker = <TemplatePicker onTemplateApply={handleTemplateApply} />;
   }
 
-  // TODO: remove "is-editable" CSS and use JS
+  let imageDropzone = null;
+  let imageAttachmentPreview = null;
+  if (isEditable === true) {
+    imageDropzone = (
+      <div
+        className={`notes-editor-image-dropzone ${isDraggingOver ? "dragover" : ""}`}
+        onDrop={handleImageDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onClick={handleDropzoneClick}>
+        Click to upload or drag and drop images
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          ref={fileInputRef}
+          onChange={handleFileInputChange}
+          style={{ display: "none" }}
+        />
+      </div>
+    );
+    imageAttachmentPreview = (
+      <div className="notes-editor-image-attachment-preview">{imagePreviewItems}</div>
+    );
+  }
+
   return (
-    <div className={`notes-editor ${isEditable ? "is-editable" : ""}`} tabIndex="0" onPaste={handlePaste}>
+    <div className="notes-editor" tabIndex="0" onPaste={handlePaste}>
       <Toolbar
         note={selectedNote}
         isNewNote={isNewNote}
         isEditable={isEditable}
-        isFloating={isFloating}
+        isModal={isModal}
         isSaveLoading={isSaveLoading}
         isExpanded={isExpanded}
         onSaveClick={handleSaveClick}
         onEditClick={handleEditClick}
         onEditCancelClick={handleEditCancelClick}
-        onCloseClick={handleCloseClick}
         onDeleteClick={handleDeleteClick}
         onArchiveClick={handleArchiveClick}
         onUnarchiveClick={handleUnarchiveClick}
@@ -326,11 +371,8 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
         <div className="notes-editor-title" contentEditable={isEditable} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
       </div>
       <NotesEditorTags tags={tags} isEditable={isEditable} canCreateTag onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
-      <div className={`notes-editor-image-dropzone ${isDraggingOver ? "dragover" : ""}`} onDrop={handleImageDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onClick={handleDropzoneClick}>
-        Click to upload or drag and drop images
-        <input type="file" accept="image/*" multiple ref={fileInputRef} onChange={handleFileInputChange} style={{ display: "none" }} />
-      </div>
-      <div className="notes-editor-image-attachment-preview">{imagePreviewItems}</div>
+      {imageDropzone}
+      {imageAttachmentPreview}
       <NotesEditorFormattingToolbar isEditable={isEditable} onFormat={applyMarkdownFormat} />
       <div className="notes-editor-content">
         {contentArea}
@@ -341,7 +383,7 @@ export default function NotesEditor({ isNewNote, isFloating, onClose }) {
   );
 }
 
-function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExpanded, onSaveClick, onEditClick, onEditCancelClick, onCloseClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick, onPinClick, onUnpinClick }) {
+function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpanded, onSaveClick, onEditClick, onEditCancelClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick, onPinClick, onUnpinClick }) {
   const saveButtonText = isSaveLoading ? "Saving..." : "Save";
 
   function handleClick(e) {
@@ -357,7 +399,7 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExp
     left: [
       {
         key: 'expand',
-        condition: !isFloating && !isMobile(),
+        condition: !isModal && !isMobile(),
         component: <Button variant="ghost" onClick={onExpandToggleClick}>
           {isExpanded ? <SidebarCloseIcon /> : <SidebarOpenIcon />}
         </Button>
@@ -369,11 +411,6 @@ function Toolbar({ note, isNewNote, isEditable, isFloating, isSaveLoading, isExp
       }
     ],
     right: [
-      {
-        key: 'close',
-        condition: isFloating,
-        component: <Button variant="ghost" onClick={onCloseClick}><CloseIcon /></Button>
-      },
       {
         key: 'save',
         condition: isEditable,

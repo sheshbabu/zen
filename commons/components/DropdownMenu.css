@@ -1,6 +1,5 @@
 .dropdown-container {
     position: relative;
-    max-width: 200px;
 
     .dropdown-button {
         min-width: 160px;
@@ -10,17 +9,23 @@
         list-style: none;
         margin: 0;
         padding: 0;
-        top: 4px;
+        top: 100%;
+        margin-top: 4px;
         position: absolute;
+        left: 0;
         min-width: 100%;
         box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
-        display: none;
         background-color: var(--bg-secondary);
         z-index: 1;
         max-height: 198px;
-        overflow: scroll;
+        overflow: auto;
         border: 1px solid var(--neutral-100);
         border-radius: 4px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-4px);
+        transition: opacity 0.15s ease-out, transform 0.15s ease-out, visibility 0.15s ease-out;
+        pointer-events: none;
 
         &::-webkit-scrollbar {
             display: none;
@@ -92,24 +97,14 @@
 
     &.is-open {
         .dropdown-menu {
-            display: block;
-            animation: dropdown-fade-in 0.15s ease-out;
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         .dropdown-button {
             border-radius: 6px 6px 0 0;
         }
-    }
-}
-
-@keyframes dropdown-fade-in {
-    from {
-        opacity: 0;
-        transform: translateY(-4px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
     }
 }

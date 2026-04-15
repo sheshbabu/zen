@@ -62,7 +62,7 @@ export default function Sidebar({ isOpen, onSidebarClose }) {
             <NotesIcon />
             Notes
           </Link>
-          <Link className="sidebar-button canvas" to="/canvas">
+          <Link className="sidebar-button canvas" activeClassName="is-active" to="/canvases/">
             <BoardIcon />
             Canvas
           </Link>

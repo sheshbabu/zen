@@ -6,11 +6,13 @@ import StickyNoteNode from './StickyNoteNode.js';
 import CanvasNotePicker from './CanvasNotePicker.jsx';
 import CanvasToolbar from './CanvasToolbar.jsx';
 import JsonCanvas from './JsonCanvas.js';
+import CanvasPreview from './CanvasPreview.js';
 import ViewportManager from './ViewportManager.js';
 import SelectionManager from './SelectionManager.js';
 import TransformerManager from './TransformerManager.js';
 import NodePositioning from './NodePositioning.js';
-import CanvasStorage from './CanvasStorage.js';
+import ApiClient from '../../commons/http/ApiClient.js';
+import navigateTo from '../../commons/utils/navigateTo.js';
 import Lightbox from '../../commons/components/Lightbox.jsx';
 import NotesEditorModal from '../notes/NotesEditorModal.jsx';
 import { AppProvider } from '../../commons/contexts/AppContext.jsx';
@@ -18,7 +20,7 @@ import { NotesProvider } from '../../commons/contexts/NotesContext.jsx';
 import { openModal, closeModal } from '../../commons/components/Modal.jsx';
 import './CanvasPage.css';
 
-export default function CanvasPage() {
+export default function CanvasPage({ canvasId }) {
   const containerRef = useRef(null);
   const stageRef = useRef(null);
   const isKonvaReady = useKonva();
@@ -27,11 +29,15 @@ export default function CanvasPage() {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [hasMultiSelection, setHasMultiSelection] = useState(false);
   const [isPanMode, setIsPanMode] = useState(false);
+  const [canvasTitle, setCanvasTitle] = useState('');
+  const isPanModeRef = useRef(false);
   const nodesRef = useRef([]);
   const stickyNoteCounterRef = useRef(0);
   const viewportManagerRef = useRef(null);
   const selectionManagerRef = useRef(null);
   const transformerManagerRef = useRef(null);
+  const saveTimerRef = useRef(null);
+  const canvasIdRef = useRef(canvasId);
 
   useEffect(() => {
     if (containerRef.current === null || isKonvaReady !== true) {
@@ -54,7 +60,7 @@ export default function CanvasPage() {
 
     function handleViewportChange(scale) {
       setZoomLevel(scale);
-      saveCanvasStateFromNodesRef();
+      debouncedSave();
     }
 
     const viewportManager = ViewportManager.createViewportManager(stage, layer, handleViewportChange);
@@ -64,7 +70,7 @@ export default function CanvasPage() {
     selectionManager.initialize();
     selectionManagerRef.current = selectionManager;
 
-    const transformerManager = TransformerManager.createTransformerManager(stage, layer, nodesRef, saveCanvasStateFromNodesRef);
+    const transformerManager = TransformerManager.createTransformerManager(stage, layer, nodesRef, debouncedSave);
     transformerManager.initialize();
     transformerManagerRef.current = transformerManager;
 
@@ -74,7 +80,7 @@ export default function CanvasPage() {
       }
 
       const isShiftPressed = e.evt.shiftKey;
-      const shouldPan = isPanMode || isShiftPressed;
+      const shouldPan = isPanModeRef.current || isShiftPressed;
 
       if (shouldPan) {
         viewportManager.startPan();
@@ -111,36 +117,45 @@ export default function CanvasPage() {
       }
     });
 
-    const savedCanvas = CanvasStorage.loadCanvasState();
-    const restored = JsonCanvas.fromJsonCanvas(savedCanvas);
+    ApiClient.getCanvasById(canvasIdRef.current)
+      .then(canvas => {
+        if (canvas) {
+          setCanvasTitle(canvas.title || '');
+          canvas.data = canvas.data ? JSON.parse(canvas.data) : { nodes: [], edges: [] };
+        }
+        const canvasData = canvas ? canvas.data : { nodes: [], edges: [] };
+        const restored = JsonCanvas.fromJsonCanvas(canvasData);
 
-    if (restored.viewport) {
-      viewportManager.setViewport(restored.viewport);
-      setZoomLevel(restored.viewport.scale);
-    } else {
-      stage.scale({ x: 0.75, y: 0.75 });
-      setZoomLevel(0.75);
-    }
+        if (restored.viewport) {
+          viewportManager.setViewport(restored.viewport);
+          setZoomLevel(restored.viewport.scale);
+        } else {
+          stage.scale({ x: 0.75, y: 0.75 });
+          setZoomLevel(0.75);
+        }
 
-    if (restored.nodes.length > 0) {
-      const addedItemIds = new Set();
-      restored.nodes.forEach(nodeData => {
-        if (nodeData.type === 'note') {
-          const group = NoteNode.create(layer, nodeData.item, nodeData.x, nodeData.y, saveCanvasStateFromNodesRef, handleNodeClick, handleNoteDoubleClick, nodeData.width, nodeData.height);
-          addedItemIds.add(nodeData.item.noteId);
-          nodesRef.current.push({ id: nodeData.item.noteId, group, item: nodeData.item, type: 'note' });
-        } else if (nodeData.type === 'image') {
-          const group = ImageNode.create(layer, nodeData.item, nodeData.x, nodeData.y, saveCanvasStateFromNodesRef, handleNodeClick, handleImageDoubleClick, nodeData.width, nodeData.height);
-          addedItemIds.add(nodeData.item.filename);
-          nodesRef.current.push({ id: nodeData.item.filename, group, item: nodeData.item, type: 'image' });
-        } else if (nodeData.type === 'sticky') {
-          const group = StickyNoteNode.create(layer, nodeData.x, nodeData.y, saveCanvasStateFromNodesRef, handleNodeClick, handleStickyNoteClick, nodeData.width, nodeData.height, nodeData.item.text);
-          nodesRef.current.push({ id: nodeData.item.id, group, item: nodeData.item, type: 'sticky' });
+        if (restored.nodes.length > 0) {
+          const addedItemIds = new Set();
+          restored.nodes.forEach(nodeData => {
+            if (nodeData.type === 'note') {
+              const group = NoteNode.create(layer, nodeData.item, nodeData.x, nodeData.y, debouncedSave, handleNodeClick, handleNoteDoubleClick, nodeData.width, nodeData.height);
+              addedItemIds.add(nodeData.item.noteId);
+              nodesRef.current.push({ id: nodeData.item.noteId, group, item: nodeData.item, type: 'note' });
+            } else if (nodeData.type === 'image') {
+              const group = ImageNode.create(layer, nodeData.item, nodeData.x, nodeData.y, debouncedSave, handleNodeClick, handleImageDoubleClick, nodeData.width, nodeData.height);
+              addedItemIds.add(nodeData.item.filename);
+              nodesRef.current.push({ id: nodeData.item.filename, group, item: nodeData.item, type: 'image' });
+            } else if (nodeData.type === 'sticky') {
+              const group = StickyNoteNode.create(layer, nodeData.x, nodeData.y, debouncedSave, handleNodeClick, handleStickyNoteClick, nodeData.width, nodeData.height, nodeData.item.text);
+              nodesRef.current.push({ id: nodeData.item.id, group, item: nodeData.item, type: 'sticky' });
+            }
+          });
+          setItems(addedItemIds);
+          layer.draw();
+
+          syncNoteNodes(layer);
         }
       });
-      setItems(addedItemIds);
-      layer.draw();
-    }
 
     function handleResize() {
       const newCanvasWidth = isSidebarOpen ? window.innerWidth - 400 : window.innerWidth;
@@ -149,12 +164,15 @@ export default function CanvasPage() {
     }
 
     function handleKeyDown(e) {
-      if (e.key === 'Delete' || e.key === 'Backspace') {
+      const tag = e.target.tagName;
+      const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable === true;
+
+      if ((e.key === 'Delete' || e.key === 'Backspace') && isTyping !== true) {
         handleDeleteSelected();
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         handleToggleSidebar();
-      } else if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'd' && isTyping !== true) {
         e.preventDefault();
         handleDuplicateSelected();
       }
@@ -168,10 +186,11 @@ export default function CanvasPage() {
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('keydown', handleKeyDown);
+      flushPendingSave();
       nodesRef.current = [];
       stage.destroy();
     };
-  }, [isKonvaReady, isPanMode]);
+  }, [isKonvaReady]);
 
   useEffect(() => {
     if (stageRef.current === null) {
@@ -183,14 +202,109 @@ export default function CanvasPage() {
     stageRef.current.layer.draw();
   }, [isSidebarOpen]);
 
-  function saveCanvasStateFromNodesRef() {
+  function getCanvasData() {
     if (stageRef.current === null || viewportManagerRef.current === null) {
+      return null;
+    }
+    const viewport = viewportManagerRef.current.getViewport();
+    return JsonCanvas.toJsonCanvas(nodesRef.current, viewport);
+  }
+
+  function debouncedSave() {
+    if (saveTimerRef.current !== null) {
+      clearTimeout(saveTimerRef.current);
+    }
+    saveTimerRef.current = setTimeout(() => {
+      saveTimerRef.current = null;
+      const canvasData = getCanvasData();
+      if (canvasData === null) {
+        return;
+      }
+      const preview = CanvasPreview.computePreview(canvasData);
+      ApiClient.updateCanvas(canvasIdRef.current, {
+        data: JSON.stringify(canvasData),
+        preview: JSON.stringify(preview),
+      });
+    }, 2000);
+  }
+
+  function flushPendingSave() {
+    if (saveTimerRef.current !== null) {
+      clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+      const canvasData = getCanvasData();
+      if (canvasData === null) {
+        return;
+      }
+      const preview = CanvasPreview.computePreview(canvasData);
+      ApiClient.updateCanvas(canvasIdRef.current, {
+        data: JSON.stringify(canvasData),
+        preview: JSON.stringify(preview),
+      }, { keepalive: true });
+    }
+  }
+
+  function syncNoteNodes(layer) {
+    const noteNodes = nodesRef.current.filter(n => n.type === 'note');
+    if (noteNodes.length === 0) {
       return;
     }
 
-    const viewport = viewportManagerRef.current.getViewport();
-    const canvasData = JsonCanvas.toJsonCanvas(nodesRef.current, viewport);
-    CanvasStorage.saveCanvasState(canvasData);
+    const promises = noteNodes.map(n =>
+      ApiClient.getNoteById(n.item.noteId)
+        .then(note => ({ status: 'fulfilled', noteId: n.item.noteId, note }))
+        .catch(() => ({ status: 'rejected', noteId: n.item.noteId }))
+    );
+
+    Promise.all(promises).then(results => {
+      let hasChanges = false;
+
+      results.forEach(result => {
+        const nodeIndex = nodesRef.current.findIndex(n => n.type === 'note' && n.item.noteId === result.noteId);
+        if (nodeIndex === -1) {
+          return;
+        }
+
+        const nodeData = nodesRef.current[nodeIndex];
+
+        if (result.status === 'rejected') {
+          if (nodeData.item.isDeleted !== true) {
+            nodeData.item.isDeleted = true;
+            const oldGroup = nodeData.group;
+            const x = oldGroup.x();
+            const y = oldGroup.y();
+            const width = oldGroup.width();
+            const height = oldGroup.height();
+            oldGroup.destroy();
+            const newGroup = NoteNode.create(layer, nodeData.item, x, y, debouncedSave, handleNodeClick, handleNoteDoubleClick, width, height);
+            nodeData.group = newGroup;
+            hasChanges = true;
+          }
+        } else if (result.status === 'fulfilled') {
+          const note = result.note;
+          const oldItem = nodeData.item;
+          const hasItemChanges = oldItem.title !== note.title || oldItem.content !== note.content || oldItem.isDeleted === true;
+
+          if (hasItemChanges) {
+            nodeData.item = note;
+            const oldGroup = nodeData.group;
+            const x = oldGroup.x();
+            const y = oldGroup.y();
+            const width = oldGroup.width();
+            const height = oldGroup.height();
+            oldGroup.destroy();
+            const newGroup = NoteNode.create(layer, note, x, y, debouncedSave, handleNodeClick, handleNoteDoubleClick, width, height);
+            nodeData.group = newGroup;
+            hasChanges = true;
+          }
+        }
+      });
+
+      if (hasChanges) {
+        layer.draw();
+        debouncedSave();
+      }
+    });
   }
 
   function handleNodeClick(group, e) {
@@ -246,7 +360,7 @@ export default function CanvasPage() {
     }
     setHasMultiSelection(false);
     stageRef.current.layer.draw();
-    saveCanvasStateFromNodesRef();
+    debouncedSave();
   }
 
   function handleDuplicateSelected() {
@@ -283,7 +397,7 @@ export default function CanvasPage() {
             nodeData.item,
             newX,
             newY,
-            saveCanvasStateFromNodesRef,
+            debouncedSave,
             handleNodeClick,
             handleNoteDoubleClick,
             nodeGroup.width(),
@@ -296,7 +410,7 @@ export default function CanvasPage() {
             nodeData.item,
             newX,
             newY,
-            saveCanvasStateFromNodesRef,
+            debouncedSave,
             handleNodeClick,
             handleImageDoubleClick,
             nodeGroup.width(),
@@ -310,7 +424,7 @@ export default function CanvasPage() {
             layer,
             newX,
             newY,
-            saveCanvasStateFromNodesRef,
+            debouncedSave,
             handleNodeClick,
             handleStickyNoteClick,
             nodeGroup.width(),
@@ -334,7 +448,7 @@ export default function CanvasPage() {
 
     setHasMultiSelection(newGroups.length >= 2);
     layer.draw();
-    saveCanvasStateFromNodesRef();
+    debouncedSave();
   }
 
   function handleAddNote(item) {
@@ -349,28 +463,33 @@ export default function CanvasPage() {
       const cardHeight = item.title && item.title.length > 0 ? 360 : 340;
       const { x, y } = NodePositioning.findRandomUnoccupiedPosition(stage, nodesRef, nodeWidth, cardHeight);
 
-      const group = NoteNode.create(layer, item, x, y, saveCanvasStateFromNodesRef, handleNodeClick, handleNoteDoubleClick);
+      const group = NoteNode.create(layer, item, x, y, debouncedSave, handleNodeClick, handleNoteDoubleClick);
       layer.draw();
       const itemId = item.noteId;
       setItems(prev => new Set(prev).add(itemId));
       nodesRef.current.push({ id: itemId, group, item, type: 'note' });
-      saveCanvasStateFromNodesRef();
+      debouncedSave();
     } else if (item.filename) {
       const thumbnailWidth = 500;
       const thumbnailHeight = thumbnailWidth / item.aspectRatio;
       const { x, y } = NodePositioning.findRandomUnoccupiedPosition(stage, nodesRef, thumbnailWidth, thumbnailHeight);
 
-      const group = ImageNode.create(layer, item, x, y, saveCanvasStateFromNodesRef, handleNodeClick, handleImageDoubleClick);
+      const group = ImageNode.create(layer, item, x, y, debouncedSave, handleNodeClick, handleImageDoubleClick);
       layer.draw();
       const itemId = item.filename;
       setItems(prev => new Set(prev).add(itemId));
       nodesRef.current.push({ id: itemId, group, item, type: 'image' });
-      saveCanvasStateFromNodesRef();
+      debouncedSave();
     }
   }
 
   function handleBack() {
-    window.history.back();
+    navigateTo('/canvases/');
+  }
+
+  function handleTitleChange(newTitle) {
+    setCanvasTitle(newTitle);
+    ApiClient.updateCanvas(canvasIdRef.current, { title: newTitle });
   }
 
   function handleZoom(type) {
@@ -395,7 +514,7 @@ export default function CanvasPage() {
     }
 
     stageRef.current.layer.draw();
-    saveCanvasStateFromNodesRef();
+    debouncedSave();
   }
 
   function handleSelectAll() {
@@ -421,7 +540,10 @@ export default function CanvasPage() {
   }
 
   function handleTogglePanMode() {
-    setIsPanMode(prev => !prev);
+    setIsPanMode(prev => {
+      isPanModeRef.current = !prev;
+      return !prev;
+    });
   }
 
   function handleAddStickyNote() {
@@ -435,11 +557,16 @@ export default function CanvasPage() {
     const { x, y } = NodePositioning.findRandomUnoccupiedPosition(stage, nodesRef, nodeWidth, nodeHeight);
 
     const id = `sticky-${Date.now()}-${stickyNoteCounterRef.current++}`;
-    const group = StickyNoteNode.create(layer, x, y, saveCanvasStateFromNodesRef, handleNodeClick, handleStickyNoteClick);
+    const group = StickyNoteNode.create(layer, x, y, debouncedSave, handleNodeClick, handleStickyNoteClick);
 
     nodesRef.current.push({ id, group, item: { id, text: '' }, type: 'sticky' });
     layer.draw();
-    saveCanvasStateFromNodesRef();
+    debouncedSave();
+
+    const textNode = group.findOne('Text');
+    if (textNode) {
+      handleStickyNoteClick(group, textNode);
+    }
   }
 
   function handleStickyNoteClick(group, textNode) {
@@ -500,7 +627,7 @@ export default function CanvasPage() {
       textNode.show();
       StickyNoteNode.setText(group, textarea.value);
       stageRef.current.layer.draw();
-      saveCanvasStateFromNodesRef();
+      debouncedSave();
     }
 
     textarea.addEventListener('keydown', (e) => {
@@ -536,14 +663,44 @@ export default function CanvasPage() {
   }
 
   function handleNoteDoubleClick(noteItem) {
-    openModal(
-      <AppProvider>
-        <NotesProvider>
-          <NotesEditorModal note={noteItem} />
-        </NotesProvider>
-      </AppProvider>,
-      '.note-modal-root'
-    );
+    ApiClient.getNoteById(noteItem.noteId)
+      .then(note => {
+        function handleModalClose() {
+          ApiClient.getNoteById(noteItem.noteId)
+            .then(updatedNote => {
+              const nodeIndex = nodesRef.current.findIndex(n => n.id === noteItem.noteId);
+              if (nodeIndex === -1 || stageRef.current === null) {
+                return;
+              }
+
+              const oldNode = nodesRef.current[nodeIndex];
+              const { layer } = stageRef.current;
+              const x = oldNode.group.x();
+              const y = oldNode.group.y();
+              const width = oldNode.group.width();
+              const height = oldNode.group.height();
+
+              oldNode.group.destroy();
+
+              const newGroup = NoteNode.create(layer, updatedNote, x, y, debouncedSave, handleNodeClick, handleNoteDoubleClick, width, height);
+              nodesRef.current[nodeIndex] = { id: updatedNote.noteId, group: newGroup, item: updatedNote, type: 'note' };
+
+              layer.draw();
+              debouncedSave();
+            })
+            .catch(() => { });
+        }
+
+        openModal(
+          <AppProvider>
+            <NotesProvider>
+              <NotesEditorModal note={note} onModalClose={handleModalClose} />
+            </NotesProvider>
+          </AppProvider>,
+          '.note-modal-root'
+        );
+      })
+      .catch(() => { });
   }
 
   function handleAlign(type) {
@@ -579,7 +736,7 @@ export default function CanvasPage() {
     }
 
     stageRef.current.layer.draw();
-    saveCanvasStateFromNodesRef();
+    debouncedSave();
   }
 
   let content;
@@ -593,7 +750,10 @@ export default function CanvasPage() {
     <div className="canvas-page">
       <CanvasToolbar
         onBack={handleBack}
+        title={canvasTitle}
+        onTitleChange={handleTitleChange}
         onDelete={handleDeleteSelected}
+        onDuplicate={handleDuplicateSelected}
         onZoom={handleZoom}
         zoomLevel={zoomLevel}
         onToggleSidebar={handleToggleSidebar}

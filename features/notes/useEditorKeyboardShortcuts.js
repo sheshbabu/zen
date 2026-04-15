@@ -2,7 +2,7 @@ import { useEffect, useCallback } from "../../assets/preact.esm.js";
 
 export default function useEditorKeyboardShortcuts({
   isEditable,
-  isFloating,
+  isModal,
   isExpanded,
   textareaRef,
   onSave,
@@ -26,7 +26,7 @@ export default function useEditorKeyboardShortcuts({
 
     if (e.key === 'Escape') {
       e.preventDefault();
-      if (isFloating === true) {
+      if (isModal === true) {
         onClose();
       }
     }
@@ -78,6 +78,21 @@ export default function useEditorKeyboardShortcuts({
           e.preventDefault();
           const indentation = match[1];
           let prefix = match[2];
+          const lineContent = currentLine.substring(match[0].length);
+
+          // Empty list item: remove the prefix and end the list
+          if (lineContent.trim() === "") {
+            const lineStart = textBeforeCursor.length - currentLine.length;
+            const textBefore = textarea.value.substring(0, lineStart);
+            const textAfter = textarea.value.substring(cursorPos);
+            const newValue = textBefore + "\n" + textAfter;
+            const newCursorPos = lineStart + 1;
+            textarea.value = newValue;
+            textarea.selectionStart = newCursorPos;
+            textarea.selectionEnd = newCursorPos;
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+            return;
+          }
 
           if (prefix === "- [x] ") {
             prefix = "- [ ] ";
@@ -93,7 +108,7 @@ export default function useEditorKeyboardShortcuts({
         }
       }
     }
-  }, [isEditable, isFloating, isExpanded, textareaRef, onSave, onEdit, onClose, onExpandToggle, onInsertAtCursor, onFormatText]);
+  }, [isEditable, isModal, isExpanded, textareaRef, onSave, onEdit, onClose, onExpandToggle, onInsertAtCursor, onFormatText]);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);

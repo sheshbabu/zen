@@ -76,6 +76,7 @@ function processNewElements(element) {
 
 function showTooltip(element) {
   clearTimeout(hideTimeout);
+  clearTimeout(showTimeout);
 
   showTimeout = setTimeout(() => {
     const tooltipText = element.getAttribute('data-tooltip');
@@ -83,7 +84,7 @@ function showTooltip(element) {
       return;
     }
 
-    hideTooltip();
+    removeTooltip();
 
     const tooltip = document.createElement('div');
     tooltip.className = 'tooltip';
@@ -100,18 +101,32 @@ function showTooltip(element) {
     requestAnimationFrame(() => {
       tooltip.classList.add('visible');
     });
-  }, 100);
+  }, 400);
 }
 
 function hideTooltip() {
   clearTimeout(showTimeout);
-  clearTimeout(hideTimeout);
 
   if (activeTooltip) {
     const tooltip = activeTooltip;
+    activeTooltip = null;
+    tooltip.classList.remove('visible');
+
+    hideTimeout = setTimeout(() => {
+      removeTooltip(tooltip);
+    }, 150);
+  }
+}
+
+function removeTooltip(tooltip) {
+  if (tooltip) {
     if (tooltip.parentNode) {
       tooltip.parentNode.removeChild(tooltip);
     }
+    return;
+  }
+  if (activeTooltip && activeTooltip.parentNode) {
+    activeTooltip.parentNode.removeChild(activeTooltip);
     activeTooltip = null;
   }
 }

@@ -22,7 +22,13 @@ export default function renderMarkdown(text) {
     return self.renderToken(tokens, idx, options);
   };
   md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
-    tokens[idx].attrSet('target', '_blank');
+    const href = tokens[idx].attrGet('href') || '';
+    const match = href.match(/^\/notes\/(\d+)$/);
+    if (match) {
+      tokens[idx].attrSet('data-note-id', match[1]);
+    } else {
+      tokens[idx].attrSet('target', '_blank');
+    }
     return defaultRender(tokens, idx, options, env, self);
   };
 

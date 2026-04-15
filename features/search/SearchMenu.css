@@ -27,6 +27,11 @@
         padding: var(--spacing-2);
     }
 
+    .search-tabs {
+        padding: 0 var(--spacing-2);
+        padding-bottom: var(--spacing-2);
+    }
+
     .search-results-container {
         max-height: 400px;
         overflow-y: scroll;

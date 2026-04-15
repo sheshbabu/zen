@@ -1,0 +1,109 @@
+.canvases-page-content {
+  flex: 1;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.canvases-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.canvases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+  padding: var(--spacing-3);
+}
+
+.canvas-card {
+  border: 1px solid var(--neutral-100);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--shadow-2);
+  transition: box-shadow var(--transition-fast);
+  background: var(--bg-primary);
+
+  &:hover {
+    box-shadow: var(--shadow-4);
+
+    .canvas-card-delete {
+      opacity: 1;
+    }
+  }
+}
+
+.canvas-card-preview {
+  position: relative;
+  margin: 16px auto;
+  background: var(--bg-primary);
+  border-radius: 4px;
+}
+
+.canvas-card-preview-empty {
+  width: 200px;
+  height: 150px;
+}
+
+.canvas-card-preview-node {
+  position: absolute;
+  border: 1px solid;
+  border-radius: 2px;
+}
+
+.canvas-card-info {
+  padding: 12px 10px 12px 16px;
+  border-top: 1px solid var(--neutral-100);
+}
+
+.canvas-card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.canvas-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.canvas-card-date {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.canvas-card-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+
+  &:hover {
+    color: var(--red-600);
+  }
+
+  svg.lucide {
+    width: 16px;
+    height: 16px;
+  }
+}

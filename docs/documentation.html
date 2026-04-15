@@ -7,7 +7,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/zen/favicon-16x16.png">
     <title>Zen Documentation</title>
     <meta name="description" content="A minimal, clean space for your thoughts. Store notes securely in Markdown format within a local SQLite database.">
-    
+    <link rel="stylesheet" href="base16-google-light.css">
+
     <style>
         /* https: //www.joshwcomeau.com/css/custom-css-reset/ */
 
@@ -80,7 +81,7 @@
         #__next {
             isolation: isolate;
         }
-        
+
         :root {
             /* https://tailwindcss.com/docs/colors */
             /* https://gist.github.com/guvener/d8952570d5a8be430580b93800519439 */
@@ -95,7 +96,7 @@
             --neutral-800: #262626;
             --neutral-900: #171717;
             --red-600: #DC2626;
-            --red-700 : #B91C1C;
+            --red-700: #B91C1C;
             --yellow-100: #FEF9C3;
 
             /* typography */
@@ -142,6 +143,7 @@
             /* globals */
             --mobile-navbar-height: 60px;
             --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+            --sidebar-width: 250px;
         }
 
         * {
@@ -159,24 +161,24 @@
             /* https://uxmovement.com/content/why-you-should-never-use-pure-black-for-text-or-backgrounds/ */
             color: #444;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 var(--spacing-md);
         }
-        
+
         .header {
             padding: var(--spacing-md) 0;
             border-bottom: 1px solid var(--neutral-200);
         }
-        
+
         .nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-    
+
         .logo {
             display: flex;
             align-items: center;
@@ -186,13 +188,13 @@
             color: var(--neutral-900);
             text-decoration: none;
         }
-        
+
         .nav-links {
             display: flex;
             gap: var(--spacing-md);
             align-items: center;
         }
-        
+
         .nav-link {
             color: var(--neutral-600);
             text-decoration: none;
@@ -200,7 +202,7 @@
             font-weight: 500;
             transition: color 0.3s ease;
         }
-        
+
         .nav-link:hover {
             color: var(--neutral-900);
         }
@@ -209,37 +211,37 @@
             color: var(--neutral-900);
             font-weight: 500;
         }
-        
+
         .content-container {
             display: flex;
             min-height: calc(100vh - 80px);
             max-width: 1200px;
             margin: auto;
         }
-        
+
         .sidebar {
             position: relative;
             width: var(--sidebar-width);
             background-color: white;
             border-right: 1px solid var(--neutral-200);
         }
-        
+
         .sidebar-content {
             position: sticky;
             top: var(--spacing-lg);
             padding: var(--spacing-md);
         }
-        
+
         .sidebar-nav {
             list-style: none;
             padding: 0;
             margin: 0;
         }
-        
-        .sidebar-nav > li {
+
+        .sidebar-nav>li {
             margin-bottom: 8px;
         }
-        
+
         .sidebar-nav-item {
             display: block;
             color: var(--neutral-600);
@@ -251,21 +253,21 @@
             border: none;
             background: none;
         }
-        
+
         .sidebar-nav-item:hover {
             color: var(--neutral-900);
         }
-        
+
         .sidebar-nav-sub {
             list-style: none;
             padding: 0;
             margin: 0 16px;
         }
-        
+
         .sidebar-nav-sub .sidebar-nav-item {
             color: var(--neutral-500);
         }
-        
+
         .sidebar-nav-sub .sidebar-nav-item:hover {
             color: var(--neutral-700);
         }
@@ -273,19 +275,19 @@
         :target {
             scroll-margin-top: 80px;
         }
-        
+
         .content {
             flex: 1;
             padding: 0 40px;
             max-width: calc(100% - var(--sidebar-width));
         }
-        
+
         section {
             margin-bottom: var(--spacing-lg);
         }
 
         .content {
-            
+
             strong {
                 font-weight: 600;
             }
@@ -351,12 +353,57 @@
                 background-color: var(--neutral-50);
                 border-radius: 4px;
                 overflow: scroll;
+                position: relative;
+
                 &::-webkit-scrollbar {
                     display: none;
                 }
 
                 font: var(--code);
                 line-height: 24px;
+            }
+
+            .code-block-container {
+                position: relative;
+            }
+
+            .copy-code-button {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                padding: 6px;
+                background-color: var(--neutral-100);
+                border: 1px solid var(--neutral-300);
+                border-radius: 4px;
+                cursor: pointer;
+                opacity: 0;
+                transition: opacity 0.2s, background-color 0.2s;
+                z-index: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .copy-code-button svg {
+                width: 18px;
+                height: 18px;
+                stroke: var(--neutral-700);
+            }
+
+            .code-block-container:hover .copy-code-button {
+                opacity: 1;
+            }
+
+            .copy-code-button:hover {
+                background-color: var(--neutral-200);
+            }
+
+            .copy-code-button.copied {
+                background-color: var(--neutral-700);
+            }
+
+            .copy-code-button.copied svg {
+                stroke: white;
             }
 
             blockquote {
@@ -423,35 +470,36 @@
             .content-container {
                 flex-direction: column;
             }
-            
+
             .sidebar {
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid var(--neutral-200);
                 padding: var(--spacing-md);
             }
-            
+
             .content {
                 max-width: 100%;
                 padding: var(--spacing-md);
             }
         }
-        
+
         @media (max-width: 768px) {
             .nav-links {
                 gap: var(--spacing-sm);
             }
-            
+
             .sidebar-content {
                 padding: 0;
             }
-            
+
             .content {
                 padding: var(--spacing-md);
             }
         }
     </style>
 </head>
+
 <body>
     <header class="header">
         <nav class="nav container">
@@ -498,6 +546,13 @@
                             <li><a href="#mcp-lm-studio" class="sidebar-nav-item">LM Studio</a></li>
                         </ul>
                     </li>
+                    <li>
+                        <a href="#templates" class="sidebar-nav-item">Templates</a>
+                        <ul class="sidebar-nav-sub">
+                            <li><a href="#templates-create" class="sidebar-nav-item">Creating Templates</a></li>
+                            <li><a href="#templates-placeholders" class="sidebar-nav-item">Placeholders</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </aside>
@@ -508,7 +563,7 @@
 
                 <h3 id="docker-compose">Docker Compose</h3>
                 <p>
-                    The easiest way to get started is using <code>Docker Compose</code>. This method requires 
+                    The easiest way to get started is using <code>Docker Compose</code>. This method requires
                     minimal setup and handles all dependencies automatically.
                 </p>
 
@@ -520,13 +575,12 @@
                 <h4>Installation steps:</h4>
                 <ol>
                     <li>Create a new directory for your Zen installation:</li>
-                    <pre>$ mkdir zen && cd zen</pre>
+                    <pre><code class="language-bash">$ mkdir zen && cd zen</code></pre>
                 </ol>
 
                 <ol start="2">
                     <li>Create a <code>docker-compose.yml</code> file:</li>
-<pre>
-services:
+                    <pre><code class="language-yaml">services:
   zen:
     image: ghcr.io/sheshbabu/zen/zen:latest
     container_name: zen
@@ -537,14 +591,14 @@ services:
       - /path/to/data:/data
       - /path/to/images:/images
     restart: 'unless-stopped'
-</pre>
+</code></pre>
                 </ol>
 
-                
+
 
                 <ol start="3">
                     <li>Start the application:</li>
-                    <pre>docker-compose up -d</pre>
+                    <pre><code class="language-bash">$ docker compose up -d</code></pre>
                 </ol>
 
                 <ol start="4">
@@ -552,12 +606,15 @@ services:
                 </ol>
 
                 <blockquote>
-                    <p><strong>Note:</strong> Your notes and images will be stored in the <code>./data</code> and <code>./images</code> directories respectively, ensuring your data persists between container restarts.</p>
+                    <p><strong>Note:</strong> Your notes and images will be stored in the <code>./data</code> and
+                        <code>./images</code> directories respectively, ensuring your data persists between container
+                        restarts.
+                    </p>
                 </blockquote>
 
                 <h3 id="build-from-scratch">Build from Scratch</h3>
                 <p>
-                    For developers who want more control or need to modify the source code, 
+                    For developers who want more control or need to modify the source code,
                     you can build Zen from the source repository.
                 </p>
 
@@ -575,26 +632,24 @@ services:
                             <li>Install <a href="https://go.dev/doc/install">Go</a></li>
                             <li>Install esbuild</li>
                         </ul>
-<pre>
-$ go install github.com/evanw/esbuild/cmd/esbuild@latest</pre>
+                        <pre><code class="language-bash">$ go install github.com/evanw/esbuild/cmd/esbuild@latest</code></pre>
                     </li>
                 </ol>
 
                 <ol start="2">
                     <li>Clone the repository:</li>
-<pre>
-$ git clone https://github.com/sheshbabu/zen.git
-$ cd zen</pre>
+                    <pre><code class="language-bash">$ git clone https://github.com/sheshbabu/zen.git
+$ cd zen</code></pre>
                 </ol>
 
                 <ol start="3">
                     <li>Build the application:</li>
-                    <pre>make build</pre>
+                    <pre><code class="language-bash">$ make build</code></pre>
                 </ol>
-                
+
                 <ol start="4">
                     <li>Run the application:</li>
-                    <pre>./zen</pre>
+                    <pre><code class="language-bash">$ ./zen</code></pre>
                 </ol>
 
                 <ol start="5">
@@ -604,14 +659,14 @@ $ cd zen</pre>
 
             <section id="keyboard-shortcuts">
                 <h1>Keyboard Shortcuts</h1>
-                
+
                 <p>
                     Shortcuts use <code>Ctrl</code> on Windows/Linux and <code>Cmd</code> on macOS.
                 </p>
 
                 <h3 id="global-shortcuts">Global Shortcuts</h3>
                 <p>These shortcuts work from anywhere in the application:</p>
-                
+
                 <ul>
                     <li><code>Ctrl/Cmd + N</code> - Create a new note</li>
                     <li><code>Ctrl/Cmd + K</code> - Open search</li>
@@ -621,7 +676,7 @@ $ cd zen</pre>
 
                 <h3 id="editor-shortcuts">Editor Shortcuts</h3>
                 <p>These shortcuts work when editing notes:</p>
-                
+
                 <ul>
                     <li><code>Ctrl/Cmd + Enter</code> - Save note (or start editing when viewing)</li>
                     <li><code>Ctrl/Cmd + B</code> - Bold selected text</li>
@@ -632,7 +687,7 @@ $ cd zen</pre>
 
                 <h3 id="navigation-shortcuts">Navigation Shortcuts</h3>
                 <p>These shortcuts help you navigate through search results and suggestions:</p>
-                
+
                 <ul>
                     <li><code>Arrow Up/Down</code> - Navigate through search results</li>
                     <li><code>Enter</code> - Select highlighted search result or tag suggestion</li>
@@ -642,7 +697,7 @@ $ cd zen</pre>
 
                 <h3 id="image-gallery-shortcuts">Image Gallery Shortcuts</h3>
                 <p>These shortcuts work when viewing images in the lightbox:</p>
-                
+
                 <ul>
                     <li><code>Escape</code> - Close the image lightbox</li>
                     <li><code>Arrow Left</code> - Navigate to previous image</li>
@@ -660,28 +715,27 @@ $ cd zen</pre>
                 <h3 id="backup-powershell">PowerShell</h3>
 
                 <p>
-                    To back up your notes, you can use the following PowerShell script. 
+                    To back up your notes, you can use the following PowerShell script.
                     This script creates a timestamped backup of your SQLite database and verifies its integrity.
                 </p>
 
-                <pre>
-$sourceDbPath  = "C:\path\to\data\zen.db"
+                <pre><code class="language-powershell">$sourceDbPath  = "C:\path\to\data\zen.db"
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$backupDbPath = "C:\path\to\backup\zen_backup_$timestamp.db"
+$backupDbPath = "C:\path\to\backup\zen_backup_$timestamp.db" 
 
-Write-Host "Backing up Zen..."
+Write-Host "Backing up Zen..." 
 
-sqlite3 $sourceDbPath ".backup '$backupDbPath'"
+sqlite3 $sourceDbPath ".backup '$backupDbPath'" 
 
 Write-Host "`n--- Checking integrity of the backup database ---"
 $integrityResult = sqlite3 $backupDbPath "PRAGMA integrity_check;"
-$integrityResult = $integrityResult.Trim()
+$integrityResult = $integrityResult.Trim() 
 
 if ($integrityResult -eq "ok") {
     Write-Host "Backup successful and verified: $backupDbPath"
     Write-Host "`n--- Checking for notes in the backup database ---"
     $notesCheckOutput = sqlite3 $backupDbPath "SELECT COUNT(*) FROM notes;"
-    $notesCheckOutput = $notesCheckOutput.Trim()
+    $notesCheckOutput = $notesCheckOutput.Trim() 
 
     if ($notesCheckOutput -match "^\d+$") {
         $notesCount = [int]$notesCheckOutput
@@ -694,25 +748,25 @@ if ($integrityResult -eq "ok") {
         Write-Host "Notes table not found in the backup database."
     } else {
         Write-Host "Could not determine notes table status. SQLite output: '$notesCheckOutput'"
-    }
+    } 
 
 } else {
     Write-Host "Backup verification failed for: $backupDbPath"
     Write-Host "Integrity check result: '$integrityResult'"
-}
+} 
 
 # Restart so the WAL file is created again
 Write-Host "`nRestarting Zen..."
 docker compose restart
-                </pre>
+</code></pre>
             </section>
 
             <section id="mcp-integration">
                 <h1>MCP Integration</h1>
-                
+
                 <p>
-                    Zen provides Model Context Protocol (MCP) integration, allowing you to connect with 
-                    external tools and services like Claude Code. This enables you to search, read, 
+                    Zen provides Model Context Protocol (MCP) integration, allowing you to connect with
+                    external tools and services like Claude Code. This enables you to search, read,
                     and manage your notes directly from supported applications.
                 </p>
 
@@ -720,7 +774,7 @@ docker compose restart
                 <p>
                     Before you can use MCP integration, you need to generate an access token:
                 </p>
-                
+
                 <ol>
                     <li>Open Zen in your browser</li>
                     <li>Click on <strong>Settings</strong> in the sidebar</li>
@@ -734,15 +788,15 @@ docker compose restart
                     To integrate Zen with Claude Code, use the following command with the token you generated in the previous step:
                 </p>
 
-                <pre>claude mcp add --transport http zen-notes http://&lt;ZEN_URL&gt;/mcp --header "Authorization: Bearer &lt;TOKEN&gt;"</pre>
+                <pre><code class="language-bash">$ claude mcp add --transport http zen-notes http://&lt;ZEN_URL&gt;/mcp --header "Authorization: Bearer &lt;TOKEN&gt;"</code></pre>
 
                 <p>Replace <code>&lt;TOKEN&gt;</code> with the actual token you generated.</p>
-                <br/>
+                <br />
 
                 <p>
                     Once configured, you can use Claude Code to:
                 </p>
-                
+
                 <ul>
                     <li>Search through your notes</li>
                     <li>Read specific notes by ID</li>
@@ -758,8 +812,7 @@ docker compose restart
 
                 <p>Add the following configuration to your <code>mcp.json</code> file:</p>
 
-                <pre>
-{
+                <pre><code class="language-json">{
   "mcpServers": {
     "zen-notes": {
       "url": "http://&lt;ZEN_URL&gt;/mcp",
@@ -769,25 +822,142 @@ docker compose restart
     }
   }
 }
-                </pre>
+</code></pre>
 
                 <p>Replace <code>&lt;TOKEN&gt;</code> with the actual token you generated.</p>
+            </section>
+
+            <section id="templates">
+                <h1>Templates</h1>
+
+                <p>
+                    Templates let you create reusable note structures with dynamic placeholders.
+                    They're perfect for recurring note types like daily journals, meeting notes, or project plans.
+                </p>
+
+                <h3 id="templates-create">Creating Templates</h3>
+                <p>
+                    To create a new template:
+                </p>
+
+                <ol>
+                    <li>Click on <strong>Templates</strong> in the sidebar</li>
+                    <li>Click the <strong>New</strong> button</li>
+                    <li>Enter a template name (e.g., "Daily Journal", "Meeting Notes")</li>
+                    <li>Optionally set a default note title</li>
+                    <li>Write your template content using Markdown</li>
+                    <li>Add tags if needed</li>
+                    <li>Click <strong>Save</strong></li>
+                </ol>
+
+                <h3 id="templates-placeholders">Placeholders</h3>
+                <p>
+                    Templates support dynamic placeholders that are automatically replaced when creating a new note:
+                </p>
+
+                <ul>
+                    <li><code>{{date}}</code> - Current date in YYYY-MM-DD format (e.g., 2025-01-15)</li>
+                    <li><code>{{time}}</code> - Current time in HH:MM:SS format (e.g., 14:30:00)</li>
+                    <li><code>{{datetime}}</code> - Current date and time (e.g., 2025-01-15 14:30:00)</li>
+                    <li><code>{{datetime:FORMAT}}</code> - Custom datetime format using Go's time format</li>
+                </ul>
+
+                <h4>Custom Datetime Formats</h4>
+                <p>You can use custom datetime formats with the <code>{{datetime:FORMAT}}</code> placeholder:</p>
+
+                <ul>
+                    <li><code>{{datetime:01/02/2006}}</code> - US date format (MM/DD/YYYY)</li>
+                    <li><code>{{datetime:02-01-2006}}</code> - European date format (DD-MM-YYYY)</li>
+                    <li><code>{{datetime:Monday, January 2, 2006}}</code> - Long date format</li>
+                    <li><code>{{datetime:15:04}}</code> - 24-hour time without seconds</li>
+                    <li><code>{{datetime:3:04 PM}}</code> - 12-hour time with AM/PM</li>
+                </ul>
+
+                <blockquote>
+                    <p><strong>Format Reference:</strong> Go uses a reference time of
+                        <code>Mon Jan 2 15:04:05 MST 2006</code> for formatting. Use these values to create your custom
+                        format.
+                    </p>
+                </blockquote>
+
+                <h4>Example Template</h4>
+                <pre><code class="language-markdown"># Daily Journal - {{datetime:Monday, January 2, 2006}}
+
+## Morning Reflection
+- What am I grateful for today?
+
+## Tasks
+- [ ]
+
+## Evening Notes
+- What went well today?
+- What could be improved?
+
+---
+Created at {{time}}
+</code></pre>
             </section>
 
 
         </main>
     </div>
 
+    <!-- Highlight.js -->
+    <script src="highlight.min.js"></script>
+
+    <!-- Copy code button functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize syntax highlighting
+            hljs.highlightAll();
+
+            // Wrap all pre tags in a container and add copy buttons
+            document.querySelectorAll('pre').forEach(function (pre) {
+                var container = document.createElement('div');
+                container.className = 'code-block-container';
+                pre.parentNode.insertBefore(container, pre);
+                container.appendChild(pre);
+
+                var button = document.createElement('button');
+                button.className = 'copy-code-button';
+                button.setAttribute('aria-label', 'Copy code to clipboard');
+
+                // Copy icon SVG
+                button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
+
+                var checkIconSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+                var copyIconSvg = button.innerHTML;
+
+                button.addEventListener('click', function () {
+                    var code = pre.textContent;
+                    navigator.clipboard.writeText(code).then(function () {
+                        button.innerHTML = checkIconSvg;
+                        button.classList.add('copied');
+
+                        setTimeout(function () {
+                            button.innerHTML = copyIconSvg;
+                            button.classList.remove('copied');
+                        }, 2000);
+                    }).catch(function (err) {
+                        console.error('Failed to copy:', err);
+                    });
+                });
+
+                container.appendChild(button);
+            });
+        });
+    </script>
+
     <!-- mouji snippet -->
     <script>
-        (function() {
+        (function () {
             var COLLECT_URL = "https://mouji.fly.dev/collect";
             var PROJECT_ID = "4b8f80d61e65f0c6c954826d89646e4a";
             var GLOBAL_VAR_NAME = "__mouji__";
 
             window[GLOBAL_VAR_NAME] = {};
 
-            window[GLOBAL_VAR_NAME].sendPageView = function() {
+            window[GLOBAL_VAR_NAME].sendPageView = function () {
                 var path = location.pathname;
                 var title = document.title;
                 var referrer = document.referrer;
@@ -813,4 +983,5 @@ docker compose restart
     </script>
 
 </body>
+
 </html>

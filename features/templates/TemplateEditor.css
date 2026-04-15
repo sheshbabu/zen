@@ -35,6 +35,11 @@
       align-items: center;
       flex-direction: row-reverse;
 
+      .dropdown-menu {
+        left: auto;
+        right: 0;
+      }
+
       svg.lucide {
         cursor: pointer;
         width: 20px;

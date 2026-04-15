@@ -1,6 +1,7 @@
 import { h, useEffect, useState, useRef } from "../../assets/preact.esm.js"
 import ApiClient from "../../commons/http/ApiClient.js";
 import { SearchIcon } from "../../commons/components/Icon.jsx";
+import Tabs from "../../commons/components/Tabs.jsx";
 import "./CanvasNotePicker.css";
 
 export default function CanvasNotePicker({ onAddNote, addedItems }) {
@@ -232,24 +233,11 @@ export default function CanvasNotePicker({ onAddNote, addedItems }) {
   return (
     <div className="canvas-note-picker">
       <div className="canvas-note-picker-tabs">
-        <button
-          className={activeTab === "search" ? "canvas-note-picker-tab active" : "canvas-note-picker-tab"}
-          onClick={() => setActiveTab("search")}
-        >
-          Search
-        </button>
-        <button
-          className={activeTab === "notes" ? "canvas-note-picker-tab active" : "canvas-note-picker-tab"}
-          onClick={() => setActiveTab("notes")}
-        >
-          Notes
-        </button>
-        <button
-          className={activeTab === "images" ? "canvas-note-picker-tab active" : "canvas-note-picker-tab"}
-          onClick={() => setActiveTab("images")}
-        >
-          Images
-        </button>
+        <Tabs
+          tabs={[{ value: "search", label: "Search" }, { value: "notes", label: "Notes" }, { value: "images", label: "Images" }]}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
       </div>
       {tabContent}
     </div>

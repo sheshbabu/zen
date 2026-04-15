@@ -13,13 +13,28 @@
     box-shadow: var(--shadow-4);
     pointer-events: none;
     opacity: 0;
-    transform: translateY(-8px);
-    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+    transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
     will-change: transform, opacity;
+
+    &.top {
+        transform: translateY(4px);
+    }
+
+    &.bottom {
+        transform: translateY(-4px);
+    }
+
+    &.left {
+        transform: translateX(4px);
+    }
+
+    &.right {
+        transform: translateX(-4px);
+    }
 
     &.visible {
         opacity: 1;
-        transform: translateY(0);
+        transform: translate(0);
     }
 
     div {

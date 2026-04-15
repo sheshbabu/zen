@@ -1,3 +1,5 @@
+const fontFamily = getComputedStyle(document.documentElement).getPropertyValue('--font-family').trim();
+
 function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidth, customHeight) {
   const note = {
     id: `note-${item.noteId}`,
@@ -25,17 +27,19 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidt
     height: cardHeight,
   });
 
+  const isDeleted = item.isDeleted === true;
+
   const background = new window.Konva.Rect({
     width: nodeWidth,
     height: cardHeight,
-    fill: '#FFFFFF',
-    stroke: '#E5E5E5',
+    fill: isDeleted ? '#F0F0F0' : '#FFFFFF',
+    stroke: isDeleted ? '#D4D4D4' : '#E5E5E5',
     strokeWidth: 1,
     cornerRadius: 8,
     shadowColor: '#000000',
     shadowBlur: 4,
     shadowOffset: { x: 0, y: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: isDeleted ? 0.05 : 0.1,
   });
 
   const selectionBorder = new window.Konva.Rect({
@@ -62,6 +66,7 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidt
       y: padding,
       text: note.title,
       fontSize: 20,
+      fontFamily: fontFamily,
       fontStyle: 'bold',
       fill: '#404040',
       width: nodeWidth - (padding * 2) - 4,
@@ -71,12 +76,13 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidt
   }
 
   if (note.tags && note.tags.length > 0) {
-    const tagsText = note.tags.map(tag => `#${tag}`).join(' ');
+    const tagsText = note.tags.map(tag => `#${tag.name}`).join(' ');
     tags = new window.Konva.Text({
       x: padding + 4,
       y: textYPosition,
       text: tagsText,
       fontSize: 14,
+      fontFamily: fontFamily,
       fill: '#A3A3A3',
       width: nodeWidth - (padding * 2) - 4,
     });
@@ -90,6 +96,7 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidt
     y: textYPosition,
     text: note.text,
     fontSize: 18,
+    fontFamily: fontFamily,
     fill: '#525252',
     width: nodeWidth - (padding * 2) - 4,
     height: availableHeight,
@@ -106,6 +113,23 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidt
     group.add(tags);
   }
   group.add(textContent);
+
+  if (isDeleted) {
+    group.opacity(0.5);
+
+    const deletedLabel = new window.Konva.Text({
+      x: padding,
+      y: cardHeight - 36,
+      text: 'Note deleted',
+      fontSize: 13,
+      fontFamily: fontFamily,
+      fontStyle: 'italic',
+      fill: '#A3A3A3',
+      width: nodeWidth - (padding * 2),
+      align: 'center',
+    });
+    group.add(deletedLabel);
+  }
 
   group.on('mouseenter', () => {
     if (isSelected !== true) {
@@ -130,7 +154,7 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidt
   });
 
   group.on('dblclick', () => {
-    if (onDoubleClick) {
+    if (onDoubleClick && isDeleted !== true) {
       onDoubleClick(item);
     }
   });

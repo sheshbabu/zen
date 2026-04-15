@@ -57,6 +57,11 @@
             flex-direction: row-reverse;
         }
 
+        .right-toolbar .dropdown-menu {
+            left: auto;
+            right: 0;
+        }
+
         .left-toolbar {
             margin-left: -12px;
         }
@@ -111,66 +116,6 @@
 .notes-editor {
     outline: none;
 
-    &.is-editable {
-        .notes-editor-image-dropzone {
-            display: block;
-            border: 1px dashed var(--neutral-300);
-            padding: var(--spacing-4);
-            margin: var(--spacing-2) 0;
-            border-radius: 4px;
-            text-align: left;
-            font-weight: 500;
-            color: var(--neutral-400);
-            font-size: 14px;
-            cursor: pointer;
-            transition-property: background-color, border-color;
-            transition-duration: var(--transition-normal);
-
-            &:hover {
-                background-color: var(--neutral-50);
-                border-color: var(--neutral-400);
-            }
-
-            &.dragover {
-                background-color: var(--neutral-50);
-            }
-        }
-
-        .notes-editor-image-attachment-preview {
-            display: flex;
-            overflow-x: auto;
-
-            img {
-                max-height: 200px;
-                box-shadow: var(--shadow-2);
-                box-sizing: border-box;
-                object-fit: cover;
-                margin: 16px 16px 16px 0;
-                border-radius: 4px;
-            }
-
-            &::-webkit-scrollbar {
-                display: none;
-            }
-        }
-
-        .notes-editor-textarea {
-            display: block;
-            border: 1px solid var(--neutral-200);
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            padding: var(--spacing-4);
-            border-radius: 4px;
-        }
-
-        .notes-editor-rendered {
-            display: none;
-        }
-
-        .notes-editor-empty-text {
-            display: none;
-        }
-    }
 
     .notes-editor-empty-text {
         font: var(--sm);
@@ -187,7 +132,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-8);
+    margin-bottom: var(--spacing-4);
 }
 
 .notes-editor-title {
@@ -204,6 +149,10 @@
 
 .notes-editor-tags {
     margin-bottom: var(--spacing-4);
+
+    .dropdown-container {
+        max-width: 200px;
+    }
 }
 
 .notes-editor-tags-input {
@@ -218,9 +167,46 @@
     width: 100px;
 }
 
-.notes-editor-image-dropzone,
+.notes-editor-image-dropzone {
+    display: block;
+    border: 1px dashed var(--neutral-300);
+    padding: var(--spacing-4);
+    margin: var(--spacing-2) 0;
+    border-radius: 4px;
+    text-align: left;
+    font-weight: 500;
+    color: var(--neutral-400);
+    font-size: 14px;
+    cursor: pointer;
+    transition-property: background-color, border-color;
+    transition-duration: var(--transition-normal);
+
+    &:hover {
+        background-color: var(--neutral-50);
+        border-color: var(--neutral-400);
+    }
+
+    &.dragover {
+        background-color: var(--neutral-50);
+    }
+}
+
 .notes-editor-image-attachment-preview {
-    display: none;
+    display: flex;
+    overflow-x: auto;
+
+    img {
+        max-height: 200px;
+        box-shadow: var(--shadow-2);
+        box-sizing: border-box;
+        object-fit: cover;
+        margin: 16px 16px 16px 0;
+        border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 .notes-editor-textarea {
@@ -230,7 +216,12 @@
     outline: none;
     resize: none;
     padding-right: 10px;
-    display: none;
+    display: block;
+    border: 1px solid var(--neutral-200);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    padding: var(--spacing-4);
+    border-radius: 4px;
 }
 
 .notes-grid-item-content,
@@ -273,6 +264,10 @@
     table {
         font: var(--p1);
         padding: 3px 0;
+    }
+
+    p {
+        padding: 6px 0;
     }
 
     a {
@@ -435,17 +430,13 @@
 }
 
 .formatting-toolbar {
-    display: none;
+    display: flex;
     flex-wrap: wrap;
     gap: var(--spacing-2);
     margin: var(--spacing-3) 0;
     border: 1px solid var(--neutral-300);
     border-radius: 4px;
     align-items: center;
-
-    .notes-editor.is-editable & {
-        display: flex;
-    }
 
     .formatting-toolbar-group {
         display: flex;
@@ -520,9 +511,5 @@
 @media screen and (max-width: 948px) {
     .formatting-toolbar {
         display: none;
-
-        .notes-editor.is-editable & {
-            display: none;
-        }
     }
 }

@@ -236,3 +236,52 @@ func CreateFocusMode(focusMode *FocusMode) error {
 
 	return nil
 }
+
+func DeleteFocusMode(focusID int) error {
+	tx, err := sqlite.DB.Begin()
+
+	if err != nil {
+		err = fmt.Errorf("error starting transaction: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	defer tx.Rollback()
+
+	query := `
+		DELETE FROM
+			focus_mode_tags
+		WHERE
+			focus_mode_id = ?
+	`
+
+	_, err = tx.Exec(query, focusID)
+	if err != nil {
+		err = fmt.Errorf("error deleting focus mode tags: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	query = `
+		DELETE FROM
+			focus_modes
+		WHERE
+			focus_mode_id = ?
+	`
+
+	_, err = tx.Exec(query, focusID)
+	if err != nil {
+		err = fmt.Errorf("error deleting focus mode: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("error committing transaction: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	return nil
+}

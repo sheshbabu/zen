@@ -29,6 +29,10 @@ type Note struct {
 	IsPinned           bool       `json:"isPinned"`
 }
 
+type BulkRequest struct {
+	IDs []int `json:"ids"`
+}
+
 type NotesFilter struct {
 	page        int
 	tagID       int
@@ -212,6 +216,26 @@ func HandleSoftDeleteNote(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func HandleBulkSoftDeleteNotes(w http.ResponseWriter, r *http.Request) {
+	var input BulkRequest
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", "Invalid request data", err, http.StatusBadRequest)
+		return
+	}
+
+	for _, noteID := range input.IDs {
+		err := SoftDeleteNote(noteID)
+		if err != nil {
+			utils.SendErrorResponse(w, "NOTES_BULK_SOFT_DELETE_FAILED", "Error deleting notes.", err, http.StatusInternalServerError)
+			return
+		}
+		queue.RemoveAllNoteTasks(noteID)
+		queue.AddNoteTask(noteID, queue.QUEUE_NOTE_DELETE, "delete")
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func HandleRestoreDeletedNote(w http.ResponseWriter, r *http.Request) {
 	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
@@ -248,6 +272,26 @@ func HandleArchiveNote(w http.ResponseWriter, r *http.Request) {
 
 	queue.RemoveAllNoteTasks(noteID)
 	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_DELETE, "delete")
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func HandleBulkArchiveNotes(w http.ResponseWriter, r *http.Request) {
+	var input BulkRequest
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", "Invalid request data", err, http.StatusBadRequest)
+		return
+	}
+
+	for _, noteID := range input.IDs {
+		err := ArchiveNote(noteID)
+		if err != nil {
+			utils.SendErrorResponse(w, "NOTES_BULK_ARCHIVE_FAILED", "Error archiving notes.", err, http.StatusInternalServerError)
+			return
+		}
+		queue.RemoveAllNoteTasks(noteID)
+		queue.AddNoteTask(noteID, queue.QUEUE_NOTE_DELETE, "delete")
+	}
 
 	w.WriteHeader(http.StatusOK)
 }

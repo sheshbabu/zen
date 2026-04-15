@@ -18,23 +18,26 @@ function toJsonCanvas(nodesData, viewport) {
       return {
         id: `note-${node.item.noteId}`,
         type: 'text',
-        x: pos.x,
-        y: pos.y,
-        width: size.width,
-        height: size.height,
+        x: Math.round(pos.x),
+        y: Math.round(pos.y),
+        width: Math.round(size.width),
+        height: Math.round(size.height),
         text: fullText,
         _zenMeta: {
           noteId: node.item.noteId,
+          title: node.item.title || '',
+          tags: node.item.tags || [],
+          isPinned: node.item.isPinned || false,
         },
       };
     } else if (node.type === 'image') {
       return {
         id: `image-${node.item.filename}`,
         type: 'file',
-        x: pos.x,
-        y: pos.y,
-        width: size.width,
-        height: size.height,
+        x: Math.round(pos.x),
+        y: Math.round(pos.y),
+        width: Math.round(size.width),
+        height: Math.round(size.height),
         file: `images/${node.item.filename}`,
         _zenMeta: {
           aspectRatio: node.item.aspectRatio,
@@ -47,10 +50,10 @@ function toJsonCanvas(nodesData, viewport) {
       return {
         id: node.item.id,
         type: 'text',
-        x: pos.x,
-        y: pos.y,
-        width: size.width,
-        height: size.height,
+        x: Math.round(pos.x),
+        y: Math.round(pos.y),
+        width: Math.round(size.width),
+        height: Math.round(size.height),
         text: text,
         _zenMeta: {
           isSticky: true,
@@ -87,7 +90,7 @@ function fromJsonCanvas(canvasData) {
         item: {
           noteId: nodeData._zenMeta.noteId,
           title: nodeData._zenMeta.title || '',
-          content: nodeData.text || '',
+          content: stripTitlePrefix(nodeData.text || '', nodeData._zenMeta.title || ''),
           tags: nodeData._zenMeta.tags || [],
           isPinned: nodeData._zenMeta.isPinned || false,
         },
@@ -124,6 +127,13 @@ function fromJsonCanvas(canvasData) {
     nodes,
     viewport: canvasData._zenViewport || null,
   };
+}
+
+function stripTitlePrefix(text, title) {
+  if (title && text.startsWith(`# ${title}\n\n`)) {
+    return text.slice(`# ${title}\n\n`.length);
+  }
+  return text;
 }
 
 export default { toJsonCanvas, fromJsonCanvas };

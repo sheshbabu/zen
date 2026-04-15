@@ -97,14 +97,22 @@ function todoify(token, TokenConstructor) {
         }
     }
 
+    var labelOpen = new TokenConstructor('html_inline', '', 0);
+    labelOpen.content = '<span class="task-item-text">';
+
+    var labelClose = new TokenConstructor('html_inline', '', 0);
+    labelClose.content = '</span>';
+
     token.children = [];
     token.children.push(wrapperOpen);
     token.children.push(checkbox);
+    token.children.push(labelOpen);
 
     for (var i = 0; i < newChildren.length; i++) {
         token.children.push(newChildren[i]);
     }
 
+    token.children.push(labelClose);
     token.children.push(wrapperClose);
 
     token.content = token.content.slice(3);

@@ -25,8 +25,8 @@
     }
 
     .sidebar-focus-switcher {
-        padding: 8px;
-        padding-top: 0;
+        margin: 0 8px;
+        padding-bottom: 8px;
 
         .dropdown-button {
             width: 100%;
@@ -172,17 +172,13 @@
                     height: 48px;
                 }
 
-                .dropdown-container {
-                    max-width: 100%;
+                .dropdown-option {
+                    height: 48px;
 
-                    .dropdown-option {
-                        height: 48px;
-
-                        &:hover,
-                        &.is-selected {
-                            svg.lucide {
-                                display: none;
-                            }
+                    &:hover,
+                    &.is-selected {
+                        svg.lucide {
+                            display: none;
                         }
                     }
                 }

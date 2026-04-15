@@ -1,0 +1,51 @@
+.bulk-actions-panel {
+    width: 250px;
+    padding: var(--spacing-6);
+    margin: auto;
+    margin-top: 200px;
+
+    .bulk-actions-panel-count {
+        font: var(--sm);
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: var(--spacing-6);
+        padding-left: var(--spacing-3);
+    }
+
+    .bulk-actions-panel-row {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-3);
+        padding: var(--spacing-2);
+        border-radius: 6px;
+        cursor: pointer;
+        color: var(--text-primary);
+        transition: background-color var(--transition-normal);
+
+        &:hover {
+            background-color: var(--neutral-100);
+        }
+
+        &.cancel {
+            margin-top: var(--spacing-5);
+        }
+
+        .bulk-actions-panel-row-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+
+            svg.lucide {
+                width: 18px;
+                height: 18px;
+            }
+        }
+
+        .bulk-actions-panel-row-label {
+            font: var(--sm);
+        }
+    }
+}

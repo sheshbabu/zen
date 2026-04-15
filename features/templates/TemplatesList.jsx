@@ -2,6 +2,8 @@ import { h, Fragment } from "../../assets/preact.esm.js"
 import TemplatesListToolbar from './TemplatesListToolbar.jsx';
 import TemplateListItem from './TemplateListItem.jsx';
 import Spinner from '../../commons/components/Spinner.jsx';
+import EmptyState from '../../commons/components/EmptyState.jsx';
+import { TemplatesIcon } from '../../commons/components/Icon.jsx';
 import "./TemplatesList.css";
 
 export default function TemplatesList({ templates = [], isLoading, onNewTemplateClick }) {
@@ -31,7 +33,5 @@ function EmptyList({ templates }) {
     return null;
   }
 
-  return (
-    <div className="templates-list-empty-text">No templates found</div>
-  );
+  return <EmptyState icon={<TemplatesIcon />} title="No templates" description="Create a template to speed up note creation" />;
 }

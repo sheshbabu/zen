@@ -1,9 +1,10 @@
 import { showToast } from "../components/Toast.jsx";
 
-async function request(method, url, payload) {
+async function request(method, url, payload, opts) {
   const options = {
     method: method,
-    headers: {}
+    headers: {},
+    ...opts,
   };
 
   if (payload instanceof FormData) {
@@ -101,6 +102,10 @@ async function updateFocusMode(focusMode) {
   return await request('PUT', `/api/focus/${focusMode.focusId}`, focusMode);
 }
 
+async function deleteFocusMode(focusId) {
+  return await request('DELETE', `/api/focus/${focusId}/`);
+}
+
 // Notes
 
 async function getNotes(tagId, focusId, isArchived, isDeleted, page) {
@@ -146,12 +151,20 @@ async function deleteNote(noteId) {
   return await request('DELETE', `/api/notes/${noteId}`);
 }
 
+async function bulkDeleteNotes(ids) {
+  return await request('DELETE', '/api/notes/bulk/', { ids });
+}
+
 async function restoreNote(noteId) {
   return await request('PUT', `/api/notes/${noteId}/restore/`);
 }
 
 async function archiveNote(noteId) {
   return await request('PUT', `/api/notes/${noteId}/archive/`);
+}
+
+async function bulkArchiveNotes(ids) {
+  return await request('PUT', '/api/notes/bulk/archive/', { ids });
 }
 
 async function unarchiveNote(noteId) {
@@ -307,6 +320,28 @@ async function deleteToken(tokenId) {
   return await request('DELETE', `/api/mcp/tokens/${tokenId}/`);
 }
 
+// Canvases
+
+async function getCanvases() {
+  return await request('GET', '/api/canvases/');
+}
+
+async function getCanvasById(canvasId) {
+  return await request('GET', `/api/canvases/${canvasId}/`);
+}
+
+async function createCanvas(canvas) {
+  return await request('POST', '/api/canvases/', canvas);
+}
+
+async function updateCanvas(canvasId, canvas, opts) {
+  return await request('PUT', `/api/canvases/${canvasId}/`, canvas, opts);
+}
+
+async function deleteCanvas(canvasId) {
+  return await request('DELETE', `/api/canvases/${canvasId}/`);
+}
+
 export default {
   request,
   checkUser,
@@ -317,13 +352,16 @@ export default {
   getFocusModes,
   createFocusMode,
   updateFocusMode,
+  deleteFocusMode,
   getNotes,
   getNoteById,
   createNote,
   updateNote,
   deleteNote,
+  bulkDeleteNotes,
   restoreNote,
   archiveNote,
+  bulkArchiveNotes,
   unarchiveNote,
   pinNote,
   unpinNote,
@@ -347,5 +385,10 @@ export default {
   incrementTemplateUsage,
   getTokens,
   createToken,
-  deleteToken
+  deleteToken,
+  getCanvases,
+  getCanvasById,
+  createCanvas,
+  updateCanvas,
+  deleteCanvas
 };

@@ -97,6 +97,7 @@
             --red-600: #DC2626;
             --red-700 : #B91C1C;
             --yellow-100: #FEF9C3;
+            --yellow-500: #EAB308;
 
             /* typography */
             /* Major Second */
@@ -355,6 +356,15 @@
 
             svg {
                 margin-right: 6px;;
+            }
+
+            .experimental {
+                color: var(--yellow-500);
+                background-color: var(--yellow-100);
+                padding: 4px 10px;
+                border-radius: 50px;
+                font-size: 14px;
+                margin-left: 6px;
             }
         }
         
@@ -726,8 +736,40 @@
 
                     <div class="feature-card">
                         <h3 class="feature-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-stack-icon lucide-file-stack"><path d="M21 7h-3a2 2 0 0 1-2-2V2"/><path d="M21 6v6.5c0 .8-.7 1.5-1.5 1.5h-7c-.8 0-1.5-.7-1.5-1.5v-9c0-.8.7-1.5 1.5-1.5H17Z"/><path d="M7 8v8.8c0 .3.2.6.4.8.2.2.5.4.8.4H15"/><path d="M3 12v8.8c0 .3.2.6.4.8.2.2.5.4.8.4H11"/></svg>
+                            Templates
+                        </h3>
+                        <p class="feature-description">
+                            Create reusable note templates with placeholders. Quickly start new notes with consistent structure and formatting.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3 class="feature-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pin-icon lucide-pin"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>
+                            Pinned Notes
+                        </h3>
+                        <p class="feature-description">
+                            Keep important notes at the top of your list. Pin frequently accessed notes for quick access whenever you need them.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3 class="feature-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                            Canvas
+                            <span class="experimental">Experimental</span>
+                        </h3>
+                        <p class="feature-description">
+                             Spatial organization for visual thinkers. Arrange notes and images on an infinite canvas to see connections and build your mental model.
+                        </p>
+                    </div>
+
+                    <div class="feature-card">
+                        <h3 class="feature-title">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain-circuit-icon lucide-brain-circuit"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M9 13a4.5 4.5 0 0 0 3-4"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M12 13h4"/><path d="M12 18h6a2 2 0 0 1 2 2v1"/><path d="M12 8h8"/><path d="M16 8V5a2 2 0 0 1 2-2"/><circle cx="16" cy="13" r=".5"/><circle cx="18" cy="3" r=".5"/><circle cx="20" cy="21" r=".5"/><circle cx="20" cy="8" r=".5"/></svg>
                             MCP Server
+                            <span class="experimental">Experimental</span>
                         </h3>
                         <p class="feature-description">
                             Connect your favorite AI apps to chat naturally with your notes and uncover hidden connections across everything you've written.
@@ -772,6 +814,6 @@
             window[GLOBAL_VAR_NAME].sendPageView();
         })();
     </script>
-    
+
 </body>
 </html>

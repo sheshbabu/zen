@@ -2,6 +2,7 @@ import { h, useState } from "../../assets/preact.esm.js"
 import { UploadIcon, SuccessIcon, WarnIcon, ErrorIcon } from "../../commons/components/Icon.jsx";
 import { showToast } from "../../commons/components/Toast.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
+import pluralize from "../../commons/utils/pluralize.js";
 
 export default function ImportPane() {
   const [isUploading, setIsUploading] = useState(false);
@@ -74,11 +75,11 @@ export default function ImportPane() {
 
       let message = ""
       if (uploadedCount > 0) {
-        message = `${uploadedCount} files imported.`;
+        message = `${uploadedCount} ${pluralize(uploadedCount, 'file')} imported.`;
       }
 
       if (errorCount > 0) {
-        message += ` ${errorCount} errors.`;
+        message += ` ${errorCount} ${pluralize(errorCount, 'error')}.`;
       }
 
       if (unsupportedCount > 0) {

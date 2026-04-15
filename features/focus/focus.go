@@ -2,7 +2,9 @@ package focus
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+	"strconv"
 	"time"
 	"zen/commons/utils"
 	"zen/features/tags"
@@ -33,8 +35,13 @@ func HandleCreateFocusMode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := isValid(focusMode); err != nil {
+		utils.SendErrorResponse(w, "FOCUS_UPDATE_FAILED", err.Error(), err, http.StatusInternalServerError)
+		return
+	}
+
 	if err := CreateFocusMode(&focusMode); err != nil {
-		utils.SendErrorResponse(w, "FOCUS_CREATE_FAILED", "Error creating focus mode.", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "FOCUS_CREATE_FAILED", "Error creating focus mode", err, http.StatusInternalServerError)
 		return
 	}
 
@@ -50,12 +57,47 @@ func HandleUpdateFocusMode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := isValid(focusMode); err != nil {
+		utils.SendErrorResponse(w, "FOCUS_UPDATE_FAILED", err.Error(), err, http.StatusInternalServerError)
+		return
+	}
+
 	if err := UpdateFocusMode(&focusMode); err != nil {
-		utils.SendErrorResponse(w, "FOCUS_UPDATE_FAILED", "Error updating focus mode.", err, http.StatusInternalServerError)
+		utils.SendErrorResponse(w, "FOCUS_UPDATE_FAILED", "Error updating focus mode", err, http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(focusMode)
+}
+
+func HandleDeleteFocusMode(w http.ResponseWriter, r *http.Request) {
+	focusIDStr := r.PathValue("focusId")
+	focusID, err := strconv.Atoi(focusIDStr)
+	if err != nil {
+		utils.SendErrorResponse(w, "INVALID_FOCUS_ID", "Invalid focus ID", err, http.StatusBadRequest)
+		return
+	}
+
+	if err := DeleteFocusMode(focusID); err != nil {
+		utils.SendErrorResponse(w, "FOCUS_DELETE_FAILED", "Error deleting focus mode", err, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func isValid(focusMode FocusMode) error {
+	if focusMode.Name == "" {
+		message := "Focus name is required"
+		return errors.New(message)
+	}
+
+	if len(focusMode.Tags) == 0 {
+		message := "Atleast one tag is required"
+		return errors.New(message)
+	}
+
+	return nil
 }

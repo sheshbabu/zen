@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"zen/commons/queue"
 	"zen/features/notes"
 )
@@ -86,7 +87,7 @@ func scanImagesDirectory() (map[string]os.FileInfo, error) {
 }
 
 func isImageFile(filename string) bool {
-	ext := filepath.Ext(filename)
+	ext := strings.ToLower(filepath.Ext(filename))
 	switch ext {
 	case ".jpg", ".jpeg", ".png", ".gif":
 		return true
@@ -209,9 +210,7 @@ func createImageRecordFromFile(filename string, fileInfo os.FileInfo) error {
 
 	imageInfo, err := getImageInfo(file)
 	if err != nil {
-		err = fmt.Errorf("error getting image info: %w", err)
-		slog.Error(err.Error())
-		return err
+		return fmt.Errorf("error getting image info: %w", err)
 	}
 
 	imageRecord := ImageRecord{

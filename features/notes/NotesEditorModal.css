@@ -18,5 +18,10 @@
         padding: var(--spacing-8);
         padding-top: 0;
         overflow-y: auto;
+
+        .notes-editor-toolbar {
+            padding-top: var(--spacing-8);
+            padding-bottom: 0;
+        }
     }
 }

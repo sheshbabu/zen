@@ -22,6 +22,7 @@
 * Pinned notes
 * Archive and soft delete notes
 * Minimal dependency footprint
+* Automated backups (via [Zen Backup](https://github.com/sheshbabu/zen-backup))
 
 
 ### Experimental Features

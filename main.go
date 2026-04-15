@@ -13,6 +13,7 @@ import (
 	"zen/commons/session"
 	"zen/commons/sqlite"
 	"zen/commons/utils"
+	"zen/features/canvas"
 	"zen/features/focus"
 	"zen/features/images"
 	"zen/features/intelligence"
@@ -90,13 +91,15 @@ func newRouter() *http.ServeMux {
 
 	addPrivateRoute(mux, "GET /api/notes/", notes.HandleGetNotes)
 	addPrivateRoute(mux, "GET /api/notes/{noteId}/", notes.HandleGetNote)
-	addPrivateRoute(mux, "PUT /api/notes/{noteId}/", notes.HandleUpdateNote)
 	addPrivateRoute(mux, "POST /api/notes/", notes.HandleCreateNote)
+	addPrivateRoute(mux, "PUT /api/notes/{noteId}/", notes.HandleUpdateNote)
+	addPrivateRoute(mux, "DELETE /api/notes/bulk/", notes.HandleBulkSoftDeleteNotes)
 	addPrivateRoute(mux, "DELETE /api/notes/{noteId}/", notes.HandleSoftDeleteNote)
 	addPrivateRoute(mux, "DELETE /api/notes/", notes.HandleDeleteNotes)
-	addPrivateRoute(mux, "PUT /api/notes/{noteId}/restore/", notes.HandleRestoreDeletedNote)
+	addPrivateRoute(mux, "PUT /api/notes/bulk/archive/", notes.HandleBulkArchiveNotes)
 	addPrivateRoute(mux, "PUT /api/notes/{noteId}/archive/", notes.HandleArchiveNote)
 	addPrivateRoute(mux, "PUT /api/notes/{noteId}/unarchive/", notes.HandleUnarchiveNote)
+	addPrivateRoute(mux, "PUT /api/notes/{noteId}/restore/", notes.HandleRestoreDeletedNote)
 	addPrivateRoute(mux, "PUT /api/notes/{noteId}/pin/", notes.HandlePinNote)
 	addPrivateRoute(mux, "PUT /api/notes/{noteId}/unpin/", notes.HandleUnpinNote)
 
@@ -107,6 +110,7 @@ func newRouter() *http.ServeMux {
 	addPrivateRoute(mux, "GET /api/focus/", focus.HandleGetAllFocusModes)
 	addPrivateRoute(mux, "POST /api/focus/", focus.HandleCreateFocusMode)
 	addPrivateRoute(mux, "PUT /api/focus/{focusId}/", focus.HandleUpdateFocusMode)
+	addPrivateRoute(mux, "DELETE /api/focus/{focusId}/", focus.HandleDeleteFocusMode)
 
 	addPrivateRoute(mux, "POST /api/images/", images.HandleUploadImage)
 	addPrivateRoute(mux, "GET /api/images/", images.HandleGetImages)
@@ -132,6 +136,12 @@ func newRouter() *http.ServeMux {
 	addPrivateRoute(mux, "DELETE /api/templates/{templateId}/", templates.HandleDeleteTemplate)
 	addPrivateRoute(mux, "GET /api/templates/recommended/", templates.HandleGetRecommendedTemplates)
 	addPrivateRoute(mux, "PUT /api/templates/{templateId}/usage/", templates.HandleIncrementTemplateUsage)
+
+	addPrivateRoute(mux, "GET /api/canvases/", canvas.HandleGetCanvases)
+	addPrivateRoute(mux, "GET /api/canvases/{canvasId}/", canvas.HandleGetCanvas)
+	addPrivateRoute(mux, "POST /api/canvases/", canvas.HandleCreateCanvas)
+	addPrivateRoute(mux, "PUT /api/canvases/{canvasId}/", canvas.HandleUpdateCanvas)
+	addPrivateRoute(mux, "DELETE /api/canvases/{canvasId}/", canvas.HandleDeleteCanvas)
 
 	mux.HandleFunc("POST /mcp", mcp.HandleMCP)
 	mux.HandleFunc("OPTIONS /mcp", mcp.HandleMCP)
@@ -208,6 +218,7 @@ func runBackgroundTasks() {
 	intelligenceProcessingFrequency := 5 * time.Minute // 5 minutes
 
 	go func() {
+		notes.EmptyTrash(true) // Run immediately on server start
 		for range time.Tick(trashCleanupFrequency) {
 			notes.EmptyTrash(true)
 		}
