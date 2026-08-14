@@ -9,7 +9,7 @@ import navigateTo from '../../commons/utils/navigateTo.js';
 import isMobile from '../../commons/utils/isMobile.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
 import NotePreviewModal from './NotePreviewModal.jsx';
-import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
+import NotesEditorMenu from './NotesEditorMenu.jsx';
 import Button from '../../commons/components/Button.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
 import { closeModal, openModal } from '../../commons/components/Modal.jsx';
@@ -429,32 +429,6 @@ function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpand
         condition: !isEditable,
         component: <Button variant="ghost" onClick={onEditClick}>Edit</Button>
       }
-    ],
-    menu: [
-      {
-        key: 'pin',
-        condition: !isNewNote && !note?.isDeleted && !note?.isArchived,
-        component: <div onClick={note?.isPinned ? onUnpinClick : onPinClick}>
-          {note?.isPinned ? 'Unpin' : 'Pin'}
-        </div>
-      },
-      {
-        key: 'archive',
-        condition: !isNewNote && !note?.isDeleted,
-        component: <div onClick={note?.isArchived ? onUnarchiveClick : onArchiveClick}>
-          {note?.isArchived ? 'Unarchive' : 'Archive'}
-        </div>
-      },
-      {
-        key: 'restore',
-        condition: !isNewNote && note?.isDeleted,
-        component: <div onClick={onRestoreClick}>Restore</div>
-      },
-      {
-        key: 'delete',
-        condition: !isNewNote && !note?.isDeleted,
-        component: <div onClick={onDeleteClick}>Delete</div>
-      }
     ]
   };
 
@@ -466,10 +440,6 @@ function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpand
     .filter(action => action.condition)
     .map(action => action.component);
 
-  const menuActions = actions.menu
-    .filter(action => action.condition)
-    .map(action => action.component);
-
   return (
     <div className="notes-editor-toolbar" onClick={handleClick}>
       <div className="left-toolbar">
@@ -477,7 +447,16 @@ function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpand
       </div>
       <div className="right-toolbar">
         {rightToolbarActions}
-        <DropdownMenu actions={menuActions} />
+        <NotesEditorMenu
+          note={note}
+          isNewNote={isNewNote}
+          onPinClick={onPinClick}
+          onUnpinClick={onUnpinClick}
+          onArchiveClick={onArchiveClick}
+          onUnarchiveClick={onUnarchiveClick}
+          onRestoreClick={onRestoreClick}
+          onDeleteClick={onDeleteClick}
+        />
       </div>
     </div>
   );

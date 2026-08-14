@@ -46,7 +46,7 @@
             flex-direction: row-reverse;
         }
 
-        .right-toolbar .dropdown-menu {
+        .right-toolbar .notes-editor-menu-dropdown {
             left: auto;
             right: 0;
         }

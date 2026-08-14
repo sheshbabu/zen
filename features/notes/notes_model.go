@@ -27,6 +27,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 				n.title,
 				n.content,
 				SUBSTR(n.content, 0, 500) AS snippet,
+				n.created_at,
 				n.updated_at,
 				COALESCE(
 					JSON_GROUP_ARRAY(JSON_OBJECT(
@@ -71,6 +72,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 				n.title,
 				n.content,
 				SUBSTR(n.content, 0, 500) AS snippet,
+				n.created_at,
 				n.updated_at,
 				COALESCE(
 					JSON_GROUP_ARRAY(JSON_OBJECT(
@@ -122,6 +124,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 				n.title,
 				n.content,
 				SUBSTR(n.content, 0, 500) AS snippet,
+				n.created_at,
 				n.updated_at,
 				CASE
 					WHEN COUNT(t.tag_id) > 0 THEN
@@ -172,7 +175,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 		var archivedAt sql.NullTime
 		var deletedAt sql.NullTime
 		var pinnedAt sql.NullTime
-		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt, &total)
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.CreatedAt, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt, &total)
 		if err != nil {
 			err = fmt.Errorf("error scanning note: %w", err)
 			slog.Error(err.Error())
@@ -209,6 +212,7 @@ func GetNoteByID(noteID int) (Note, error) {
 			n.title,
 			n.content,
 			SUBSTR(content, 0, 500) AS snippet,
+			n.created_at,
 			n.updated_at,
 			CASE
 				WHEN COUNT(t.tag_id) > 0 THEN
@@ -235,7 +239,7 @@ func GetNoteByID(noteID int) (Note, error) {
 
 	row := sqlite.DB.QueryRow(query, noteID)
 	var pinnedAt sql.NullTime
-	err := row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt)
+	err := row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.CreatedAt, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt)
 	if err != nil {
 		err = fmt.Errorf("error retrieving note: %w", err)
 		slog.Error(err.Error())
