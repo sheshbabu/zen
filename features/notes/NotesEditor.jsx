@@ -8,13 +8,12 @@ import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import isMobile from '../../commons/utils/isMobile.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
-import NotesEditorModal from './NotesEditorModal.jsx';
+import NotePreviewModal from './NotePreviewModal.jsx';
 import DropdownMenu from '../../commons/components/DropdownMenu.jsx';
 import Button from '../../commons/components/Button.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
 import { closeModal, openModal } from '../../commons/components/Modal.jsx';
-import { useNotes, NotesProvider } from "../../commons/contexts/NotesContext.jsx";
-import { AppProvider } from '../../commons/contexts/AppContext.jsx';
+import { useNotes } from "../../commons/contexts/NotesContext.jsx";
 import { useLayout } from "../../commons/contexts/LayoutContext.jsx";
 import NotePreview from './NotePreview.jsx';
 import { useVisibleHeadings } from "./useVisibleHeadings.js";
@@ -248,17 +247,10 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     const noteId = parseInt(link.getAttribute('data-note-id'), 10);
 
     if (isMobile()) {
-      ApiClient.getNoteById(noteId)
-        .then(note => {
-          openModal(
-            <AppProvider>
-              <NotesProvider>
-                <NotesEditorModal note={note} />
-              </NotesProvider>
-            </AppProvider>,
-            '.note-modal-root'
-          );
-        });
+      openModal(
+        <NotePreviewModal noteId={noteId} />,
+        '.note-modal-root'
+      );
     } else {
       setSidePanelContent(<NotePreview noteId={noteId} />);
     }
