@@ -4,7 +4,11 @@ export default function useLongPress(callback, delay = 500) {
   const timerRef = useRef(null);
   const firedRef = useRef(false);
 
-  function start() {
+  function start(e) {
+    // Only left click should start a long-press
+    if (e?.button !== undefined && e.button !== 0) {
+      return;
+    }
     firedRef.current = false;
     timerRef.current = setTimeout(() => {
       firedRef.current = true;
