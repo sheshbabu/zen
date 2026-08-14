@@ -1,31 +1,31 @@
 .templates-list-toolbar {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--spacing-2) 0;
-  margin: 6px var(--spacing-3) 0 4px;
-
-  .templates-list-toolbar-left {
     display: flex;
-    align-items: center;
-    gap: var(--spacing-2);
+    justify-content: space-between;
+    padding: var(--spacing-2) 0;
+    margin: 6px var(--spacing-3) 0 4px;
 
-    svg.lucide {
-      cursor: pointer;
-      width: 20px;
-      height: 20px;
-      margin: var(--spacing-2);
-      margin-right: 0;
-      transition-property: stroke;
-      transition-duration: 500ms;
+    .templates-list-toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-2);
 
-      &:hover {
+        svg.lucide {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            margin: var(--spacing-2);
+            margin-right: 0;
+            transition-property: stroke;
+            transition-duration: 500ms;
 
-        rect,
-        path,
-        circle {
-          stroke: var(--neutral-900);
+            &:hover {
+
+                rect,
+                path,
+                circle {
+                    stroke: var(--neutral-900);
+                }
+            }
         }
-      }
     }
-  }
 }

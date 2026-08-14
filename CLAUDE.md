@@ -56,9 +56,9 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
 ### Canvas
 - **Canvas Library**: Konva.js for 2D canvas rendering
 - **File Format**: JSON Canvas (jsoncanvas.org) for data storage
-- **Storage**: SessionStorage for canvas state persistence
+- **Storage**: Database-backed persistence
 - **Node Types**: Note nodes, sticky notes, image nodes
-- **Features**: Pan/zoom viewport, selection, transformation, spatial organization
+- **Features**: Pan/zoom viewport, selection, transformation, spatial organization, multiple named canvases
 
 ### Key Patterns
 - **API Routes**: RESTful endpoints prefixed with `/api/`
@@ -69,7 +69,7 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
 ### Database Schema
 - Migrations are sequential SQL files in `./migrations/` with format `<version>_<title>.sql`
 - Uses SQLite with FTS5 extension for full-text search
-- Main entities: users, notes, tags, focus_modes, sessions, images, templates, mcp_tokens, queues
+- Main entities: users, notes, tags, focus_modes, sessions, images, templates, mcp_tokens, queues, canvases
 
 ### Environment Variables
 - `DEV_MODE=true` - Development mode with file system assets
@@ -196,12 +196,24 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
 
 #### CSS Classes
 - BEM-like naming: `notes-editor-toolbar`, `left-toolbar`
+- 4-space indentation
 - Use CSS nesting with `&` for modifiers and pseudo-elements: `&.visible`, `&:hover`, `&::before`
 - Child classes and elements nested directly without `&`: `.child-class`, `svg.lucide`
+- Nest all child/descendant selectors under their parent instead of declaring them flat at the top level — only declare a new top-level selector for a class that is a genuinely separate component, not a child of an existing one
 - Conditional classes using template literals
 - Minimal inline styles, prefer CSS classes
+
+#### CSS Variables (Design Tokens)
+- All values must use the tokens defined in `assets/index.css` (colors, spacing, shadows, typography, z-index, transitions) — never hardcode a value that duplicates or approximates an existing token
+- Colors: use `--neutral-*`, `--red-*`, `--yellow-*`, `--green-*`, `--text-*`, `--bg-*` variables, not hex/rgb/named colors (`white`, `black`, `#FFF`, etc.) — exception: colors that must stay constant across light/dark themes (e.g. white text/icons on a permanently dark overlay) may use literal `white`/`black`/`rgba(0, 0, 0, ...)` since no theme-aware token applies
+- To derive a translucent variant of a token color, use relative color syntax instead of a hardcoded rgba: `rgb(from var(--yellow-400) r g b / 0.1)`, not `rgba(250, 204, 21, 0.1)`
+- Spacing: use `--spacing-1` through `--spacing-8` (4/8/12/16/20/24/32px) for padding/margin/gap — never hardcode a pixel value that matches one of these
+- Shadows: use `--shadow-1` through `--shadow-6`, never hand-write an equivalent `box-shadow` value
+- Typography: use `--h1`–`--h6`, `--p1`, `--sm`, `--code` via the `font` shorthand, never hardcode `font-size`/`line-height`
+- No `rem` or `em` units outside `assets/index.css` — use `px` for one-off sizes not covered by a token, since the token system is the source of truth for scalable values
+- z-index: always use `--z-base`, `--z-modal`, `--z-popover`, `--z-critical` — never a raw number
 - Use semantic z-index layering system:
-  - `z-index: 1` - Basic overlays (editor components, dropdown menus)
-  - `z-index: 2` - Modal backdrops, mobile navbar, sidebar overlay
-  - `z-index: 3` - Interactive content (toast notifications, sidebar content, tooltips)
-  - `z-index: 4` - Critical notifications (offline indicator)
+  - `z-index: 1` (`--z-base`) - Basic overlays (editor components, dropdown menus)
+  - `z-index: 2` (`--z-modal`) - Modal backdrops, mobile navbar, sidebar overlay
+  - `z-index: 3` (`--z-popover`) - Interactive content (toast notifications, sidebar content, tooltips)
+  - `z-index: 4` (`--z-critical`) - Critical notifications (offline indicator)
