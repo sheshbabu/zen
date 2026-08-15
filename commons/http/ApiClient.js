@@ -236,8 +236,8 @@ async function uploadImage(formData) {
 
 // Search
 
-async function search(query) {
-  return await request('GET', `/api/search/?query=${query}`);
+async function search(query, sort) {
+  return await request('GET', `/api/search/?query=${query}&sort=${sort}`);
 }
 
 // Intelligence

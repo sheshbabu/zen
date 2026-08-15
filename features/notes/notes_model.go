@@ -674,8 +674,21 @@ func UnarchiveNote(noteID int) error {
 	return nil
 }
 
-func SearchNotes(term string, limit int) ([]Note, error) {
+const (
+	SortRelevance = "relevance"
+	SortUpdated   = "updated"
+	SortCreated   = "created"
+)
+
+func SearchNotes(term string, limit int, sort string) ([]Note, error) {
 	notes := []Note{}
+
+	orderBy := "rank"
+	if sort == SortUpdated {
+		orderBy = "n.updated_at DESC"
+	} else if sort == SortCreated {
+		orderBy = "n.created_at DESC"
+	}
 
 	query := `
 		SELECT
@@ -703,8 +716,8 @@ func SearchNotes(term string, limit int) ([]Note, error) {
 				WHEN deleted_at  IS NOT NULL THEN 3
 				ELSE 4
 			END ASC,
-			-- Then by BM25 rank within each group
-			rank
+			-- Then by the chosen sort within each group
+			` + orderBy + `
 		LIMIT
 			?
 	`

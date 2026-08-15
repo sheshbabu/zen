@@ -8,6 +8,7 @@ import SearchHistory from "../../commons/preferences/SearchHistory.js";
 import SearchPreviewPreferences from "../../commons/preferences/SearchPreviewPreferences.js";
 import Tabs from "../../commons/components/Tabs.jsx";
 import SearchPreview from "./SearchPreview.jsx";
+import SearchSortDropdown, { SORT_OPTIONS } from "./SearchSortDropdown.jsx";
 import "./SearchMenu.css";
 
 export default function SearchMenu() {
@@ -18,6 +19,7 @@ export default function SearchMenu() {
   const [searchHistory, setSearchHistory] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
   const [isPreviewVisible, setIsPreviewVisible] = useState(SearchPreviewPreferences.isVisible());
+  const [activeSort, setActiveSort] = useState(SORT_OPTIONS[0].value);
 
   const inputRef = useRef(null);
   const debounceTimerRef = useRef(null);
@@ -52,16 +54,32 @@ export default function SearchMenu() {
     setHasSearched(false);
 
     debounceTimerRef.current = setTimeout(() => {
-      ApiClient.search(value)
-        .then(searchResults => {
-          setResults(searchResults);
-          setHasSearched(true);
-          const allItems = [...searchResults.lexical_notes, ...searchResults.semantic_notes, ...searchResults.semantic_images, ...searchResults.tags];
-          if (allItems.length > 0) {
-            setSelectedItem(allItems[0]);
-          }
-        });
+      runSearch(value, activeSort);
     }, 200);
+  }
+
+  function runSearch(value, sort) {
+    ApiClient.search(value, sort)
+      .then(searchResults => {
+        setResults(searchResults);
+        setHasSearched(true);
+        const allItems = [...searchResults.lexical_notes, ...searchResults.semantic_notes, ...searchResults.semantic_images, ...searchResults.tags];
+        if (allItems.length > 0) {
+          setSelectedItem(allItems[0]);
+        }
+      });
+  }
+
+  function handleSortChange(sort) {
+    setActiveSort(sort);
+
+    if (query.trim() !== "") {
+      runSearch(query, sort);
+    }
+
+    if (inputRef.current !== null) {
+      inputRef.current.focus();
+    }
   }
 
   function handleKeyDown(e) {
@@ -270,11 +288,6 @@ export default function SearchMenu() {
   // localStorage snapshots that may be stale, so they must be refetched by the preview.
   const hasInlineContent = results.lexical_notes.includes(selectedItem);
 
-  let previewToggleTitle = "Show preview";
-  if (isPreviewVisible === true) {
-    previewToggleTitle = "Hide preview";
-  }
-
   let previewSection = null;
   if (isPreviewVisible === true) {
     previewSection = <SearchPreview item={selectedItem} hasInlineContent={hasInlineContent} />;
@@ -284,6 +297,12 @@ export default function SearchMenu() {
 
   let tabsSection = null;
   if (showTabs === true) {
+    // Sort only reorders the Notes section, so hide it when only tags are shown
+    let sortSection = null;
+    if (activeTab !== "tags") {
+      sortSection = <SearchSortDropdown activeSort={activeSort} onSortChange={handleSortChange} />;
+    }
+
     tabsSection = (
       <div className="search-tabs">
         <Tabs
@@ -291,6 +310,7 @@ export default function SearchMenu() {
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />
+        {sortSection}
       </div>
     );
   }
@@ -310,7 +330,7 @@ export default function SearchMenu() {
             onKeyDown={handleKeyDown}
             onKeyUp={handleKeyUp}
           />
-          <button className={`search-preview-toggle ${isPreviewVisible === true ? "is-active" : ""}`} onClick={handleTogglePreviewClick} title={previewToggleTitle}>
+          <button className={`search-preview-toggle ${isPreviewVisible === true ? "is-active" : ""}`} onClick={handleTogglePreviewClick}>
             <PanelRightIcon />
           </button>
         </div>
