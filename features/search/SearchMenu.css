@@ -47,6 +47,13 @@
             padding: 10px;
         }
 
+        .search-empty {
+            font: var(--p1);
+            color: var(--text-secondary);
+            text-align: center;
+            padding: var(--spacing-6) var(--spacing-4);
+        }
+
         .search-result-item {
             display: flex;
             align-items: center;

@@ -11,6 +11,7 @@ import "./SearchMenu.css";
 export default function SearchMenu() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState({ lexical_notes: [], semantic_notes: [], semantic_images: [], tags: [] });
+  const [hasSearched, setHasSearched] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchHistory, setSearchHistory] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
@@ -40,13 +41,17 @@ export default function SearchMenu() {
     if (value.trim() === "") {
       setResults({ lexical_notes: [], semantic_notes: [], semantic_images: [], tags: [] });
       setSelectedItem(searchHistory.length > 0 ? searchHistory[0] : null);
+      setHasSearched(false);
       return;
     }
+
+    setHasSearched(false);
 
     debounceTimerRef.current = setTimeout(() => {
       ApiClient.search(value)
         .then(searchResults => {
           setResults(searchResults);
+          setHasSearched(true);
           const allItems = [...searchResults.lexical_notes, ...searchResults.semantic_notes, ...searchResults.semantic_images, ...searchResults.tags];
           if (allItems.length > 0) {
             setSelectedItem(allItems[0]);
@@ -220,6 +225,17 @@ export default function SearchMenu() {
     }
   }
 
+  let emptySection = null;
+  const hasVisibleResults = lexicalNotesSection !== null || semanticNotesSection !== null || semanticImagesSection !== null || tagsSection !== null;
+
+  if (query.trim() !== "" && hasSearched === true && hasVisibleResults === false) {
+    emptySection = (
+      <div className="search-empty">
+        No results for "{query}"
+      </div>
+    );
+  }
+
   const showTabs = query.trim() !== "";
 
   let tabsSection = null;
@@ -257,6 +273,7 @@ export default function SearchMenu() {
           {semanticNotesSection}
           {semanticImagesSection}
           {tagsSection}
+          {emptySection}
         </div>
       </ModalContainer>
     </ModalBackdrop>
