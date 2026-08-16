@@ -1,9 +1,9 @@
 import { h, useState, useRef, useEffect } from "../../assets/preact.esm.js"
 import Button from "../../commons/components/Button.jsx";
-import { EllipsisIcon, PinIcon, ArchiveIcon, TrashIcon } from "../../commons/components/Icon.jsx";
+import { EllipsisIcon, PinIcon, ArchiveIcon, TrashIcon, CopyIcon, ShareIcon } from "../../commons/components/Icon.jsx";
 import "./NotesEditorMenu.css";
 
-export default function NotesEditorMenu({ note, isNewNote, onPinClick, onUnpinClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onDeleteClick }) {
+export default function NotesEditorMenu({ note, isNewNote, onPinClick, onUnpinClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onDeleteClick, onCopyClick, onShareClick }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const dropdownRef = useRef(null);
@@ -59,6 +59,27 @@ export default function NotesEditorMenu({ note, isNewNote, onPinClick, onUnpinCl
       <li key="restore" className="notes-editor-menu-option" onClick={() => handleItemClick(onRestoreClick)}>
         <ArchiveIcon />
         <span>Restore</span>
+      </li>
+    );
+  }
+
+  const isClipboardAvailable = typeof navigator.clipboard !== 'undefined';
+  const isShareAvailable = typeof navigator.share !== 'undefined';
+
+  if (isNewNote !== true && note?.isDeleted !== true && isClipboardAvailable === true) {
+    items.push(
+      <li key="copy" className="notes-editor-menu-option" onClick={() => handleItemClick(onCopyClick)}>
+        <CopyIcon />
+        <span>Copy</span>
+      </li>
+    );
+  }
+
+  if (isNewNote !== true && note?.isDeleted !== true && isShareAvailable === true) {
+    items.push(
+      <li key="share" className="notes-editor-menu-option" onClick={() => handleItemClick(onShareClick)}>
+        <ShareIcon />
+        <span>Share</span>
       </li>
     );
   }

@@ -231,6 +231,39 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
       });
   }
 
+  function buildNoteMarkdown() {
+    const currentTitle = titleRef.current?.textContent || "";
+    const currentContent = textareaRef.current?.value || content;
+
+    if (currentTitle.trim() === "") {
+      return currentContent;
+    }
+
+    return `# ${currentTitle}\n\n${currentContent}`;
+  }
+
+  function handleCopyClick() {
+    navigator.clipboard.writeText(buildNoteMarkdown())
+      .then(() => {
+        showToast("Note copied.");
+      })
+      .catch(() => {
+        showToast("Couldn't copy note.");
+      });
+  }
+
+  function handleShareClick() {
+    const currentTitle = titleRef.current?.textContent || "";
+
+    navigator.share({ title: currentTitle, text: buildNoteMarkdown() })
+      .catch(error => {
+        if (error.name === "AbortError") {
+          return;
+        }
+        showToast("Couldn't share note.");
+      });
+  }
+
   function handleExpandToggleClick() {
     if (isExpandable !== true) {
       return;
@@ -369,6 +402,8 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
         onExpandToggleClick={handleExpandToggleClick}
         onPinClick={handlePinClick}
         onUnpinClick={handleUnpinClick}
+        onCopyClick={handleCopyClick}
+        onShareClick={handleShareClick}
       />
       <div className="notes-editor-header">
         <div className="notes-editor-title" contentEditable={isEditable} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
@@ -386,7 +421,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   );
 }
 
-function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpanded, isExpandable, onSaveClick, onEditClick, onEditCancelClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick, onPinClick, onUnpinClick }) {
+function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpanded, isExpandable, onSaveClick, onEditClick, onEditCancelClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick, onPinClick, onUnpinClick, onCopyClick, onShareClick }) {
   const saveButtonText = isSaveLoading ? "Saving..." : "Save";
 
   function handleClick(e) {
@@ -456,6 +491,8 @@ function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpand
           onUnarchiveClick={onUnarchiveClick}
           onRestoreClick={onRestoreClick}
           onDeleteClick={onDeleteClick}
+          onCopyClick={onCopyClick}
+          onShareClick={onShareClick}
         />
       </div>
     </div>
