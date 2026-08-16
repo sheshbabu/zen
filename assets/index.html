@@ -1,31 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <!-- https://webkit.org/blog/7929/designing-websites-for-iphone-x/ -->
-    <!-- https://stackoverflow.com/questions/5103407/mobile-safari-device-rotation-causes-bad-scaling-of-website -->
-    <meta name="viewport" content="initial-scale=1, viewport-fit=cover, width=device-width, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-     <meta name="theme-color" content="#FFF">
-    <meta name="background-color" content="#FFF">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
-    <link rel="manifest" href="/assets/site.webmanifest">
-    <title>Zen</title>
-    <script src="/assets/markdown-it.min.js"></script>
-    <script src="/assets/highlight.min.js"></script>
-    <link rel="stylesheet" href="/assets/reset.css">
-    <link rel="stylesheet" href="/assets/github.min.css">
-    <link rel="stylesheet" href="/assets/index.css">
-    <link rel="stylesheet" href="/assets/bundle.css">
-    <script type="module" src="/assets/bundle.js"></script>
-    <script>
-      // Supported only in HTTPS or localhost
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register('/assets/sw.js');
-      }
-    </script>
+  <meta charset="UTF-8">
+  <!-- https://webkit.org/blog/7929/designing-websites-for-iphone-x/ -->
+  <!-- https://stackoverflow.com/questions/5103407/mobile-safari-device-rotation-causes-bad-scaling-of-website -->
+  <meta name="viewport" content="initial-scale=1, viewport-fit=cover, width=device-width, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#FFF">
+  <meta name="background-color" content="#FFF">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+  <link rel="manifest" href="/assets/site.webmanifest">
+  <title>Zen</title>
+  <script src="/assets/markdown-it.min.js"></script>
+  <script src="/assets/highlight.min.js"></script>
+  <link rel="stylesheet" href="/assets/reset.css">
+  <link rel="stylesheet" href="/assets/github.min.css">
+  <link rel="stylesheet" href="/assets/index.css">
+  <link rel="stylesheet" href="/assets/bundle.css">
+  <script type="module" src="/assets/bundle.js"></script>
+  <script>
+    // A worker can only intercept paths under the URL it was fetched from, so the
+    // copy at /assets/sw.js could never see "/" or "/notes/123" — no offline shell.
+    // The /sw.js route sends Service-Worker-Allowed: / to widen scope to the site.
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(error => {
+        console.error('[sw] registration failed', error);
+      });
+    }
+  </script>
 </head>
+
 <body>
 </body>
+
 </html>

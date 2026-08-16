@@ -85,7 +85,9 @@ async function updatePassword(payload) {
 }
 
 async function logout() {
-  return await request('POST', '/api/users/logout');
+  const response = await request('POST', '/api/users/logout');
+  navigator.serviceWorker?.controller?.postMessage({ type: 'CLEAR_CACHE' });
+  return response;
 }
 
 // Focus Modes
