@@ -297,6 +297,73 @@
         padding: var(--spacing-1) var(--spacing-2);
     }
 
+    .code-block {
+        position: relative;
+        margin: 16px 0;
+
+        pre {
+            margin: 0;
+        }
+
+        .code-copy-button {
+            position: absolute;
+            top: var(--spacing-2);
+            right: var(--spacing-2);
+            z-index: var(--z-base);
+            display: grid;
+            place-items: center;
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--neutral-50);
+            color: var(--text-secondary);
+            cursor: pointer;
+
+            &:hover {
+                color: var(--text-primary);
+            }
+
+            svg.lucide {
+                width: 16px;
+                height: 16px;
+            }
+
+            .code-copied-icon {
+                display: none;
+            }
+
+            &.is-copied {
+                color: var(--green-600);
+
+                .code-copy-icon {
+                    display: none;
+                }
+
+                .code-copied-icon {
+                    display: block;
+                }
+            }
+        }
+
+        @media (hover: hover) {
+            .code-copy-button {
+                opacity: 0;
+                transition: opacity var(--transition-fast) ease;
+
+                &:focus-visible,
+                &.is-copied {
+                    opacity: 1;
+                }
+            }
+
+            &:hover .code-copy-button {
+                opacity: 1;
+            }
+        }
+    }
+
     pre {
         margin: 16px 0;
         padding: var(--spacing-3);

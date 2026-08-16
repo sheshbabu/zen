@@ -5,6 +5,7 @@ import NotesEditorFormattingToolbar from './NotesEditorFormattingToolbar.jsx';
 import TableOfContents from './TableOfContents.jsx';
 import TemplatePicker from '../templates/TemplatePicker.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
+import handleCodeCopyClick from '../../commons/utils/copyCodeBlock.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import isMobile from '../../commons/utils/isMobile.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
@@ -271,7 +272,11 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     toggleEditorExpanded();
   }
 
-  function handleInternalNoteLinkClick(e) {
+  function handleRenderedContentClick(e) {
+    if (handleCodeCopyClick(e) === true) {
+      return;
+    }
+
     const link = e.target.closest('a[data-note-id]');
     if (link === null) {
       return;
@@ -340,7 +345,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     );
   } else {
     contentArea = (
-      <div className="notes-editor-rendered" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }} onClick={handleInternalNoteLinkClick} />
+      <div className="notes-editor-rendered" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(content, { hasCodeCopyButton: true }) }} onClick={handleRenderedContentClick} />
     );
   }
 
