@@ -171,17 +171,23 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
   ```
 
 #### Boolean Type Checking
-- Use explicit boolean comparisons instead of truthy/falsy checks
+- For values that are genuinely booleans, test them directly — no `=== true` / `!== true`
+- For values that may be `undefined`, `null`, `0`, or `""`, compare explicitly so the intent is visible and a falsy-but-valid value isn't silently treated as absent
 - Examples:
   ```javascript
-  // Preferred: explicit checks
-  if (isEnabled === true) { ... }
-  if (isEnabled !== true) { ... }
-  if (typeof value === 'boolean' && value) { ... }
-  
-  // Avoid: truthy/falsy checks
-  if (!isEnabled) { ... }
+  // Preferred: real booleans tested directly
   if (isEnabled) { ... }
+  if (!isEnabled) { ... }
+  if (response.ok) { ... }
+
+  // Preferred: explicit checks when the value isn't a boolean
+  if (count === 0) { ... }
+  if (name === undefined) { ... }
+  if (items.length > 0) { ... }
+
+  // Avoid: truthy checks that hide a non-boolean
+  if (count) { ... }
+  if (name) { ... }
   ```
 
 #### Event Handling
