@@ -33,8 +33,12 @@
     &:hover {
         box-shadow: var(--shadow-4);
 
-        .canvas-card-delete {
-            opacity: 1;
+        .canvas-card-info {
+            .canvas-card-meta {
+                .canvas-card-delete {
+                    opacity: 1;
+                }
+            }
         }
     }
 
