@@ -1,3 +1,5 @@
+import stripMarkdown from '../../commons/utils/stripMarkdown.js';
+
 const fontFamily = getComputedStyle(document.documentElement).getPropertyValue('--font-family').trim();
 
 function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidth, customHeight) {
@@ -10,14 +12,13 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidt
     x,
     y,
   };
-  const defaultWidth = 500;
-  const defaultHeight = note.title && note.title.length > 0 ? 360 : 340;
+  const defaultWidth = 300;
+  const defaultHeight = 200;
 
   const nodeWidth = customWidth || defaultWidth;
   const cardHeight = customHeight || defaultHeight;
   const padding = 16;
   const headerHeight = 28;
-  const tagsHeight = 24;
 
   const group = new window.Konva.Group({
     x: note.x,
@@ -57,7 +58,6 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidt
 
 
   let title = null;
-  let tags = null;
   let textYPosition = padding;
 
   if (note.title && note.title.length > 0) {
@@ -65,7 +65,7 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidt
       x: padding + 4,
       y: padding,
       text: note.title,
-      fontSize: 20,
+      fontSize: 14,
       fontFamily: fontFamily,
       fontStyle: 'bold',
       fill: '#404040',
@@ -75,27 +75,13 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidt
     textYPosition = padding + headerHeight;
   }
 
-  if (note.tags && note.tags.length > 0) {
-    const tagsText = note.tags.map(tag => `#${tag.name}`).join(' ');
-    tags = new window.Konva.Text({
-      x: padding + 4,
-      y: textYPosition,
-      text: tagsText,
-      fontSize: 14,
-      fontFamily: fontFamily,
-      fill: '#A3A3A3',
-      width: nodeWidth - (padding * 2) - 4,
-    });
-    textYPosition += tagsHeight + 8;
-  }
-
   const availableHeight = cardHeight - textYPosition - padding;
 
   const textContent = new window.Konva.Text({
     x: padding + 4,
     y: textYPosition,
-    text: note.text,
-    fontSize: 18,
+    text: stripMarkdown(note.text),
+    fontSize: 14,
     fontFamily: fontFamily,
     fill: '#525252',
     width: nodeWidth - (padding * 2) - 4,
@@ -108,9 +94,6 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidt
   group.add(background);
   if (title) {
     group.add(title);
-  }
-  if (tags) {
-    group.add(tags);
   }
   group.add(textContent);
 
@@ -187,9 +170,6 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidt
     const textWidth = newWidth - (padding * 2) - 4;
     if (title) {
       title.width(textWidth);
-    }
-    if (tags) {
-      tags.width(textWidth);
     }
     textContent.width(textWidth);
 

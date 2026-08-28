@@ -918,3 +918,93 @@ func GetNotesCount(isDeleted, isArchived bool) (int, error) {
 
 	return count, nil
 }
+
+// GetRelatedNotes returns notes sharing tags with the given note, ranked by how
+// many tags they have in common. This is the tag-based fallback for the canvas
+// sidebar's Suggested tab - it works with INTELLIGENCE_ENABLED off.
+func GetRelatedNotes(noteID int, limit int) ([]Note, error) {
+	notes := []Note{}
+
+	query := `
+		SELECT
+			n.note_id,
+			n.title,
+			n.content,
+			SUBSTR(n.content, 0, 500) AS snippet,
+			n.created_at,
+			n.updated_at,
+			(
+				SELECT COALESCE(
+					JSON_GROUP_ARRAY(JSON_OBJECT(
+						'tagId', t2.tag_id,
+						'name', t2.name
+					)), '[]'
+				)
+				FROM note_tags nt2
+				JOIN tags t2 ON nt2.tag_id = t2.tag_id
+				WHERE nt2.note_id = n.note_id
+			) as tags_json,
+			n.archived_at,
+			n.deleted_at,
+			n.pinned_at,
+			COUNT(DISTINCT shared.tag_id) AS shared_count
+		FROM
+			notes n
+		INNER JOIN
+			note_tags shared ON n.note_id = shared.note_id
+		WHERE
+			shared.tag_id IN (SELECT tag_id FROM note_tags WHERE note_id = ?)
+			AND n.note_id != ?
+			AND n.deleted_at IS NULL
+			AND n.archived_at IS NULL
+		GROUP BY
+			n.note_id
+		ORDER BY
+			shared_count DESC,
+			n.updated_at DESC
+		LIMIT
+			?
+	`
+
+	rows, err := sqlite.DB.Query(query, noteID, noteID, limit)
+	if err != nil {
+		err = fmt.Errorf("error retrieving related notes: %w", err)
+		slog.Error(err.Error())
+		return notes, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var note Note
+		var tagsJSON string
+		var archivedAt sql.NullTime
+		var deletedAt sql.NullTime
+		var pinnedAt sql.NullTime
+		var sharedCount int
+
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.CreatedAt, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt, &sharedCount)
+		if err != nil {
+			err = fmt.Errorf("error scanning related note: %w", err)
+			slog.Error(err.Error())
+			return notes, err
+		}
+
+		if strings.TrimSpace(tagsJSON) == "" || tagsJSON == "null" {
+			note.Tags = []tags.Tag{}
+		} else {
+			err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+			if err != nil {
+				err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+				slog.Error(err.Error())
+				note.Tags = []tags.Tag{}
+			}
+		}
+
+		note.IsArchived = archivedAt.Valid
+		note.IsDeleted = deletedAt.Valid
+		note.IsPinned = pinnedAt.Valid
+		notes = append(notes, note)
+	}
+
+	return notes, nil
+}

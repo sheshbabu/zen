@@ -91,6 +91,7 @@ func newRouter() *http.ServeMux {
 
 	addPrivateRoute(mux, "GET /api/notes/", notes.HandleGetNotes)
 	addPrivateRoute(mux, "GET /api/notes/{noteId}/", notes.HandleGetNote)
+	addPrivateRoute(mux, "GET /api/notes/{noteId}/related/", notes.HandleGetRelatedNotes)
 	addPrivateRoute(mux, "POST /api/notes/", notes.HandleCreateNote)
 	addPrivateRoute(mux, "PUT /api/notes/{noteId}/", notes.HandleUpdateNote)
 	addPrivateRoute(mux, "DELETE /api/notes/bulk/", notes.HandleBulkSoftDeleteNotes)

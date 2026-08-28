@@ -137,6 +137,14 @@ async function getNotes(tagId, focusId, isArchived, isDeleted, page) {
   return await request('GET', url);
 }
 
+async function getRelatedNotes(noteId, limit) {
+  let url = `/api/notes/${noteId}/related/`;
+  if (limit) {
+    url += `?limit=${limit}`;
+  }
+  return await request('GET', url);
+}
+
 async function getNoteById(noteId) {
   return await request('GET', `/api/notes/${noteId}/`);
 }
@@ -356,6 +364,7 @@ export default {
   updateFocusMode,
   deleteFocusMode,
   getNotes,
+  getRelatedNotes,
   getNoteById,
   createNote,
   updateNote,

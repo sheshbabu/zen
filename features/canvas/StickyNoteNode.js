@@ -1,6 +1,6 @@
 const fontFamily = getComputedStyle(document.documentElement).getPropertyValue('--font-family').trim();
 
-function create(layer, x, y, onPositionChange, onClick, onDoubleClick, width = 250, height = 250, text = '') {
+function create(layer, x, y, onPositionChange, onClick, onDoubleClick, width = 200, height = 200, text = '') {
   const group = new window.Konva.Group({
     x: x,
     y: y,
@@ -33,7 +33,7 @@ function create(layer, x, y, onPositionChange, onClick, onDoubleClick, width = 2
     width: width - 24,
     height: height - 24,
     text: text,
-    fontSize: 18,
+    fontSize: 14,
     fontFamily: fontFamily,
     fill: '#713f12',
     align: 'left',
@@ -68,11 +68,13 @@ function create(layer, x, y, onPositionChange, onClick, onDoubleClick, width = 2
     }
   });
 
-  group.on('click tap', (e) => {
+  group.on('click', (e) => {
     if (onClick) {
       onClick(group, e);
     }
+  });
 
+  group.on('dblclick', () => {
     if (onDoubleClick) {
       onDoubleClick(group, textNode);
     }

@@ -114,3 +114,22 @@
         margin: 0 4px;
     }
 }
+
+.canvas-toolbar .segmented-control {
+    height: 32px;
+}
+
+.canvas-toolbar .segmented-control .segment {
+    height: 24px;
+    padding: 0 12px;
+    color: var(--text-secondary);
+}
+
+.canvas-toolbar .segmented-control .segment.selected {
+    color: var(--text-primary);
+}
+
+.canvas-toolbar .segmented-control .segment svg {
+    width: 14px;
+    height: 14px;
+}

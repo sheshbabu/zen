@@ -364,3 +364,30 @@ func HandleDeleteNotes(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 }
+
+func HandleGetRelatedNotes(w http.ResponseWriter, r *http.Request) {
+	noteIDStr := r.PathValue("noteId")
+	noteID, err := strconv.Atoi(noteIDStr)
+	if err != nil {
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", "Invalid note ID", err, http.StatusBadRequest)
+		return
+	}
+
+	limit := 20
+	limitStr := r.URL.Query().Get("limit")
+	if limitStr != "" {
+		parsedLimit, err := strconv.Atoi(limitStr)
+		if err == nil && parsedLimit > 0 && parsedLimit <= 100 {
+			limit = parsedLimit
+		}
+	}
+
+	relatedNotes, err := GetRelatedNotes(noteID, limit)
+	if err != nil {
+		utils.SendErrorResponse(w, "RELATED_NOTES_READ_FAILED", "Error fetching related notes.", err, http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(relatedNotes)
+}

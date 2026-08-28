@@ -5,6 +5,7 @@ import ImageNode from './ImageNode.js';
 import StickyNoteNode from './StickyNoteNode.js';
 import CanvasNotePicker from './CanvasNotePicker.jsx';
 import CanvasToolbar from './CanvasToolbar.jsx';
+import CanvasSelectionBar from './CanvasSelectionBar.jsx';
 import JsonCanvas from './JsonCanvas.js';
 import CanvasPreview from './CanvasPreview.js';
 import ViewportManager from './ViewportManager.js';
@@ -27,7 +28,8 @@ export default function CanvasPage({ canvasId }) {
   const [items, setItems] = useState(new Set());
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const [hasMultiSelection, setHasMultiSelection] = useState(false);
+  const [selectionCount, setSelectionCount] = useState(0);
+  const [selectionRect, setSelectionRect] = useState(null);
   const [isPanMode, setIsPanMode] = useState(false);
   const [canvasTitle, setCanvasTitle] = useState('');
   const isPanModeRef = useRef(false);
@@ -96,6 +98,7 @@ export default function CanvasPage({ canvasId }) {
 
     stage.on('mousemove', () => {
       if (viewportManager.updatePan()) {
+        updateSelectionBar();
         return;
       }
 
@@ -113,7 +116,7 @@ export default function CanvasPage({ canvasId }) {
         if (transformerManagerRef.current !== null) {
           transformerManagerRef.current.attachToNodes(Array.from(selectedNodes));
         }
-        setHasMultiSelection(selectedNodes.size >= 2);
+        updateSelectionBar();
       }
     });
 
@@ -130,8 +133,8 @@ export default function CanvasPage({ canvasId }) {
           viewportManager.setViewport(restored.viewport);
           setZoomLevel(restored.viewport.scale);
         } else {
-          stage.scale({ x: 0.75, y: 0.75 });
-          setZoomLevel(0.75);
+          stage.scale({ x: 1, y: 1 });
+          setZoomLevel(1);
         }
 
         if (restored.nodes.length > 0) {
@@ -175,10 +178,20 @@ export default function CanvasPage({ canvasId }) {
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'd' && isTyping !== true) {
         e.preventDefault();
         handleDuplicateSelected();
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'a' && isTyping !== true) {
+        e.preventDefault();
+        handleSelectAll();
       }
     }
 
-    stage.on('wheel', viewportManager.handleWheel);
+    stage.on('wheel', e => {
+      viewportManager.handleWheel(e);
+      updateSelectionBar();
+    });
+
+    stage.on('dragmove', () => {
+      updateSelectionBar();
+    });
 
     window.addEventListener('resize', handleResize);
     window.addEventListener('keydown', handleKeyDown);
@@ -315,12 +328,46 @@ export default function CanvasPage({ canvasId }) {
     if (transformerManagerRef.current !== null) {
       const selectedNodes = selectionManagerRef.current.getSelectedNodes();
       transformerManagerRef.current.attachToNodes(Array.from(selectedNodes));
-      setHasMultiSelection(selectedNodes.size >= 2);
+      updateSelectionBar();
     }
 
     if (stageRef.current !== null) {
       stageRef.current.layer.draw();
     }
+  }
+
+  // Selection lives in Konva, which Preact cannot observe, so the bar's count and
+  // bounding rect are derived into state here. Also called on pan and zoom, where
+  // the selection is unchanged but its on-screen rect moves.
+  function updateSelectionBar() {
+    if (selectionManagerRef.current === null) {
+      setSelectionCount(0);
+      setSelectionRect(null);
+      return;
+    }
+
+    const selectedNodes = Array.from(selectionManagerRef.current.getSelectedNodes());
+    setSelectionCount(selectedNodes.length);
+
+    if (selectedNodes.length === 0) {
+      setSelectionRect(null);
+      return;
+    }
+
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    selectedNodes.forEach(node => {
+      const box = node.getClientRect();
+      if (box.x < minX) { minX = box.x; }
+      if (box.y < minY) { minY = box.y; }
+      if (box.x + box.width > maxX) { maxX = box.x + box.width; }
+      if (box.y + box.height > maxY) { maxY = box.y + box.height; }
+    });
+
+    setSelectionRect({ x: minX, y: minY, width: maxX - minX, height: maxY - minY });
   }
 
   function handleDeleteSelected() {
@@ -358,7 +405,7 @@ export default function CanvasPage({ canvasId }) {
     if (transformerManagerRef.current !== null) {
       transformerManagerRef.current.detach();
     }
-    setHasMultiSelection(false);
+    updateSelectionBar();
     stageRef.current.layer.draw();
     debouncedSave();
   }
@@ -369,84 +416,52 @@ export default function CanvasPage({ canvasId }) {
     }
 
     const selectedNodes = selectionManagerRef.current.getSelectedNodes();
-    if (selectedNodes.size === 0) {
+    if (selectedNodes.size !== 1) {
+      return;
+    }
+
+    const nodeGroup = Array.from(selectedNodes)[0];
+    const nodeData = nodesRef.current.find(n => n.group === nodeGroup);
+
+    if (nodeData === undefined || nodeData.type !== 'sticky') {
       return;
     }
 
     const { layer } = stageRef.current;
-    const nodesToDuplicate = Array.from(selectedNodes);
-    const newGroups = [];
 
     selectionManagerRef.current.deselectAll();
     if (transformerManagerRef.current !== null) {
       transformerManagerRef.current.detach();
     }
 
-    nodesToDuplicate.forEach(nodeGroup => {
-      const nodeData = nodesRef.current.find(n => n.group === nodeGroup);
-      if (nodeData !== undefined) {
-        const offsetX = 20;
-        const offsetY = 20;
-        const newX = nodeGroup.x() + offsetX;
-        const newY = nodeGroup.y() + offsetY;
+    const offsetX = 20;
+    const offsetY = 20;
+    const newX = nodeGroup.x() + offsetX;
+    const newY = nodeGroup.y() + offsetY;
 
-        let newGroup;
-        if (nodeData.type === 'note') {
-          newGroup = NoteNode.create(
-            layer,
-            nodeData.item,
-            newX,
-            newY,
-            debouncedSave,
-            handleNodeClick,
-            handleNoteDoubleClick,
-            nodeGroup.width(),
-            nodeGroup.height()
-          );
-          nodesRef.current.push({ id: nodeData.item.noteId, group: newGroup, item: nodeData.item, type: 'note' });
-        } else if (nodeData.type === 'image') {
-          newGroup = ImageNode.create(
-            layer,
-            nodeData.item,
-            newX,
-            newY,
-            debouncedSave,
-            handleNodeClick,
-            handleImageDoubleClick,
-            nodeGroup.width(),
-            nodeGroup.height()
-          );
-          nodesRef.current.push({ id: nodeData.item.filename, group: newGroup, item: nodeData.item, type: 'image' });
-        } else if (nodeData.type === 'sticky') {
-          const text = StickyNoteNode.getText(nodeGroup);
-          const newId = `sticky-${Date.now()}-${stickyNoteCounterRef.current++}`;
-          newGroup = StickyNoteNode.create(
-            layer,
-            newX,
-            newY,
-            debouncedSave,
-            handleNodeClick,
-            handleStickyNoteClick,
-            nodeGroup.width(),
-            nodeGroup.height(),
-            text
-          );
-          nodesRef.current.push({ id: newId, group: newGroup, item: { id: newId, text }, type: 'sticky' });
-        }
+    const text = StickyNoteNode.getText(nodeGroup);
+    const newId = `sticky-${Date.now()}-${stickyNoteCounterRef.current++}`;
+    const newGroup = StickyNoteNode.create(
+      layer,
+      newX,
+      newY,
+      debouncedSave,
+      handleNodeClick,
+      handleStickyNoteClick,
+      nodeGroup.width(),
+      nodeGroup.height(),
+      text
+    );
+    nodesRef.current.push({ id: newId, group: newGroup, item: { id: newId, text }, type: 'sticky' });
 
-        if (newGroup !== undefined) {
-          newGroup.setSelected(true);
-          newGroups.push(newGroup);
-          selectionManagerRef.current.getSelectedNodes().add(newGroup);
-        }
-      }
-    });
+    newGroup.setSelected(true);
+    selectionManagerRef.current.getSelectedNodes().add(newGroup);
 
-    if (transformerManagerRef.current !== null && newGroups.length > 0) {
-      transformerManagerRef.current.attachToNodes(newGroups);
+    if (transformerManagerRef.current !== null) {
+      transformerManagerRef.current.attachToNodes([newGroup]);
     }
 
-    setHasMultiSelection(newGroups.length >= 2);
+    updateSelectionBar();
     layer.draw();
     debouncedSave();
   }
@@ -530,6 +545,8 @@ export default function CanvasPage({ canvasId }) {
       transformerManagerRef.current.attachToNodes(Array.from(selectedNodes));
     }
 
+    updateSelectionBar();
+
     if (stageRef.current !== null) {
       stageRef.current.layer.draw();
     }
@@ -573,8 +590,10 @@ export default function CanvasPage({ canvasId }) {
     const stage = stageRef.current.stage;
     stage.container().style.cursor = 'text';
 
+    const scale = stage.scaleX();
     const areaPosition = textNode.getAbsolutePosition();
     const stageBox = stage.container().getBoundingClientRect();
+    const originalText = textNode.text();
 
     textNode.hide();
     stageRef.current.layer.draw();
@@ -582,17 +601,17 @@ export default function CanvasPage({ canvasId }) {
     const textarea = document.createElement('textarea');
     document.body.appendChild(textarea);
 
-    textarea.value = textNode.text();
+    textarea.value = originalText;
     textarea.style.position = 'absolute';
     textarea.style.top = `${areaPosition.y + stageBox.top}px`;
     textarea.style.left = `${areaPosition.x + stageBox.left}px`;
     textarea.style.width = `${textNode.width()}px`;
     textarea.style.height = `${textNode.height()}px`;
-    textarea.style.fontSize = '18px';
+    textarea.style.fontSize = `${textNode.fontSize()}px`;
     textarea.style.border = 'none';
     textarea.style.padding = '0';
     textarea.style.margin = '0';
-    textarea.style.overflow = 'hidden';
+    textarea.style.overflow = 'auto';
     textarea.style.background = 'transparent';
     textarea.style.outline = 'none';
     textarea.style.resize = 'none';
@@ -603,41 +622,53 @@ export default function CanvasPage({ canvasId }) {
     textarea.style.color = textNode.fill();
 
     const rotation = group.rotation();
-    let transform = '';
+    let transform = `scale(${scale})`;
     if (rotation) {
-      transform += `rotateZ(${rotation}deg)`;
+      transform += ` rotateZ(${rotation}deg)`;
     }
-
-    const px = 0;
-    const py = 0;
-    const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-    if (isFirefox) {
-      transform += `translateY(-${py + 2}px)`;
-    }
-
     textarea.style.transform = transform;
-    textarea.style.height = 'auto';
 
     textarea.focus();
 
-    function removeTextarea() {
+    let isRemoved = false;
+
+    function removeTextarea(shouldCommit) {
+      if (isRemoved) {
+        return;
+      }
+      isRemoved = true;
+
+      textarea.removeEventListener('blur', handleBlur);
       textarea.parentNode.removeChild(textarea);
       stage.container().style.cursor = 'default';
-      textNode.text(textarea.value);
+
+      const newText = shouldCommit ? textarea.value : originalText;
+      textNode.text(newText);
       textNode.show();
-      StickyNoteNode.setText(group, textarea.value);
+      StickyNoteNode.setText(group, newText);
       stageRef.current.layer.draw();
-      debouncedSave();
+
+      if (newText !== originalText) {
+        debouncedSave();
+      }
+    }
+
+    function handleBlur() {
+      removeTextarea(true);
     }
 
     textarea.addEventListener('keydown', (e) => {
       e.stopPropagation();
+
       if (e.key === 'Escape') {
-        removeTextarea();
+        removeTextarea(false);
+      } else if (e.key === 'Enter' && e.shiftKey !== true) {
+        e.preventDefault();
+        removeTextarea(true);
       }
     });
 
-    textarea.addEventListener('blur', removeTextarea);
+    textarea.addEventListener('blur', handleBlur);
   }
 
   function handleImageDoubleClick(imageItem) {
@@ -743,7 +774,17 @@ export default function CanvasPage({ canvasId }) {
   if (isKonvaReady !== true) {
     content = <div className="canvas-loading">Loading...</div>;
   } else {
-    content = <div ref={containerRef} className="canvas-container" />;
+    content = (
+      <div className="canvas-container">
+        <div ref={containerRef} className="canvas-stage" />
+        <CanvasSelectionBar
+          rect={selectionRect}
+          selectionCount={selectionCount}
+          onDelete={handleDeleteSelected}
+          onAlign={handleAlign}
+        />
+      </div>
+    );
   }
 
   return (
@@ -752,16 +793,12 @@ export default function CanvasPage({ canvasId }) {
         onBack={handleBack}
         title={canvasTitle}
         onTitleChange={handleTitleChange}
-        onDelete={handleDeleteSelected}
-        onDuplicate={handleDuplicateSelected}
         onZoom={handleZoom}
         zoomLevel={zoomLevel}
         onToggleSidebar={handleToggleSidebar}
         isSidebarOpen={isSidebarOpen}
         onTogglePanMode={handleTogglePanMode}
         isPanMode={isPanMode}
-        onAlign={handleAlign}
-        hasMultiSelection={hasMultiSelection}
         onAddStickyNote={handleAddStickyNote}
       />
       {content}
