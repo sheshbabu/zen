@@ -32,7 +32,7 @@ function NotesPageContent({ noteId }) {
   const [isMultiSelect, setIsMultiSelect] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
 
-  const { refreshTags, refreshFocusModes } = useAppContext();
+  const { refreshTags } = useAppContext();
   const {
     notes,
     selectedNote,
@@ -67,24 +67,15 @@ function NotesPageContent({ noteId }) {
   let editorClassName = "notes-editor-container";
 
   useEffect(() => {
-    refreshNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage);
-    refreshImages(selectedTagId, selectedFocusId);
-    refreshTags(selectedFocusId);
-    refreshFocusModes();
-  }, [refreshNotes, refreshImages, refreshTags, refreshFocusModes]);
-
-  useEffect(() => {
     // Reset to avoid showing incorrect notes
     resetPagination();
 
-    refreshNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage);
-    refreshImages(selectedTagId, selectedFocusId);
     refreshTags(selectedFocusId);
 
     // Reload preference
     const savedView = ViewPreferences.getPreference(selectedFocusId, selectedTagId, isArchivesPage, isTrashPage);
     setSelectedView(savedView);
-  }, [selectedTagId, selectedFocusId, isArchivesPage, isTrashPage, resetPagination, refreshNotes, refreshImages, refreshTags]);
+  }, [selectedTagId, selectedFocusId, isArchivesPage, isTrashPage, resetPagination, refreshTags]);
 
   useEffect(() => {
     refreshNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage, notesPageNumber);
