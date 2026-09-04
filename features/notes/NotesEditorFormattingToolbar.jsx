@@ -1,5 +1,5 @@
 import { h } from "../../assets/preact.esm.js"
-import { BoldIcon, ItalicIcon, StrikethroughIcon, HighlightIcon, CodeIcon, Heading1Icon, Heading2Icon, Heading3Icon, ListIcon, ListOrderedIcon, ListTodoIcon, QuoteIcon, LinkIcon, SeparatorIcon } from '../../commons/components/Icon.jsx';
+import { BoldIcon, ItalicIcon, StrikethroughIcon, HighlightIcon, CodeIcon, Heading1Icon, Heading2Icon, Heading3Icon, ListIcon, ListOrderedIcon, ListTodoIcon, QuoteIcon, LinkIcon, SeparatorIcon, TableIcon, TablePropertiesIcon } from '../../commons/components/Icon.jsx';
 
 export default function NotesEditorFormattingToolbar({ isEditable, onFormat }) {
   if (!isEditable) {
@@ -59,6 +59,15 @@ export default function NotesEditorFormattingToolbar({ isEditable, onFormat }) {
         </button>
         <button type="button" className="formatting-button" onClick={() => onFormat("hr")} title="Horizontal Rule">
           <SeparatorIcon />
+        </button>
+      </div>
+
+      <div className="formatting-toolbar-group">
+        <button type="button" className="formatting-button" onClick={() => onFormat("insertTable")} title="Insert Table">
+          <TableIcon />
+        </button>
+        <button type="button" className="formatting-button" onClick={() => onFormat("editTable")} title="Edit Table">
+          <TablePropertiesIcon />
         </button>
       </div>
     </div>

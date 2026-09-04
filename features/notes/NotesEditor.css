@@ -555,10 +555,10 @@
                 box-shadow: none;
             }
 
-            svg.lucide {
-                width: 16px;
-                height: 16px;
-                stroke: currentColor;
+            svg.material-icon {
+                width: 20px;
+                height: 20px;
+                fill: var(--neutral-500);
             }
 
             strong,

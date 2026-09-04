@@ -10,6 +10,7 @@ import navigateTo from '../../commons/utils/navigateTo.js';
 import isMobile from '../../commons/utils/isMobile.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
 import NotePreviewModal from './NotePreviewModal.jsx';
+import TableEditorModal from './TableEditorModal.jsx';
 import NotesEditorMenu from './NotesEditorMenu.jsx';
 import Button from '../../commons/components/Button.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
@@ -143,6 +144,29 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     onInsertAtCursor: insertAtCursor,
     onFormatText: applyMarkdownFormat
   });
+
+  function handleEditorActions(action, placeholder) {
+    if (action !== "insertTable" && action !== "editTable") {
+      applyMarkdownFormat(action, placeholder);
+      return;
+    }
+
+    const textarea = textareaRef.current;
+    const startPos = textarea.selectionStart;
+    const endPos = textarea.selectionEnd;
+    const isEditing = action === "editTable";
+    const selectedText = textarea.value.substring(startPos, endPos);
+
+    const beforeText = textarea.value.substring(0, startPos);
+    const afterText = textarea.value.substring(endPos);
+
+    function handleConfirm(tableMarkdown) {
+      closeModal();
+      setContent(beforeText + tableMarkdown + afterText);
+    }
+
+    openModal(<TableEditorModal isEditing={isEditing} selectedText={selectedText} beforeText={beforeText} afterText={afterText} onConfirm={handleConfirm} onCloseClick={() => closeModal()} />);
+  }
 
   function handleContentInput() {
     handleTextAreaHeight();
@@ -443,7 +467,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
       <NotesEditorTags tags={tags} isEditable={isEditable} canCreateTag onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
       {imageDropzone}
       {imageAttachmentPreview}
-      <NotesEditorFormattingToolbar isEditable={isEditable} onFormat={applyMarkdownFormat} />
+      <NotesEditorFormattingToolbar isEditable={isEditable} onFormat={handleEditorActions} />
       <div className="notes-editor-content">
         {contentArea}
       </div>
