@@ -244,6 +244,28 @@
                 }
             }
 
+            .settings-toggle-option {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--spacing-4);
+                margin-top: var(--spacing-4);
+
+                .settings-toggle-info {
+                    .settings-toggle-label {
+                        font: var(--sm);
+                        font-weight: 600;
+                        color: var(--text-primary);
+                        margin-bottom: 4px;
+                    }
+
+                    .settings-toggle-description {
+                        font: var(--sm);
+                        color: var(--text-secondary);
+                    }
+                }
+            }
+
             .theme-selector {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));

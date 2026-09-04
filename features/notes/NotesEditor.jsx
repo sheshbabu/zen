@@ -21,6 +21,7 @@ import { useVisibleHeadings } from "./useVisibleHeadings.js";
 import useEditorKeyboardShortcuts from "./useEditorKeyboardShortcuts.js";
 import useImageUpload from "./useImageUpload.js";
 import useMarkdownFormatter from "./useMarkdownFormatter.js";
+import useAutoSave from "./useAutoSave.js";
 import "./NotesEditor.css";
 import { SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
 
@@ -47,6 +48,17 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   const { insertAtCursor, applyMarkdownFormat } = useMarkdownFormatter({
     textareaRef,
     setContent
+  });
+
+  const tagsRef = useRef(tags);
+  tagsRef.current = tags;
+
+  const { scheduleAutoSave, cancelAutoSave } = useAutoSave({
+    isNewNote,
+    noteId: selectedNote?.noteId,
+    titleRef,
+    textareaRef,
+    tagsRef
   });
 
   const {
@@ -93,6 +105,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
 
     let promise = null;
     setIsSaveLoading(true);
+    cancelAutoSave();
 
     if (isNewNote) {
       promise = ApiClient.createNote(note);
@@ -130,6 +143,11 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     onFormatText: applyMarkdownFormat
   });
 
+  function handleContentInput() {
+    handleTextAreaHeight();
+    scheduleAutoSave();
+  }
+
   function handleTextAreaHeight() {
     if (textareaRef.current === null) {
       return;
@@ -147,6 +165,8 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   }
 
   function handleEditCancelClick() {
+    cancelAutoSave();
+
     if (isNewNote) {
       if (onClose) {
         onClose();
@@ -177,6 +197,8 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   }
 
   function handleCloseClick() {
+    cancelAutoSave();
+
     if (onClose) {
       onClose();
     } else {
@@ -193,6 +215,8 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   }
 
   function handleDeleteConfirmClick() {
+    cancelAutoSave();
+
     ApiClient.deleteNote(selectedNote.noteId)
       .then(() => {
         handleDeleteCloseClick();
@@ -335,7 +359,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
         spellCheck="false"
         ref={textareaRef}
         value={content}
-        onInput={handleTextAreaHeight}
+        onInput={handleContentInput}
         onBlur={e => setContent(e.target.value)}
       />
     );
