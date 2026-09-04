@@ -22,6 +22,7 @@ import useEditorKeyboardShortcuts from "./useEditorKeyboardShortcuts.js";
 import useImageUpload from "./useImageUpload.js";
 import useMarkdownFormatter from "./useMarkdownFormatter.js";
 import useAutoSave from "./useAutoSave.js";
+import SpellcheckPreferences from "../../commons/preferences/SpellcheckPreferences.js";
 import "./NotesEditor.css";
 import { SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
 
@@ -351,12 +352,14 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     }, 0);
   }
 
+  const spellcheckValue = SpellcheckPreferences.isEnabled() ? "true" : "false";
+
   if (isEditable) {
     contentArea = (
       <textarea
         className="notes-editor-textarea"
         placeholder="Write here..."
-        spellCheck="false"
+        spellCheck={spellcheckValue}
         ref={textareaRef}
         value={content}
         onInput={handleContentInput}
@@ -435,7 +438,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
         onShareClick={handleShareClick}
       />
       <div className="notes-editor-header">
-        <div className="notes-editor-title" contentEditable={isEditable} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
+        <div className="notes-editor-title" contentEditable={isEditable} spellCheck={spellcheckValue} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
       </div>
       <NotesEditorTags tags={tags} isEditable={isEditable} canCreateTag onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
       {imageDropzone}
