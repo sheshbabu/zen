@@ -278,8 +278,7 @@ svg.lucide {
 
 .tag {
     display: inline-flex;
-    align-items: center;
-    padding: var(--spacing-1) var(--spacing-2);
+    align-items: stretch;
     margin-right: var(--spacing-1);
     margin-bottom: var(--spacing-1);
     border-radius: 4px;
@@ -293,19 +292,6 @@ svg.lucide {
     text-decoration: none;
     user-select: none;
 
-    svg.lucide {
-        height: 14px;
-        width: 14px;
-        margin-left: var(--spacing-1);
-
-        line,
-        circle,
-        rect,
-        path {
-            stroke: var(--neutral-400);
-        }
-    }
-
     &:hover {
         color: var(--neutral-500);
         background-color: var(--neutral-200);
@@ -314,5 +300,63 @@ svg.lucide {
     &:active {
         transform: scale(0.97);
         transition: transform var(--transition-fast) ease-out;
+    }
+
+    &:not(.is-editable) {
+        padding: var(--spacing-1) var(--spacing-2);
+        align-items: center;
+    }
+
+    &.is-editable {
+        cursor: default;
+
+        .tag-label {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-1) var(--spacing-2);
+        }
+
+        .tag-remove {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            border-radius: 4px;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            cursor: pointer;
+            transition: background-color var(--transition-normal);
+
+            svg.lucide {
+                height: 16px;
+                width: 16px;
+
+                line,
+                circle,
+                rect,
+                path {
+                    stroke: var(--neutral-500);
+                }
+            }
+
+            &:hover {
+                background-color: var(--neutral-300);
+
+                svg.lucide {
+
+                    line,
+                    circle,
+                    rect,
+                    path {
+                        stroke: var(--neutral-500);
+                    }
+                }
+            }
+
+            &:active {
+                transform: scale(0.97);
+                transition: transform var(--transition-fast) ease-out;
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
 import { h, Fragment, useState, useEffect, useRef } from "../../assets/preact.esm.js"
 import ApiClient from '../../commons/http/ApiClient.js';
-import { RemoveIcon } from "../../commons/components/Icon.jsx";
+import { CloseIcon } from "../../commons/components/Icon.jsx";
 import Link from "../../commons/components/Link.jsx";
 
 export default function NotesEditorTags({ tags, isEditable, canCreateTag, placeholder = "Add Tags...", onAddTag, onRemoveTag }) {
@@ -155,9 +155,11 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, placeh
 function TagItem({ tag, isEditable, onRemoveTag }) {
   if (isEditable) {
     return (
-      <div className="tag" key={tag.tagId}>
-        {tag.name}
-        <RemoveIcon onClick={onRemoveTag} />
+      <div className="tag is-editable" key={tag.tagId}>
+        <span className="tag-label">{tag.name}</span>
+        <span className="tag-remove" onClick={onRemoveTag}>
+          <CloseIcon />
+        </span>
       </div>
     );
   }
