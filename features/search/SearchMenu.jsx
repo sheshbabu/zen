@@ -1,22 +1,29 @@
 import { h, useEffect, useState, useRef } from "../../assets/preact.esm.js"
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
-import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon, TagIcon } from "../../commons/components/Icon.jsx";
+import { SearchIcon, NoteIcon, ArchiveIcon, TrashIcon, TagIcon, PanelRightIcon } from "../../commons/components/Icon.jsx";
 import { ModalBackdrop, ModalContainer, closeModal, openModal } from "../../commons/components/Modal.jsx";
 import Lightbox from "../../commons/components/Lightbox.jsx";
 import SearchHistory from "../../commons/preferences/SearchHistory.js";
+import SearchPreviewPreferences from "../../commons/preferences/SearchPreviewPreferences.js";
 import Tabs from "../../commons/components/Tabs.jsx";
+import SearchPreview from "./SearchPreview.jsx";
+import SearchSortDropdown, { SORT_OPTIONS } from "./SearchSortDropdown.jsx";
 import "./SearchMenu.css";
 
 export default function SearchMenu() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState({ lexical_notes: [], semantic_notes: [], semantic_images: [], tags: [] });
+  const [hasSearched, setHasSearched] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchHistory, setSearchHistory] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
+  const [isPreviewVisible, setIsPreviewVisible] = useState(SearchPreviewPreferences.isVisible());
+  const [activeSort, setActiveSort] = useState(SORT_OPTIONS[0].value);
 
   const inputRef = useRef(null);
   const debounceTimerRef = useRef(null);
+  const isPointerActiveRef = useRef(false);
 
   function handleCloseModal() {
     closeModal();
@@ -40,19 +47,39 @@ export default function SearchMenu() {
     if (value.trim() === "") {
       setResults({ lexical_notes: [], semantic_notes: [], semantic_images: [], tags: [] });
       setSelectedItem(searchHistory.length > 0 ? searchHistory[0] : null);
+      setHasSearched(false);
       return;
     }
 
+    setHasSearched(false);
+
     debounceTimerRef.current = setTimeout(() => {
-      ApiClient.search(value)
-        .then(searchResults => {
-          setResults(searchResults);
-          const allItems = [...searchResults.lexical_notes, ...searchResults.semantic_notes, ...searchResults.semantic_images, ...searchResults.tags];
-          if (allItems.length > 0) {
-            setSelectedItem(allItems[0]);
-          }
-        });
+      runSearch(value, activeSort);
     }, 200);
+  }
+
+  function runSearch(value, sort) {
+    ApiClient.search(value, sort)
+      .then(searchResults => {
+        setResults(searchResults);
+        setHasSearched(true);
+        const allItems = [...searchResults.lexical_notes, ...searchResults.semantic_notes, ...searchResults.semantic_images, ...searchResults.tags];
+        if (allItems.length > 0) {
+          setSelectedItem(allItems[0]);
+        }
+      });
+  }
+
+  function handleSortChange(sort) {
+    setActiveSort(sort);
+
+    if (query.trim() !== "") {
+      runSearch(query, sort);
+    }
+
+    if (inputRef.current !== null) {
+      inputRef.current.focus();
+    }
   }
 
   function handleKeyDown(e) {
@@ -71,8 +98,10 @@ export default function SearchMenu() {
       return;
     }
 
+    const isHistoryMode = query.trim() === "";
+
     let allItems = [];
-    if (query.trim() === "") {
+    if (isHistoryMode === true) {
       allItems = searchHistory;
     } else if (activeTab === "all") {
       allItems = [...results.lexical_notes, ...results.semantic_notes, ...results.semantic_images, ...results.tags];
@@ -83,6 +112,7 @@ export default function SearchMenu() {
     }
 
     if (e.key === "ArrowDown") {
+      isPointerActiveRef.current = false;
       const nextIndex = allItems.indexOf(selectedItem) + 1;
       if (nextIndex < allItems.length) {
         setSelectedItem(allItems[nextIndex]);
@@ -93,6 +123,7 @@ export default function SearchMenu() {
     }
 
     if (e.key === "ArrowUp") {
+      isPointerActiveRef.current = false;
       const prevIndex = allItems.indexOf(selectedItem) - 1;
       if (prevIndex >= 0) {
         setSelectedItem(allItems[prevIndex]);
@@ -108,6 +139,28 @@ export default function SearchMenu() {
     }
   }
 
+
+  function handleTogglePreviewClick() {
+    const nextIsVisible = isPreviewVisible !== true;
+    setIsPreviewVisible(nextIsVisible);
+    SearchPreviewPreferences.setVisible(nextIsVisible);
+
+    // Keep keyboard navigation working after clicking the toggle
+    if (inputRef.current !== null) {
+      inputRef.current.focus();
+    }
+  }
+
+  function handleResultsMouseMove() {
+    isPointerActiveRef.current = true;
+  }
+
+  function handleResultMouseEnter(item) {
+    if (isPointerActiveRef.current !== true) {
+      return;
+    }
+    setSelectedItem(item);
+  }
 
   function handleResultClick(item) {
     if (item.noteId) {
@@ -144,7 +197,7 @@ export default function SearchMenu() {
     const historyItems = searchHistory.map((item, index) => {
       const isSelected = (item.noteId && item.noteId === selectedItem?.noteId) || (item.tagId && item.tagId === selectedItem?.tagId);
       return (
-        <SearchResultItem key={`history-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
+        <SearchResultItem key={`history-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} onMouseEnter={() => handleResultMouseEnter(item)} />
       )
     });
 
@@ -163,7 +216,7 @@ export default function SearchMenu() {
         const noteItems = results.lexical_notes.map((item, index) => {
           const isSelected = item.noteId === selectedItem?.noteId;
           return (
-            <SearchResultItem key={`lexical-note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
+            <SearchResultItem key={`lexical-note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} onMouseEnter={() => handleResultMouseEnter(item)} />
           )
         });
 
@@ -179,7 +232,7 @@ export default function SearchMenu() {
         const noteItems = results.semantic_notes.map((item, index) => {
           const isSelected = item.noteId === selectedItem?.noteId;
           return (
-            <SearchResultItem key={`semantic-note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
+            <SearchResultItem key={`semantic-note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} onMouseEnter={() => handleResultMouseEnter(item)} />
           )
         });
 
@@ -195,7 +248,7 @@ export default function SearchMenu() {
         semanticImagesSection = (
           <div className="search-section">
             <h4 className="search-section-title">Similar Images</h4>
-            <SearchResultImages items={results.semantic_images} onClick={handleResultClick} />
+            <SearchResultImages items={results.semantic_images} onClick={handleResultClick} onMouseEnter={handleResultMouseEnter} />
           </div>
         );
       }
@@ -206,7 +259,7 @@ export default function SearchMenu() {
         const tagItems = results.tags.map((item, index) => {
           const isSelected = item.tagId === selectedItem?.tagId;
           return (
-            <SearchResultItem key={`tag-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} />
+            <SearchResultItem key={`tag-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} onMouseEnter={() => handleResultMouseEnter(item)} />
           )
         });
 
@@ -220,10 +273,36 @@ export default function SearchMenu() {
     }
   }
 
+  let emptySection = null;
+  const hasVisibleResults = lexicalNotesSection !== null || semanticNotesSection !== null || semanticImagesSection !== null || tagsSection !== null;
+
+  if (query.trim() !== "" && hasSearched === true && hasVisibleResults === false) {
+    emptySection = (
+      <div className="search-empty">
+        No results for "{query}"
+      </div>
+    );
+  }
+
+  // Only lexical results from the current search carry full content. History items are
+  // localStorage snapshots that may be stale, so they must be refetched by the preview.
+  const hasInlineContent = results.lexical_notes.includes(selectedItem);
+
+  let previewSection = null;
+  if (isPreviewVisible === true) {
+    previewSection = <SearchPreview item={selectedItem} hasInlineContent={hasInlineContent} />;
+  }
+
   const showTabs = query.trim() !== "";
 
   let tabsSection = null;
   if (showTabs === true) {
+    // Sort only reorders the Notes section, so hide it when only tags are shown
+    let sortSection = null;
+    if (activeTab !== "tags") {
+      sortSection = <SearchSortDropdown activeSort={activeSort} onSortChange={handleSortChange} />;
+    }
+
     tabsSection = (
       <div className="search-tabs">
         <Tabs
@@ -231,6 +310,7 @@ export default function SearchMenu() {
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />
+        {sortSection}
       </div>
     );
   }
@@ -243,27 +323,35 @@ export default function SearchMenu() {
           <input
             type="text"
             placeholder="Search..."
+            spellCheck="false"
             ref={inputRef}
             value={query}
             onInput={handleChange}
             onKeyDown={handleKeyDown}
             onKeyUp={handleKeyUp}
           />
+          <button className={`search-preview-toggle ${isPreviewVisible === true ? "is-active" : ""}`} onClick={handleTogglePreviewClick}>
+            <PanelRightIcon />
+          </button>
         </div>
         {tabsSection}
-        <div className="search-results-container">
-          {historySection}
-          {lexicalNotesSection}
-          {semanticNotesSection}
-          {semanticImagesSection}
-          {tagsSection}
+        <div className={`search-modal-body ${isPreviewVisible === true ? "has-preview" : ""}`}>
+          <div className="search-results-container" onMouseMove={handleResultsMouseMove}>
+            {historySection}
+            {lexicalNotesSection}
+            {semanticNotesSection}
+            {semanticImagesSection}
+            {tagsSection}
+            {emptySection}
+          </div>
+          {previewSection}
         </div>
       </ModalContainer>
     </ModalBackdrop>
   );
 }
 
-function SearchResultItem({ item, isSelected, onClick }) {
+function SearchResultItem({ item, isSelected, onClick, onMouseEnter }) {
   let icon = <NoteIcon />
   let title = item.title || item.name
   let subtitle = ""
@@ -290,7 +378,7 @@ function SearchResultItem({ item, isSelected, onClick }) {
   }
 
   return (
-    <div className={`search-result-item ${isSelected ? "is-selected" : ""}`} onClick={onClick}>
+    <div className={`search-result-item ${isSelected ? "is-selected" : ""}`} onClick={onClick} onMouseEnter={onMouseEnter}>
       {icon}
       <div className="search-result-item-content">
         <p className="title" dangerouslySetInnerHTML={{ __html: displayTitle }}></p>
@@ -300,8 +388,8 @@ function SearchResultItem({ item, isSelected, onClick }) {
   );
 }
 
-function SearchResultImages({ items, onClick }) {
-  const images = items.map(item => <img src={`/images/${item.filename}`} key={item.filename} alt={item.description} onClick={() => onClick(item)} />)
+function SearchResultImages({ items, onClick, onMouseEnter }) {
+  const images = items.map(item => <img src={`/images/${item.filename}`} key={item.filename} alt={item.description} onClick={() => onClick(item)} onMouseEnter={() => onMouseEnter(item)} />)
 
   return (
     <div className="search-result-images">

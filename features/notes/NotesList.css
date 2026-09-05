@@ -137,13 +137,14 @@
                 color: var(--neutral-400);
                 align-content: end;
                 white-space: nowrap;
+                flex-shrink: 0;
             }
 
             .notes-list-item-tags {
                 display: flex;
                 gap: 4px;
                 margin-right: 24px;
-                width: 190px;
+                flex: 1;
                 overflow: hidden;
                 white-space: nowrap;
             }

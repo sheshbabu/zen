@@ -1,7 +1,22 @@
 .search-modal {
     width: 600px;
+    max-width: calc(100vw - var(--spacing-8) * 2);
     margin: auto;
     margin-top: 20vh;
+    transition: width var(--transition-fast) ease;
+
+    &:has(.search-modal-body.has-preview) {
+        width: 960px;
+    }
+
+    .search-modal-body {
+        display: grid;
+        grid-template-columns: 1fr;
+
+        &.has-preview {
+            grid-template-columns: 380px 1fr;
+        }
+    }
 
     .search-input-container {
         display: flex;
@@ -21,6 +36,37 @@
             background-color: var(--neutral-100);
             border-radius: 4px;
         }
+
+        .search-preview-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            padding: 0;
+            margin-right: 6px;
+            border: 0;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: transparent;
+            color: var(--text-secondary);
+            transition: background-color var(--transition-fast) ease;
+
+            &:hover {
+                background-color: var(--neutral-200);
+                color: var(--text-primary);
+            }
+
+            &.is-active {
+                color: var(--text-primary);
+            }
+
+            svg.lucide {
+                /* Override the modal-wide icon padding so the button hugs the icon */
+                padding: 6px;
+                width: 30px;
+                height: 30px;
+            }
+        }
     }
 
     svg.lucide {
@@ -28,11 +74,17 @@
     }
 
     .search-tabs {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--spacing-2);
         padding: 0 var(--spacing-2);
         padding-bottom: var(--spacing-2);
     }
 
     .search-results-container {
+        min-width: 0;
+        min-height: 0;
         max-height: 400px;
         overflow-y: scroll;
 
@@ -47,6 +99,13 @@
             padding: 10px;
         }
 
+        .search-empty {
+            font: var(--p1);
+            color: var(--text-secondary);
+            text-align: center;
+            padding: var(--spacing-6) var(--spacing-4);
+        }
+
         .search-result-item {
             display: flex;
             align-items: center;
@@ -58,19 +117,27 @@
             cursor: pointer;
             transition: background-color 0.5s;
 
-            &:hover,
-            &.is-selected {
+            &:hover {
                 background-color: var(--neutral-100);
+            }
+
+            &.is-selected {
+                background-color: var(--neutral-200);
+            }
+
+            svg.lucide {
+                flex-shrink: 0;
             }
 
             .search-result-item-content {
                 padding-left: 10px;
+                min-width: 0;
 
                 .title {
                     font-weight: 600;
 
                     mark {
-                        background: rgba(250, 204, 21, 0.1);
+                        background: rgb(from var(--yellow-400) r g b / 0.1);
                         color: var(--yellow-500);
                         border-radius: 4px;
                         padding: 2px;
@@ -80,14 +147,14 @@
                 .subtitle {
                     font: var(--sm);
                     color: var(--neutral-400);
-                    max-width: 500px;
+                    max-width: 100%;
                     overflow: hidden;
                     height: 20px;
                     text-overflow: ellipsis;
                     white-space: nowrap;
 
                     mark {
-                        background: rgba(250, 204, 21, 0.1);
+                        background: rgb(from var(--yellow-400) r g b / 0.1);
                         color: var(--yellow-500);
                         border-radius: 4px;
                         padding: 2px;
@@ -98,15 +165,16 @@
         }
 
         .search-result-images {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 6px;
             padding: 10px;
             padding-top: 0;
 
             img {
                 height: 185px;
-                width: 185px;
-                margin: 6px 6px 0 0;
+                width: 100%;
+                margin: 0;
                 box-sizing: border-box;
                 object-fit: cover;
                 border-radius: 4px;
@@ -130,21 +198,30 @@
 @media screen and (max-width: 948px) {
     .search-modal {
         width: 100%;
+        max-width: 100%;
         margin-top: 0;
         border-radius: 0;
+
+        &:has(.search-modal-body.has-preview) {
+            width: 100%;
+        }
+
+        .search-input-container .search-preview-toggle {
+            display: none;
+        }
+
+        .search-modal-body,
+        .search-modal-body.has-preview {
+            grid-template-columns: 1fr;
+        }
+
+        .search-preview {
+            display: none;
+        }
 
         .search-results-container {
             /* Show some background so user can dismiss search */
             max-height: 70vh;
-
-            .search-result-item {
-                .search-result-item-content {
-                    .subtitle {
-                        width: 300px;
-                    }
-                }
-            }
         }
-
     }
 }

@@ -39,7 +39,7 @@ export default function ExportPane() {
         </ul>
         
         <h4>Export structure:</h4>
-        <pre className="export-tree">
+        <pre className="code-block">
 {`zen-export-2025-08-08.zip
 ├── my-note.md
 ├── project-ideas.md

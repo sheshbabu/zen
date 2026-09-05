@@ -85,7 +85,9 @@ async function updatePassword(payload) {
 }
 
 async function logout() {
-  return await request('POST', '/api/users/logout');
+  const response = await request('POST', '/api/users/logout');
+  navigator.serviceWorker?.controller?.postMessage({ type: 'CLEAR_CACHE' });
+  return response;
 }
 
 // Focus Modes
@@ -135,8 +137,16 @@ async function getNotes(tagId, focusId, isArchived, isDeleted, page) {
   return await request('GET', url);
 }
 
+async function getRelatedNotes(noteId, limit) {
+  let url = `/api/notes/${noteId}/related/`;
+  if (limit) {
+    url += `?limit=${limit}`;
+  }
+  return await request('GET', url);
+}
+
 async function getNoteById(noteId) {
-  return await request('GET', `/api/notes/${noteId}`);
+  return await request('GET', `/api/notes/${noteId}/`);
 }
 
 async function createNote(note) {
@@ -144,11 +154,11 @@ async function createNote(note) {
 }
 
 async function updateNote(noteId, note) {
-  return await request('PUT', `/api/notes/${noteId}`, note);
+  return await request('PUT', `/api/notes/${noteId}/`, note);
 }
 
 async function deleteNote(noteId) {
-  return await request('DELETE', `/api/notes/${noteId}`);
+  return await request('DELETE', `/api/notes/${noteId}/`);
 }
 
 async function bulkDeleteNotes(ids) {
@@ -186,7 +196,7 @@ async function clearTrash() {
 // Tags
 
 async function getTags(focusId) {
-  let url = "/api/tags";
+  let url = "/api/tags/";
 
   if (focusId) {
     url += `?focusId=${focusId}`;
@@ -196,15 +206,15 @@ async function getTags(focusId) {
 }
 
 async function searchTags(query) {
-  return await request('GET', `/api/tags?query=${query}`);
+  return await request('GET', `/api/tags/?query=${query}`);
 }
 
 async function updateTag(tag) {
-  return await request('PUT', `/api/tags/${tag.tagId}`, tag);
+  return await request('PUT', `/api/tags/${tag.tagId}/`, tag);
 }
 
 async function deleteTag(tagId) {
-  return await request('DELETE', `/api/tags/${tagId}`);
+  return await request('DELETE', `/api/tags/${tagId}/`);
 }
 
 // Images
@@ -236,8 +246,8 @@ async function uploadImage(formData) {
 
 // Search
 
-async function search(query) {
-  return await request('GET', `/api/search?query=${query}`);
+async function search(query, sort) {
+  return await request('GET', `/api/search/?query=${query}&sort=${sort}`);
 }
 
 // Intelligence
@@ -282,7 +292,7 @@ async function getTemplates() {
 }
 
 async function getTemplateById(templateId) {
-  return await request('GET', `/api/templates/${templateId}`);
+  return await request('GET', `/api/templates/${templateId}/`);
 }
 
 async function createTemplate(template) {
@@ -290,11 +300,11 @@ async function createTemplate(template) {
 }
 
 async function updateTemplate(templateId, template) {
-  return await request('PUT', `/api/templates/${templateId}`, template);
+  return await request('PUT', `/api/templates/${templateId}/`, template);
 }
 
 async function deleteTemplate(templateId) {
-  return await request('DELETE', `/api/templates/${templateId}`);
+  return await request('DELETE', `/api/templates/${templateId}/`);
 }
 
 async function getRecommendedTemplates() {
@@ -354,6 +364,7 @@ export default {
   updateFocusMode,
   deleteFocusMode,
   getNotes,
+  getRelatedNotes,
   getNoteById,
   createNote,
   updateNote,

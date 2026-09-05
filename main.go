@@ -91,6 +91,7 @@ func newRouter() *http.ServeMux {
 
 	addPrivateRoute(mux, "GET /api/notes/", notes.HandleGetNotes)
 	addPrivateRoute(mux, "GET /api/notes/{noteId}/", notes.HandleGetNote)
+	addPrivateRoute(mux, "GET /api/notes/{noteId}/related/", notes.HandleGetRelatedNotes)
 	addPrivateRoute(mux, "POST /api/notes/", notes.HandleCreateNote)
 	addPrivateRoute(mux, "PUT /api/notes/{noteId}/", notes.HandleUpdateNote)
 	addPrivateRoute(mux, "DELETE /api/notes/bulk/", notes.HandleBulkSoftDeleteNotes)
@@ -247,7 +248,12 @@ func handleServiceWorker(w http.ResponseWriter, r *http.Request) {
 	var swContent []byte
 	var err error
 
-	swContent, err = os.ReadFile("./assets/sw.js")
+	if os.Getenv("DEV_MODE") == "true" {
+		swContent, err = os.ReadFile("./assets/sw.js")
+	} else {
+		swContent, err = assets.ReadFile("assets/sw.js")
+	}
+
 	if err != nil {
 		err = fmt.Errorf("error reading sw.js: %w", err)
 		slog.Error(err.Error())

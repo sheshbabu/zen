@@ -102,6 +102,8 @@ export default function ImportPane() {
     <div className="settings-tab-content">
       <h3>Import Files</h3>
       <p>Import .md or .txt files.</p>
+      <p>For .md files, you can optionally include a YAML frontmatter block with title, tags (comma-separated), created, and updated fields.</p>
+      <pre className="code-block">{`---\ntitle: My Note Title\ntags: work, ideas, project\ncreated: 2023-04-15T10:30:00Z\nupdated: 2023-06-20T14:45:00Z\n---\n\nNote content here...`}</pre>
 
       <div className="file-upload-container">
         <input

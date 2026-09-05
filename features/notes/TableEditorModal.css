@@ -1,0 +1,64 @@
+.table-editor-modal {
+    width: 600px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .table-editor-grid {
+        overflow: auto;
+        min-height: 0;
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid var(--neutral-200);
+            padding: 0;
+            width: 1%;
+            min-width: 120px;
+        }
+
+        th {
+            background-color: var(--bg-primary);
+        }
+
+        th input {
+            font: var(--p1);
+            font-weight: 600;
+        }
+
+        input {
+            border: none;
+            outline: none;
+            width: 100%;
+            padding: var(--spacing-2);
+            font: var(--p1);
+            color: var(--text-primary);
+            background-color: transparent;
+
+            &:focus {
+                background-color: var(--bg-secondary);
+            }
+        }
+    }
+
+    .table-editor-actions {
+        display: flex;
+        gap: 4px;
+        margin-bottom: var(--spacing-5);
+        border: 1px solid var(--neutral-200);
+        padding: 4px;
+        border-radius: 5px;
+    }
+}

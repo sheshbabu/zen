@@ -35,6 +35,9 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Sorting applies to lexical notes only
+	sort := r.URL.Query().Get("sort")
+
 	lexicalNotesChan := make(chan LexicalNoteSearchResults, 1)
 	tagsChan := make(chan TagSearchResults, 1)
 	semanticNotesChan := make(chan []intelligence.SemanticNoteResult, 1)
@@ -42,7 +45,7 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 
 	// Run all searches in parallel
 	go func() {
-		searchNotes, err := notes.SearchNotes(query, LIMIT)
+		searchNotes, err := notes.SearchNotes(query, LIMIT, sort)
 		lexicalNotesChan <- LexicalNoteSearchResults{Notes: searchNotes, Err: err}
 	}()
 

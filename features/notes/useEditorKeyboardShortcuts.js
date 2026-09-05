@@ -4,6 +4,7 @@ export default function useEditorKeyboardShortcuts({
   isEditable,
   isModal,
   isExpanded,
+  isExpandable,
   textareaRef,
   onSave,
   onEdit,
@@ -32,8 +33,10 @@ export default function useEditorKeyboardShortcuts({
     }
 
     if ((e.metaKey || e.ctrlKey) && e.key === '\\') {
-      e.preventDefault();
-      onExpandToggle();
+      if (isExpandable === true) {
+        e.preventDefault();
+        onExpandToggle();
+      }
     }
 
     if (isTextAreaFocused && e.key === 'Tab' && !e.shiftKey) {
@@ -108,7 +111,7 @@ export default function useEditorKeyboardShortcuts({
         }
       }
     }
-  }, [isEditable, isModal, isExpanded, textareaRef, onSave, onEdit, onClose, onExpandToggle, onInsertAtCursor, onFormatText]);
+  }, [isEditable, isModal, isExpanded, isExpandable, textareaRef, onSave, onEdit, onClose, onExpandToggle, onInsertAtCursor, onFormatText]);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);

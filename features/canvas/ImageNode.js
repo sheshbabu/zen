@@ -9,8 +9,16 @@ function create(layer, item, x, y, onDragEnd, onClick, onDoubleClick, customWidt
     x,
     y,
   };
-  const defaultWidth = 500;
-  const defaultHeight = defaultWidth / item.aspectRatio;
+  const maxDefaultWidth = 300;
+  const maxDefaultHeight = 300;
+
+  let defaultWidth = maxDefaultWidth;
+  let defaultHeight = maxDefaultWidth / item.aspectRatio;
+
+  if (defaultHeight > maxDefaultHeight) {
+    defaultHeight = maxDefaultHeight;
+    defaultWidth = maxDefaultHeight * item.aspectRatio;
+  }
 
   const thumbnailWidth = customWidth || defaultWidth;
   const thumbnailHeight = customHeight || defaultHeight;

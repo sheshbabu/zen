@@ -296,7 +296,7 @@ func handleSearchNotes(args map[string]interface{}) ToolCallResult {
 		limit = int(l)
 	}
 
-	searchNotes, err := notes.SearchNotes(query, limit)
+	searchNotes, err := notes.SearchNotes(query, limit, notes.SortRelevance)
 	if err != nil {
 		slog.Error("MCP search error", "error", err)
 		return ToolCallResult{

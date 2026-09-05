@@ -8,8 +8,9 @@ import (
 )
 
 type Tag struct {
-	TagID int    `json:"tagId"`
-	Name  string `json:"name"`
+	TagID     int    `json:"tagId"`
+	Name      string `json:"name"`
+	NoteCount int    `json:"noteCount"`
 }
 
 func HandleGetTags(w http.ResponseWriter, r *http.Request) {

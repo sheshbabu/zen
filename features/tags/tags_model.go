@@ -33,8 +33,7 @@ func GetAllTags() ([]Tag, error) {
 
 	for rows.Next() {
 		var tag Tag
-		var count int
-		err = rows.Scan(&tag.TagID, &tag.Name, &count)
+		err = rows.Scan(&tag.TagID, &tag.Name, &tag.NoteCount)
 		if err != nil {
 			err = fmt.Errorf("error scanning tag: %w", err)
 			slog.Error(err.Error())
@@ -81,8 +80,7 @@ func SearchTags(term string) ([]Tag, error) {
 
 	for rows.Next() {
 		var tag Tag
-		var count int
-		err = rows.Scan(&tag.TagID, &tag.Name, &count)
+		err = rows.Scan(&tag.TagID, &tag.Name, &tag.NoteCount)
 		if err != nil {
 			err = fmt.Errorf("error scanning tag: %w", err)
 			slog.Error(err.Error())
@@ -125,8 +123,7 @@ func GetTagsByFocusModeID(focusModeID int) ([]Tag, error) {
 
 	for rows.Next() {
 		var tag Tag
-		var count int
-		err = rows.Scan(&tag.TagID, &tag.Name, &count)
+		err = rows.Scan(&tag.TagID, &tag.Name, &tag.NoteCount)
 		if err != nil {
 			err = fmt.Errorf("error scanning tag: %w", err)
 			slog.Error(err.Error())

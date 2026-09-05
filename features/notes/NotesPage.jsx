@@ -1,5 +1,6 @@
 import { h, Fragment, useState, useEffect } from "../../assets/preact.esm.js"
 import Sidebar from '../../commons/components/Sidebar.jsx';
+import SidePanel from '../../commons/components/SidePanel.jsx';
 import NotesList from './NotesList.jsx';
 import NotesEditor from './NotesEditor.jsx';
 import BulkActionsPanel from './BulkActionsPanel.jsx';
@@ -10,6 +11,7 @@ import isMobile from "../../commons/utils/isMobile.js";
 import useSearchParams from "../../commons/components/useSearchParams.jsx";
 import { useAppContext } from "../../commons/contexts/AppContext.jsx";
 import { NotesProvider, useNotes } from "../../commons/contexts/NotesContext.jsx";
+import { LayoutProvider, useLayout } from "../../commons/contexts/LayoutContext.jsx";
 import ViewPreferences from "../../commons/preferences/ViewPreferences.js";
 import NotesEditorModal from "./NotesEditorModal.jsx";
 import { AppProvider } from "../../commons/contexts/AppContext.jsx";
@@ -18,18 +20,19 @@ import { openModal } from "../../commons/components/Modal.jsx";
 export default function NotesPage({ noteId }) {
   return (
     <NotesProvider>
-      <NotesPageContent noteId={noteId} />
+      <LayoutProvider>
+        <NotesPageContent noteId={noteId} />
+      </LayoutProvider>
     </NotesProvider>
   );
 }
 
 function NotesPageContent({ noteId }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(isMobile() ? false : true);
+  const { isEditorExpanded } = useLayout();
   const [isMultiSelect, setIsMultiSelect] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
-  const [isExpanded, setIsExpanded] = useState(false);
 
-  const { refreshTags, refreshFocusModes } = useAppContext();
+  const { refreshTags } = useAppContext();
   const {
     notes,
     selectedNote,
@@ -64,24 +67,15 @@ function NotesPageContent({ noteId }) {
   let editorClassName = "notes-editor-container";
 
   useEffect(() => {
-    refreshNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage);
-    refreshImages(selectedTagId, selectedFocusId);
-    refreshTags(selectedFocusId);
-    refreshFocusModes();
-  }, [refreshNotes, refreshImages, refreshTags, refreshFocusModes]);
-
-  useEffect(() => {
     // Reset to avoid showing incorrect notes
     resetPagination();
 
-    refreshNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage);
-    refreshImages(selectedTagId, selectedFocusId);
     refreshTags(selectedFocusId);
 
     // Reload preference
     const savedView = ViewPreferences.getPreference(selectedFocusId, selectedTagId, isArchivesPage, isTrashPage);
     setSelectedView(savedView);
-  }, [selectedTagId, selectedFocusId, isArchivesPage, isTrashPage, resetPagination, refreshNotes, refreshImages, refreshTags]);
+  }, [selectedTagId, selectedFocusId, isArchivesPage, isTrashPage, resetPagination, refreshTags]);
 
   useEffect(() => {
     refreshNotes(selectedTagId, selectedFocusId, isArchivesPage, isTrashPage, notesPageNumber);
@@ -160,7 +154,10 @@ function NotesPageContent({ noteId }) {
     setSelectedIds([]);
   }
 
-  let editorContent = <NotesEditor isNewNote={noteId === "new"} isExpanded={isExpanded} onExpandToggle={() => setIsExpanded(prev => !prev)} key={selectedNote?.noteId} />;
+  const isEditorExpandable = selectedView === "list";
+  const isPageExpanded = isEditorExpanded === true && isEditorExpandable === true;
+
+  let editorContent = <NotesEditor isNewNote={noteId === "new"} isExpandable={isEditorExpandable} key={selectedNote?.noteId} />;
   if (isMultiSelect === true) {
     editorContent = <BulkActionsPanel selectedIds={selectedIds} allIds={notes.map(n => n.noteId)} onClose={handleClearSelection} onSelectAll={() => setSelectedIds(notes.map(n => n.noteId))} />;
   }
@@ -194,8 +191,8 @@ function NotesPageContent({ noteId }) {
 
   return (
     <>
-      <div className="page-container">
-        <Sidebar isOpen={isSidebarOpen} onSidebarClose={() => setIsSidebarOpen(false)} />
+      <div className={`page-container${isPageExpanded ? " is-editor-expanded" : ""}`}>
+        <Sidebar />
 
         <div className={listClassName}>
           <NotesList
@@ -209,7 +206,6 @@ function NotesPageContent({ noteId }) {
             onViewChange={handleViewChange}
             onLoadMoreClick={handleLoadMoreNotes}
             onLoadMoreImagesClick={handleLoadMoreImages}
-            onSidebarToggle={() => setIsSidebarOpen(!isSidebarOpen)}
             isMultiSelect={isMultiSelect}
             selectedIds={selectedIds}
             onMultiSelectStart={handleMultiSelectStart}
@@ -217,9 +213,11 @@ function NotesPageContent({ noteId }) {
           />
         </div>
 
-        <div className={`${editorClassName}${isExpanded ? " is-expanded" : ""}`}>
+        <div className={`${editorClassName}${isPageExpanded ? " is-expanded" : ""}`}>
           {editorContent}
         </div>
+
+        <SidePanel />
 
         <MobileNavbar />
         <div className="note-modal-root"></div>

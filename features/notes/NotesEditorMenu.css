@@ -1,0 +1,117 @@
+.notes-editor-menu {
+    position: relative;
+
+    .notes-editor-menu-dropdown {
+        top: 100%;
+        margin-top: 4px;
+        position: absolute;
+        left: 0;
+        min-width: 180px;
+        box-shadow: var(--shadow-4);
+        background-color: var(--bg-secondary);
+        z-index: var(--z-base);
+        border: 1px solid var(--neutral-100);
+        border-radius: 4px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-4px);
+        transition: opacity 0.15s ease-out, transform 0.15s ease-out, visibility 0.15s ease-out;
+        pointer-events: none;
+    }
+
+    .notes-editor-menu-options {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        max-height: 198px;
+        overflow: auto;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    .notes-editor-menu-option {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-2);
+        padding-left: 12px;
+        height: 36px;
+        margin: 4px;
+        border-radius: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        font: var(--sm);
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 500ms;
+
+        svg.lucide {
+            width: 16px;
+            height: 16px;
+
+            line,
+            circle,
+            rect,
+            path {
+                stroke: var(--neutral-400);
+            }
+        }
+
+        &:hover {
+            background-color: var(--neutral-200);
+        }
+
+        &:active {
+            transform: scale(0.98);
+            transition: transform 150ms ease-out;
+        }
+
+        &.is-destructive {
+            color: var(--red-500);
+
+            svg.lucide line,
+            svg.lucide circle,
+            svg.lucide rect,
+            svg.lucide path {
+                stroke: var(--red-500);
+            }
+        }
+    }
+
+    .notes-editor-menu-footer {
+        display: flex;
+        flex-direction: column;
+        padding: var(--spacing-2) var(--spacing-3);
+        border-top: 1px solid var(--neutral-100);
+        font: var(--sm);
+        white-space: nowrap;
+
+        div {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--spacing-4);
+
+            &+div {
+                margin-top: var(--spacing-1);
+            }
+
+            span:first-child {
+                color: var(--neutral-400);
+            }
+
+            span:last-child {
+                color: var(--neutral-500);
+            }
+        }
+    }
+
+    &.is-open {
+        .notes-editor-menu-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+    }
+}

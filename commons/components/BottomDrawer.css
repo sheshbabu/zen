@@ -1,0 +1,26 @@
+@media screen and (max-width: 948px) {
+    .modal-backdrop-container:has(.bottom-drawer) {
+        align-items: flex-end;
+    }
+
+    .bottom-drawer {
+        width: 100%;
+        max-width: 100%;
+        height: 90vh;
+        max-height: 90vh;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        border-bottom: none;
+        animation: bottom-drawer-slide-up 0.3s ease-out;
+    }
+}
+
+@keyframes bottom-drawer-slide-up {
+    0% {
+        transform: translateY(100%);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}

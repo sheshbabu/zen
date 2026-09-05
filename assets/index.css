@@ -86,6 +86,7 @@
     --sidebar-width: 220px;
     --notes-list-width: 280px;
     --notes-editor-max-width: 850px;
+    --sidepanel-width: 360px;
 
     /* transitions */
     --transition-fast: 150ms;
@@ -249,6 +250,17 @@ svg.lucide {
     height: 100%;
     overflow: hidden;
     position: relative;
+
+    &.is-editor-expanded {
+
+        >.sidebar-container,
+        >.notes-list-container {
+            min-width: 0;
+            width: 0;
+            overflow: hidden;
+            transition: min-width var(--transition-fast) ease, width var(--transition-fast) ease;
+        }
+    }
 }
 
 .button-container {

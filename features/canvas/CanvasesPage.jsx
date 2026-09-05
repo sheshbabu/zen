@@ -1,5 +1,6 @@
 import { h, useState, useEffect } from "../../assets/preact.esm.js"
 import Sidebar from '../../commons/components/Sidebar.jsx';
+import { LayoutProvider } from '../../commons/contexts/LayoutContext.jsx';
 import CanvasesToolbar from './CanvasesToolbar.jsx';
 import CanvasDeleteModal from './CanvasDeleteModal.jsx';
 import Spinner from '../../commons/components/Spinner.jsx';
@@ -92,17 +93,19 @@ export default function CanvasesPage() {
   }
 
   return (
-    <div className="page-container">
-      <Sidebar isOpen={true} onSidebarClose={() => { }} />
+    <LayoutProvider>
+      <div className="page-container">
+        <Sidebar />
 
-      <div className="canvases-page-content">
-        <CanvasesToolbar onNewCanvasClick={handleNewCanvasClick} />
-        {content}
+        <div className="canvases-page-content">
+          <CanvasesToolbar onNewCanvasClick={handleNewCanvasClick} />
+          {content}
+        </div>
+
+        <div className="modal-root"></div>
+        <div className="toast-root"></div>
       </div>
-
-      <div className="modal-root"></div>
-      <div className="toast-root"></div>
-    </div>
+    </LayoutProvider>
   );
 }
 

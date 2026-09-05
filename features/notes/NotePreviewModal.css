@@ -1,0 +1,18 @@
+.note-preview-modal {
+    max-width: 700px;
+    max-height: 70vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .note-preview-modal-content {
+        overflow-y: auto;
+    }
+}
+
+@media screen and (max-width: 948px) {
+    .note-preview-modal .note-preview-modal-content {
+        padding: var(--spacing-4);
+        padding-bottom: calc(var(--spacing-4) + var(--safe-area-bottom));
+    }
+}

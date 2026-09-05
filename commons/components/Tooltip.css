@@ -3,11 +3,11 @@
     z-index: var(--z-popover);
     display: flex;
     align-items: center;
-    padding: 4px 12px;
+    padding: 2px 8px;
     background-color: var(--neutral-800);
     color: var(--neutral-50);
-    border-radius: 50px;
-    font: var(--sm);
+    border-radius: 4px;
+    font-size: 12px;
     max-width: 300px;
     word-wrap: break-word;
     box-shadow: var(--shadow-4);
@@ -38,14 +38,8 @@
     }
 
     div {
-        background-color: var(--neutral-700);
-        color: var(--neutral-300);
-        border-radius: 50px;
-        padding: 0px 4px;
+        color: var(--neutral-400);
         font-size: 12px;
-        border: 1px solid var(--neutral-500);
-        font-weight: 600;
         margin-left: 10px;
-        margin-right: -6px;
     }
 }

@@ -43,6 +43,7 @@
 
 
             .lightbox-similar-button,
+            .lightbox-open-new-tab-button,
             .lightbox-close-button {
                 padding: 8px;
                 cursor: pointer;
@@ -150,18 +151,17 @@
 
 
         .lightbox-similar-images-grid {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 10px;
             padding: 10px;
-            justify-content: center;
             align-content: flex-start;
             overflow-y: auto;
             flex: 1;
 
             .lightbox-similar-image {
                 height: 300px;
-                width: 300px;
+                width: 100%;
                 object-fit: cover;
                 border-radius: 6px;
                 cursor: pointer;

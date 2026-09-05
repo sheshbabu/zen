@@ -3,7 +3,7 @@ import ApiClient from '../../commons/http/ApiClient.js';
 import { RemoveIcon } from "../../commons/components/Icon.jsx";
 import Link from "../../commons/components/Link.jsx";
 
-export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddTag, onRemoveTag }) {
+export default function NotesEditorTags({ tags, isEditable, canCreateTag, placeholder = "Add Tags...", onAddTag, onRemoveTag }) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [selectedTag, setSelectedTag] = useState(null);
@@ -127,7 +127,7 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, onAddT
       <Fragment>
         <input
           className="notes-editor-tags-input"
-          placeholder="Add Tags..."
+          placeholder={placeholder}
           autoComplete="off"
           value={query}
           onKeyUp={handleKeyUp}

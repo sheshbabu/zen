@@ -530,6 +530,7 @@
                             <li><a href="#editor-shortcuts" class="sidebar-nav-item">Editor</a></li>
                             <li><a href="#navigation-shortcuts" class="sidebar-nav-item">Navigation</a></li>
                             <li><a href="#image-gallery-shortcuts" class="sidebar-nav-item">Image Gallery</a></li>
+                            <li><a href="#canvas-shortcuts" class="sidebar-nav-item">Canvas</a></li>
                         </ul>
                     </li>
                     <li>
@@ -544,6 +545,12 @@
                             <li><a href="#mcp-generate-token" class="sidebar-nav-item">Generate Token</a></li>
                             <li><a href="#mcp-claude-code" class="sidebar-nav-item">Claude Code</a></li>
                             <li><a href="#mcp-lm-studio" class="sidebar-nav-item">LM Studio</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#import" class="sidebar-nav-item">Import</a>
+                        <ul class="sidebar-nav-sub">
+                            <li><a href="#import-frontmatter" class="sidebar-nav-item">Frontmatter</a></li>
                         </ul>
                     </li>
                     <li>
@@ -680,8 +687,10 @@ $ cd zen</code></pre>
                 <ul>
                     <li><code>Ctrl/Cmd + Enter</code> - Save note (or start editing when viewing)</li>
                     <li><code>Ctrl/Cmd + B</code> - Bold selected text</li>
+                    <li><code>Ctrl/Cmd + I</code> - Italicize selected text</li>
                     <li><code>Ctrl/Cmd + Shift + H</code> - Highlight selected text</li>
                     <li><code>Tab</code> - Insert indentation (2 spaces)</li>
+                    <li><code>Enter</code> - Continue the current list item (bullets, numbers, and task lists)</li>
                     <li><code>Escape</code> - Close editor popup</li>
                 </ul>
 
@@ -690,6 +699,7 @@ $ cd zen</code></pre>
 
                 <ul>
                     <li><code>Arrow Up/Down</code> - Navigate through search results</li>
+                    <li><code>Tab</code> - Cycle through the search tabs (All, Notes, Tags)</li>
                     <li><code>Enter</code> - Select highlighted search result or tag suggestion</li>
                     <li><code>Escape</code> - Close search or tag suggestions</li>
                     <li><code>Backspace</code> - Close tag suggestions when input is empty</li>
@@ -702,6 +712,16 @@ $ cd zen</code></pre>
                     <li><code>Escape</code> - Close the image lightbox</li>
                     <li><code>Arrow Left</code> - Navigate to previous image</li>
                     <li><code>Arrow Right</code> - Navigate to next image</li>
+                </ul>
+
+                <h3 id="canvas-shortcuts">Canvas Shortcuts</h3>
+                <p>These shortcuts work while a canvas is open:</p>
+
+                <ul>
+                    <li><code>Ctrl/Cmd + K</code> - Toggle the canvas sidebar</li>
+                    <li><code>Ctrl/Cmd + D</code> - Duplicate the selected nodes</li>
+                    <li><code>Delete/Backspace</code> - Delete the selected nodes</li>
+                    <li><code>Escape</code> - Finish editing a sticky note's text</li>
                 </ul>
 
                 <blockquote>
@@ -825,6 +845,50 @@ docker compose restart
 </code></pre>
 
                 <p>Replace <code>&lt;TOKEN&gt;</code> with the actual token you generated.</p>
+            </section>
+
+            <section id="import">
+                <h1>Import</h1>
+
+                <p>
+                    You can import existing Markdown files into Zen from <strong>Settings</strong> &rarr; <strong>Import</strong>.
+                    By default, the note title is taken from the filename and the content is imported as-is.
+                </p>
+
+                <h3 id="import-frontmatter">Frontmatter</h3>
+                <p>
+                    If a file starts with a YAML frontmatter block, Zen reads it to set the note's title, tags, and
+                    timestamps. The block must be the very first thing in the file, opening with <code>---</code> on its
+                    own line and closing with another <code>---</code> on its own line. The frontmatter itself is
+                    stripped from the imported note's content.
+                </p>
+
+                <ul>
+                    <li><code>title</code> - Note title. Falls back to the filename when omitted.</li>
+                    <li><code>tags</code> - Comma-separated tag names. Tags that don't exist yet are created.</li>
+                    <li><code>created</code> - Creation timestamp in RFC 3339 format.</li>
+                    <li><code>updated</code> - Last modified timestamp in RFC 3339 format.</li>
+                </ul>
+
+                <h4>Example</h4>
+                <pre><code class="language-markdown">---
+title: Trip to Kyoto
+tags: travel, japan
+created: 2025-03-14T09:30:00Z
+updated: 2025-04-02T18:45:00Z
+---
+
+# Trip to Kyoto
+
+Notes from the trip...
+</code></pre>
+
+                <blockquote>
+                    <p><strong>Note:</strong> If only one of <code>created</code> or <code>updated</code> is provided,
+                        the other is set to the same value. If neither is provided, or a timestamp can't be parsed, the
+                        import time is used instead.
+                    </p>
+                </blockquote>
             </section>
 
             <section id="templates">

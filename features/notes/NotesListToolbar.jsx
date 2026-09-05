@@ -4,6 +4,7 @@ import useSearchParams from "../../commons/components/useSearchParams.jsx";
 import { openModal } from "../../commons/components/Modal.jsx";
 import { AppProvider, useAppContext } from '../../commons/contexts/AppContext.jsx';
 import { NotesProvider, useNotes } from "../../commons/contexts/NotesContext.jsx";
+import { useLayout } from "../../commons/contexts/LayoutContext.jsx";
 import { HamburgerIcon } from '../../commons/components/Icon.jsx';
 import ButtonGroup from '../../commons/components/ButtonGroup.jsx';
 import navigateTo from "../../commons/utils/navigateTo.js";
@@ -11,7 +12,7 @@ import isMobile from "../../commons/utils/isMobile.js";
 import TrashClearModal from "./TrashClearModal.jsx"
 import "./NotesListToolbar.css";
 
-export default function NotesListToolbar({ onSidebarToggle, onViewChange }) {
+export default function NotesListToolbar({ onViewChange }) {
   const searchParams = useSearchParams();
   const { refreshNotes } = useNotes();
   const { tags, focusModes } = useAppContext();
@@ -87,11 +88,12 @@ export default function NotesListToolbar({ onSidebarToggle, onViewChange }) {
   }
 
   return (
-    <Toolbar actions={actions} onSidebarToggle={onSidebarToggle} listName={listName} className="notes-list-toolbar" />
+    <Toolbar actions={actions} listName={listName} className="notes-list-toolbar" />
   );
 }
 
-function Toolbar({ actions, onSidebarToggle, listName, className }) {
+function Toolbar({ actions, listName, className }) {
+  const { toggleSidebar } = useLayout();
   const buttons = actions.map(action => (
     <div key={action.title} {...action}>
       <action.icon />
@@ -106,7 +108,7 @@ function Toolbar({ actions, onSidebarToggle, listName, className }) {
   return (
     <div className={className}>
       <ButtonGroup isMobile={true}>
-        <div onClick={onSidebarToggle} title="Toggle Sidebar">
+        <div onClick={toggleSidebar} title="Toggle Sidebar">
           <HamburgerIcon />
         </div>
       </ButtonGroup>

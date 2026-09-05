@@ -27,6 +27,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 				n.title,
 				n.content,
 				SUBSTR(n.content, 0, 500) AS snippet,
+				n.created_at,
 				n.updated_at,
 				COALESCE(
 					JSON_GROUP_ARRAY(JSON_OBJECT(
@@ -71,6 +72,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 				n.title,
 				n.content,
 				SUBSTR(n.content, 0, 500) AS snippet,
+				n.created_at,
 				n.updated_at,
 				COALESCE(
 					JSON_GROUP_ARRAY(JSON_OBJECT(
@@ -122,6 +124,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 				n.title,
 				n.content,
 				SUBSTR(n.content, 0, 500) AS snippet,
+				n.created_at,
 				n.updated_at,
 				CASE
 					WHEN COUNT(t.tag_id) > 0 THEN
@@ -172,7 +175,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 		var archivedAt sql.NullTime
 		var deletedAt sql.NullTime
 		var pinnedAt sql.NullTime
-		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt, &total)
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.CreatedAt, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt, &total)
 		if err != nil {
 			err = fmt.Errorf("error scanning note: %w", err)
 			slog.Error(err.Error())
@@ -209,6 +212,7 @@ func GetNoteByID(noteID int) (Note, error) {
 			n.title,
 			n.content,
 			SUBSTR(content, 0, 500) AS snippet,
+			n.created_at,
 			n.updated_at,
 			CASE
 				WHEN COUNT(t.tag_id) > 0 THEN
@@ -235,7 +239,7 @@ func GetNoteByID(noteID int) (Note, error) {
 
 	row := sqlite.DB.QueryRow(query, noteID)
 	var pinnedAt sql.NullTime
-	err := row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt)
+	err := row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.CreatedAt, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt)
 	if err != nil {
 		err = fmt.Errorf("error retrieving note: %w", err)
 		slog.Error(err.Error())
@@ -269,20 +273,39 @@ func CreateNote(note Note) (Note, error) {
 
 	defer tx.Rollback()
 
-	query := `
-		INSERT INTO
-			notes (title, content)
-		VALUES
-			(?, ?)
-		RETURNING
-			note_id,
-			title,
-			content,
-			SUBSTR(content, 0, 500) AS snippet,
-			updated_at
-	`
+	var query string
+	var row *sql.Row
 
-	row := tx.QueryRow(query, note.Title, note.Content)
+	if !note.UpdatedAt.IsZero() {
+		query = `
+			INSERT INTO
+				notes (title, content, created_at, updated_at)
+			VALUES
+				(?, ?, ?, ?)
+			RETURNING
+				note_id,
+				title,
+				content,
+				SUBSTR(content, 0, 500) AS snippet,
+				updated_at
+		`
+		row = tx.QueryRow(query, note.Title, note.Content, note.CreatedAt, note.UpdatedAt)
+	} else {
+		query = `
+			INSERT INTO
+				notes (title, content)
+			VALUES
+				(?, ?)
+			RETURNING
+				note_id,
+				title,
+				content,
+				SUBSTR(content, 0, 500) AS snippet,
+				updated_at
+		`
+		row = tx.QueryRow(query, note.Title, note.Content)
+	}
+
 	err = row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt)
 	if err != nil {
 		err = fmt.Errorf("error creating note: %w", err)
@@ -651,8 +674,21 @@ func UnarchiveNote(noteID int) error {
 	return nil
 }
 
-func SearchNotes(term string, limit int) ([]Note, error) {
+const (
+	SortRelevance = "relevance"
+	SortUpdated   = "updated"
+	SortCreated   = "created"
+)
+
+func SearchNotes(term string, limit int, sort string) ([]Note, error) {
 	notes := []Note{}
+
+	orderBy := "rank"
+	if sort == SortUpdated {
+		orderBy = "n.updated_at DESC"
+	} else if sort == SortCreated {
+		orderBy = "n.created_at DESC"
+	}
 
 	query := `
 		SELECT
@@ -680,8 +716,8 @@ func SearchNotes(term string, limit int) ([]Note, error) {
 				WHEN deleted_at  IS NOT NULL THEN 3
 				ELSE 4
 			END ASC,
-			-- Then by BM25 rank within each group
-			rank
+			-- Then by the chosen sort within each group
+			` + orderBy + `
 		LIMIT
 			?
 	`
@@ -881,4 +917,94 @@ func GetNotesCount(isDeleted, isArchived bool) (int, error) {
 	}
 
 	return count, nil
+}
+
+// GetRelatedNotes returns notes sharing tags with the given note, ranked by how
+// many tags they have in common. This is the tag-based fallback for the canvas
+// sidebar's Suggested tab - it works with INTELLIGENCE_ENABLED off.
+func GetRelatedNotes(noteID int, limit int) ([]Note, error) {
+	notes := []Note{}
+
+	query := `
+		SELECT
+			n.note_id,
+			n.title,
+			n.content,
+			SUBSTR(n.content, 0, 500) AS snippet,
+			n.created_at,
+			n.updated_at,
+			(
+				SELECT COALESCE(
+					JSON_GROUP_ARRAY(JSON_OBJECT(
+						'tagId', t2.tag_id,
+						'name', t2.name
+					)), '[]'
+				)
+				FROM note_tags nt2
+				JOIN tags t2 ON nt2.tag_id = t2.tag_id
+				WHERE nt2.note_id = n.note_id
+			) as tags_json,
+			n.archived_at,
+			n.deleted_at,
+			n.pinned_at,
+			COUNT(DISTINCT shared.tag_id) AS shared_count
+		FROM
+			notes n
+		INNER JOIN
+			note_tags shared ON n.note_id = shared.note_id
+		WHERE
+			shared.tag_id IN (SELECT tag_id FROM note_tags WHERE note_id = ?)
+			AND n.note_id != ?
+			AND n.deleted_at IS NULL
+			AND n.archived_at IS NULL
+		GROUP BY
+			n.note_id
+		ORDER BY
+			shared_count DESC,
+			n.updated_at DESC
+		LIMIT
+			?
+	`
+
+	rows, err := sqlite.DB.Query(query, noteID, noteID, limit)
+	if err != nil {
+		err = fmt.Errorf("error retrieving related notes: %w", err)
+		slog.Error(err.Error())
+		return notes, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var note Note
+		var tagsJSON string
+		var archivedAt sql.NullTime
+		var deletedAt sql.NullTime
+		var pinnedAt sql.NullTime
+		var sharedCount int
+
+		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.CreatedAt, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt, &sharedCount)
+		if err != nil {
+			err = fmt.Errorf("error scanning related note: %w", err)
+			slog.Error(err.Error())
+			return notes, err
+		}
+
+		if strings.TrimSpace(tagsJSON) == "" || tagsJSON == "null" {
+			note.Tags = []tags.Tag{}
+		} else {
+			err = json.Unmarshal([]byte(tagsJSON), &note.Tags)
+			if err != nil {
+				err = fmt.Errorf("error unmarshaling tags for note %d: %w", note.NoteID, err)
+				slog.Error(err.Error())
+				note.Tags = []tags.Tag{}
+			}
+		}
+
+		note.IsArchived = archivedAt.Valid
+		note.IsDeleted = deletedAt.Valid
+		note.IsPinned = pinnedAt.Valid
+		notes = append(notes, note)
+	}
+
+	return notes, nil
 }
