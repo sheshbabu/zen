@@ -9,10 +9,11 @@ import SearchPreviewPreferences from "../../commons/preferences/SearchPreviewPre
 import Tabs from "../../commons/components/Tabs.jsx";
 import SearchPreview from "./SearchPreview.jsx";
 import SearchSortDropdown, { SORT_OPTIONS } from "./SearchSortDropdown.jsx";
+import RecentSearchQuery from "./RecentSearchQuery.js";
 import "./SearchMenu.css";
 
 export default function SearchMenu() {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(RecentSearchQuery.get());
   const [results, setResults] = useState({ lexical_notes: [], semantic_notes: [], semantic_images: [], tags: [] });
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -32,9 +33,20 @@ export default function SearchMenu() {
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
+      // Cursor at the end, not the start, when reopening with a recalled query
+      const length = inputRef.current.value.length;
+      inputRef.current.setSelectionRange(length, length);
     }
     setSearchHistory(SearchHistory.getItems());
+
+    if (query.trim() !== "") {
+      runSearch(query, activeSort);
+    }
   }, []);
+
+  useEffect(() => {
+    RecentSearchQuery.set(query);
+  }, [query]);
 
   function handleChange(e) {
     const value = e.target.value;
