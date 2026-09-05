@@ -256,6 +256,10 @@
     li {
         font: var(--p1);
         margin-bottom: 4px;
+
+        p {
+            margin: 0;
+        }
     }
 
     a {
@@ -430,7 +434,7 @@
     .task-list-container {
         list-style: none;
         padding: 0;
-        margin: 0;
+        margin: 4px 0 16px 0;
     }
 
     .task-list-item {
