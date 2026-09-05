@@ -43,6 +43,7 @@
 
 
             .lightbox-similar-button,
+            .lightbox-open-new-tab-button,
             .lightbox-close-button {
                 padding: 8px;
                 cursor: pointer;

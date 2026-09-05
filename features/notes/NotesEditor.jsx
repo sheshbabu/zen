@@ -11,6 +11,7 @@ import isMobile from '../../commons/utils/isMobile.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
 import NotePreviewModal from './NotePreviewModal.jsx';
 import TableEditorModal from './TableEditorModal.jsx';
+import Lightbox from '../../commons/components/Lightbox.jsx';
 import NotesEditorMenu from './NotesEditorMenu.jsx';
 import Button from '../../commons/components/Button.jsx';
 import { showToast } from '../../commons/components/Toast.jsx';
@@ -321,8 +322,24 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     toggleEditorExpanded();
   }
 
+  function closeLightbox() {
+    closeModal();
+  }
+
   function handleRenderedContentClick(e) {
     if (handleCodeCopyClick(e) === true) {
+      return;
+    }
+
+    const image = e.target.closest('.notes-editor-rendered img');
+    if (image !== null) {
+      const filename = image.src.substring(image.src.lastIndexOf('/') + 1);
+      const selectedImage = {
+        url: image.src,
+        filename: filename,
+        aspectRatio: image.naturalWidth / image.naturalHeight,
+      };
+      openModal(<Lightbox selectedImage={selectedImage} imageDetails={[selectedImage]} onClose={closeLightbox} />);
       return;
     }
 

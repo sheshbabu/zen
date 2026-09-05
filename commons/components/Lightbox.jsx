@@ -1,6 +1,6 @@
 import { h, useEffect, useState } from "../../assets/preact.esm.js";
 import { ModalBackdrop, ModalContainer } from "./Modal.jsx";
-import { CloseIcon, ImagesIcon, BackIcon } from "./Icon.jsx";
+import { CloseIcon, ImagesIcon, BackIcon, ExternalLinkIcon } from "./Icon.jsx";
 import ApiClient from "../http/ApiClient.js";
 import "./Lightbox.css";
 
@@ -73,6 +73,10 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
     setIsSimilarImagesVisible(!isSimilarImagesVisible);
   }
 
+  function handleOpenInNewTabClick() {
+    window.open(currentImage.url, '_blank');
+  }
+
   function handleSimilarImageClick(image) {
     const imageWithUrl = {
       url: `/images/${image.filename}`,
@@ -138,6 +142,9 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
         />
         <div className="lightbox-controls">
           {similarImagesButton}
+          <div className="lightbox-open-new-tab-button" onClick={handleOpenInNewTabClick}>
+            <ExternalLinkIcon />
+          </div>
           <div className="lightbox-close-button" onClick={onClose}>
             <CloseIcon />
           </div>
