@@ -1,0 +1,114 @@
+.note-versions-modal {
+    width: 95vw;
+    height: 95vh;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+
+    .note-versions-rail {
+        width: 260px;
+        flex-shrink: 0;
+        overflow-y: auto;
+        padding: var(--spacing-2);
+        border-right: 1px solid var(--neutral-200);
+
+        .note-versions-rail-header {
+            font: var(--sm);
+            font-weight: 600;
+            color: var(--text-primary);
+            padding: var(--spacing-2);
+            margin-bottom: var(--spacing-2);
+        }
+
+        .note-versions-row {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-1);
+            padding: var(--spacing-2);
+            border-radius: var(--radius-1);
+            cursor: pointer;
+            transition: background-color var(--transition-normal);
+
+            &:hover {
+                background-color: var(--neutral-100);
+            }
+
+            &.is-selected {
+                background-color: var(--neutral-100);
+            }
+
+            .note-versions-row-timestamp {
+                font: var(--sm);
+                color: var(--text-primary);
+            }
+
+            .note-versions-row-label {
+                font: var(--xs);
+                color: var(--text-secondary);
+            }
+        }
+
+        .note-versions-load-more-button {
+            width: 100%;
+            margin-top: var(--spacing-2);
+        }
+
+        .note-versions-spinner {
+            display: flex;
+            justify-content: center;
+            padding: var(--spacing-4);
+        }
+    }
+
+    .note-versions-preview {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .note-versions-preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--spacing-4);
+            padding: var(--spacing-2);
+            padding-left: var(--spacing-4);
+            border-bottom: 1px solid var(--neutral-200);
+
+            .note-versions-preview-timestamp {
+                font: var(--sm);
+                color: var(--text-secondary);
+            }
+
+            .note-versions-preview-actions {
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-2);
+            }
+
+            .note-versions-close-button {
+                padding: var(--spacing-2);
+                cursor: pointer;
+                border-radius: var(--radius-1);
+                transition: background-color var(--transition-normal);
+
+                &:hover {
+                    background-color: var(--neutral-100);
+                }
+
+                line,
+                circle,
+                rect,
+                path {
+                    stroke: var(--text-secondary);
+                }
+            }
+        }
+
+        .note-versions-preview-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-6);
+        }
+    }
+}

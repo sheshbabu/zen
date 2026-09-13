@@ -411,7 +411,36 @@ func UpdateNote(note Note) (Note, error) {
 
 	defer tx.Rollback()
 
+	// Only snapshot when the text actually changes and every 5 mins
 	query := `
+		INSERT INTO
+			note_versions (note_id, title, content)
+		SELECT
+			note_id,
+			title,
+			content
+		FROM
+			notes
+		WHERE
+			note_id = ? AND (title != ? OR content != ?)
+			AND NOT EXISTS (
+				SELECT
+					1
+				FROM
+					note_versions
+				WHERE
+					note_id = ? AND created_at > datetime('now', ?)
+			)
+	`
+
+	_, err = tx.Exec(query, note.NoteID, note.Title, note.Content, note.NoteID, VERSION_MIN_INTERVAL)
+	if err != nil {
+		err = fmt.Errorf("error creating note version: %w", err)
+		slog.Error(err.Error())
+		return note, err
+	}
+
+	query = `
 		UPDATE
 			notes
 		SET
@@ -570,6 +599,20 @@ func ForceDeleteNote(noteID int) error {
 	_, err = tx.Exec(query, noteID)
 	if err != nil {
 		err = fmt.Errorf("error deleting note images: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	query = `
+		DELETE FROM
+			note_versions
+		WHERE
+			note_id = ?
+	`
+
+	_, err = tx.Exec(query, noteID)
+	if err != nil {
+		err = fmt.Errorf("error deleting note versions: %w", err)
 		slog.Error(err.Error())
 		return err
 	}
@@ -1014,4 +1057,174 @@ func GetRelatedNotes(noteID int, limit int) ([]Note, error) {
 	}
 
 	return notes, nil
+}
+
+const VERSIONS_LIMIT = 50
+
+// Version pruning keeps the newest version per time window, widening the window as versions age.
+// Notes with fewer versions than the threshold are skipped, so the scan only visits notes with enough history worth thinning.
+const (
+	VERSION_KEEP_ALL_AGE    = "-1 hour"
+	VERSION_HOURLY_AGE      = "-7 days"
+	VERSION_DAILY_AGE       = "-30 days"
+	VERSION_PRUNE_THRESHOLD = 5
+)
+
+// Shortest gap between two snapshots of the same note
+const VERSION_MIN_INTERVAL = "-5 minutes"
+
+func GetNoteVersions(noteID int, page int) ([]NoteVersion, int, error) {
+	versions := []NoteVersion{}
+	total := 0
+	offset := (page - 1) * VERSIONS_LIMIT
+
+	query := `
+		SELECT
+			COUNT(*)
+		FROM
+			note_versions
+		WHERE
+			note_id = ?
+	`
+
+	row := sqlite.DB.QueryRow(query, noteID)
+	err := row.Scan(&total)
+	if err != nil {
+		err = fmt.Errorf("error counting note versions: %w", err)
+		slog.Error(err.Error())
+		return versions, total, err
+	}
+
+	query = `
+		SELECT
+			version_id,
+			note_id,
+			title,
+			content,
+			created_at
+		FROM
+			note_versions
+		WHERE
+			note_id = ?
+		ORDER BY
+			created_at DESC,
+			version_id DESC
+		LIMIT
+			?
+		OFFSET
+			?
+	`
+
+	rows, err := sqlite.DB.Query(query, noteID, VERSIONS_LIMIT, offset)
+	if err != nil {
+		err = fmt.Errorf("error retrieving note versions: %w", err)
+		slog.Error(err.Error())
+		return versions, total, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var version NoteVersion
+		err = rows.Scan(&version.VersionID, &version.NoteID, &version.Title, &version.Content, &version.CreatedAt)
+		if err != nil {
+			err = fmt.Errorf("error scanning note version: %w", err)
+			slog.Error(err.Error())
+			return versions, total, err
+		}
+		versions = append(versions, version)
+	}
+
+	return versions, total, nil
+}
+
+func GetNoteVersionByID(noteID int, versionID int) (NoteVersion, error) {
+	var version NoteVersion
+
+	query := `
+		SELECT
+			version_id,
+			note_id,
+			title,
+			content,
+			created_at
+		FROM
+			note_versions
+		WHERE
+			note_id = ? AND version_id = ?
+	`
+
+	row := sqlite.DB.QueryRow(query, noteID, versionID)
+	err := row.Scan(&version.VersionID, &version.NoteID, &version.Title, &version.Content, &version.CreatedAt)
+	if err != nil {
+		err = fmt.Errorf("error retrieving note version: %w", err)
+		slog.Error(err.Error())
+		return version, err
+	}
+
+	return version, nil
+}
+
+func RestoreNoteVersion(noteID int, versionID int) (Note, error) {
+	var note Note
+
+	version, err := GetNoteVersionByID(noteID, versionID)
+	if err != nil {
+		return note, err
+	}
+
+	currentNote, err := GetNoteByID(noteID)
+	if err != nil {
+		return note, err
+	}
+
+	note.NoteID = noteID
+	note.Title = version.Title
+	note.Content = version.Content
+	note.Tags = currentNote.Tags
+
+	note, err = UpdateNote(note)
+	if err != nil {
+		return note, err
+	}
+
+	// UpdateNote's RETURNING clause doesn't populate these
+	note.IsPinned = currentNote.IsPinned
+	note.IsArchived = currentNote.IsArchived
+	note.IsDeleted = currentNote.IsDeleted
+	note.CreatedAt = currentNote.CreatedAt
+
+	return note, nil
+}
+
+func PruneNoteVersions() error {
+	query := `
+		DELETE FROM note_versions WHERE version_id IN (
+			SELECT version_id FROM (
+				SELECT
+					version_id,
+					ROW_NUMBER() OVER (
+						PARTITION BY note_id, CASE
+							WHEN created_at > datetime('now', ?) THEN version_id
+							WHEN created_at > datetime('now', ?) THEN strftime('%Y%m%d%H', created_at)
+							WHEN created_at > datetime('now', ?) THEN strftime('%Y%m%d', created_at)
+							ELSE strftime('%Y%W', created_at)
+						END
+						ORDER BY created_at DESC
+					) AS rn
+				FROM
+					note_versions
+				WHERE
+					note_id IN (SELECT note_id FROM note_versions GROUP BY note_id HAVING COUNT(*) > ?)
+			) WHERE rn > 1
+		)
+	`
+
+	_, err := sqlite.DB.Exec(query, VERSION_KEEP_ALL_AGE, VERSION_HOURLY_AGE, VERSION_DAILY_AGE, VERSION_PRUNE_THRESHOLD)
+	if err != nil {
+		err = fmt.Errorf("error pruning note versions: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
+	return nil
 }

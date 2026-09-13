@@ -193,6 +193,25 @@ async function clearTrash() {
   return await request('DELETE', '/api/notes/?isDeleted=true');
 }
 
+async function getNoteVersions(noteId, page) {
+  let url = `/api/notes/${noteId}/versions/`;
+  const params = new URLSearchParams();
+
+  if (page) {
+    params.append('page', page);
+  }
+
+  if (params.toString()) {
+    url += '?' + params.toString();
+  }
+
+  return await request('GET', url);
+}
+
+async function restoreNoteVersion(noteId, versionId) {
+  return await request('PUT', `/api/notes/${noteId}/versions/${versionId}/restore/`);
+}
+
 // Tags
 
 async function getTags(focusId) {
@@ -377,6 +396,8 @@ export default {
   pinNote,
   unpinNote,
   clearTrash,
+  getNoteVersions,
+  restoreNoteVersion,
   getTags,
   searchTags,
   updateTag,

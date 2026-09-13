@@ -25,12 +25,13 @@ import useEditorKeyboardShortcuts from "./useEditorKeyboardShortcuts.js";
 import useImageUpload from "./useImageUpload.js";
 import useMarkdownFormatter from "./useMarkdownFormatter.js";
 import useAutoSave from "./useAutoSave.js";
+import useNoteVersions from "./useNoteVersions.js";
 import SpellcheckPreferences from "../../commons/preferences/SpellcheckPreferences.js";
 import "./NotesEditor.css";
 import { SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
 
 export default function NotesEditor({ isNewNote, isModal, isExpandable = false, onClose }) {
-  const { selectedNote, handleNoteChange, handlePinToggle } = useNotes();
+  const { selectedNote, setSelectedNote, handleNoteChange, handlePinToggle } = useNotes();
   const { isEditorExpanded, toggleEditorExpanded, setSidePanelContent } = useLayout();
 
   if (!isNewNote && selectedNote === null) {
@@ -57,6 +58,20 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
 
   const tagsRef = useRef(tags);
   tagsRef.current = tags;
+
+  function handleVersionRestored(restoredNote) {
+    setTitle(restoredNote.title);
+    setContent(restoredNote.content);
+    setTags(restoredNote.tags || []);
+    setSelectedNote(restoredNote);
+  }
+
+  const { handleVersionsClick } = useNoteVersions({
+    note: selectedNote,
+    onRestored: handleVersionRestored,
+    // Wrapped because useAutoSave is initialised below this call
+    cancelAutoSave: () => cancelAutoSave()
+  });
 
   const { scheduleAutoSave, cancelAutoSave } = useAutoSave({
     isNewNote,
@@ -518,6 +533,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
         onUnpinClick={handleUnpinClick}
         onCopyClick={handleCopyClick}
         onShareClick={handleShareClick}
+        onVersionsClick={handleVersionsClick}
       />
       <div className="notes-editor-header">
         <div className="notes-editor-title" contentEditable={isEditable} spellCheck={spellcheckValue} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
@@ -535,7 +551,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   );
 }
 
-function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpanded, isExpandable, onSaveClick, onEditClick, onEditCancelClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick, onPinClick, onUnpinClick, onCopyClick, onShareClick }) {
+function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpanded, isExpandable, onSaveClick, onEditClick, onEditCancelClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick, onPinClick, onUnpinClick, onCopyClick, onShareClick, onVersionsClick }) {
   const saveButtonText = isSaveLoading ? "Saving..." : "Save";
 
   function handleClick(e) {
@@ -607,6 +623,8 @@ function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpand
           onDeleteClick={onDeleteClick}
           onCopyClick={onCopyClick}
           onShareClick={onShareClick}
+          onVersionsClick={onVersionsClick}
+          isModal={isModal}
         />
       </div>
     </div>

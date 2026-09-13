@@ -1,7 +1,9 @@
 package notes
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -28,6 +30,19 @@ type Note struct {
 	IsArchived         bool       `json:"isArchived"`
 	IsDeleted          bool       `json:"isDeleted"`
 	IsPinned           bool       `json:"isPinned"`
+}
+
+type NoteVersion struct {
+	VersionID int       `json:"versionId"`
+	NoteID    int       `json:"noteId"`
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+type VersionsResponseEnvelope struct {
+	Versions []NoteVersion `json:"versions"`
+	Total    int           `json:"total"`
 }
 
 type BulkRequest struct {
@@ -390,4 +405,69 @@ func HandleGetRelatedNotes(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(relatedNotes)
+}
+
+func HandleGetNoteVersions(w http.ResponseWriter, r *http.Request) {
+	noteIDStr := r.PathValue("noteId")
+	noteID, err := strconv.Atoi(noteIDStr)
+	if err != nil {
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", "Invalid note ID", err, http.StatusBadRequest)
+		return
+	}
+
+	page := 1
+	pageStr := r.URL.Query().Get("page")
+	if pageStr != "" {
+		page, err = strconv.Atoi(pageStr)
+		if err != nil {
+			utils.SendErrorResponse(w, "INVALID_PAGE_NUMBER", "Invalid page number", err, http.StatusBadRequest)
+			return
+		}
+	}
+
+	versions, total, err := GetNoteVersions(noteID, page)
+	if err != nil {
+		utils.SendErrorResponse(w, "NOTE_VERSIONS_READ_FAILED", "Error fetching note versions.", err, http.StatusInternalServerError)
+		return
+	}
+
+	response := VersionsResponseEnvelope{
+		Versions: versions,
+		Total:    total,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+func HandleRestoreNoteVersion(w http.ResponseWriter, r *http.Request) {
+	noteIDStr := r.PathValue("noteId")
+	noteID, err := strconv.Atoi(noteIDStr)
+	if err != nil {
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", "Invalid note ID", err, http.StatusBadRequest)
+		return
+	}
+
+	versionIDStr := r.PathValue("versionId")
+	versionID, err := strconv.Atoi(versionIDStr)
+	if err != nil {
+		utils.SendErrorResponse(w, "INVALID_VERSION_ID", "Invalid version ID", err, http.StatusBadRequest)
+		return
+	}
+
+	note, err := RestoreNoteVersion(noteID, versionID)
+	if errors.Is(err, sql.ErrNoRows) {
+		utils.SendErrorResponse(w, "NOTE_VERSION_NOT_FOUND", "Note version not found.", err, http.StatusNotFound)
+		return
+	}
+	if err != nil {
+		utils.SendErrorResponse(w, "NOTE_VERSION_RESTORE_FAILED", "Error restoring note version.", err, http.StatusInternalServerError)
+		return
+	}
+
+	queue.RemoveAllNoteTasks(noteID)
+	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_PROCESS, "process")
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(note)
 }

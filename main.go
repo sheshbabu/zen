@@ -103,6 +103,8 @@ func newRouter() *http.ServeMux {
 	addPrivateRoute(mux, "PUT /api/notes/{noteId}/restore/", notes.HandleRestoreDeletedNote)
 	addPrivateRoute(mux, "PUT /api/notes/{noteId}/pin/", notes.HandlePinNote)
 	addPrivateRoute(mux, "PUT /api/notes/{noteId}/unpin/", notes.HandleUnpinNote)
+	addPrivateRoute(mux, "GET /api/notes/{noteId}/versions/", notes.HandleGetNoteVersions)
+	addPrivateRoute(mux, "PUT /api/notes/{noteId}/versions/{versionId}/restore/", notes.HandleRestoreNoteVersion)
 
 	addPrivateRoute(mux, "GET /api/tags/", tags.HandleGetTags)
 	addPrivateRoute(mux, "PUT /api/tags/", tags.HandleUpdateTag)
@@ -211,6 +213,7 @@ func runBackgroundTasks() {
 	sessionCleanupFrequency := 24 * time.Hour          // 24 hours
 	imageSyncFrequency := 24 * time.Hour               // 24 hours
 	intelligenceProcessingFrequency := 5 * time.Minute // 5 minutes
+	versionPruneFrequency := 24 * time.Hour            // 24 hours
 
 	go func() {
 		notes.EmptyTrash(true) // Run immediately on server start
@@ -234,6 +237,13 @@ func runBackgroundTasks() {
 	go func() {
 		for range time.Tick(intelligenceProcessingFrequency) {
 			intelligence.ProcessQueues()
+		}
+	}()
+
+	go func() {
+		notes.PruneNoteVersions() // Run immediately on server start
+		for range time.Tick(versionPruneFrequency) {
+			notes.PruneNoteVersions()
 		}
 	}()
 }
