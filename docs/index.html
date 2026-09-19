@@ -97,6 +97,25 @@
             --red-600: #DC2626;
             --red-700 : #B91C1C;
             --yellow-100: #FEF9C3;
+            --yellow-400: #FACC15;
+
+            /* tag palette, ported from assets/index.css: each hue is the
+               Tailwind 500, with saturation scaled and lightness pinned so a
+               colored tag carries hue without shouting */
+            --red-500: #EF4444;
+            --orange-500: #F97316;
+            --green-500: #22C55E;
+            --teal-500: #14B8A6;
+            --blue-500: #3B82F6;
+            --purple-500: #8B5CF6;
+            --pink-500: #EC4899;
+            --transition-fast: 150ms;
+            --transition-normal: 300ms;
+            --radius-1: 4px;
+            --spacing-1: 4px;
+            --spacing-2: 8px;
+            /* one search-mock cycle: slide in, type, reveal, hold, reset */
+            --mock-cycle: 6s;
             --yellow-500: #EAB308;
 
             /* typography */
@@ -335,47 +354,829 @@
         .features {
             background-color: var(--neutral-50);
         }
-        
+
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 32px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
             margin-top: 32px;
         }
-        
+
         .feature-card {
             background: white;
-            padding: 18px;
-            border-radius: 8px;
-            box-shadow: var(--shadow-3);
+            padding: 24px;
+            border: 1px solid var(--neutral-200);
+            border-radius: 12px;
+            box-shadow: var(--shadow-1);
+            grid-column: span 2;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
-        
+
+        .feature-card.wide {
+            grid-column: span 6;
+        }
+
+        .feature-card.half {
+            grid-column: span 3;
+        }
+
         .feature-title {
             color: var(--neutral-900);
             display: flex;
+            align-items: center;
+            font: var(--h6);
 
             svg {
-                margin-right: 6px;;
+                margin-right: 8px;
+                color: var(--neutral-400);
+                flex-shrink: 0;
             }
 
             .experimental {
                 color: var(--yellow-500);
                 background-color: var(--yellow-100);
-                padding: 4px 10px;
+                padding: 2px 8px;
                 border-radius: 50px;
-                font-size: 14px;
-                margin-left: 6px;
+                font-size: 12px;
+                font-weight: 500;
+                margin-left: 8px;
             }
         }
-        
+
         .feature-description {
             color: var(--neutral-500);
+            font: var(--sm);
+            margin-top: 8px;
         }
-        
+
+        /* mini UI mockups */
+        /* these mocks sit flush under the text, not pinned to the card bottom */
+        .feature-visual:has(.mock),
+        .feature-visual:has(.mock-lens),
+        .feature-visual:has(.mock-template),
+        .feature-visual:has(.mock-history) {
+            margin: 20px 0 0;
+            min-height: 0;
+            flex-grow: 0;
+            align-items: flex-start;
+        }
+
+        .feature-visual {
+            margin-top: 24px;
+            margin-bottom: -25px;
+            margin-right: -25px;
+            margin-left: 16px;
+            flex-grow: 1;
+            display: flex;
+            align-items: flex-end;
+            min-height: 150px;
+        }
+
+        .mock {
+            width: 100%;
+            background: white;
+            border: 1px solid var(--neutral-200);
+            border-radius: var(--radius-1);
+            box-shadow: var(--shadow-2);
+            padding: 12px;
+            font: var(--sm);
+            font-size: 12px;
+            color: var(--neutral-600);
+            overflow: hidden;
+        }
+
+        .mock-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 8px;
+            border-radius: 6px;
+        }
+
+        .mock-row.active {
+            background-color: var(--neutral-100);
+        }
+
+        .mock-row svg {
+            width: 14px;
+            height: 14px;
+            color: var(--neutral-400);
+            flex-shrink: 0;
+        }
+
+        .mock-title {
+            color: var(--neutral-800);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .mock-line {
+            height: 6px;
+            border-radius: 3px;
+            background-color: var(--neutral-200);
+            flex-grow: 1;
+        }
+
+        .mock-search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border: 1px solid var(--neutral-200);
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .mock-search svg {
+            width: 14px;
+            height: 14px;
+            color: var(--neutral-400);
+            flex-shrink: 0;
+        }
+
+        /* search mock animation, mirrors the app's modal-slide-down */
+        @keyframes modal-slide-down {
+            0% {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 0.3s in, 0.7s typing, 0.5s results, 3.5s hold, 1s out of a 6s cycle */
+        @keyframes mock-cycle-modal {
+            0% {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+
+            5%, 83% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            95%, 100% {
+                transform: translateY(-6px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes mock-cycle-type {
+            0%, 5% {
+                width: 0;
+            }
+
+            17%, 100% {
+                width: 7ch;
+            }
+        }
+
+        /* caret blinks while typing, then stays hidden for the rest of the cycle */
+        @keyframes mock-cycle-caret {
+            0%, 2% {
+                border-right-color: var(--neutral-400);
+            }
+
+            4% {
+                border-right-color: transparent;
+            }
+
+            6% {
+                border-right-color: var(--neutral-400);
+            }
+
+            8% {
+                border-right-color: transparent;
+            }
+
+            10% {
+                border-right-color: var(--neutral-400);
+            }
+
+            12% {
+                border-right-color: transparent;
+            }
+
+            14% {
+                border-right-color: var(--neutral-400);
+            }
+
+            17%, 100% {
+                border-right-color: transparent;
+            }
+        }
+
+        /* results appear just after typing settles, tabs first then rows */
+        @keyframes mock-cycle-reveal {
+            0%, 18% {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+
+            23%, 83% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            95%, 100% {
+                transform: translateY(0);
+                opacity: 0;
+            }
+        }
+
+        .feature-card.is-playing .mock-search-modal {
+            animation: mock-cycle-modal var(--mock-cycle) ease-out infinite both;
+        }
+
+        .feature-card.is-playing .mock-typed {
+            animation:
+                mock-cycle-type var(--mock-cycle) steps(7, end) infinite both,
+                mock-cycle-caret var(--mock-cycle) step-end infinite both;
+        }
+
+        .mock-typed {
+            display: inline-block;
+            width: 7ch;
+            max-width: 100%;
+            flex: none;
+            overflow: hidden;
+            white-space: nowrap;
+            vertical-align: bottom;
+            border-right: 1.5px solid transparent;
+        }
+
+        .feature-card.is-playing .mock-reveal {
+            animation: mock-cycle-reveal var(--mock-cycle) ease-out infinite both;
+            animation-delay: var(--reveal-delay, 0s);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .feature-card.is-playing .mock-search-modal,
+            .feature-card.is-playing .mock-typed,
+            .feature-card.is-playing .mock-reveal {
+                animation: none;
+            }
+        }
+
+        .mock-tabs {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 2px 8px;
+            border-bottom: 1px solid var(--neutral-200);
+            margin-bottom: 4px;
+        }
+
+        .mock-tab {
+            color: var(--neutral-500);
+        }
+
+        .mock-tab.active {
+            background-color: var(--neutral-100);
+            color: var(--neutral-800);
+            font-weight: 500;
+            border-radius: 4px;
+            padding: 2px 8px;
+        }
+
+        .mock-sort {
+            margin-left: auto;
+            color: var(--neutral-500);
+            white-space: nowrap;
+        }
+
+        .mock-result {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            padding: 7px 8px;
+            border-radius: 6px;
+        }
+
+        .mock-result.active {
+            background-color: var(--neutral-100);
+        }
+
+        .mock-result-title {
+            color: var(--neutral-800);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .mock-result-snippet {
+            color: var(--neutral-400);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mock mark {
+            background: rgb(from var(--yellow-400) r g b / 0.1);
+            color: var(--yellow-500);
+            border-radius: 4px;
+            padding: 2px;
+        }
+
+        /* Focus Areas: a named lens over the same pool of notes.
+           Each mode lights the notes and tags that belong to it. */
+        .mock-lens {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .lens-modes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .lens-mode {
+            padding: var(--spacing-1) var(--spacing-2);
+            border-radius: var(--radius-1);
+            border: 1px solid var(--neutral-200);
+            color: var(--neutral-500);
+            font: var(--sm);
+            font-weight: 500;
+            white-space: nowrap;
+            transition: background-color var(--transition-normal) ease,
+                        border-color var(--transition-normal) ease,
+                        color var(--transition-normal) ease;
+        }
+
+        /* icons keep their 20px size and the column count follows the card
+           width, so they never get squeezed on a narrow screen */
+        .lens-field {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, 26px);
+            grid-auto-rows: 26px;
+            justify-content: space-between;
+            gap: 10px;
+            /* 4 rows: 4*26px + 3*10px gap */
+            height: 134px;
+            overflow: hidden;
+        }
+
+        /* same derivation as the app: text at s*0.53 / 64%, bg at full s / 95.5% */
+        .color-red { --tag-text: hsl(from var(--red-500) h calc(s * 0.53) 64.0%); --tag-bg: hsl(from var(--red-500) h s 95.5%); }
+        .color-orange { --tag-text: hsl(from var(--orange-500) h calc(s * 0.53) 64.0%); --tag-bg: hsl(from var(--orange-500) h s 95.5%); }
+        .color-yellow { --tag-text: hsl(from var(--yellow-500) h calc(s * 0.53) 64.0%); --tag-bg: hsl(from var(--yellow-500) h s 95.5%); }
+        .color-green { --tag-text: hsl(from var(--green-500) h calc(s * 0.53) 64.0%); --tag-bg: hsl(from var(--green-500) h s 95.5%); }
+        .color-teal { --tag-text: hsl(from var(--teal-500) h calc(s * 0.53) 64.0%); --tag-bg: hsl(from var(--teal-500) h s 95.5%); }
+        .color-blue { --tag-text: hsl(from var(--blue-500) h calc(s * 0.53) 64.0%); --tag-bg: hsl(from var(--blue-500) h s 95.5%); }
+        .color-purple { --tag-text: hsl(from var(--purple-500) h calc(s * 0.53) 64.0%); --tag-bg: hsl(from var(--purple-500) h s 95.5%); }
+        .color-pink { --tag-text: hsl(from var(--pink-500) h calc(s * 0.53) 64.0%); --tag-bg: hsl(from var(--pink-500) h s 95.5%); }
+
+        /* dots sit one step stronger than the tag pills: same hue, fuller
+           saturation and a darker lightness, so the field reads at a glance */
+        /* each note carries its tag's icon, stroked in the tag's own colour */
+        /* notes are monochrome: dark when they belong to the active lens,
+           grey when they fall outside it */
+        /* each note is a disc in its tag's own colours: the pill background
+           behind the pill's text colour, so the field and the tags below match */
+        .lens-note {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--tag-bg, var(--neutral-100));
+            transition: filter var(--transition-normal) ease,
+                        opacity var(--transition-normal) ease;
+        }
+
+        .lens-note svg {
+            width: 15px;
+            height: 15px;
+            color: var(--tag-text, var(--neutral-400));
+        }
+
+        .lens-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        /* matches .tag in assets/index.css */
+        .lens-tag {
+            padding: var(--spacing-1) var(--spacing-2);
+            border-radius: var(--radius-1);
+            background-color: var(--tag-bg, var(--neutral-100));
+            color: var(--tag-text, var(--neutral-400));
+            font: var(--sm);
+            font-weight: 500;
+            white-space: nowrap;
+            transition: opacity var(--transition-normal) ease,
+                        filter var(--transition-normal) ease;
+        }
+
+        /* resting state, also what reduced-motion shows: the "Everything" lens */
+        .lens-mode[data-mode="0"] {
+            background-color: var(--neutral-900);
+            border-color: var(--neutral-900);
+            color: white;
+        }
+
+        /* the active lens is driven by data-active on the mock */
+        .mock-lens[data-active="1"] .lens-mode[data-mode="0"],
+        .mock-lens[data-active="2"] .lens-mode[data-mode="0"],
+        .mock-lens[data-active="3"] .lens-mode[data-mode="0"] {
+            background-color: transparent;
+            border-color: var(--neutral-200);
+            color: var(--neutral-500);
+        }
+
+        .mock-lens[data-active="1"] .lens-mode[data-mode="1"],
+        .mock-lens[data-active="2"] .lens-mode[data-mode="2"],
+        .mock-lens[data-active="3"] .lens-mode[data-mode="3"] {
+            background-color: var(--neutral-900);
+            border-color: var(--neutral-900);
+            color: white;
+        }
+
+        /* notes outside the active lens recede */
+        .mock-lens[data-active="1"] .lens-note:not([data-in~="1"]),
+        .mock-lens[data-active="2"] .lens-note:not([data-in~="2"]),
+        .mock-lens[data-active="3"] .lens-note:not([data-in~="3"]) {
+            filter: grayscale(1);
+            opacity: 0.3;
+        }
+
+        /* only the lens's own tags stay legible */
+        .mock-lens[data-active="1"] .lens-tag:not([data-in~="1"]),
+        .mock-lens[data-active="2"] .lens-tag:not([data-in~="2"]),
+        .mock-lens[data-active="3"] .lens-tag:not([data-in~="3"]) {
+            filter: grayscale(1);
+            opacity: 0.3;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .lens-mode,
+            .lens-note,
+            .lens-tag {
+                transition: none;
+            }
+        }
+
+        /* Version History: a Time Machine style stack receding into the past.
+           data-rewind on the wrapper says how many versions we have stepped back. */
+        .mock-history {
+            width: 100%;
+            perspective: 900px;
+            padding-top: 42px;
+            overflow: hidden;
+        }
+
+        .hist-stack {
+            position: relative;
+            height: 165px;
+            transform-style: preserve-3d;
+        }
+
+        .hist-card {
+            position: absolute;
+            inset: 0 0 auto 0;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            padding: 12px 14px;
+            background: white;
+            border: 1px solid var(--neutral-200);
+            border-radius: var(--radius-1);
+            box-shadow: var(--shadow-2);
+            transform-origin: 50% 100%;
+            /* depth 0 is the front card; each step back sinks and shrinks */
+            --step: 0;
+            transform: translateY(calc(var(--step) * -13px)) translateZ(calc(var(--step) * -60px));
+            opacity: 1;
+            transition: transform 520ms cubic-bezier(0.22, 0.61, 0.36, 1),
+                        opacity 520ms ease,
+                        filter 520ms ease;
+        }
+
+        .hist-card[data-depth="0"] { --step: 0; z-index: 4; }
+        .hist-card[data-depth="1"] { --step: 1; z-index: 3; }
+        .hist-card[data-depth="2"] { --step: 2; z-index: 2; }
+        .hist-card[data-depth="3"] { --step: 3; z-index: 1; }
+
+        /* cards behind the front one wash out with distance */
+        .hist-card:not([data-depth="0"]) {
+            filter: saturate(0.9);
+        }
+
+        .hist-stamp {
+            font: var(--sm);
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--neutral-400);
+        }
+
+        .hist-h {
+            height: 8px;
+            width: 42%;
+            border-radius: 3px;
+            background-color: var(--neutral-300);
+        }
+
+        .hist-line {
+            height: 6px;
+            border-radius: 3px;
+            background-color: var(--neutral-200);
+        }
+
+        .hist-line.short {
+            width: 58%;
+        }
+
+        /* rewinding: the front card peels away and the next one steps up */
+        .mock-history[data-rewind="1"] .hist-card[data-depth="0"],
+        .mock-history[data-rewind="2"] .hist-card[data-depth="0"],
+        .mock-history[data-rewind="2"] .hist-card[data-depth="1"],
+        .mock-history[data-rewind="3"] .hist-card[data-depth="0"],
+        .mock-history[data-rewind="3"] .hist-card[data-depth="1"],
+        .mock-history[data-rewind="3"] .hist-card[data-depth="2"] {
+            transform: translateY(26px) translateZ(120px);
+            opacity: 0;
+        }
+
+        .mock-history[data-rewind="1"] .hist-card[data-depth="1"] { --step: 0; }
+        .mock-history[data-rewind="1"] .hist-card[data-depth="2"] { --step: 1; }
+        .mock-history[data-rewind="1"] .hist-card[data-depth="3"] { --step: 2; }
+
+        .mock-history[data-rewind="2"] .hist-card[data-depth="2"] { --step: 0; }
+        .mock-history[data-rewind="2"] .hist-card[data-depth="3"] { --step: 1; }
+
+        .mock-history[data-rewind="3"] .hist-card[data-depth="3"] { --step: 0; }
+
+        /* whichever card is at the front reads as current */
+        .mock-history[data-rewind="1"] .hist-card[data-depth="1"],
+        .mock-history[data-rewind="2"] .hist-card[data-depth="2"],
+        .mock-history[data-rewind="3"] .hist-card[data-depth="3"] {
+            filter: none;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hist-card {
+                transition: none;
+            }
+        }
+
+        /* Templates: pick a blueprint, its placeholders resolve into a real note.
+           data-active picks the template; data-filled resolves the placeholder. */
+        .mock-template {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tpl-picker {
+            display: flex;
+            gap: 6px;
+        }
+
+        .tpl-name {
+            padding: var(--spacing-1) var(--spacing-2);
+            border-radius: var(--radius-1);
+            border: 1px solid var(--neutral-200);
+            color: var(--neutral-500);
+            font: var(--sm);
+            font-weight: 500;
+            white-space: nowrap;
+            transition: background-color var(--transition-normal) ease,
+                        border-color var(--transition-normal) ease,
+                        color var(--transition-normal) ease;
+        }
+
+        .mock-template[data-active="0"] .tpl-name[data-t="0"],
+        .mock-template[data-active="1"] .tpl-name[data-t="1"],
+        .mock-template[data-active="2"] .tpl-name[data-t="2"] {
+            background-color: var(--neutral-900);
+            border-color: var(--neutral-900);
+            color: white;
+        }
+
+        .tpl-sheet {
+            position: relative;
+            min-height: 132px;
+        }
+
+        .tpl-doc {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            padding: 14px;
+            background: white;
+            border: 1px solid var(--neutral-200);
+            border-radius: var(--radius-1);
+            box-shadow: var(--shadow-2);
+            opacity: 0;
+            transform: translateY(4px);
+            pointer-events: none;
+            /* fade out quickly in place, fade in with a gentle rise */
+            transition: opacity 140ms ease, transform 0ms linear 140ms;
+        }
+
+        .mock-template[data-active="0"] .tpl-doc[data-t="0"],
+        .mock-template[data-active="1"] .tpl-doc[data-t="1"],
+        .mock-template[data-active="2"] .tpl-doc[data-t="2"] {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 260ms ease 120ms, transform 260ms ease 120ms;
+        }
+
+        .tpl-title {
+            font: var(--sm);
+            font-weight: 600;
+            color: var(--neutral-800);
+        }
+
+        /* the placeholder reads the same in a title or a body row: an amber
+           token that resolves into whatever type surrounds it */
+        .tpl-ph {
+            font-family: var(--font-family-code);
+            font-size: 0.92em;
+            padding: 1px 5px;
+            border-radius: 3px;
+            background: rgb(from var(--yellow-400) r g b / 0.14);
+            color: var(--yellow-500);
+            transition: background-color var(--transition-normal) ease,
+                        color var(--transition-normal) ease;
+        }
+
+        .mock-template[data-filled="true"] .tpl-ph {
+            background: transparent;
+            color: inherit;
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+        }
+
+        .tpl-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font: var(--sm);
+            font-size: 12px;
+            color: var(--neutral-400);
+        }
+
+        .tpl-bullet {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: var(--neutral-300);
+            flex-shrink: 0;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .tpl-name,
+            .tpl-doc,
+            .tpl-ph {
+                transition: none;
+            }
+        }
+
+        .mock-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .mock-chip {
+            padding: 3px 10px;
+            border-radius: 50px;
+            border: 1px solid var(--neutral-200);
+            color: var(--neutral-600);
+            white-space: nowrap;
+        }
+
+        .mock-chip.active {
+            background-color: var(--neutral-900);
+            border-color: var(--neutral-900);
+            color: white;
+        }
+
+        .mock-md {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .mock-md-h {
+            height: 9px;
+            width: 45%;
+            border-radius: 3px;
+            background-color: var(--neutral-300);
+        }
+
+        .mock-code {
+            font: var(--code);
+            font-size: 11px;
+            background-color: var(--neutral-50);
+            border-radius: 4px;
+            padding: 8px;
+            color: var(--neutral-500);
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .mock-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mock-box {
+            width: 13px;
+            height: 13px;
+            border: 1.5px solid var(--neutral-300);
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .mock-box.checked {
+            background-color: var(--neutral-800);
+            border-color: var(--neutral-800);
+        }
+
+        .mock-versions {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mock-version {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 4px;
+        }
+
+        .mock-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: var(--neutral-300);
+            flex-shrink: 0;
+        }
+
+        .mock-version.active .mock-dot {
+            background-color: var(--neutral-800);
+        }
+
+        .mock-time {
+            color: var(--neutral-400);
+            white-space: nowrap;
+        }
+
+        .mock-canvas {
+            position: relative;
+            height: 100%;
+            min-height: 130px;
+        }
+
+        .mock-note {
+            position: absolute;
+            background: white;
+            border: 1px solid var(--neutral-200);
+            border-radius: 6px;
+            box-shadow: var(--shadow-2);
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .mock-note .mock-line {
+            flex-grow: 0;
+            width: 100%;
+        }
+
+        .mock-note .mock-line.short {
+            width: 60%;
+        }
+
+        .mock-highlight {
+            background: var(--yellow-100);
+            border-radius: 3px;
+            padding: 1px 2px;
+        }
+
         .focus-section {
             text-align: center;
         }
-        
+
         .section-title {
             font: var(--h2);
             color: var(--neutral-900);
@@ -514,6 +1315,22 @@
             padding: 2px;
         }
         
+        @media (max-width: 1000px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .feature-card,
+            .feature-card.wide,
+            .feature-card.half {
+                grid-column: span 1;
+            }
+
+            .feature-card.wide {
+                grid-column: span 2;
+            }
+        }
+
         @media (max-width: 768px) {
             .nav-links {
                 gap: var(--spacing-sm);
@@ -526,10 +1343,26 @@
             .features-grid {
                 grid-template-columns: 1fr;
             }
+
+            .feature-card,
+            .feature-card.wide,
+            .feature-card.half {
+                grid-column: span 1;
+            }
         }
     </style>
 </head>
 <body>
+        <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <defs>
+        <symbol id="icon-utensils" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
+        <symbol id="icon-dumbbell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></symbol>
+        <symbol id="icon-clapperboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+        <symbol id="icon-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+        <symbol id="icon-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></symbol>
+        <symbol id="icon-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></symbol>
+        </defs>
+        </svg>
     <header class="header">
         <nav class="nav container">
             <a href="/zen" class="logo">Zen</a>
@@ -564,33 +1397,282 @@
         <section class="features section">
             <div class="container">
                 <div class="features-grid">
-                    <div class="feature-card">
-                        <h3 class="feature-title">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-feather-icon lucide-feather"><path d="M12.67 19a2 2 0 0 0 1.416-.588l6.154-6.172a6 6 0 0 0-8.49-8.49L5.586 9.914A2 2 0 0 0 5 11.328V18a1 1 0 0 0 1 1z"/><path d="M16 8 2 22"/><path d="M17.5 15H9"/></svg>
-                            Simple & Lightweight
-                        </h3>
-                        <p class="feature-description">
-                            Single Go binary or Docker Compose. ~20MB memory, minimal CPU usage. Your choice, your infrastructure.
-                        </p>
-                    </div>
-                    
-                    <div class="feature-card">
-                        <h3 class="feature-title">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-infinity-icon lucide-infinity"><path d="M6 16c5 0 7-8 12-8a4 4 0 0 1 0 8c-5 0-7-8-12-8a4 4 0 1 0 0 8"/></svg>
-                            Future-Proof Storage
-                        </h3>
-                        <p class="feature-description">
-                            Standard Markdown files, local SQLite database. No vendor lock-in, no proprietary formats. Your notes are yours, accessible forever.
-                        </p>
-                    </div>
-
-                    <div class="feature-card">
+                    <div class="feature-card half">
                         <h3 class="feature-title">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-funnel-icon lucide-funnel"><path d="M10 20a1 1 0 0 0 .553.895l2 1A1 1 0 0 0 14 21v-7a2 2 0 0 1 .517-1.341L21.74 4.67A1 1 0 0 0 21 3H3a1 1 0 0 0-.742 1.67l7.225 7.989A2 2 0 0 1 10 14z"/></svg>
                             Focus Areas
                         </h3>
                         <p class="feature-description">
                             Organize with flexible tags, not rigid folders. Create custom views called "Focus Modes" that adapt with your priorities.
+                        </p>
+                        <div class="feature-visual">
+                            <div class="mock-lens">
+                                <div class="lens-modes">
+                                    <span class="lens-mode" data-mode="0">Everything</span>
+                                    <span class="lens-mode" data-mode="1">Weight Loss</span>
+                                    <span class="lens-mode" data-mode="2">Novel</span>
+                                    <span class="lens-mode" data-mode="3">Learning</span>
+                                </div>
+                                <div class="lens-field">
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                    <span class="lens-note color-green" data-in="0 1"><svg aria-hidden="true"><use href="#icon-dumbbell"/></svg></span>
+                                    <span class="lens-note color-blue" data-in="0 3"><svg aria-hidden="true"><use href="#icon-code"/></svg></span>
+                                    <span class="lens-note color-red" data-in="0 2"><svg aria-hidden="true"><use href="#icon-users"/></svg></span>
+                                    <span class="lens-note color-teal" data-in="0 1"><svg aria-hidden="true"><use href="#icon-utensils"/></svg></span>
+                                    <span class="lens-note color-purple" data-in="0 3"><svg aria-hidden="true"><use href="#icon-table"/></svg></span>
+                                    <span class="lens-note color-orange" data-in="0 2"><svg aria-hidden="true"><use href="#icon-clapperboard"/></svg></span>
+                                </div>
+                                <div class="lens-tags">
+                                    <span class="lens-tag color-teal" data-in="1">Meal Prep</span>
+                                    <span class="lens-tag color-green" data-in="1">Workout</span>
+                                    <span class="lens-tag color-orange" data-in="2">Scenes</span>
+                                    <span class="lens-tag color-red" data-in="2">Characters</span>
+                                    <span class="lens-tag color-blue" data-in="3">Python</span>
+                                    <span class="lens-tag color-purple" data-in="3">Pandas</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feature-card half">
+                        <h3 class="feature-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+                            Instant Search
+                        </h3>
+                        <p class="feature-description">
+                            Full-text search across titles and content with BM25 ranking. Find what you need instantly as you type, including archived and deleted notes.
+                        </p>
+                        <div class="feature-visual">
+                            <div class="mock mock-search-modal">
+                                <div class="mock-search">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+                                    <span class="mock-title mock-typed">protein</span>
+                                </div>
+                                <div class="mock-tabs mock-reveal" style="--reveal-delay: 0s">
+                                    <span class="mock-tab active">All</span>
+                                    <span class="mock-tab">Notes</span>
+                                    <span class="mock-tab">Tags</span>
+                                    <span class="mock-sort">Best matches</span>
+                                </div>
+                                <div class="mock-result active mock-reveal" style="--reveal-delay: 0.12s">
+                                    <span class="mock-result-title">Sunday Meal Prep</span>
+                                    <span class="mock-result-snippet">### <mark>Protein</mark> Options (pick 2)</span>
+                                </div>
+                                <div class="mock-result mock-reveal" style="--reveal-delay: 0.24s">
+                                    <span class="mock-result-title">Week 3 Progress Report</span>
+                                    <span class="mock-result-snippet">hit <mark>protein</mark> target 5 of 7 days</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="feature-card half">
+                        <h3 class="feature-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-history-icon lucide-history"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                            Version History
+                        </h3>
+                        <p class="feature-description">
+                            Every save keeps a snapshot of the previous version. Browse a note's history and restore any earlier version. No account, no sync tier.
+                        </p>
+                        <div class="feature-visual">
+                            <div class="mock-history">
+                                <div class="hist-stack">
+                                    <div class="hist-card" data-depth="3">
+                                        <span class="hist-stamp">Jun 15, 9:02 AM</span>
+                                        <span class="hist-h"></span>
+                                        <span class="hist-line"></span>
+                                        <span class="hist-line short"></span>
+                                    </div>
+                                    <div class="hist-card" data-depth="2">
+                                        <span class="hist-stamp">Jun 17, 4:20 PM</span>
+                                        <span class="hist-h"></span>
+                                        <span class="hist-line"></span>
+                                        <span class="hist-line"></span>
+                                        <span class="hist-line short"></span>
+                                    </div>
+                                    <div class="hist-card" data-depth="1">
+                                        <span class="hist-stamp">Jun 19, 8:47 AM</span>
+                                        <span class="hist-h"></span>
+                                        <span class="hist-line"></span>
+                                        <span class="hist-line"></span>
+                                        <span class="hist-line"></span>
+                                        <span class="hist-line short"></span>
+                                    </div>
+                                    <div class="hist-card" data-depth="0">
+                                        <span class="hist-stamp">Current version</span>
+                                        <span class="hist-h"></span>
+                                        <span class="hist-line"></span>
+                                        <span class="hist-line"></span>
+                                        <span class="hist-line"></span>
+                                        <span class="hist-line"></span>
+                                        <span class="hist-line short"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="feature-card half">
+                        <h3 class="feature-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-stack-icon lucide-file-stack"><path d="M21 7h-3a2 2 0 0 1-2-2V2"/><path d="M21 6v6.5c0 .8-.7 1.5-1.5 1.5h-7c-.8 0-1.5-.7-1.5-1.5v-9c0-.8.7-1.5 1.5-1.5H17Z"/><path d="M7 8v8.8c0 .3.2.6.4.8.2.2.5.4.8.4H15"/><path d="M3 12v8.8c0 .3.2.6.4.8.2.2.5.4.8.4H11"/></svg>
+                            Templates
+                        </h3>
+                        <p class="feature-description">
+                            Create reusable note templates with placeholders. Quickly start new notes with consistent structure and formatting.
+                        </p>
+                        <div class="feature-visual">
+                            <div class="mock-template" data-active="0" data-filled="false">
+                                <div class="tpl-picker">
+                                    <span class="tpl-name" data-t="0">Journal</span>
+                                    <span class="tpl-name" data-t="1">Meeting notes</span>
+                                    <span class="tpl-name" data-t="2">Book summary</span>
+                                </div>
+                                <div class="tpl-sheet">
+                                    <div class="tpl-doc" data-t="0">
+                                        <span class="tpl-title">Journal<span class="tpl-ph">{{date}}</span></span>
+                                        <span class="tpl-row"><span class="tpl-bullet"></span>Logged at <span class="tpl-ph">{{time}}</span></span>
+                                        <span class="tpl-row"><span class="tpl-bullet"></span>Grateful for</span>
+                                        <span class="tpl-row"><span class="tpl-bullet"></span>One thing I learned</span>
+                                    </div>
+                                    <div class="tpl-doc" data-t="1">
+                                        <span class="tpl-title">Meeting<span class="tpl-ph">{{datetime}}</span></span>
+                                        <span class="tpl-row"><span class="tpl-bullet"></span>Attendees</span>
+                                        <span class="tpl-row"><span class="tpl-bullet"></span>Decisions</span>
+                                        <span class="tpl-row"><span class="tpl-bullet"></span>Follow up by <span class="tpl-ph">{{date}}</span></span>
+                                    </div>
+                                    <div class="tpl-doc" data-t="2">
+                                        <span class="tpl-title">Book summary</span>
+                                        <span class="tpl-row"><span class="tpl-bullet"></span>Started <span class="tpl-ph">{{date}}</span></span>
+                                        <span class="tpl-row"><span class="tpl-bullet"></span>Thesis</span>
+                                        <span class="tpl-row"><span class="tpl-bullet"></span>Takeaways</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="feature-card">
+                        <h3 class="feature-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-feather-icon lucide-feather"><path d="M12.67 19a2 2 0 0 0 1.416-.588l6.154-6.172a6 6 0 0 0-8.49-8.49L5.586 9.914A2 2 0 0 0 5 11.328V18a1 1 0 0 0 1 1z"/><path d="M16 8 2 22"/><path d="M17.5 15H9"/></svg>
+                            Simple &amp; Lightweight
+                        </h3>
+                        <p class="feature-description">
+                            Single Go binary or Docker Compose. ~20MB memory, minimal CPU usage. Your choice, your infrastructure.
                         </p>
                     </div>
 
@@ -604,13 +1686,14 @@
                         </p>
                     </div>
 
+
                     <div class="feature-card">
                         <h3 class="feature-title">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
-                            Instant Search
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-infinity-icon lucide-infinity"><path d="M6 16c5 0 7-8 12-8a4 4 0 0 1 0 8c-5 0-7-8-12-8a4 4 0 1 0 0 8"/></svg>
+                            Future-Proof Storage
                         </h3>
                         <p class="feature-description">
-                            Full-text search across titles and content with BM25 ranking. Find what you need instantly as you type, including archived and deleted notes.
+                            Standard Markdown files, local SQLite database. No vendor lock-in, no proprietary formats. Your notes are yours, accessible forever.
                         </p>
                     </div>
 
@@ -726,16 +1809,6 @@
 
                     <div class="feature-card">
                         <h3 class="feature-title">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-stack-icon lucide-file-stack"><path d="M21 7h-3a2 2 0 0 1-2-2V2"/><path d="M21 6v6.5c0 .8-.7 1.5-1.5 1.5h-7c-.8 0-1.5-.7-1.5-1.5v-9c0-.8.7-1.5 1.5-1.5H17Z"/><path d="M7 8v8.8c0 .3.2.6.4.8.2.2.5.4.8.4H15"/><path d="M3 12v8.8c0 .3.2.6.4.8.2.2.5.4.8.4H11"/></svg>
-                            Templates
-                        </h3>
-                        <p class="feature-description">
-                            Create reusable note templates with placeholders. Quickly start new notes with consistent structure and formatting.
-                        </p>
-                    </div>
-
-                    <div class="feature-card">
-                        <h3 class="feature-title">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pin-icon lucide-pin"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg>
                             Pinned Notes
                         </h3>
@@ -746,22 +1819,12 @@
 
                     <div class="feature-card">
                         <h3 class="feature-title">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-history-icon lucide-history"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
-                            Version History
-                        </h3>
-                        <p class="feature-description">
-                            Every save keeps a snapshot of the previous version. Browse a note's history and restore any earlier version. No account, no sync tier.
-                        </p>
-                    </div>
-
-                    <div class="feature-card">
-                        <h3 class="feature-title">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
                             Canvas
                             <span class="experimental">Experimental</span>
                         </h3>
                         <p class="feature-description">
-                             Spatial organization for visual thinkers. Arrange notes and images on an infinite canvas to see connections and build your mental model.
+                            Spatial organization for visual thinkers. Arrange notes and images on an infinite canvas to see connections and build your mental model.
                         </p>
                     </div>
 
@@ -779,7 +1842,159 @@
                 </div>
             </div>
         </section>
+
     </main>
+
+    <script>
+        (function() {
+            var card = document.querySelector('.mock-search-modal')?.closest('.feature-card');
+            if (!card) {
+                return;
+            }
+
+            if (!('IntersectionObserver' in window)) {
+                card.classList.add('is-playing');
+                return;
+            }
+
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        card.classList.add('is-playing');
+                        observer.disconnect();
+                    }
+                });
+            }, { threshold: 0.4 });
+
+            observer.observe(card);
+        })();
+
+        // Templates: cycle blueprints, resolving {{date}} into a real value
+        (function() {
+            var template = document.querySelector('.mock-template');
+            if (!template) {
+                return;
+            }
+
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+                return;
+            }
+
+            // the app formats {{date}} as YYYY-MM-DD and {{datetime}} with a time
+            var now = new Date();
+            var pad = function(n) { return String(n).padStart(2, '0'); };
+            var date = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+            var datetime = date + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+
+            // the app resolves {{date}}, {{time}} and {{datetime}} separately
+            var time = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+            var resolved = { '{{date}}': date, '{{time}}': time, '{{datetime}}': datetime };
+
+            var placeholders = template.querySelectorAll('.tpl-ph');
+            placeholders.forEach(function(ph) {
+                var token = ph.textContent.trim();
+                ph.dataset.token = token;
+                ph.dataset.value = resolved[token] || date;
+            });
+
+            var timer = null;
+            var step = 0;
+
+            function tick() {
+                // even steps show the raw template, odd steps resolve it
+                step = (step + 1) % 6;
+                var active = Math.floor(step / 2);
+                var filled = step % 2 === 1;
+
+                template.setAttribute('data-active', active);
+                template.setAttribute('data-filled', filled);
+
+                placeholders.forEach(function(ph) {
+                    ph.textContent = filled ? ph.dataset.value : ph.dataset.token;
+                });
+            }
+
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting && timer === null) {
+                        timer = setInterval(tick, 1500);
+                    } else if (!entry.isIntersecting && timer !== null) {
+                        clearInterval(timer);
+                        timer = null;
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            observer.observe(template);
+        })();
+
+        // Version History: rewind through the stack, then snap back to now
+        (function() {
+            var history = document.querySelector('.mock-history');
+            if (!history) {
+                return;
+            }
+
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+                return;
+            }
+
+            var timer = null;
+            var rewind = 0;
+
+            function step() {
+                rewind = (rewind + 1) % 4;
+                history.setAttribute('data-rewind', rewind);
+            }
+
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting && timer === null) {
+                        timer = setInterval(step, 1900);
+                    } else if (!entry.isIntersecting && timer !== null) {
+                        clearInterval(timer);
+                        timer = null;
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            observer.observe(history);
+        })();
+
+        // Focus Areas: cycle the active lens while the card is on screen
+        (function() {
+            var lens = document.querySelector('.mock-lens');
+            if (!lens) {
+                return;
+            }
+
+            var reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+            if (reduced.matches || !('IntersectionObserver' in window)) {
+                return;
+            }
+
+            var timer = null;
+            var mode = 0;
+
+            function step() {
+                mode = (mode + 1) % 4;
+                lens.setAttribute('data-active', mode);
+            }
+
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting && timer === null) {
+                        timer = setInterval(step, 2200);
+                    } else if (!entry.isIntersecting && timer !== null) {
+                        clearInterval(timer);
+                        timer = null;
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            observer.observe(lens);
+        })();
+    </script>
 
     <!-- mouji snippet -->
     <script>
