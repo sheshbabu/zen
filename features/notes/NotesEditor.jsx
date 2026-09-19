@@ -10,7 +10,6 @@ import handleCodeCopyClick from '../../commons/utils/copyCodeBlock.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import isMobile from '../../commons/utils/isMobile.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
-import NotePreviewModal from './NotePreviewModal.jsx';
 import TableEditorModal from './TableEditorModal.jsx';
 import Lightbox from '../../commons/components/Lightbox.jsx';
 import NotesEditorMenu from './NotesEditorMenu.jsx';
@@ -19,7 +18,6 @@ import { showToast } from '../../commons/components/Toast.jsx';
 import { closeModal, openModal } from '../../commons/components/Modal.jsx';
 import { useNotes } from "../../commons/contexts/NotesContext.jsx";
 import { useLayout } from "../../commons/contexts/LayoutContext.jsx";
-import NotePreview from './NotePreview.jsx';
 import { useVisibleHeadings } from "./useVisibleHeadings.js";
 import useEditorKeyboardShortcuts from "./useEditorKeyboardShortcuts.js";
 import useImageUpload from "./useImageUpload.js";
@@ -32,7 +30,7 @@ import { SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/compo
 
 export default function NotesEditor({ isNewNote, isModal, isExpandable = false, onClose }) {
   const { selectedNote, setSelectedNote, handleNoteChange, handlePinToggle } = useNotes();
-  const { isEditorExpanded, toggleEditorExpanded, setSidePanelContent } = useLayout();
+  const { isEditorExpanded, toggleEditorExpanded, openSidePanelNote } = useLayout();
 
   if (!isNewNote && selectedNote === null) {
     return null;
@@ -406,14 +404,13 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     e.preventDefault();
     const noteId = parseInt(link.getAttribute('data-note-id'), 10);
 
-    if (isMobile()) {
-      openModal(
-        <NotePreviewModal noteId={noteId} />,
-        '.note-modal-root'
-      );
-    } else {
-      setSidePanelContent(<NotePreview noteId={noteId} />);
+    // Shift opens the side panel; Cmd/Ctrl stays the browser's new-tab gesture.
+    if (e.shiftKey === true) {
+      openSidePanelNote(noteId);
+      return;
     }
+
+    navigateTo(`/notes/${noteId}`);
   }
 
   function handlePinClick() {

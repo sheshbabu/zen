@@ -24,7 +24,6 @@
 
     .sidepanel-toolbar {
         display: flex;
-        justify-content: flex-end;
         padding-top: 18px;
         padding-bottom: 18px;
         padding-right: var(--spacing-4);

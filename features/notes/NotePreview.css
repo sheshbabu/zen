@@ -1,8 +1,5 @@
 .note-preview {
-    .note-preview-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    .notes-editor-title {
         margin-bottom: var(--spacing-4);
     }
 }

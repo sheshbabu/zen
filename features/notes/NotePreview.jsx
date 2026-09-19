@@ -9,7 +9,7 @@ import './NotePreview.css';
 import './NotesEditor.css';
 
 
-export default function NotePreview({ noteId }) {
+export default function NotePreview({ noteId, onOpenLink, onNavigateLink, onNoteChange }) {
   const [note, setNote] = useState(null);
 
   useEffect(() => {
@@ -42,6 +42,12 @@ export default function NotePreview({ noteId }) {
       title: note.title,
       content: newContent,
       tags: note.tags,
+    }).then(() => {
+      if (onNoteChange) {
+        onNoteChange();
+      }
+    }).catch(() => {
+      setNote(note);
     });
   }
 
@@ -53,6 +59,23 @@ export default function NotePreview({ noteId }) {
     const checkbox = e.target.closest('.task-list-item-checkbox[data-line]');
     if (checkbox !== null) {
       handleTaskCheckboxClick(checkbox);
+      return;
+    }
+
+    const link = e.target.closest('a[data-note-id]');
+    if (link !== null) {
+      e.preventDefault();
+      const linkedNoteId = parseInt(link.getAttribute('data-note-id'), 10);
+
+      // Shift keeps the note in the preview; a plain click navigates, as it does in the editor.
+      if (e.shiftKey === true && onOpenLink) {
+        onOpenLink(linkedNoteId);
+        return;
+      }
+
+      if (onNavigateLink) {
+        onNavigateLink(linkedNoteId);
+      }
       return;
     }
 
@@ -71,9 +94,7 @@ export default function NotePreview({ noteId }) {
 
   return (
     <div className="note-preview">
-      <div className="note-preview-header">
-        <div className="notes-editor-title">{titleText}</div>
-      </div>
+      <div className="notes-editor-title">{titleText}</div>
       <div className="notes-editor-rendered" dangerouslySetInnerHTML={{ __html: renderMarkdown(note.content, { hasCodeCopyButton: true, hasClickableTasks: true }) }} onClick={handleContentClick} />
     </div>
   );
