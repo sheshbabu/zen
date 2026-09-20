@@ -65,14 +65,12 @@ export default function NoteVersionsModal({ note, onRestoreClick, onCloseClick }
 
   let selectedTitle = note.title;
   let selectedContent = note.content;
-  let selectedTimestampText = formatVersionDate(note.updatedAt);
 
   if (isCurrentSelected !== true) {
     const selectedVersion = versions.find(version => version.versionId === selectedVersionId);
     if (selectedVersion !== undefined) {
       selectedTitle = selectedVersion.title;
       selectedContent = selectedVersion.content;
-      selectedTimestampText = formatVersionDate(selectedVersion.createdAt);
     }
   }
 
@@ -115,20 +113,20 @@ export default function NoteVersionsModal({ note, onRestoreClick, onCloseClick }
       <ModalContainer className="note-versions-modal">
         <div className="note-versions-rail">
           <div className="note-versions-rail-header">Version history</div>
-          <div className={currentRowClasses} onClick={() => setSelectedVersionId(CURRENT_VERSION_ID)}>
-            <div className="note-versions-row-timestamp">{formatVersionDate(note.updatedAt)}</div>
-            <div className="note-versions-row-label">Current version</div>
+          <div className="note-versions-rail-list">
+            <div className={currentRowClasses} onClick={() => setSelectedVersionId(CURRENT_VERSION_ID)}>
+              <div className="note-versions-row-timestamp">{formatVersionDate(note.updatedAt)}</div>
+              <div className="note-versions-row-label">Current version</div>
+            </div>
+            {railContent}
+            {loadMoreButton}
           </div>
-          {railContent}
-          {loadMoreButton}
+          <NoteVersionTiers />
         </div>
         <div className="note-versions-preview">
           <div className="note-versions-preview-header">
-            <div className="note-versions-preview-timestamp">{selectedTimestampText}</div>
-            <div className="note-versions-preview-actions">
-              <Button isDisabled={isCurrentSelected === true || isRestoreLoading === true} onClick={handleRestoreClick}>{restoreButtonText}</Button>
-              <CloseIcon className="note-versions-close-button" onClick={onCloseClick} />
-            </div>
+            <Button variant="danger" isDisabled={isCurrentSelected === true || isRestoreLoading === true} onClick={handleRestoreClick}>{restoreButtonText}</Button>
+            <CloseIcon className="note-versions-close-button" onClick={onCloseClick} />
           </div>
           <div className="note-versions-preview-content">
             <div className="notes-editor-title">{titleText}</div>
@@ -137,6 +135,29 @@ export default function NoteVersionsModal({ note, onRestoreClick, onCloseClick }
         </div>
       </ModalContainer>
     </ModalBackdrop>
+  );
+}
+
+function NoteVersionTiers() {
+  const tiers = [
+    { age: "Last hour", kept: "Every edit" },
+    { age: "Up to 7 days", kept: "Hourly" },
+    { age: "Up to 30 days", kept: "Daily" },
+    { age: "Older", kept: "Weekly" },
+  ];
+
+  const tierRows = tiers.map(tier => (
+    <div key={tier.age} className="note-versions-tiers-row">
+      <span className="note-versions-tiers-age">{tier.age}</span>
+      <span className="note-versions-tiers-kept">{tier.kept}</span>
+    </div>
+  ));
+
+  return (
+    <div className="note-versions-tiers">
+      <div className="note-versions-tiers-header">What's kept and for how long:</div>
+      {tierRows}
+    </div>
   );
 }
 

@@ -8,9 +8,16 @@
     .note-versions-rail {
         width: 260px;
         flex-shrink: 0;
-        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
         padding: var(--spacing-2);
         border-right: 1px solid var(--neutral-200);
+
+        .note-versions-rail-list {
+            flex: 1;
+            overflow-y: auto;
+        }
 
         .note-versions-rail-header {
             font: var(--sm);
@@ -58,6 +65,33 @@
             justify-content: center;
             padding: var(--spacing-4);
         }
+
+        .note-versions-tiers {
+            flex-shrink: 0;
+            margin-top: var(--spacing-2);
+            padding: var(--spacing-3) var(--spacing-2);
+            border-top: 1px solid var(--neutral-200);
+
+            .note-versions-tiers-header {
+                font: var(--xs);
+                color: var(--text-primary);
+                margin-bottom: var(--spacing-2);
+            }
+
+            .note-versions-tiers-row {
+                display: flex;
+                justify-content: space-between;
+                gap: var(--spacing-2);
+                font: var(--xs);
+                color: var(--text-primary);
+                padding: var(--spacing-1) 0;
+
+                .note-versions-tiers-kept {
+                    color: var(--text-primary);
+                    text-align: right;
+                }
+            }
+        }
     }
 
     .note-versions-preview {
@@ -74,17 +108,6 @@
             padding: var(--spacing-2);
             padding-left: var(--spacing-4);
             border-bottom: 1px solid var(--neutral-200);
-
-            .note-versions-preview-timestamp {
-                font: var(--sm);
-                color: var(--text-secondary);
-            }
-
-            .note-versions-preview-actions {
-                display: flex;
-                align-items: center;
-                gap: var(--spacing-2);
-            }
 
             .note-versions-close-button {
                 padding: var(--spacing-2);
