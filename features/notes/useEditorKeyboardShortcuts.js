@@ -1,5 +1,27 @@
 import { useEffect, useCallback } from "../../assets/preact.esm.js";
 
+const listPatterns = [
+  /^(\s*)(- \[ \] )/,
+  /^(\s*)(- \[x\] )/,
+  /^(\s*)(- )/,
+  /^(\s*)(\* )/,
+  /^(\s*)(\+ )/,
+  /^(\s*)(\d+\. )/,
+];
+
+function isListLine(line) {
+  return listPatterns.some(pattern => pattern.test(line));
+}
+
+function updateLine(textarea, lineStart, newLine, newCursorPos) {
+  const lineEnd = textarea.value.indexOf('\n', lineStart);
+  const textAfter = lineEnd === -1 ? "" : textarea.value.substring(lineEnd);
+  textarea.value = textarea.value.substring(0, lineStart) + newLine + textAfter;
+  textarea.selectionStart = newCursorPos;
+  textarea.selectionEnd = newCursorPos;
+  textarea.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
 export default function useEditorKeyboardShortcuts({
   isEditable,
   isModal,
@@ -39,9 +61,34 @@ export default function useEditorKeyboardShortcuts({
       }
     }
 
-    if (isTextAreaFocused && e.key === 'Tab' && !e.shiftKey) {
-      e.preventDefault();
-      onInsertAtCursor('  ');
+    if (isTextAreaFocused && e.key === 'Tab') {
+      const textarea = textareaRef.current;
+      const cursorPos = textarea.selectionStart;
+      const lineStart = textarea.value.lastIndexOf('\n', cursorPos - 1) + 1;
+      const lineEnd = textarea.value.indexOf('\n', cursorPos);
+      const currentLine = textarea.value.substring(lineStart, lineEnd === -1 ? textarea.value.length : lineEnd);
+
+      if (isListLine(currentLine)) {
+        e.preventDefault();
+        const indentation = currentLine.match(/^\s*/)[0];
+
+        if (e.shiftKey) {
+          const removedCount = Math.min(indentation.length, 2);
+          if (removedCount === 0) {
+            return;
+          }
+          const newCursorPos = Math.max(lineStart, cursorPos - removedCount);
+          updateLine(textarea, lineStart, currentLine.substring(removedCount), newCursorPos);
+        } else {
+          updateLine(textarea, lineStart, '  ' + currentLine, cursorPos + 2);
+        }
+        return;
+      }
+
+      if (!e.shiftKey) {
+        e.preventDefault();
+        onInsertAtCursor('  ');
+      }
     }
 
     if (isTextAreaFocused && (e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'h') {
@@ -65,15 +112,6 @@ export default function useEditorKeyboardShortcuts({
       const textBeforeCursor = textarea.value.substring(0, cursorPos);
       const lines = textBeforeCursor.split('\n');
       const currentLine = lines[lines.length - 1];
-
-      const listPatterns = [
-        /^(\s*)(- \[ \] )/,
-        /^(\s*)(- \[x\] )/,
-        /^(\s*)(- )/,
-        /^(\s*)(\* )/,
-        /^(\s*)(\+ )/,
-        /^(\s*)(\d+\. )/,
-      ];
 
       for (const pattern of listPatterns) {
         const match = currentLine.match(pattern);
