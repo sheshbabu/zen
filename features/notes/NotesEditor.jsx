@@ -19,6 +19,7 @@ import { closeModal, openModal } from '../../commons/components/Modal.jsx';
 import { useNotes } from "../../commons/contexts/NotesContext.jsx";
 import { useLayout } from "../../commons/contexts/LayoutContext.jsx";
 import { useVisibleHeadings } from "./useVisibleHeadings.js";
+import { useCollapsibleHeadings } from "./useCollapsibleHeadings.js";
 import useEditorKeyboardShortcuts from "./useEditorKeyboardShortcuts.js";
 import useImageUpload from "./useImageUpload.js";
 import useMarkdownFormatter from "./useMarkdownFormatter.js";
@@ -48,6 +49,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   const editorRef = useRef(null);
 
   const visibleHeadings = useVisibleHeadings(contentRef, content, isEditable, isEditorExpanded);
+  const { handleHeadingClick } = useCollapsibleHeadings(contentRef, selectedNote?.noteId);
 
   const { insertAtCursor, applyMarkdownFormat } = useMarkdownFormatter({
     textareaRef,
@@ -379,6 +381,10 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
       return;
     }
 
+    if (handleHeadingClick(e) === true) {
+      return;
+    }
+
     const checkbox = e.target.closest('.task-list-item-checkbox[data-line]');
     if (checkbox !== null) {
       handleTaskCheckboxClick(checkbox);
@@ -466,7 +472,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     );
   } else {
     contentArea = (
-      <div className="notes-editor-rendered" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(content, { hasCodeCopyButton: true, hasClickableTasks: true }) }} onClick={handleRenderedContentClick} />
+      <div className="notes-editor-rendered has-foldable-headings" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(content, { hasCodeCopyButton: true, hasClickableTasks: true }) }} onClick={handleRenderedContentClick} />
     );
   }
 
@@ -543,7 +549,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
         {contentArea}
       </div>
       {templatePicker}
-      <TableOfContents content={content} isExpanded={isEditorExpanded} isEditable={isEditable} isNewNote={isNewNote} visibleHeadings={visibleHeadings} />
+      <TableOfContents noteId={selectedNote?.noteId} content={content} isExpanded={isEditorExpanded} isEditable={isEditable} isNewNote={isNewNote} visibleHeadings={visibleHeadings} />
     </div>
   );
 }

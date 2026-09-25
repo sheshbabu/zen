@@ -1,16 +1,19 @@
-import { h, useState, useEffect } from '../../assets/preact.esm.js';
+import { h, useState, useEffect, useRef } from '../../assets/preact.esm.js';
 import ApiClient from '../../commons/http/ApiClient.js';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import { toggleTaskAtLine } from '../../commons/utils/toggleTaskLine.js';
 import handleCodeCopyClick from '../../commons/utils/copyCodeBlock.js';
 import { closeModal, openModal } from '../../commons/components/Modal.jsx';
 import Lightbox from '../../commons/components/Lightbox.jsx';
+import { useCollapsibleHeadings } from './useCollapsibleHeadings.js';
 import './NotePreview.css';
 import './NotesEditor.css';
 
 
 export default function NotePreview({ noteId, onOpenLink, onNavigateLink, onNoteChange }) {
   const [note, setNote] = useState(null);
+  const contentRef = useRef(null);
+  const { handleHeadingClick } = useCollapsibleHeadings(contentRef, note?.noteId);
 
   useEffect(() => {
     ApiClient.getNoteById(noteId)
@@ -56,6 +59,10 @@ export default function NotePreview({ noteId, onOpenLink, onNavigateLink, onNote
       return;
     }
 
+    if (handleHeadingClick(e) === true) {
+      return;
+    }
+
     const checkbox = e.target.closest('.task-list-item-checkbox[data-line]');
     if (checkbox !== null) {
       handleTaskCheckboxClick(checkbox);
@@ -95,7 +102,7 @@ export default function NotePreview({ noteId, onOpenLink, onNavigateLink, onNote
   return (
     <div className="note-preview">
       <div className="notes-editor-title">{titleText}</div>
-      <div className="notes-editor-rendered" dangerouslySetInnerHTML={{ __html: renderMarkdown(note.content, { hasCodeCopyButton: true, hasClickableTasks: true }) }} onClick={handleContentClick} />
+      <div className="notes-editor-rendered has-foldable-headings" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(note.content, { hasCodeCopyButton: true, hasClickableTasks: true }) }} onClick={handleContentClick} />
     </div>
   );
 }

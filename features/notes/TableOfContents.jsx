@@ -1,8 +1,9 @@
 import { h, render, useRef } from "../../assets/preact.esm.js"
 import { closeModal, openModal } from "../../commons/components/Modal.jsx";
+import { unfoldToHeading } from "./useCollapsibleHeadings.js";
 import "./TableOfContents.css";
 
-export default function TableOfContents({ content, isExpanded, isEditable, isNewNote, visibleHeadings = [] }) {
+export default function TableOfContents({ noteId, content, isExpanded, isEditable, isNewNote, visibleHeadings = [] }) {
   const headings = extractHeadings(content);
   const hideTimeoutRef = useRef(null);
 
@@ -19,7 +20,7 @@ export default function TableOfContents({ content, isExpanded, isEditable, isNew
       clearTimeout(hideTimeoutRef.current);
       hideTimeoutRef.current = null;
     }
-    openModal(<TableOfContentsPopover headings={headings} visibleHeadings={visibleHeadings} onMouseEnter={handlePopoverMouseEnter} onMouseLeave={handlePopoverMouseLeave} />);
+    openModal(<TableOfContentsPopover noteId={noteId} headings={headings} visibleHeadings={visibleHeadings} onMouseEnter={handlePopoverMouseEnter} onMouseLeave={handlePopoverMouseLeave} />);
   }
 
   function hidePopover() {
@@ -78,7 +79,7 @@ export default function TableOfContents({ content, isExpanded, isEditable, isNew
   return null;
 }
 
-function TableOfContentsPopover({ headings, visibleHeadings = [], onMouseEnter, onMouseLeave }) {
+function TableOfContentsPopover({ noteId, headings, visibleHeadings = [], onMouseEnter, onMouseLeave }) {
   function handleItemClick(heading) {
     const headingElements = document.querySelectorAll(`h${heading.level}`);
     let targetElement = null;
@@ -91,6 +92,7 @@ function TableOfContentsPopover({ headings, visibleHeadings = [], onMouseEnter, 
     }
 
     if (targetElement !== null) {
+      unfoldToHeading(targetElement.parentElement, targetElement, noteId);
       targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 

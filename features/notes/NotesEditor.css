@@ -596,6 +596,36 @@
     }
 }
 
+.has-foldable-headings {
+    >h1,
+    >h2,
+    >h3 {
+        cursor: pointer;
+    }
+
+    /* Balanced wrapping pushes the fold pill onto its own line. */
+    >h1.is-folded,
+    >h2.is-folded,
+    >h3.is-folded {
+        text-wrap: wrap;
+    }
+
+    >h1.is-folded::after,
+    >h2.is-folded::after,
+    >h3.is-folded::after {
+        content: "\22EF";
+        display: inline-block;
+        margin-left: var(--spacing-2);
+        padding: 0 var(--spacing-2);
+        border-radius: var(--radius-full);
+        background-color: var(--neutral-100);
+        color: var(--neutral-500);
+        font: var(--sm);
+        font-weight: 600;
+        vertical-align: middle;
+    }
+}
+
 @media screen and (max-width: 948px) {
     .formatting-toolbar {
         display: none;
