@@ -6,16 +6,19 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+	"zen/commons/auth"
 	"zen/commons/sqlite"
 	"zen/features/tags"
 )
 
 const NOTES_LIMIT = 100
 
-func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
+func GetAllNotes(access auth.Access, filter NotesFilter) ([]Note, int, error) {
 	notes := []Note{}
 	total := 0
 	offset := (filter.page - 1) * NOTES_LIMIT
+
+	scopePredicate, scopeArgs := buildReadableNotesPredicate(access)
 
 	var query string
 	var queryArgs []interface{}
@@ -52,6 +55,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 				tags t2 ON nt2.tag_id = t2.tag_id
 			WHERE
 				t.tag_id = ? AND n.deleted_at IS NULL AND n.archived_at IS NULL
+			` + scopePredicate + `
 			GROUP BY
 				n.note_id
 			ORDER BY
@@ -65,7 +69,9 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 			OFFSET
 				?
 		`
-		queryArgs = []interface{}{filter.tagID, NOTES_LIMIT, offset}
+		queryArgs = []interface{}{filter.tagID}
+		queryArgs = append(queryArgs, scopeArgs...)
+		queryArgs = append(queryArgs, NOTES_LIMIT, offset)
 	} else if filter.focusModeID != 0 {
 		query = `
 			SELECT
@@ -96,6 +102,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 				tags t ON nt.tag_id = t.tag_id
 			WHERE
 				fmt.focus_mode_id = ? AND n.deleted_at IS NULL AND n.archived_at IS NULL
+			` + scopePredicate + `
 			GROUP BY
 				n.note_id
 			ORDER BY
@@ -109,7 +116,9 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 			OFFSET
 				?
 		`
-		queryArgs = []interface{}{filter.focusModeID, NOTES_LIMIT, offset}
+		queryArgs = []interface{}{filter.focusModeID}
+		queryArgs = append(queryArgs, scopeArgs...)
+		queryArgs = append(queryArgs, NOTES_LIMIT, offset)
 	} else {
 		whereCondition := ""
 		if filter.isDeleted {
@@ -148,6 +157,7 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 			LEFT JOIN
 				tags t ON nt.tag_id = t.tag_id
 			%s
+			%s
 			GROUP BY
 				n.note_id
 			ORDER BY
@@ -160,8 +170,10 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 				?
 			OFFSET
 				?
-		`, whereCondition)
-		queryArgs = []interface{}{NOTES_LIMIT, offset}
+		`, whereCondition, scopePredicate)
+		queryArgs = []interface{}{}
+		queryArgs = append(queryArgs, scopeArgs...)
+		queryArgs = append(queryArgs, NOTES_LIMIT, offset)
 	}
 
 	rows, err := sqlite.DB.Query(query, queryArgs...)
@@ -203,11 +215,13 @@ func GetAllNotes(filter NotesFilter) ([]Note, int, error) {
 	return notes, total, nil
 }
 
-func GetNoteByID(noteID int) (Note, error) {
+func GetNoteByID(access auth.Access, noteID int) (Note, error) {
 	var note Note
 	var tagsJSON string
 	var archivedAt sql.NullTime
 	var deletedAt sql.NullTime
+
+	scopePredicate, scopeArgs := buildReadableNotesPredicate(access)
 
 	query := `
 		SELECT
@@ -237,11 +251,15 @@ func GetNoteByID(noteID int) (Note, error) {
 			tags t ON nt.tag_id = t.tag_id
 		WHERE
 			n.note_id = ?
+			` + scopePredicate + `
 		GROUP BY
 			n.note_id
 	`
 
-	row := sqlite.DB.QueryRow(query, noteID)
+	queryArgs := []interface{}{noteID}
+	queryArgs = append(queryArgs, scopeArgs...)
+
+	row := sqlite.DB.QueryRow(query, queryArgs...)
 	var pinnedAt sql.NullTime
 	err := row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.CreatedAt, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt)
 	if err != nil {
@@ -266,7 +284,16 @@ func GetNoteByID(noteID int) (Note, error) {
 	return note, nil
 }
 
-func CreateNote(note Note) (Note, error) {
+func CreateNote(access auth.Access, note Note) (Note, error) {
+	tagIDs := []int{}
+	for _, tag := range note.Tags {
+		tagIDs = append(tagIDs, tag.TagID)
+	}
+
+	if !auth.CanWrite(access, tagIDs) {
+		return note, auth.ErrForbidden
+	}
+
 	tx, err := sqlite.DB.Begin()
 
 	if err != nil {
@@ -400,7 +427,7 @@ func CreateNote(note Note) (Note, error) {
 	return note, nil
 }
 
-func UpdateNote(note Note) (Note, error) {
+func UpdateNote(access auth.Access, note Note) (Note, error) {
 	tx, err := sqlite.DB.Begin()
 
 	if err != nil {
@@ -410,6 +437,22 @@ func UpdateNote(note Note) (Note, error) {
 	}
 
 	defer tx.Rollback()
+
+	existingTagIDs, err := getTagIDsForNote(tx, note.NoteID)
+	if err != nil {
+		return note, err
+	}
+
+	if !auth.CanWrite(access, existingTagIDs) {
+		return note, auth.ErrForbidden
+	}
+
+	if !access.CanRetag {
+		note.Tags = []tags.Tag{}
+		for _, tagID := range existingTagIDs {
+			note.Tags = append(note.Tags, tags.Tag{TagID: tagID})
+		}
+	}
 
 	// Only snapshot when the text actually changes and every 5 mins
 	query := `
@@ -729,8 +772,10 @@ const (
 	SortCreated   = "created"
 )
 
-func SearchNotes(term string, limit int, sort string) ([]Note, error) {
+func SearchNotes(access auth.Access, term string, limit int, sort string) ([]Note, error) {
 	notes := []Note{}
+
+	scopePredicate, scopeArgs := buildReadableNotesPredicate(access)
 
 	orderBy := "rank"
 	if sort == SortUpdated {
@@ -757,6 +802,7 @@ func SearchNotes(term string, limit int, sort string) ([]Note, error) {
 			notes_search ns ON n.note_id = ns.rowid
 		WHERE
 			notes_search MATCH ?
+			` + scopePredicate + `
 		ORDER BY
 			-- Boosting by active notes, then archived, then deleted notes
 			CASE
@@ -772,7 +818,11 @@ func SearchNotes(term string, limit int, sort string) ([]Note, error) {
 	`
 
 	// https://www.sqlite.org/fts5.html#fts5_column_filters
-	rows, err := sqlite.DB.Query(query, "{title content}: "+term, limit)
+	searchArgs := []interface{}{"{title content}: " + term}
+	searchArgs = append(searchArgs, scopeArgs...)
+	searchArgs = append(searchArgs, limit)
+
+	rows, err := sqlite.DB.Query(query, searchArgs...)
 	if err != nil {
 		err = fmt.Errorf("error retrieving notes: %w", err)
 		slog.Error(err.Error())
@@ -1172,7 +1222,7 @@ func RestoreNoteVersion(noteID int, versionID int) (Note, error) {
 		return note, err
 	}
 
-	currentNote, err := GetNoteByID(noteID)
+	currentNote, err := GetNoteByID(auth.Unrestricted, noteID)
 	if err != nil {
 		return note, err
 	}
@@ -1182,7 +1232,7 @@ func RestoreNoteVersion(noteID int, versionID int) (Note, error) {
 	note.Content = version.Content
 	note.Tags = currentNote.Tags
 
-	note, err = UpdateNote(note)
+	note, err = UpdateNote(auth.Unrestricted, note)
 	if err != nil {
 		return note, err
 	}
@@ -1227,4 +1277,48 @@ func PruneNoteVersions() error {
 	}
 
 	return nil
+}
+
+func getTagIDsForNote(tx *sql.Tx, noteID int) ([]int, error) {
+	tagIDs := []int{}
+
+	query := `
+		SELECT
+			tag_id
+		FROM
+			note_tags
+		WHERE
+			note_id = ?
+	`
+
+	rows, err := tx.Query(query, noteID)
+	if err != nil {
+		err = fmt.Errorf("error retrieving note tags: %w", err)
+		slog.Error(err.Error())
+		return tagIDs, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var tagID int
+		err = rows.Scan(&tagID)
+		if err != nil {
+			err = fmt.Errorf("error scanning note tag: %w", err)
+			slog.Error(err.Error())
+			return tagIDs, err
+		}
+		tagIDs = append(tagIDs, tagID)
+	}
+
+	return tagIDs, nil
+}
+
+// Notes with no tags match only when every tag is readable.
+func buildReadableNotesPredicate(access auth.Access) (string, []interface{}) {
+	if auth.CanReadAllTags(access) {
+		return "", nil
+	}
+
+	tagPredicate, args := tags.BuildReadableTagsPredicate(access, "scoped_nt.tag_id")
+	return "AND EXISTS (SELECT 1 FROM note_tags scoped_nt WHERE scoped_nt.note_id = n.note_id " + tagPredicate + ")", args
 }

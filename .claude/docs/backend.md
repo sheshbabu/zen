@@ -16,8 +16,12 @@ All Go commands must include the `--tags "fts5"` flag for SQLite FTS5 support.
 - Set `Content-Type: application/json` for JSON responses
 
 ## API Endpoints
-- RESTful patterns: `GET /api/resource/`, `POST /api/resource/`, `PUT /api/resource/{id}/`
-- Private routes use `addPrivateRoute()` wrapper for authentication
+- RESTful patterns: `GET /api/v1/resource/`, `POST /api/v1/resource/`, `PUT /api/v1/resource/{id}/`
+- Routes are registered in `main.go` with one of three wrappers:
+  - `addPublicRoute()` - no authentication
+  - `addSessionRoute()` - logged-in users only; API tokens get 403
+  - `addAuthenticatedRoute()` - logged-in users or API tokens
+- Handlers on authenticated routes pass `auth.GetAccess(r.Context())` to the model, and never branch on the caller. Model functions reachable by tokens take an `auth.Access` and apply it in SQL (`buildReadableNotesPredicate` in the notes model, `tags.BuildReadableTagsPredicate`) or before writing (`auth.CanWrite`, returning `auth.ErrForbidden`). Sessions and background work use `auth.Unrestricted`
 - Response envelopes for paginated data (e.g., `ResponseEnvelope`)
 
 ## Struct Conventions

@@ -7,7 +7,7 @@
 
 ## Schema & Migrations
 - Migrations are sequential SQL files in `./migrations/` with format `<version>_<title>.sql`
-- Main entities: users, notes, tags, focus_modes, sessions, images, templates, mcp_tokens, queues, canvases
+- Main entities: users, notes, tags, focus_modes, sessions, images, templates, api_tokens, api_token_scopes, queues, canvases
 
 ## Query Patterns
 - Always use parameterized queries with `?` placeholders

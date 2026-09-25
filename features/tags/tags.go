@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"zen/commons/auth"
 	"zen/commons/utils"
 )
 
@@ -36,12 +37,14 @@ func HandleGetTags(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	access := auth.GetAccess(r.Context())
+
 	if focusModeID != 0 {
-		tags, err = GetTagsByFocusModeID(focusModeID)
+		tags, err = GetTagsByFocusModeID(access, focusModeID)
 	} else if query != "" {
-		tags, err = SearchTags(query)
+		tags, err = SearchTags(access, query)
 	} else {
-		tags, err = GetAllTags()
+		tags, err = GetAllTags(access)
 	}
 
 	if err != nil {

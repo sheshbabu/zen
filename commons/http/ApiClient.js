@@ -69,23 +69,23 @@ async function request(method, url, payload, opts) {
 // Users
 
 async function checkUser() {
-  return await request('GET', '/api/users/me');
+  return await request('GET', '/api/v1/users/me');
 }
 
 async function createUser(payload) {
-  return await request('POST', '/api/users/new', payload);
+  return await request('POST', '/api/v1/users/new', payload);
 }
 
 async function login(payload) {
-  return await request('POST', '/api/users/login', payload);
+  return await request('POST', '/api/v1/users/login', payload);
 }
 
 async function updatePassword(payload) {
-  return await request('POST', '/api/users/me/password', payload);
+  return await request('POST', '/api/v1/users/me/password', payload);
 }
 
 async function logout() {
-  const response = await request('POST', '/api/users/logout');
+  const response = await request('POST', '/api/v1/users/logout');
   navigator.serviceWorker?.controller?.postMessage({ type: 'CLEAR_CACHE' });
   return response;
 }
@@ -93,25 +93,25 @@ async function logout() {
 // Focus Modes
 
 async function getFocusModes() {
-  return await request('GET', '/api/focus');
+  return await request('GET', '/api/v1/focus');
 }
 
 async function createFocusMode(focusMode) {
-  return await request('POST', '/api/focus/new', focusMode);
+  return await request('POST', '/api/v1/focus/new', focusMode);
 }
 
 async function updateFocusMode(focusMode) {
-  return await request('PUT', `/api/focus/${focusMode.focusId}`, focusMode);
+  return await request('PUT', `/api/v1/focus/${focusMode.focusId}`, focusMode);
 }
 
 async function deleteFocusMode(focusId) {
-  return await request('DELETE', `/api/focus/${focusId}/`);
+  return await request('DELETE', `/api/v1/focus/${focusId}/`);
 }
 
 // Notes
 
 async function getNotes(tagId, focusId, isArchived, isDeleted, page) {
-  let url = "/api/notes/";
+  let url = "/api/v1/notes/";
   const params = new URLSearchParams();
 
   if (tagId) {
@@ -138,7 +138,7 @@ async function getNotes(tagId, focusId, isArchived, isDeleted, page) {
 }
 
 async function getRelatedNotes(noteId, limit) {
-  let url = `/api/notes/${noteId}/related/`;
+  let url = `/api/v1/notes/${noteId}/related/`;
   if (limit) {
     url += `?limit=${limit}`;
   }
@@ -146,55 +146,55 @@ async function getRelatedNotes(noteId, limit) {
 }
 
 async function getNoteById(noteId) {
-  return await request('GET', `/api/notes/${noteId}/`);
+  return await request('GET', `/api/v1/notes/${noteId}/`);
 }
 
 async function createNote(note) {
-  return await request('POST', '/api/notes/', note);
+  return await request('POST', '/api/v1/notes/', note);
 }
 
 async function updateNote(noteId, note) {
-  return await request('PUT', `/api/notes/${noteId}/`, note);
+  return await request('PUT', `/api/v1/notes/${noteId}/`, note);
 }
 
 async function deleteNote(noteId) {
-  return await request('DELETE', `/api/notes/${noteId}/`);
+  return await request('DELETE', `/api/v1/notes/${noteId}/`);
 }
 
 async function bulkDeleteNotes(ids) {
-  return await request('DELETE', '/api/notes/bulk/', { ids });
+  return await request('DELETE', '/api/v1/notes/bulk/', { ids });
 }
 
 async function restoreNote(noteId) {
-  return await request('PUT', `/api/notes/${noteId}/restore/`);
+  return await request('PUT', `/api/v1/notes/${noteId}/restore/`);
 }
 
 async function archiveNote(noteId) {
-  return await request('PUT', `/api/notes/${noteId}/archive/`);
+  return await request('PUT', `/api/v1/notes/${noteId}/archive/`);
 }
 
 async function bulkArchiveNotes(ids) {
-  return await request('PUT', '/api/notes/bulk/archive/', { ids });
+  return await request('PUT', '/api/v1/notes/bulk/archive/', { ids });
 }
 
 async function unarchiveNote(noteId) {
-  return await request('PUT', `/api/notes/${noteId}/unarchive/`);
+  return await request('PUT', `/api/v1/notes/${noteId}/unarchive/`);
 }
 
 async function pinNote(noteId) {
-  return await request('PUT', `/api/notes/${noteId}/pin/`);
+  return await request('PUT', `/api/v1/notes/${noteId}/pin/`);
 }
 
 async function unpinNote(noteId) {
-  return await request('PUT', `/api/notes/${noteId}/unpin/`);
+  return await request('PUT', `/api/v1/notes/${noteId}/unpin/`);
 }
 
 async function clearTrash() {
-  return await request('DELETE', '/api/notes/?isDeleted=true');
+  return await request('DELETE', '/api/v1/notes/?isDeleted=true');
 }
 
 async function getNoteVersions(noteId, page) {
-  let url = `/api/notes/${noteId}/versions/`;
+  let url = `/api/v1/notes/${noteId}/versions/`;
   const params = new URLSearchParams();
 
   if (page) {
@@ -209,13 +209,13 @@ async function getNoteVersions(noteId, page) {
 }
 
 async function restoreNoteVersion(noteId, versionId) {
-  return await request('PUT', `/api/notes/${noteId}/versions/${versionId}/restore/`);
+  return await request('PUT', `/api/v1/notes/${noteId}/versions/${versionId}/restore/`);
 }
 
 // Tags
 
 async function getTags(focusId) {
-  let url = "/api/tags/";
+  let url = "/api/v1/tags/";
 
   if (focusId) {
     url += `?focusId=${focusId}`;
@@ -225,21 +225,21 @@ async function getTags(focusId) {
 }
 
 async function searchTags(query) {
-  return await request('GET', `/api/tags/?query=${query}`);
+  return await request('GET', `/api/v1/tags/?query=${query}`);
 }
 
 async function updateTag(tag) {
-  return await request('PUT', `/api/tags/${tag.tagId}/`, tag);
+  return await request('PUT', `/api/v1/tags/${tag.tagId}/`, tag);
 }
 
 async function deleteTag(tagId) {
-  return await request('DELETE', `/api/tags/${tagId}/`);
+  return await request('DELETE', `/api/v1/tags/${tagId}/`);
 }
 
 // Images
 
 async function getImages(tagId, focusId, page) {
-  let url = "/api/images/";
+  let url = "/api/v1/images/";
   const params = new URLSearchParams();
 
   if (tagId) {
@@ -260,31 +260,31 @@ async function getImages(tagId, focusId, page) {
 }
 
 async function uploadImage(formData) {
-  return await request('POST', '/api/images/', formData);
+  return await request('POST', '/api/v1/images/', formData);
 }
 
 // Search
 
 async function search(query, sort) {
-  return await request('GET', `/api/search/?query=${query}&sort=${sort}`);
+  return await request('GET', `/api/v1/search/?query=${query}&sort=${sort}`);
 }
 
 // Intelligence
 
 async function getSimilarImages(filename) {
-  return await request('GET', `/api/intelligence/similarity/images/${filename}/`);
+  return await request('GET', `/api/v1/intelligence/similarity/images/${filename}/`);
 }
 
 // Import
 
 async function importFile(formData) {
-  return await request('POST', '/api/import/', formData);
+  return await request('POST', '/api/v1/import/', formData);
 }
 
 // Export
 
 async function exportNotes() {
-  const response = await fetch('/api/export/', {
+  const response = await fetch('/api/v1/export/', {
     method: 'GET',
     headers: {}
   });
@@ -307,68 +307,68 @@ async function exportNotes() {
 // Templates
 
 async function getTemplates() {
-  return await request('GET', "/api/templates/");
+  return await request('GET', "/api/v1/templates/");
 }
 
 async function getTemplateById(templateId) {
-  return await request('GET', `/api/templates/${templateId}/`);
+  return await request('GET', `/api/v1/templates/${templateId}/`);
 }
 
 async function createTemplate(template) {
-  return await request('POST', '/api/templates/', template);
+  return await request('POST', '/api/v1/templates/', template);
 }
 
 async function updateTemplate(templateId, template) {
-  return await request('PUT', `/api/templates/${templateId}/`, template);
+  return await request('PUT', `/api/v1/templates/${templateId}/`, template);
 }
 
 async function deleteTemplate(templateId) {
-  return await request('DELETE', `/api/templates/${templateId}/`);
+  return await request('DELETE', `/api/v1/templates/${templateId}/`);
 }
 
 async function getRecommendedTemplates() {
-  return await request('GET', "/api/templates/recommended/");
+  return await request('GET', "/api/v1/templates/recommended/");
 }
 
 async function incrementTemplateUsage(templateId) {
-  return await request('PUT', `/api/templates/${templateId}/usage/`);
+  return await request('PUT', `/api/v1/templates/${templateId}/usage/`);
 }
 
 
-// MCP Tokens
+// API Tokens
 
 async function getTokens() {
-  return await request('GET', '/api/mcp/tokens/');
+  return await request('GET', '/api/v1/tokens/');
 }
 
 async function createToken(payload) {
-  return await request('POST', '/api/mcp/tokens/', payload);
+  return await request('POST', '/api/v1/tokens/', payload);
 }
 
 async function deleteToken(tokenId) {
-  return await request('DELETE', `/api/mcp/tokens/${tokenId}/`);
+  return await request('DELETE', `/api/v1/tokens/${tokenId}/`);
 }
 
 // Canvases
 
 async function getCanvases() {
-  return await request('GET', '/api/canvases/');
+  return await request('GET', '/api/v1/canvases/');
 }
 
 async function getCanvasById(canvasId) {
-  return await request('GET', `/api/canvases/${canvasId}/`);
+  return await request('GET', `/api/v1/canvases/${canvasId}/`);
 }
 
 async function createCanvas(canvas) {
-  return await request('POST', '/api/canvases/', canvas);
+  return await request('POST', '/api/v1/canvases/', canvas);
 }
 
 async function updateCanvas(canvasId, canvas, opts) {
-  return await request('PUT', `/api/canvases/${canvasId}/`, canvas, opts);
+  return await request('PUT', `/api/v1/canvases/${canvasId}/`, canvas, opts);
 }
 
 async function deleteCanvas(canvasId) {
-  return await request('DELETE', `/api/canvases/${canvasId}/`);
+  return await request('DELETE', `/api/v1/canvases/${canvasId}/`);
 }
 
 export default {

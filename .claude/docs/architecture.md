@@ -16,7 +16,8 @@
   - `mcp/` - Model Context Protocol server for external integrations
   - `canvas/` - Spatial organization with infinite canvas
 - **Commons**: Shared utilities in `commons/`
-  - `auth/` - Authentication middleware
+  - `auth/` - Authentication middleware and the request principal (session or API token)
+  - `tokens/` - API tokens and their per-tag scopes
   - `session/` - Session management
   - `sqlite/` - Database connection and migrations
   - `utils/` - HTTP utilities
@@ -33,8 +34,8 @@
 - **Styling**: Plain CSS with CSS custom properties for theming
 
 ## Key Patterns
-- **API Routes**: RESTful endpoints prefixed with `/api/`
-- **Authentication**: Session-based with middleware wrapping private routes
+- **API Routes**: RESTful endpoints prefixed with `/api/v1/`
+- **Authentication**: Session cookie for the app, or a bearer API token scoped to tags for scripts and MCP
 - **File Structure**: Features are self-contained with models, handlers, and components
 - **Asset Handling**: Static assets embedded in binary for production, file system for development
 

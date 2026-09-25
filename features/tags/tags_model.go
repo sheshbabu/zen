@@ -3,11 +3,14 @@ package tags
 import (
 	"fmt"
 	"log/slog"
+	"strings"
+	"zen/commons/auth"
 	"zen/commons/sqlite"
 )
 
-func GetAllTags() ([]Tag, error) {
+func GetAllTags(access auth.Access) ([]Tag, error) {
 	tags := []Tag{}
+	scopePredicate, scopeArgs := BuildReadableTagsPredicate(access, "t.tag_id")
 	query := `
 		SELECT
 			t.tag_id,
@@ -18,13 +21,15 @@ func GetAllTags() ([]Tag, error) {
 			tags t
 		LEFT JOIN
 			note_tags nt ON t.tag_id = nt.tag_id
+		WHERE
+			1 ` + scopePredicate + `
 		GROUP BY
 			t.tag_id, t.name, t.color
 		ORDER BY
 			note_count DESC
 	`
 
-	rows, err := sqlite.DB.Query(query)
+	rows, err := sqlite.DB.Query(query, scopeArgs...)
 	if err != nil {
 		err = fmt.Errorf("error retrieving tags: %w", err)
 		slog.Error(err.Error())
@@ -46,8 +51,9 @@ func GetAllTags() ([]Tag, error) {
 	return tags, nil
 }
 
-func SearchTags(term string) ([]Tag, error) {
+func SearchTags(access auth.Access, term string) ([]Tag, error) {
 	tags := []Tag{}
+	scopePredicate, scopeArgs := BuildReadableTagsPredicate(access, "t.tag_id")
 	query := `
 		SELECT
 			t.tag_id,
@@ -60,6 +66,7 @@ func SearchTags(term string) ([]Tag, error) {
 			note_tags nt ON t.tag_id = nt.tag_id
 		WHERE
 			t.name LIKE '%' || ? || '%'
+			` + scopePredicate + `
 		GROUP BY
 			t.tag_id, t.name, t.color
 		ORDER BY
@@ -72,7 +79,11 @@ func SearchTags(term string) ([]Tag, error) {
 			note_count DESC
 	`
 
-	rows, err := sqlite.DB.Query(query, term, term)
+	queryArgs := []interface{}{term}
+	queryArgs = append(queryArgs, scopeArgs...)
+	queryArgs = append(queryArgs, term)
+
+	rows, err := sqlite.DB.Query(query, queryArgs...)
 	if err != nil {
 		err = fmt.Errorf("error retrieving tags: %w", err)
 		slog.Error(err.Error())
@@ -94,8 +105,9 @@ func SearchTags(term string) ([]Tag, error) {
 	return tags, nil
 }
 
-func GetTagsByFocusModeID(focusModeID int) ([]Tag, error) {
+func GetTagsByFocusModeID(access auth.Access, focusModeID int) ([]Tag, error) {
 	tags := []Tag{}
+	scopePredicate, scopeArgs := BuildReadableTagsPredicate(access, "t.tag_id")
 	query := `
 		SELECT
 			t.tag_id,
@@ -110,13 +122,17 @@ func GetTagsByFocusModeID(focusModeID int) ([]Tag, error) {
 			focus_mode_tags f ON t.tag_id = f.tag_id
 		WHERE
 			f.focus_mode_id = ?
+			` + scopePredicate + `
 		GROUP BY
 			t.tag_id, t.name, t.color
 		ORDER BY
 			t.tag_id ASC
 	`
 
-	rows, err := sqlite.DB.Query(query, focusModeID)
+	queryArgs := []interface{}{focusModeID}
+	queryArgs = append(queryArgs, scopeArgs...)
+
+	rows, err := sqlite.DB.Query(query, queryArgs...)
 	if err != nil {
 		err = fmt.Errorf("error retrieving tags: %w", err)
 		slog.Error(err.Error())
@@ -174,6 +190,13 @@ func DeleteTag(tagID int) error {
 		return err
 	}
 
+	_, err = tx.Exec("DELETE FROM api_token_scopes WHERE tag_id = ?", tagID)
+	if err != nil {
+		err = fmt.Errorf("error deleting from api_token_scopes: %w", err)
+		slog.Error(err.Error())
+		return err
+	}
+
 	_, err = tx.Exec("DELETE FROM tags WHERE tag_id = ?", tagID)
 	if err != nil {
 		err = fmt.Errorf("error deleting from tags: %w", err)
@@ -189,4 +212,22 @@ func DeleteTag(tagID int) error {
 	}
 
 	return nil
+}
+
+func BuildReadableTagsPredicate(access auth.Access, tagIDColumn string) (string, []interface{}) {
+	if auth.CanReadAllTags(access) {
+		return "", nil
+	}
+
+	if len(access.ReadTagIDs) == 0 {
+		return "AND 0", nil
+	}
+
+	placeholders := strings.TrimSuffix(strings.Repeat("?,", len(access.ReadTagIDs)), ",")
+	args := []interface{}{}
+	for _, tagID := range access.ReadTagIDs {
+		args = append(args, tagID)
+	}
+
+	return fmt.Sprintf("AND %s IN (%s)", tagIDColumn, placeholders), args
 }

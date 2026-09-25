@@ -3,6 +3,7 @@ package search
 import (
 	"encoding/json"
 	"net/http"
+	"zen/commons/auth"
 	"zen/commons/utils"
 	"zen/features/intelligence"
 	"zen/features/notes"
@@ -38,6 +39,8 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 	// Sorting applies to lexical notes only
 	sort := r.URL.Query().Get("sort")
 
+	access := auth.GetAccess(r.Context())
+
 	lexicalNotesChan := make(chan LexicalNoteSearchResults, 1)
 	tagsChan := make(chan TagSearchResults, 1)
 	semanticNotesChan := make(chan []intelligence.SemanticNoteResult, 1)
@@ -45,21 +48,30 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 
 	// Run all searches in parallel
 	go func() {
-		searchNotes, err := notes.SearchNotes(query, LIMIT, sort)
+		searchNotes, err := notes.SearchNotes(access, query, LIMIT, sort)
 		lexicalNotesChan <- LexicalNoteSearchResults{Notes: searchNotes, Err: err}
 	}()
 
 	go func() {
-		searchTags, err := tags.SearchTags(query)
+		searchTags, err := tags.SearchTags(access, query)
 		tagsChan <- TagSearchResults{Tags: searchTags, Err: err}
 	}()
 
+	// Images carry no tags, so like untagged notes only an all-tags grant reaches semantic results.
 	go func() {
+		if !auth.CanReadAllTags(access) {
+			semanticNotesChan <- []intelligence.SemanticNoteResult{}
+			return
+		}
 		semanticNotes, _ := intelligence.SemanticNoteSearch(query, LIMIT)
 		semanticNotesChan <- semanticNotes
 	}()
 
 	go func() {
+		if !auth.CanReadAllTags(access) {
+			semanticImagesChan <- []intelligence.SemanticImageResult{}
+			return
+		}
 		semanticImages, _ := intelligence.SemanticImageSearch(query, LIMIT)
 		semanticImagesChan <- semanticImages
 	}()

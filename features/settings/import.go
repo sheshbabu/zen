@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"zen/commons/auth"
 	"zen/commons/utils"
 	"zen/features/notes"
 	"zen/features/tags"
@@ -81,7 +82,7 @@ func HandleImport(w http.ResponseWriter, r *http.Request) {
 		note.UpdatedAt = *fm.updatedAt
 	}
 
-	_, err = notes.CreateNote(note)
+	_, err = notes.CreateNote(auth.Unrestricted, note)
 	if err != nil {
 		err = fmt.Errorf("error creating note: %w", err)
 		utils.SendErrorResponse(w, "NOTES_IMPORT_FAILED", "Error importing note", err, http.StatusInternalServerError)
@@ -160,7 +161,7 @@ func splitTags(value string) []string {
 func resolveTags(names []string) []tags.Tag {
 	var result []tags.Tag
 	for _, name := range names {
-		existingTags, err := tags.SearchTags(name)
+		existingTags, err := tags.SearchTags(auth.Unrestricted, name)
 		if err == nil {
 			for _, t := range existingTags {
 				if t.Name == name {

@@ -1,11 +1,11 @@
 import { h, useState } from "../../assets/preact.esm.js"
 import { ModalBackdrop, ModalContainer, ModalHeader, closeModal } from "../../commons/components/Modal.jsx";
-import { UploadIcon, DownloadIcon, ThemeIcon, BrainCircuitIcon, SecurityIcon, PencilIcon } from "../../commons/components/Icon.jsx";
+import { UploadIcon, DownloadIcon, ThemeIcon, SecurityIcon, PencilIcon } from "../../commons/components/Icon.jsx";
 import ImportPane from "./ImportPane.jsx";
 import ExportPane from "./ExportPane.jsx";
 import AppearancePane from "./AppearancePane.jsx";
 import EditorPane from "./EditorPane.jsx";
-import McpPane from "./McpPane.jsx";
+import ApiTokensPane from "./ApiTokensPane.jsx";
 import SecurityPane from "./SecurityPane.jsx";
 import "./SettingsModal.css";
 
@@ -15,7 +15,7 @@ const tabs = [
   { id: "account", label: "Security", icon: <SecurityIcon className="settings-tab-icon" />, content: <SecurityPane /> },
   { id: "import", label: "Import", icon: <UploadIcon className="settings-tab-icon" />, content: <ImportPane /> },
   { id: "export", label: "Export", icon: <DownloadIcon className="settings-tab-icon" />, content: <ExportPane /> },
-  { id: "mcp", label: "MCP", icon: <BrainCircuitIcon className="settings-tab-icon" />, content: <McpPane /> }
+  { id: "tokens", label: "API Tokens", icon: <SecurityIcon className="settings-tab-icon" />, content: <ApiTokensPane /> }
 ];
 
 export default function SettingsModal() {

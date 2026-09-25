@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"zen/commons/auth"
 	"zen/commons/queue"
 	"zen/commons/utils"
 	"zen/features/tags"
@@ -114,7 +115,7 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 		isArchived:  isArchived == "true",
 	}
 
-	allNotes, total, err = GetAllNotes(filter)
+	allNotes, total, err = GetAllNotes(auth.GetAccess(r.Context()), filter)
 
 	if err != nil {
 		utils.SendErrorResponse(w, "NOTES_READ_FAILED", "Error fetching notes.", err, http.StatusInternalServerError)
@@ -138,8 +139,13 @@ func HandleGetNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	note, err := GetNoteByID(noteID)
+	note, err := GetNoteByID(auth.GetAccess(r.Context()), noteID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			utils.SendErrorResponse(w, "NOTE_NOT_FOUND", "Note not found.", err, http.StatusNotFound)
+			return
+		}
+
 		utils.SendErrorResponse(w, "NOTES_READ_FAILED", "Error fetching note.", err, http.StatusInternalServerError)
 		return
 	}
@@ -155,8 +161,13 @@ func HandleCreateNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	note, err := CreateNote(noteInput)
+	note, err := CreateNote(auth.GetAccess(r.Context()), noteInput)
 	if err != nil {
+		if errors.Is(err, auth.ErrForbidden) {
+			utils.SendErrorResponse(w, "FORBIDDEN_SCOPE", "This token does not have write access to those tags.", err, http.StatusForbidden)
+			return
+		}
+
 		utils.SendErrorResponse(w, "NOTES_CREATE_FAILED", "Error saving note.", err, http.StatusInternalServerError)
 		return
 	}
@@ -182,8 +193,13 @@ func HandleUpdateNote(w http.ResponseWriter, r *http.Request) {
 	}
 	noteInput.NoteID = noteID
 
-	note, err := UpdateNote(noteInput)
+	note, err := UpdateNote(auth.GetAccess(r.Context()), noteInput)
 	if err != nil {
+		if errors.Is(err, auth.ErrForbidden) {
+			utils.SendErrorResponse(w, "FORBIDDEN_SCOPE", "This token does not have write access to that note.", err, http.StatusForbidden)
+			return
+		}
+
 		utils.SendErrorResponse(w, "NOTES_UPDATE_FAILED", "Error saving note.", err, http.StatusInternalServerError)
 		return
 	}

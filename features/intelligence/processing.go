@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"zen/commons/auth"
 	"zen/commons/queue"
 	"zen/features/images"
 	"zen/features/notes"
@@ -93,7 +94,7 @@ func embedNote(noteIDStr string) error {
 		return fmt.Errorf("invalid note ID: %w", err)
 	}
 
-	note, err := notes.GetNoteByID(noteID)
+	note, err := notes.GetNoteByID(auth.Unrestricted, noteID)
 	if err != nil {
 		return fmt.Errorf("failed to get note: %w", err)
 	}

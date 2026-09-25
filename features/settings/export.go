@@ -12,6 +12,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"zen/commons/auth"
 	"zen/commons/utils"
 	"zen/features/images"
 	"zen/features/notes"
@@ -45,7 +46,7 @@ func HandleExport(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	allTags, err := tags.GetAllTags()
+	allTags, err := tags.GetAllTags(auth.Unrestricted)
 	if err != nil {
 		err = fmt.Errorf("error fetching tags for export: %w", err)
 		utils.SendErrorResponse(w, "EXPORT_FAILED", "Error exporting notes", err, http.StatusInternalServerError)
@@ -115,7 +116,7 @@ func getAllNotesByStatus(isArchived bool) ([]notes.Note, error) {
 
 	for {
 		filter := notes.NewNotesFilter(page, 0, 0, false, isArchived)
-		pageNotes, total, err := notes.GetAllNotes(filter)
+		pageNotes, total, err := notes.GetAllNotes(auth.Unrestricted, filter)
 		if err != nil {
 			return nil, fmt.Errorf("error fetching notes for page %d: %w", page, err)
 		}
