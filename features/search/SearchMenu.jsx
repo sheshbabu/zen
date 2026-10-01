@@ -14,7 +14,7 @@ import "./SearchMenu.css";
 
 export default function SearchMenu() {
   const [query, setQuery] = useState(RecentSearchQuery.get());
-  const [results, setResults] = useState({ lexical_notes: [], semantic_notes: [], semantic_images: [], tags: [] });
+  const [results, setResults] = useState({ lexicalNotes: [], semanticNotes: [], semanticImages: [], tags: [] });
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchHistory, setSearchHistory] = useState([]);
@@ -57,7 +57,7 @@ export default function SearchMenu() {
     }
 
     if (value.trim() === "") {
-      setResults({ lexical_notes: [], semantic_notes: [], semantic_images: [], tags: [] });
+      setResults({ lexicalNotes: [], semanticNotes: [], semanticImages: [], tags: [] });
       setSelectedItem(searchHistory.length > 0 ? searchHistory[0] : null);
       setHasSearched(false);
       return;
@@ -75,7 +75,7 @@ export default function SearchMenu() {
       .then(searchResults => {
         setResults(searchResults);
         setHasSearched(true);
-        const allItems = [...searchResults.lexical_notes, ...searchResults.semantic_notes, ...searchResults.semantic_images, ...searchResults.tags];
+        const allItems = [...searchResults.lexicalNotes, ...searchResults.semanticNotes, ...searchResults.semanticImages, ...searchResults.tags];
         if (allItems.length > 0) {
           setSelectedItem(allItems[0]);
         }
@@ -116,9 +116,9 @@ export default function SearchMenu() {
     if (isHistoryMode === true) {
       allItems = searchHistory;
     } else if (activeTab === "all") {
-      allItems = [...results.lexical_notes, ...results.semantic_notes, ...results.semantic_images, ...results.tags];
+      allItems = [...results.lexicalNotes, ...results.semanticNotes, ...results.semanticImages, ...results.tags];
     } else if (activeTab === "notes") {
-      allItems = [...results.lexical_notes, ...results.semantic_notes, ...results.semantic_images];
+      allItems = [...results.lexicalNotes, ...results.semanticNotes, ...results.semanticImages];
     } else {
       allItems = results.tags;
     }
@@ -184,7 +184,7 @@ export default function SearchMenu() {
       navigateTo(`/?tagId=${item.tagId}`);
       closeModal();
     } else if (item.filename) {
-      const imageDetails = results.semantic_images.map(image => ({
+      const imageDetails = results.semanticImages.map(image => ({
         url: `/images/${image.filename}`,
         width: image.width,
         height: image.height,
@@ -224,8 +224,8 @@ export default function SearchMenu() {
     const showTags = activeTab === "all" || activeTab === "tags";
 
     if (showNotes === true) {
-      if (results.lexical_notes.length > 0) {
-        const noteItems = results.lexical_notes.map((item, index) => {
+      if (results.lexicalNotes.length > 0) {
+        const noteItems = results.lexicalNotes.map((item, index) => {
           const isSelected = item.noteId === selectedItem?.noteId;
           return (
             <SearchResultItem key={`lexical-note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} onMouseEnter={() => handleResultMouseEnter(item)} />
@@ -240,8 +240,8 @@ export default function SearchMenu() {
         );
       }
 
-      if (results.semantic_notes.length > 0) {
-        const noteItems = results.semantic_notes.map((item, index) => {
+      if (results.semanticNotes.length > 0) {
+        const noteItems = results.semanticNotes.map((item, index) => {
           const isSelected = item.noteId === selectedItem?.noteId;
           return (
             <SearchResultItem key={`semantic-note-${index}`} item={item} isSelected={isSelected} onClick={() => handleResultClick(item)} onMouseEnter={() => handleResultMouseEnter(item)} />
@@ -256,11 +256,11 @@ export default function SearchMenu() {
         );
       }
 
-      if (results.semantic_images.length > 0) {
+      if (results.semanticImages.length > 0) {
         semanticImagesSection = (
           <div className="search-section">
             <h4 className="search-section-title">Similar Images</h4>
-            <SearchResultImages items={results.semantic_images} onClick={handleResultClick} onMouseEnter={handleResultMouseEnter} />
+            <SearchResultImages items={results.semanticImages} onClick={handleResultClick} onMouseEnter={handleResultMouseEnter} />
           </div>
         );
       }
@@ -298,7 +298,7 @@ export default function SearchMenu() {
 
   // Only lexical results from the current search carry full content. History items are
   // localStorage snapshots that may be stale, so they must be refetched by the preview.
-  const hasInlineContent = results.lexical_notes.includes(selectedItem);
+  const hasInlineContent = results.lexicalNotes.includes(selectedItem);
 
   let previewSection = null;
   if (isPreviewVisible === true) {

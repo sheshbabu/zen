@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log/slog"
 	"zen/commons/sqlite"
 )
 
@@ -31,10 +30,9 @@ func GetUserByEmail(email string) (UserRecord, error) {
 	query := "SELECT user_id, email, password_hash FROM users where email = ?"
 
 	row := sqlite.DB.QueryRow(query, email)
-	err := row.Scan(&user.UserID, &user.Email, &user.Password)
+	err := row.Scan(&user.UserID, &user.Email, &user.PasswordHash)
 	if err != nil {
 		err = fmt.Errorf("error retrieving user: %w", err)
-		slog.Error(err.Error())
 		return user, err
 	}
 
@@ -47,10 +45,9 @@ func GetUserByID(userID string) (UserRecord, error) {
 	query := "SELECT user_id, email, password_hash FROM users where user_id = ?"
 
 	row := sqlite.DB.QueryRow(query, userID)
-	err := row.Scan(&user.UserID, &user.Email, &user.Password)
+	err := row.Scan(&user.UserID, &user.Email, &user.PasswordHash)
 	if err != nil {
 		err = fmt.Errorf("error retrieving user: %w", err)
-		slog.Error(err.Error())
 		return user, err
 	}
 
@@ -63,11 +60,10 @@ func InsertUser(email string, passwordHash string, isAdmin bool) (UserRecord, er
 	query := "INSERT INTO users (email, password_hash, is_admin) VALUES (?, ?, ?) RETURNING user_id, email, password_hash"
 
 	row := sqlite.DB.QueryRow(query, email, passwordHash, isAdmin)
-	err := row.Scan(&user.UserID, &user.Email, &user.Password)
+	err := row.Scan(&user.UserID, &user.Email, &user.PasswordHash)
 
 	if err != nil {
 		err = fmt.Errorf("error inserting user: %w", err)
-		slog.Error(err.Error())
 		return user, err
 	}
 
@@ -80,7 +76,6 @@ func UpdatePassword(userID, passwordHash string) error {
 	_, err := sqlite.DB.Exec(query, passwordHash, userID)
 	if err != nil {
 		err = fmt.Errorf("error updating password: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 

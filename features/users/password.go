@@ -3,14 +3,12 @@ package users
 import (
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
-	"log/slog"
 )
 
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	if err != nil {
 		err = fmt.Errorf("error generating password hash: %w", err)
-		slog.Error(err.Error())
 		return "", err
 	}
 	return string(bytes), nil

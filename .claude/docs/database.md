@@ -12,6 +12,6 @@
 ## Query Patterns
 - Always use parameterized queries with `?` placeholders
 - Defer `rows.Close()` for multi-row queries
-- Use transactions for multi-step operations with defer rollback pattern
+- Use transactions for multi-step operations with defer rollback pattern (except `commons/sqlite/migrate.go`, which is startup-only and rolls back manually)
 - Handle JSON data using SQLite JSON functions
 - Handle `sql.ErrNoRows` separately using `errors.Is()`

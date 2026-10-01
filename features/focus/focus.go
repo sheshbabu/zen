@@ -24,8 +24,7 @@ func HandleGetAllFocusModes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(allFocusModes)
+	utils.SendJSON(w, http.StatusOK, allFocusModes)
 }
 
 func HandleCreateFocusMode(w http.ResponseWriter, r *http.Request) {
@@ -45,9 +44,7 @@ func HandleCreateFocusMode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(focusMode)
+	utils.SendJSON(w, http.StatusCreated, focusMode)
 }
 
 func HandleUpdateFocusMode(w http.ResponseWriter, r *http.Request) {
@@ -67,9 +64,7 @@ func HandleUpdateFocusMode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(focusMode)
+	utils.SendJSON(w, http.StatusOK, focusMode)
 }
 
 func HandleDeleteFocusMode(w http.ResponseWriter, r *http.Request) {

@@ -46,14 +46,18 @@ func ParseTaskPayload(task *Task) (entityID string, ok bool) {
 	var payload map[string]string
 	if err := json.Unmarshal([]byte(task.Payload), &payload); err != nil {
 		slog.Error("Failed to parse task payload", "taskID", task.ID, "error", err)
-		MarkTaskFailed(task.ID, fmt.Sprintf("Invalid JSON payload: %v", err))
+		if err := MarkTaskFailed(task.ID, fmt.Sprintf("Invalid JSON payload: %v", err)); err != nil {
+			slog.Error(err.Error())
+		}
 		return "", false
 	}
 
 	entityID, exists := payload["entity_id"]
 	if !exists {
 		slog.Error("Missing entity_id in task payload", "taskID", task.ID)
-		MarkTaskFailed(task.ID, "Missing entity_id in payload")
+		if err := MarkTaskFailed(task.ID, "Missing entity_id in payload"); err != nil {
+			slog.Error(err.Error())
+		}
 		return "", false
 	}
 

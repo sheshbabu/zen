@@ -243,9 +243,9 @@ func runBackgroundTasks() {
 	versionPruneFrequency := 24 * time.Hour            // 24 hours
 
 	go func() {
-		notes.EmptyTrash(true) // Run immediately on server start
+		logError(notes.EmptyTrash(true)) // Run immediately on server start
 		for range time.Tick(trashCleanupFrequency) {
-			notes.EmptyTrash(true)
+			logError(notes.EmptyTrash(true))
 		}
 	}()
 
@@ -257,7 +257,7 @@ func runBackgroundTasks() {
 
 	go func() {
 		for range time.Tick(imageSyncFrequency) {
-			images.SyncImagesFromDisk()
+			logError(images.SyncImagesFromDisk())
 		}
 	}()
 
@@ -268,11 +268,17 @@ func runBackgroundTasks() {
 	}()
 
 	go func() {
-		notes.PruneNoteVersions() // Run immediately on server start
+		logError(notes.PruneNoteVersions()) // Run immediately on server start
 		for range time.Tick(versionPruneFrequency) {
-			notes.PruneNoteVersions()
+			logError(notes.PruneNoteVersions())
 		}
 	}()
+}
+
+func logError(err error) {
+	if err != nil {
+		slog.Error(err.Error())
+	}
 }
 
 func handleServiceWorker(w http.ResponseWriter, r *http.Request) {

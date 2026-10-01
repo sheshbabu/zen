@@ -2,7 +2,6 @@ package tags
 
 import (
 	"fmt"
-	"log/slog"
 	"strings"
 	"zen/commons/auth"
 	"zen/commons/sqlite"
@@ -32,7 +31,6 @@ func GetAllTags(access auth.Access) ([]Tag, error) {
 	rows, err := sqlite.DB.Query(query, scopeArgs...)
 	if err != nil {
 		err = fmt.Errorf("error retrieving tags: %w", err)
-		slog.Error(err.Error())
 		return tags, err
 	}
 	defer rows.Close()
@@ -42,7 +40,6 @@ func GetAllTags(access auth.Access) ([]Tag, error) {
 		err = rows.Scan(&tag.TagID, &tag.Name, &tag.Color, &tag.NoteCount)
 		if err != nil {
 			err = fmt.Errorf("error scanning tag: %w", err)
-			slog.Error(err.Error())
 			return tags, err
 		}
 		tags = append(tags, tag)
@@ -86,7 +83,6 @@ func SearchTags(access auth.Access, term string) ([]Tag, error) {
 	rows, err := sqlite.DB.Query(query, queryArgs...)
 	if err != nil {
 		err = fmt.Errorf("error retrieving tags: %w", err)
-		slog.Error(err.Error())
 		return tags, err
 	}
 	defer rows.Close()
@@ -96,7 +92,6 @@ func SearchTags(access auth.Access, term string) ([]Tag, error) {
 		err = rows.Scan(&tag.TagID, &tag.Name, &tag.Color, &tag.NoteCount)
 		if err != nil {
 			err = fmt.Errorf("error scanning tag: %w", err)
-			slog.Error(err.Error())
 			return tags, err
 		}
 		tags = append(tags, tag)
@@ -135,7 +130,6 @@ func GetTagsByFocusModeID(access auth.Access, focusModeID int) ([]Tag, error) {
 	rows, err := sqlite.DB.Query(query, queryArgs...)
 	if err != nil {
 		err = fmt.Errorf("error retrieving tags: %w", err)
-		slog.Error(err.Error())
 		return tags, err
 	}
 	defer rows.Close()
@@ -145,7 +139,6 @@ func GetTagsByFocusModeID(access auth.Access, focusModeID int) ([]Tag, error) {
 		err = rows.Scan(&tag.TagID, &tag.Name, &tag.Color, &tag.NoteCount)
 		if err != nil {
 			err = fmt.Errorf("error scanning tag: %w", err)
-			slog.Error(err.Error())
 			return tags, err
 		}
 		tags = append(tags, tag)
@@ -168,7 +161,6 @@ func UpdateTag(tag Tag) error {
 	_, err := sqlite.DB.Exec(query, tag.Name, tag.Color, tag.TagID)
 	if err != nil {
 		err = fmt.Errorf("error updating tag: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 	return nil
@@ -178,7 +170,6 @@ func DeleteTag(tagID int) error {
 	tx, err := sqlite.DB.Begin()
 	if err != nil {
 		err = fmt.Errorf("error starting transaction: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 	defer tx.Rollback()
@@ -186,28 +177,24 @@ func DeleteTag(tagID int) error {
 	_, err = tx.Exec("DELETE FROM note_tags WHERE tag_id = ?", tagID)
 	if err != nil {
 		err = fmt.Errorf("error deleting from note_tags: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
 	_, err = tx.Exec("DELETE FROM api_token_scopes WHERE tag_id = ?", tagID)
 	if err != nil {
 		err = fmt.Errorf("error deleting from api_token_scopes: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
 	_, err = tx.Exec("DELETE FROM tags WHERE tag_id = ?", tagID)
 	if err != nil {
 		err = fmt.Errorf("error deleting from tags: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
 	err = tx.Commit()
 	if err != nil {
 		err = fmt.Errorf("error committing transaction: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 

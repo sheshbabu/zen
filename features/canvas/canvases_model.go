@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log/slog"
 	"zen/commons/sqlite"
+	"zen/commons/utils"
 )
 
 func GetAllCanvases() ([]Canvas, error) {
@@ -27,7 +27,6 @@ func GetAllCanvases() ([]Canvas, error) {
 	rows, err := sqlite.DB.Query(query)
 	if err != nil {
 		err = fmt.Errorf("error retrieving canvases: %w", err)
-		slog.Error(err.Error())
 		return canvases, err
 	}
 	defer rows.Close()
@@ -37,7 +36,6 @@ func GetAllCanvases() ([]Canvas, error) {
 		err = rows.Scan(&canvas.CanvasID, &canvas.Title, &canvas.Preview, &canvas.CreatedAt, &canvas.UpdatedAt)
 		if err != nil {
 			err = fmt.Errorf("error scanning canvas: %w", err)
-			slog.Error(err.Error())
 			return canvases, err
 		}
 		canvases = append(canvases, canvas)
@@ -66,11 +64,10 @@ func GetCanvasByID(canvasID int) (Canvas, error) {
 	err := sqlite.DB.QueryRow(query, canvasID).Scan(&canvas.CanvasID, &canvas.Title, &canvas.Data, &canvas.Preview, &canvas.CreatedAt, &canvas.UpdatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			err = fmt.Errorf("canvas not found: %w", err)
+			err = fmt.Errorf("canvas %d: %w", canvasID, utils.ErrNotFound)
 		} else {
 			err = fmt.Errorf("error retrieving canvas: %w", err)
 		}
-		slog.Error(err.Error())
 		return canvas, err
 	}
 
@@ -101,7 +98,6 @@ func CreateCanvas(canvas *Canvas) error {
 	err := row.Scan(&canvas.CanvasID, &canvas.CreatedAt, &canvas.UpdatedAt)
 	if err != nil {
 		err = fmt.Errorf("error creating canvas: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -141,7 +137,6 @@ func UpdateCanvas(canvas *Canvas) error {
 	err = sqlite.DB.QueryRow(query, canvas.Title, canvas.Data, canvas.Preview, canvas.CanvasID).Scan(&canvas.UpdatedAt)
 	if err != nil {
 		err = fmt.Errorf("error updating canvas: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -159,19 +154,17 @@ func DeleteCanvas(canvasID int) error {
 	result, err := sqlite.DB.Exec(query, canvasID)
 	if err != nil {
 		err = fmt.Errorf("error deleting canvas: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		err = fmt.Errorf("error getting rows affected: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
 	if rowsAffected == 0 {
-		err = fmt.Errorf("canvas not found")
+		err = fmt.Errorf("canvas %d: %w", canvasID, utils.ErrNotFound)
 		return err
 	}
 

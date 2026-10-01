@@ -3,6 +3,7 @@ package settings
 import (
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -89,9 +90,7 @@ func HandleImport(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "File uploaded successfully"}`))
+	utils.SendJSON(w, http.StatusOK, map[string]string{"message": "File uploaded successfully"})
 }
 
 func extractFrontmatter(content string) (string, frontmatter) {
@@ -162,7 +161,9 @@ func resolveTags(names []string) []tags.Tag {
 	var result []tags.Tag
 	for _, name := range names {
 		existingTags, err := tags.SearchTags(auth.Unrestricted, name)
-		if err == nil {
+		if err != nil {
+			slog.Error(err.Error())
+		} else {
 			for _, t := range existingTags {
 				if t.Name == name {
 					result = append(result, t)

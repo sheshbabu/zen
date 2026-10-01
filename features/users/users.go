@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"net/mail"
 	"strings"
@@ -15,12 +14,17 @@ import (
 )
 
 type UserRecord struct {
-	UserID   string `json:"userId"`
+	UserID       string
+	Email        string
+	PasswordHash string
+}
+
+type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-type PasswordUpdateRecord struct {
+type PasswordUpdateRequest struct {
 	OldPassword string `json:"oldPassword"`
 	NewPassword string `json:"newPassword"`
 }
@@ -41,7 +45,7 @@ func HandleCheckUser(w http.ResponseWriter, r *http.Request) {
 
 	sessionID := cookie.Value
 	userID, err := session.GetUserID(sessionID)
-	if err != nil && errors.Is(err, sql.ErrNoRows) {
+	if err != nil {
 		utils.SendErrorResponse(w, "NO_SESSION", "Session not found", err, http.StatusUnauthorized)
 		return
 	}
@@ -56,7 +60,7 @@ func HandleCheckUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
-	var payload UserRecord
+	var payload LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", "Invalid request data", err, http.StatusBadRequest)
 		return
@@ -82,7 +86,6 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 	hasUsers := HasUsers()
 	if hasUsers {
 		err = fmt.Errorf("can't create more than one user")
-		slog.Error(err.Error())
 		utils.SendErrorResponse(w, "USER_CREATE_FAILED", "User already exists", err, http.StatusBadRequest)
 		return
 	}
@@ -104,7 +107,7 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
-	var payload UserRecord
+	var payload LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", "Invalid request data", err, http.StatusBadRequest)
 		return
@@ -120,9 +123,8 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !VerifyPassword(payload.Password, user.Password) {
+	if !VerifyPassword(payload.Password, user.PasswordHash) {
 		err = fmt.Errorf("incorrect password for user %s", payload.Email)
-		slog.Error(err.Error())
 		utils.SendErrorResponse(w, "INCORRECT_PASSWORD", "Incorrect password", err, http.StatusBadRequest)
 		return
 	}
@@ -139,7 +141,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleUpdatePassword(w http.ResponseWriter, r *http.Request) {
-	var payload PasswordUpdateRecord
+	var payload PasswordUpdateRequest
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", "Invalid request data", err, http.StatusBadRequest)
 		return
@@ -153,18 +155,18 @@ func HandleUpdatePassword(w http.ResponseWriter, r *http.Request) {
 
 	sessionID := cookie.Value
 	userID, err := session.GetUserID(sessionID)
-	if err != nil && errors.Is(err, sql.ErrNoRows) {
+	if err != nil {
 		utils.SendErrorResponse(w, "NO_SESSION", "Session not found", err, http.StatusUnauthorized)
 		return
 	}
 
 	user, err := GetUserByID(userID)
-	if err != nil && errors.Is(err, sql.ErrNoRows) {
+	if err != nil {
 		utils.SendErrorResponse(w, "NO_SESSION", "Session not found", err, http.StatusUnauthorized)
 		return
 	}
 
-	if !VerifyPassword(payload.OldPassword, user.Password) {
+	if !VerifyPassword(payload.OldPassword, user.PasswordHash) {
 		utils.SendErrorResponse(w, "INCORRECT_OLD_PASSWORD", "Incorrect old password", nil, http.StatusBadRequest)
 		return
 	}

@@ -20,21 +20,18 @@ func SyncImagesFromDisk() error {
 	diskImages, err := scanImagesDirectory()
 	if err != nil {
 		err = fmt.Errorf("error scanning images directory: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
 	dbImages, err := getAllDatabaseImages()
 	if err != nil {
 		err = fmt.Errorf("error retrieving database images: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
 	notesWithImages, err := notes.GetNotesWithImages()
 	if err != nil {
 		err = fmt.Errorf("error getting notes with images: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -43,7 +40,6 @@ func SyncImagesFromDisk() error {
 	err = syncImageRecords(diskImages, dbImages, noteImageRefs)
 	if err != nil {
 		err = fmt.Errorf("error syncing image records: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -77,6 +73,7 @@ func scanImagesDirectory() (map[string]os.FileInfo, error) {
 		if isImageFile(filename) {
 			info, err := entry.Info()
 			if err != nil {
+				slog.Error("failed to read image file info", "filename", filename, "error", err)
 				continue
 			}
 			diskImages[filename] = info
@@ -155,7 +152,10 @@ func syncImageRecords(diskImages map[string]os.FileInfo, dbImages map[string]Ima
 				slog.Error("failed to create image record", "filename", filename, "error", err)
 				continue
 			}
-			queue.AddImageTask(filename, queue.QUEUE_IMAGE_PROCESS, "process")
+			_, err = queue.AddImageTask(filename, queue.QUEUE_IMAGE_PROCESS, "process")
+			if err != nil {
+				slog.Error(err.Error())
+			}
 		}
 
 		if existsOnDisk {
@@ -191,7 +191,10 @@ func syncImageRecords(diskImages map[string]os.FileInfo, dbImages map[string]Ima
 			if err != nil {
 				slog.Error("failed to delete orphaned image", "filename", filename, "error", err)
 			}
-			queue.AddImageTask(filename, queue.QUEUE_IMAGE_DELETE, "delete")
+			_, err = queue.AddImageTask(filename, queue.QUEUE_IMAGE_DELETE, "delete")
+			if err != nil {
+				slog.Error(err.Error())
+			}
 		}
 	}
 
@@ -203,7 +206,6 @@ func createImageRecordFromFile(filename string, fileInfo os.FileInfo) error {
 	file, err := os.Open(filepath)
 	if err != nil {
 		err = fmt.Errorf("error opening image file: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 	defer file.Close()
@@ -226,7 +228,6 @@ func createImageRecordFromFile(filename string, fileInfo os.FileInfo) error {
 	_, err = CreateImage(imageRecord)
 	if err != nil {
 		err = fmt.Errorf("error creating image record: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -245,7 +246,6 @@ func ensureImageNoteLinks(noteIDs []int, filename string) error {
 			err := LinkImageToNote(noteID, filename)
 			if err != nil {
 				err = fmt.Errorf("error linking image to note: %w", err)
-				slog.Error(err.Error())
 				return err
 			}
 		}
@@ -278,7 +278,6 @@ func deleteImageFromFilesystem(filename string) error {
 	err := os.Remove(filepath)
 	if err != nil {
 		err = fmt.Errorf("error deleting image file %s: %w", filepath, err)
-		slog.Error(err.Error())
 		return err
 	}
 

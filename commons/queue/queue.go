@@ -23,19 +23,19 @@ const (
 
 type Task struct {
 	ID           int        `json:"id"`
-	QueueName    string     `json:"queue_name"`
+	QueueName    string     `json:"queueName"`
 	Payload      string     `json:"payload"`
 	Status       string     `json:"status"`
-	RetryCount   int        `json:"retry_count"`
-	MaxRetries   int        `json:"max_retries"`
-	ErrorMessage *string    `json:"error_message"`
-	CreatedAt    time.Time  `json:"created_at"`
-	UpdatedAt    time.Time  `json:"updated_at"`
-	ProcessedAt  *time.Time `json:"processed_at"`
+	RetryCount   int        `json:"retryCount"`
+	MaxRetries   int        `json:"maxRetries"`
+	ErrorMessage *string    `json:"errorMessage"`
+	CreatedAt    time.Time  `json:"createdAt"`
+	UpdatedAt    time.Time  `json:"updatedAt"`
+	ProcessedAt  *time.Time `json:"processedAt"`
 }
 
 type QueueStats struct {
-	QueueName  string `json:"queue_name"`
+	QueueName  string `json:"queueName"`
 	Pending    int    `json:"pending"`
 	Processing int    `json:"processing"`
 	Failed     int    `json:"failed"`
@@ -51,14 +51,12 @@ func AddTask(queueName, payload string) (int, error) {
 	result, err := sqlite.DB.Exec(query, queueName, payload, STATUS_QUEUED)
 	if err != nil {
 		err = fmt.Errorf("error adding task into queue: %w", err)
-		slog.Error(err.Error())
 		return 0, err
 	}
 
 	taskID, err := result.LastInsertId()
 	if err != nil {
 		err = fmt.Errorf("error getting task ID: %w", err)
-		slog.Error(err.Error())
 		return 0, err
 	}
 
@@ -75,7 +73,6 @@ func UpdateTaskStatus(taskID int, status string) error {
 	_, err := sqlite.DB.Exec(query, status, taskID)
 	if err != nil {
 		err = fmt.Errorf("error updating task status in queue: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -89,7 +86,6 @@ func MarkTaskFailed(taskID int, errorMessage string) error {
 	err := sqlite.DB.QueryRow(query, taskID).Scan(&retryCount, &maxRetries)
 	if err != nil {
 		err = fmt.Errorf("error getting task retry info: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -114,7 +110,6 @@ func MarkTaskFailed(taskID int, errorMessage string) error {
 	_, err = sqlite.DB.Exec(updateQuery, status, retryCount, errorMessage, taskID)
 	if err != nil {
 		err = fmt.Errorf("error marking task as failed: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -130,7 +125,6 @@ func RemoveTask(taskID int) error {
 	_, err := sqlite.DB.Exec(query, taskID)
 	if err != nil {
 		err = fmt.Errorf("error deleting task in queue: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -147,7 +141,6 @@ func RemoveAllTasksForEntity(entityType, entityID string) error {
 	_, err := sqlite.DB.Exec(query, entityType, entityID)
 	if err != nil {
 		err = fmt.Errorf("error deleting all tasks for entity in queue: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -184,7 +177,6 @@ func GetNextTask(queueName, status string) (*Task, error) {
 	}
 	if err != nil {
 		err = fmt.Errorf("error retrieving task in queue: %w", err)
-		slog.Error(err.Error())
 		return nil, err
 	}
 
@@ -215,7 +207,6 @@ func GetFailedTasks(limit int) ([]Task, error) {
 	rows, err := sqlite.DB.Query(query, STATUS_FAILED, limit)
 	if err != nil {
 		err = fmt.Errorf("error retrieving failed tasks: %w", err)
-		slog.Error(err.Error())
 		return nil, err
 	}
 	defer rows.Close()
@@ -227,7 +218,6 @@ func GetFailedTasks(limit int) ([]Task, error) {
 			&task.CreatedAt, &task.UpdatedAt, &task.ProcessedAt)
 		if err != nil {
 			err = fmt.Errorf("error scanning failed task: %w", err)
-			slog.Error(err.Error())
 			return nil, err
 		}
 		tasks = append(tasks, task)
@@ -235,7 +225,6 @@ func GetFailedTasks(limit int) ([]Task, error) {
 
 	if err = rows.Err(); err != nil {
 		err = fmt.Errorf("error iterating failed tasks: %w", err)
-		slog.Error(err.Error())
 		return nil, err
 	}
 
@@ -331,7 +320,6 @@ func Clear() error {
 	_, err := sqlite.DB.Exec(query)
 	if err != nil {
 		err = fmt.Errorf("error clearing queue: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 

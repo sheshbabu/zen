@@ -1,7 +1,7 @@
 package search
 
 import (
-	"encoding/json"
+	"log/slog"
 	"net/http"
 	"zen/commons/auth"
 	"zen/commons/utils"
@@ -13,9 +13,9 @@ import (
 const LIMIT = 20
 
 type SearchResults struct {
-	LexicalNotes   []notes.Note                       `json:"lexical_notes"`
-	SemanticNotes  []intelligence.SemanticNoteResult  `json:"semantic_notes"`
-	SemanticImages []intelligence.SemanticImageResult `json:"semantic_images"`
+	LexicalNotes   []notes.Note                       `json:"lexicalNotes"`
+	SemanticNotes  []intelligence.SemanticNoteResult  `json:"semanticNotes"`
+	SemanticImages []intelligence.SemanticImageResult `json:"semanticImages"`
 	Tags           []tags.Tag                         `json:"tags"`
 }
 
@@ -63,7 +63,10 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 			semanticNotesChan <- []intelligence.SemanticNoteResult{}
 			return
 		}
-		semanticNotes, _ := intelligence.SemanticNoteSearch(query, LIMIT)
+		semanticNotes, err := intelligence.SemanticNoteSearch(query, LIMIT)
+		if err != nil {
+			slog.Error(err.Error())
+		}
 		semanticNotesChan <- semanticNotes
 	}()
 
@@ -72,7 +75,10 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 			semanticImagesChan <- []intelligence.SemanticImageResult{}
 			return
 		}
-		semanticImages, _ := intelligence.SemanticImageSearch(query, LIMIT)
+		semanticImages, err := intelligence.SemanticImageSearch(query, LIMIT)
+		if err != nil {
+			slog.Error(err.Error())
+		}
 		semanticImagesChan <- semanticImages
 	}()
 
@@ -112,7 +118,5 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 		Tags:           tagsResult.Tags,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(results)
+	utils.SendJSON(w, http.StatusOK, results)
 }

@@ -25,9 +25,7 @@ func HandleGetAPITokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(apiTokens)
+	utils.SendJSON(w, http.StatusOK, apiTokens)
 }
 
 func HandleCreateAPIToken(w http.ResponseWriter, r *http.Request) {
@@ -91,9 +89,7 @@ func HandleCreateAPIToken(w http.ResponseWriter, r *http.Request) {
 		TokenInfo: tokenInfo,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	utils.SendJSON(w, http.StatusOK, response)
 }
 
 func HandleRevokeAPIToken(w http.ResponseWriter, r *http.Request) {
@@ -110,6 +106,5 @@ func HandleRevokeAPIToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"success": true}`))
+	utils.SendJSON(w, http.StatusOK, map[string]bool{"success": true})
 }

@@ -1,7 +1,6 @@
 package mcp
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -126,9 +125,7 @@ func HandleMCP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	utils.SendJSON(w, http.StatusOK, response)
 }
 
 func handleMCPMessage(req Request, access auth.Access) interface{} {
@@ -393,7 +390,7 @@ func handleGetNote(args map[string]interface{}, access auth.Access) ToolCallResu
 
 	noteID := int(noteIDFloat)
 	note, err := notes.GetNoteByID(access, noteID)
-	if errors.Is(err, sql.ErrNoRows) {
+	if errors.Is(err, utils.ErrNotFound) {
 		return ToolCallResult{
 			Content: []ToolContent{{Type: "text", Text: "Error: note not found"}},
 			IsError: true,
@@ -451,7 +448,5 @@ func createErrorResponse(id interface{}, code int, message string, data interfac
 
 func sendRPCError(w http.ResponseWriter, id interface{}, code int, message string, data interface{}) {
 	response := createErrorResponse(id, code, message, data)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	utils.SendJSON(w, http.StatusOK, response)
 }

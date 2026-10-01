@@ -1,7 +1,6 @@
 package intelligence
 
 import (
-	"encoding/json"
 	"log/slog"
 	"net/http"
 	"zen/commons/utils"
@@ -15,19 +14,16 @@ func HandleSimilarImages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !isIntelligenceEnabled {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode([]SemanticImageResult{})
+		utils.SendJSON(w, http.StatusOK, []SemanticImageResult{})
 		return
 	}
 
 	results, err := FindSimilarImages(filename, 10, 0.5)
 	if err != nil {
 		slog.Error("failed to find similar images", "error", err, "filename", filename)
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode([]SemanticImageResult{})
+		utils.SendJSON(w, http.StatusOK, []SemanticImageResult{})
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(results)
+	utils.SendJSON(w, http.StatusOK, results)
 }

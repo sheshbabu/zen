@@ -3,11 +3,13 @@ package notes
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"strings"
 	"zen/commons/auth"
 	"zen/commons/sqlite"
+	"zen/commons/utils"
 	"zen/features/tags"
 )
 
@@ -179,7 +181,6 @@ func GetAllNotes(access auth.Access, filter NotesFilter) ([]Note, int, error) {
 	rows, err := sqlite.DB.Query(query, queryArgs...)
 	if err != nil {
 		err = fmt.Errorf("error retrieving notes: %w", err)
-		slog.Error(err.Error())
 		return notes, total, err
 	}
 	defer rows.Close()
@@ -193,7 +194,6 @@ func GetAllNotes(access auth.Access, filter NotesFilter) ([]Note, int, error) {
 		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.CreatedAt, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt, &total)
 		if err != nil {
 			err = fmt.Errorf("error scanning note: %w", err)
-			slog.Error(err.Error())
 			return notes, total, err
 		}
 		if strings.TrimSpace(tagsJSON) == "" || tagsJSON == "null" {
@@ -262,9 +262,12 @@ func GetNoteByID(access auth.Access, noteID int) (Note, error) {
 	row := sqlite.DB.QueryRow(query, queryArgs...)
 	var pinnedAt sql.NullTime
 	err := row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.CreatedAt, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt)
+	if errors.Is(err, sql.ErrNoRows) {
+		err = fmt.Errorf("note %d: %w", noteID, utils.ErrNotFound)
+		return note, err
+	}
 	if err != nil {
 		err = fmt.Errorf("error retrieving note: %w", err)
-		slog.Error(err.Error())
 		return note, err
 	}
 	if strings.TrimSpace(tagsJSON) == "" || tagsJSON == "null" {
@@ -298,7 +301,6 @@ func CreateNote(access auth.Access, note Note) (Note, error) {
 
 	if err != nil {
 		err = fmt.Errorf("error starting transaction: %w", err)
-		slog.Error(err.Error())
 		return note, err
 	}
 
@@ -340,7 +342,6 @@ func CreateNote(access auth.Access, note Note) (Note, error) {
 	err = row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt)
 	if err != nil {
 		err = fmt.Errorf("error creating note: %w", err)
-		slog.Error(err.Error())
 		return note, err
 	}
 
@@ -360,7 +361,6 @@ func CreateNote(access auth.Access, note Note) (Note, error) {
 			err := row.Scan(&tag.TagID, &tag.Name)
 			if err != nil {
 				err = fmt.Errorf("error creating tag: %w", err)
-				slog.Error(err.Error())
 				return note, err
 			}
 		}
@@ -374,7 +374,6 @@ func CreateNote(access auth.Access, note Note) (Note, error) {
 		_, err := tx.Exec(query, note.NoteID, tag.TagID)
 		if err != nil {
 			err = fmt.Errorf("error adding tags to note: %w", err)
-			slog.Error(err.Error())
 			return note, err
 		}
 	}
@@ -401,7 +400,7 @@ func CreateNote(access auth.Access, note Note) (Note, error) {
 	row = tx.QueryRow(query, note.NoteID)
 	err = row.Scan(&tagsJSON)
 
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		note.Tags = []tags.Tag{}
 	} else if err != nil {
 		err = fmt.Errorf("error retrieving tags for note %d: %w", note.NoteID, err)
@@ -420,7 +419,6 @@ func CreateNote(access auth.Access, note Note) (Note, error) {
 
 	if err != nil {
 		err = fmt.Errorf("error creating note: %w", err)
-		slog.Error(err.Error())
 		return note, err
 	}
 
@@ -432,7 +430,6 @@ func UpdateNote(access auth.Access, note Note) (Note, error) {
 
 	if err != nil {
 		err = fmt.Errorf("error starting transaction: %w", err)
-		slog.Error(err.Error())
 		return note, err
 	}
 
@@ -479,7 +476,6 @@ func UpdateNote(access auth.Access, note Note) (Note, error) {
 	_, err = tx.Exec(query, note.NoteID, note.Title, note.Content, note.NoteID, VERSION_MIN_INTERVAL)
 	if err != nil {
 		err = fmt.Errorf("error creating note version: %w", err)
-		slog.Error(err.Error())
 		return note, err
 	}
 
@@ -504,7 +500,6 @@ func UpdateNote(access auth.Access, note Note) (Note, error) {
 	err = row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt)
 	if err != nil {
 		err = fmt.Errorf("error updating note: %w", err)
-		slog.Error(err.Error())
 		return note, err
 	}
 
@@ -518,7 +513,6 @@ func UpdateNote(access auth.Access, note Note) (Note, error) {
 	_, err = tx.Exec(query, note.NoteID)
 	if err != nil {
 		err = fmt.Errorf("error deleting tags: %w", err)
-		slog.Error(err.Error())
 		return note, err
 	}
 
@@ -538,7 +532,6 @@ func UpdateNote(access auth.Access, note Note) (Note, error) {
 			err := row.Scan(&tag.TagID, &tag.Name)
 			if err != nil {
 				err = fmt.Errorf("error creating tag: %w", err)
-				slog.Error(err.Error())
 				return note, err
 			}
 		}
@@ -552,7 +545,6 @@ func UpdateNote(access auth.Access, note Note) (Note, error) {
 		_, err := tx.Exec(query, note.NoteID, tag.TagID)
 		if err != nil {
 			err = fmt.Errorf("error adding tags to note: %w", err)
-			slog.Error(err.Error())
 			return note, err
 		}
 	}
@@ -578,7 +570,7 @@ func UpdateNote(access auth.Access, note Note) (Note, error) {
 	`
 	row = tx.QueryRow(query, note.NoteID)
 	err = row.Scan(&tagsJSON)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		note.Tags = []tags.Tag{}
 	} else if err != nil {
 		err = fmt.Errorf("error retrieving tags for note %d: %w", note.NoteID, err)
@@ -600,7 +592,6 @@ func UpdateNote(access auth.Access, note Note) (Note, error) {
 
 	if err != nil {
 		err = fmt.Errorf("error updating note: %w", err)
-		slog.Error(err.Error())
 		return note, err
 	}
 
@@ -612,7 +603,6 @@ func ForceDeleteNote(noteID int) error {
 
 	if err != nil {
 		err = fmt.Errorf("error starting transaction: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -628,7 +618,6 @@ func ForceDeleteNote(noteID int) error {
 	_, err = tx.Exec(query, noteID)
 	if err != nil {
 		err = fmt.Errorf("error deleting tags: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -642,7 +631,6 @@ func ForceDeleteNote(noteID int) error {
 	_, err = tx.Exec(query, noteID)
 	if err != nil {
 		err = fmt.Errorf("error deleting note images: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -656,7 +644,6 @@ func ForceDeleteNote(noteID int) error {
 	_, err = tx.Exec(query, noteID)
 	if err != nil {
 		err = fmt.Errorf("error deleting note versions: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -670,7 +657,6 @@ func ForceDeleteNote(noteID int) error {
 	_, err = tx.Exec(query, noteID)
 	if err != nil {
 		err = fmt.Errorf("error deleting note: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -678,7 +664,6 @@ func ForceDeleteNote(noteID int) error {
 
 	if err != nil {
 		err = fmt.Errorf("error deleting note: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -699,7 +684,6 @@ func SoftDeleteNote(noteID int) error {
 	_, err := sqlite.DB.Exec(query, noteID)
 	if err != nil {
 		err = fmt.Errorf("error soft deleting note: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -719,7 +703,6 @@ func RestoreDeletedNote(noteID int) error {
 	_, err := sqlite.DB.Exec(query, noteID)
 	if err != nil {
 		err = fmt.Errorf("error restoring deleted note: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -739,7 +722,6 @@ func ArchiveNote(noteID int) error {
 	_, err := sqlite.DB.Exec(query, noteID)
 	if err != nil {
 		err = fmt.Errorf("error archiving note: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -759,7 +741,6 @@ func UnarchiveNote(noteID int) error {
 	_, err := sqlite.DB.Exec(query, noteID)
 	if err != nil {
 		err = fmt.Errorf("error unarchiving note: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -825,7 +806,6 @@ func SearchNotes(access auth.Access, term string, limit int, sort string) ([]Not
 	rows, err := sqlite.DB.Query(query, searchArgs...)
 	if err != nil {
 		err = fmt.Errorf("error retrieving notes: %w", err)
-		slog.Error(err.Error())
 		return notes, err
 	}
 	defer rows.Close()
@@ -838,7 +818,6 @@ func SearchNotes(access auth.Access, term string, limit int, sort string) ([]Not
 		err = rows.Scan(&note.NoteID, &note.HighlightedTitle, &note.HighlightedContent, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &archivedAt, &deletedAt, &pinnedAt)
 		if err != nil {
 			err = fmt.Errorf("error scanning note: %w", err)
-			slog.Error(err.Error())
 			return notes, err
 		}
 		note.IsArchived = archivedAt.Valid
@@ -876,7 +855,6 @@ func EmptyTrash(shouldOnlyClearExpired bool) error {
 	rows, err := sqlite.DB.Query(query)
 	if err != nil {
 		err = fmt.Errorf("error retrieving trashed notes: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 	defer rows.Close()
@@ -887,7 +865,6 @@ func EmptyTrash(shouldOnlyClearExpired bool) error {
 		err = rows.Scan(&noteID)
 		if err != nil {
 			err = fmt.Errorf("error scanning note ID: %w", err)
-			slog.Error(err.Error())
 			return err
 		}
 		noteIDs = append(noteIDs, noteID)
@@ -897,7 +874,6 @@ func EmptyTrash(shouldOnlyClearExpired bool) error {
 		err = ForceDeleteNote(noteID)
 		if err != nil {
 			err = fmt.Errorf("error deleting trashed note %d: %w", noteID, err)
-			slog.Error(err.Error())
 			return err
 		}
 	}
@@ -918,7 +894,6 @@ func PinNote(noteID int) error {
 	_, err := sqlite.DB.Exec(query, noteID)
 	if err != nil {
 		err = fmt.Errorf("error pinning note: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -938,7 +913,6 @@ func UnpinNote(noteID int) error {
 	_, err := sqlite.DB.Exec(query, noteID)
 	if err != nil {
 		err = fmt.Errorf("error unpinning note: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -967,7 +941,6 @@ func GetNotesWithImages() ([]Note, error) {
 	rows, err := sqlite.DB.Query(query)
 	if err != nil {
 		err = fmt.Errorf("error querying notes: %w", err)
-		slog.Error(err.Error())
 		return nil, err
 	}
 	defer rows.Close()
@@ -981,7 +954,6 @@ func GetNotesWithImages() ([]Note, error) {
 		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt, &archivedAt, &deletedAt, &pinnedAt)
 		if err != nil {
 			err = fmt.Errorf("error scanning note: %w", err)
-			slog.Error(err.Error())
 			return nil, err
 		}
 
@@ -1011,7 +983,6 @@ func GetNotesCount(isDeleted, isArchived bool) (int, error) {
 	err := sqlite.DB.QueryRow(query).Scan(&count)
 	if err != nil {
 		err = fmt.Errorf("error getting notes count: %w", err)
-		slog.Error(err.Error())
 		return 0, err
 	}
 
@@ -1069,7 +1040,6 @@ func GetRelatedNotes(noteID int, limit int) ([]Note, error) {
 	rows, err := sqlite.DB.Query(query, noteID, noteID, limit)
 	if err != nil {
 		err = fmt.Errorf("error retrieving related notes: %w", err)
-		slog.Error(err.Error())
 		return notes, err
 	}
 	defer rows.Close()
@@ -1085,7 +1055,6 @@ func GetRelatedNotes(noteID int, limit int) ([]Note, error) {
 		err = rows.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.CreatedAt, &note.UpdatedAt, &tagsJSON, &archivedAt, &deletedAt, &pinnedAt, &sharedCount)
 		if err != nil {
 			err = fmt.Errorf("error scanning related note: %w", err)
-			slog.Error(err.Error())
 			return notes, err
 		}
 
@@ -1141,7 +1110,6 @@ func GetNoteVersions(noteID int, page int) ([]NoteVersion, int, error) {
 	err := row.Scan(&total)
 	if err != nil {
 		err = fmt.Errorf("error counting note versions: %w", err)
-		slog.Error(err.Error())
 		return versions, total, err
 	}
 
@@ -1168,7 +1136,6 @@ func GetNoteVersions(noteID int, page int) ([]NoteVersion, int, error) {
 	rows, err := sqlite.DB.Query(query, noteID, VERSIONS_LIMIT, offset)
 	if err != nil {
 		err = fmt.Errorf("error retrieving note versions: %w", err)
-		slog.Error(err.Error())
 		return versions, total, err
 	}
 	defer rows.Close()
@@ -1178,7 +1145,6 @@ func GetNoteVersions(noteID int, page int) ([]NoteVersion, int, error) {
 		err = rows.Scan(&version.VersionID, &version.NoteID, &version.Title, &version.Content, &version.CreatedAt)
 		if err != nil {
 			err = fmt.Errorf("error scanning note version: %w", err)
-			slog.Error(err.Error())
 			return versions, total, err
 		}
 		versions = append(versions, version)
@@ -1205,9 +1171,12 @@ func GetNoteVersionByID(noteID int, versionID int) (NoteVersion, error) {
 
 	row := sqlite.DB.QueryRow(query, noteID, versionID)
 	err := row.Scan(&version.VersionID, &version.NoteID, &version.Title, &version.Content, &version.CreatedAt)
+	if errors.Is(err, sql.ErrNoRows) {
+		err = fmt.Errorf("note version %d: %w", versionID, utils.ErrNotFound)
+		return version, err
+	}
 	if err != nil {
 		err = fmt.Errorf("error retrieving note version: %w", err)
-		slog.Error(err.Error())
 		return version, err
 	}
 
@@ -1272,7 +1241,6 @@ func PruneNoteVersions() error {
 	_, err := sqlite.DB.Exec(query, VERSION_KEEP_ALL_AGE, VERSION_HOURLY_AGE, VERSION_DAILY_AGE, VERSION_PRUNE_THRESHOLD)
 	if err != nil {
 		err = fmt.Errorf("error pruning note versions: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -1294,7 +1262,6 @@ func getTagIDsForNote(tx *sql.Tx, noteID int) ([]int, error) {
 	rows, err := tx.Query(query, noteID)
 	if err != nil {
 		err = fmt.Errorf("error retrieving note tags: %w", err)
-		slog.Error(err.Error())
 		return tagIDs, err
 	}
 	defer rows.Close()
@@ -1304,7 +1271,6 @@ func getTagIDsForNote(tx *sql.Tx, noteID int) ([]int, error) {
 		err = rows.Scan(&tagID)
 		if err != nil {
 			err = fmt.Errorf("error scanning note tag: %w", err)
-			slog.Error(err.Error())
 			return tagIDs, err
 		}
 		tagIDs = append(tagIDs, tagID)

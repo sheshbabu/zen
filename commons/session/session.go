@@ -32,7 +32,6 @@ func NewSession(userID string) (SessionRecord, error) {
 
 	if err != nil {
 		err = fmt.Errorf("error retrieving sessions: %w", err)
-		slog.Error(err.Error())
 		return session, err
 	}
 
@@ -40,7 +39,6 @@ func NewSession(userID string) (SessionRecord, error) {
 
 	if err != nil {
 		err = fmt.Errorf("error parsing session expiry: %w", err)
-		slog.Error(err.Error())
 		return session, err
 	}
 
@@ -91,7 +89,6 @@ func GetUserID(sessionID string) (string, error) {
 
 	if err != nil {
 		err = fmt.Errorf("error retrieving user session: %w", err)
-		slog.Error(err.Error())
 		return "", err
 	}
 
@@ -104,7 +101,6 @@ func DeleteSession(sessionID string) error {
 
 	if err != nil {
 		err = fmt.Errorf("error deleting session: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 

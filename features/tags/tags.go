@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"strconv"
 	"strings"
@@ -52,8 +51,7 @@ func HandleGetTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(tags)
+	utils.SendJSON(w, http.StatusOK, tags)
 }
 
 func HandleUpdateTag(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +66,6 @@ func HandleUpdateTag(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if code, message, err := isValid(tag); err != nil {
-		slog.Error(err.Error())
 		utils.SendErrorResponse(w, code, message, err, http.StatusBadRequest)
 		return
 	}

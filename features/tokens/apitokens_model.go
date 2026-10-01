@@ -5,10 +5,12 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
 	"zen/commons/sqlite"
+	"zen/commons/utils"
 )
 
 // AllTags is the tag_id sentinel for a scope covering every tag.
@@ -49,7 +51,6 @@ func GetAllAPITokens() ([]APIToken, error) {
 	rows, err := sqlite.DB.Query(query)
 	if err != nil {
 		err = fmt.Errorf("error retrieving API tokens: %w", err)
-		slog.Error(err.Error())
 		return apiTokens, err
 	}
 	defer rows.Close()
@@ -66,7 +67,6 @@ func GetAllAPITokens() ([]APIToken, error) {
 		err = rows.Scan(&tokenID, &name, &createdAt, &tagID, &canRead, &canWrite)
 		if err != nil {
 			err = fmt.Errorf("error scanning API token: %w", err)
-			slog.Error(err.Error())
 			return apiTokens, err
 		}
 
@@ -101,7 +101,6 @@ func CreateAPIToken(name string, scopes []Scope) (string, APIToken, error) {
 	_, err := rand.Read(tokenBytes)
 	if err != nil {
 		err = fmt.Errorf("error generating token: %w", err)
-		slog.Error(err.Error())
 		return "", APIToken{}, err
 	}
 
@@ -111,7 +110,6 @@ func CreateAPIToken(name string, scopes []Scope) (string, APIToken, error) {
 	tx, err := sqlite.DB.Begin()
 	if err != nil {
 		err = fmt.Errorf("error beginning transaction: %w", err)
-		slog.Error(err.Error())
 		return "", APIToken{}, err
 	}
 	defer tx.Rollback()
@@ -130,7 +128,6 @@ func CreateAPIToken(name string, scopes []Scope) (string, APIToken, error) {
 	err = row.Scan(&token.TokenID, &token.Name, &token.CreatedAt)
 	if err != nil {
 		err = fmt.Errorf("error creating API token: %w", err)
-		slog.Error(err.Error())
 		return "", APIToken{}, err
 	}
 
@@ -145,7 +142,6 @@ func CreateAPIToken(name string, scopes []Scope) (string, APIToken, error) {
 		_, err = tx.Exec(scopeQuery, token.TokenID, scope.TagID, scope.CanRead, scope.CanWrite)
 		if err != nil {
 			err = fmt.Errorf("error creating API token scope: %w", err)
-			slog.Error(err.Error())
 			return "", APIToken{}, err
 		}
 	}
@@ -154,7 +150,6 @@ func CreateAPIToken(name string, scopes []Scope) (string, APIToken, error) {
 	err = tx.Commit()
 	if err != nil {
 		err = fmt.Errorf("error committing API token: %w", err)
-		slog.Error(err.Error())
 		return "", APIToken{}, err
 	}
 
@@ -172,20 +167,17 @@ func RevokeAPIToken(tokenID int) error {
 	result, err := sqlite.DB.Exec(query, tokenID)
 	if err != nil {
 		err = fmt.Errorf("error revoking API token: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		err = fmt.Errorf("error checking revoked token: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
 	if rowsAffected == 0 {
-		err = fmt.Errorf("API token not found")
-		slog.Error(err.Error())
+		err = fmt.Errorf("API token %d: %w", tokenID, utils.ErrNotFound)
 		return err
 	}
 
@@ -262,12 +254,11 @@ func HasTag(tagID int) (bool, error) {
 
 	var exists int
 	err := sqlite.DB.QueryRow(query, tagID).Scan(&exists)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return false, nil
 	}
 	if err != nil {
 		err = fmt.Errorf("error checking tag: %w", err)
-		slog.Error(err.Error())
 		return false, err
 	}
 
