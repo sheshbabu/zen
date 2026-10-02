@@ -170,7 +170,7 @@
         border-color: var(--neutral-400);
     }
 
-    &.dragover {
+    &.is-dragging-over {
         background-color: var(--neutral-50);
     }
 }
@@ -458,7 +458,7 @@
             color: var(--neutral-600);
         }
 
-        &.checked {
+        &.is-checked {
             color: var(--neutral-700);
 
             &:hover {

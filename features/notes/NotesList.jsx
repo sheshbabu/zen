@@ -78,7 +78,7 @@ function NotesListItem({ note, isMultiSelect, isSelected, onMultiSelectStart, on
     if (preview.startsWith("![](/images/")) {
       preview = "Image";
     }
-    title = <div className="notes-list-item-title untitled">{preview}</div>
+    title = <div className="notes-list-item-title is-untitled">{preview}</div>
   }
 
   if (isMultiSelect === true) {
@@ -89,7 +89,7 @@ function NotesListItem({ note, isMultiSelect, isSelected, onMultiSelectStart, on
     );
 
     return (
-      <div {...longPress} className={`notes-list-item ${note.isPinned ? 'pinned' : ''} ${isSelected ? 'is-selected' : ''}`} onClick={() => onToggleSelect(note.noteId)}>
+      <div {...longPress} className={`notes-list-item ${note.isPinned ? 'is-pinned' : ''} ${isSelected ? 'is-selected' : ''}`} onClick={() => onToggleSelect(note.noteId)}>
         {checkbox}
         <div className="notes-list-item-body">
           <div className="notes-list-item-header">
@@ -113,7 +113,7 @@ function NotesListItem({ note, isMultiSelect, isSelected, onMultiSelectStart, on
 
   return (
     <div {...longPress} onClickCapture={handleCmdClick}>
-      <Link to={link} className={`notes-list-item ${note.isPinned ? 'pinned' : ''}`} activeClassName="is-active" shouldPreserveSearchParams>
+      <Link to={link} className={`notes-list-item ${note.isPinned ? 'is-pinned' : ''}`} activeClassName="is-active" shouldPreserveSearchParams>
         <div className="notes-list-item-header">
           {title}
           <PinIcon isPinned={note.isPinned} className="notes-list-item-pin" />
@@ -164,14 +164,14 @@ function NotesGridItem({ note, index }) {
 
   if (isMobile()) {
     return (
-      <Link className={`notes-grid-item ${note.isPinned ? 'pinned' : ''} reveal-animate`} to={link} shouldPreserveSearchParams style={`--reveal-index: ${(index % NOTES_PER_PAGE) + 1}`}>
+      <Link className={`notes-grid-item ${note.isPinned ? 'is-pinned' : ''} has-reveal-animation`} to={link} shouldPreserveSearchParams style={`--reveal-index: ${(index % NOTES_PER_PAGE) + 1}`}>
         {content}
       </Link>
     );
   }
 
   return (
-    <div className={`notes-grid-item ${note.isPinned ? 'pinned' : ''} reveal-animate`} onClick={handleClick} style={`--reveal-index: ${(index % NOTES_PER_PAGE) + 1}`}>
+    <div className={`notes-grid-item ${note.isPinned ? 'is-pinned' : ''} has-reveal-animation`} onClick={handleClick} style={`--reveal-index: ${(index % NOTES_PER_PAGE) + 1}`}>
       {content}
     </div>
   );

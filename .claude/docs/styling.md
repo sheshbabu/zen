@@ -13,7 +13,7 @@ that an existing token already covers.
 - Child classes and elements nested directly without `&`: `.child-class`, `svg.lucide`
 - Nest all child/descendant selectors under their parent instead of declaring them flat at the top level — only declare a new top-level selector for a class that is a genuinely separate component, not a child of an existing one
 - Nest at most 4 levels deep; extract a sub-component past that
-- State classes use `is-`/`has-` prefixes: `&.is-open`, `&.is-selected`, `&.has-preview`
+- State classes use `is-`/`has-` prefixes: `&.is-open`, `&.is-selected`, `&.has-preview`. Variants (`&.primary`, `&.danger`), layout modes (`&.left`, `&.grid`) and link identities (`&.new`, `&.templates`) aren't states and stay unprefixed
 - A component styles its inside; the parent positions it — no `margin` on a root class, use `gap` on the parent
 - Namespace `@keyframes` with the component prefix: `toast-slide-up`, not `fade-in`
 - Conditional classes using template literals

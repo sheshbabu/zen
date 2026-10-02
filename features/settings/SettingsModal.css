@@ -106,7 +106,7 @@
                         border-color: var(--neutral-400);
                     }
 
-                    &.disabled {
+                    &.is-disabled {
                         cursor: not-allowed;
                     }
 
@@ -180,7 +180,7 @@
                             }
                         }
 
-                        &.uploaded {
+                        &.is-uploaded {
                             h5 {
                                 color: var(--green-500);
 
@@ -196,7 +196,7 @@
                             }
                         }
 
-                        &.skipped {
+                        &.is-skipped {
                             h5 {
                                 color: var(--yellow-500);
 
@@ -212,7 +212,7 @@
                             }
                         }
 
-                        &.errored {
+                        &.is-errored {
                             h5 {
                                 color: var(--red-500);
 

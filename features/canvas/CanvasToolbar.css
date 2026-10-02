@@ -72,7 +72,7 @@
             background: var(--neutral-200);
         }
 
-        &.active {
+        &.is-active {
             background: var(--neutral-200);
             color: var(--text-primary);
         }

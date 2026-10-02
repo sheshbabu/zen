@@ -32,7 +32,7 @@
         transform: translateX(-4px);
     }
 
-    &.visible {
+    &.is-visible {
         opacity: 1;
         transform: translate(0);
     }

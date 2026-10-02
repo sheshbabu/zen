@@ -100,7 +100,7 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
         key={image.filename}
         src={`/images/${image.filename}`}
         alt=""
-        className="lightbox-similar-image reveal-animate"
+        className="lightbox-similar-image has-reveal-animation"
         style={`--reveal-index: ${index + 1}`}
         onClick={() => handleSimilarImageClick(image)}
       />
@@ -137,7 +137,7 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
         <img
           src={currentImage.url}
           alt=""
-          className={shouldShowZoom === true ? 'lightbox-image zoomable' : 'lightbox-image'}
+          className={shouldShowZoom === true ? 'lightbox-image is-zoomable' : 'lightbox-image'}
           onClick={handleImageClick}
         />
         <div className="lightbox-controls">
@@ -156,7 +156,7 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
 
   return (
     <ModalBackdrop onClose={onClose} isCentered={true}>
-      <ModalContainer className={isZoomed === true ? 'lightbox zoomed' : 'lightbox'}>
+      <ModalContainer className={isZoomed === true ? 'lightbox is-zoomed' : 'lightbox'}>
         {mainContent}
         {buttonContainer}
       </ModalContainer>

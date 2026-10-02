@@ -115,7 +115,7 @@ export default function ImportPane() {
           onChange={handleFileUpload}
           disabled={isUploading}
         />
-        <label htmlFor="folder-upload" className={`file-upload-label ${isUploading ? 'disabled' : ''}`}>
+        <label htmlFor="folder-upload" className={`file-upload-label ${isUploading ? 'is-disabled' : ''}`}>
           <UploadIcon />
           {isUploading ? 'Importing...' : 'Choose folder'}
         </label>
@@ -171,11 +171,11 @@ function UploadSummary({ summaryMessage, uploadedFiles, skippedFiles, erroredFil
 
   if (uploadedFiles.length > 0) {
     const uploadedFileItems = uploadedFiles.map((fileName, index) => (
-      <li key={index} className="file-item uploaded">{fileName}</li>
+      <li key={index} className="file-item is-uploaded">{fileName}</li>
     ));
 
     uploadedSection = (
-      <div className="upload-summary-section uploaded">
+      <div className="upload-summary-section is-uploaded">
         <h5><SuccessIcon /> Imported ({uploadedFiles.length})</h5>
         <ul className="file-list">
           {uploadedFileItems}
@@ -186,11 +186,11 @@ function UploadSummary({ summaryMessage, uploadedFiles, skippedFiles, erroredFil
 
   if (skippedFiles.length > 0) {
     const skippedFileItems = skippedFiles.map((fileName, index) => (
-      <li key={index} className="file-item skipped">{fileName}</li>
+      <li key={index} className="file-item is-skipped">{fileName}</li>
     ));
 
     skippedSection = (
-      <div className="upload-summary-section skipped">
+      <div className="upload-summary-section is-skipped">
         <h5><WarnIcon /> Skipped ({skippedFiles.length})</h5>
         <ul className="file-list">
           {skippedFileItems}
@@ -201,11 +201,11 @@ function UploadSummary({ summaryMessage, uploadedFiles, skippedFiles, erroredFil
 
   if (erroredFiles.length > 0) {
     const erroredFileItems = erroredFiles.map((fileName, index) => (
-      <li key={index} className="file-item errored">{fileName}</li>
+      <li key={index} className="file-item is-errored">{fileName}</li>
     ));
 
     erroredSection = (
-      <div className="upload-summary-section errored">
+      <div className="upload-summary-section is-errored">
         <h5><ErrorIcon /> Errors ({erroredFiles.length})</h5>
         <ul className="file-list">
           {erroredFileItems}

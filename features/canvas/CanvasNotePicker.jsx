@@ -234,7 +234,7 @@ function NoteCard({ note, onClick }) {
     if (preview.startsWith("![](/images/")) {
       preview = "Image";
     }
-    title = <div className="notes-list-item-title untitled">{preview}</div>;
+    title = <div className="notes-list-item-title is-untitled">{preview}</div>;
   }
 
   const tags = note.tags?.map(tag => <div className="notes-list-item-tag" key={tag.tagId}>{tag.name}</div>);

@@ -126,7 +126,7 @@ export default function ImageGallery({ images }) {
         src={image.url} 
         loading="lazy" 
         className="image-gallery-item" 
-        onLoad={e => e.target.classList.add('loaded')}
+        onLoad={e => e.target.classList.add('is-loaded')}
         onClick={() => handleImageClick(image)}
       />
     );

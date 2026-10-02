@@ -51,7 +51,7 @@
             white-space: nowrap;
             overflow: hidden;
 
-            &.untitled {
+            &.is-untitled {
                 color: var(--neutral-300);
             }
         }
@@ -107,7 +107,7 @@
             transform: translateY(-5px);
             transition: opacity, transform var(--transition-normal);
 
-            &.pinned {
+            &.is-pinned {
                 opacity: 1;
                 margin-left: var(--spacing-1);
                 flex-shrink: 0;
@@ -191,7 +191,7 @@
             cursor: pointer;
             zoom: 0.6;
 
-            &.reveal-animate {
+            &.has-reveal-animation {
                 opacity: 0;
                 transform: translateY(20px);
                 animation: notes-grid-reveal 0.4s ease-out forwards;
@@ -208,7 +208,7 @@
             .notes-grid-item-title {
                 font: var(--h4);
 
-                &.untitled {
+                &.is-untitled {
                     color: var(--neutral-400);
                 }
             }
@@ -220,7 +220,7 @@
                 transform: translateY(-10px);
                 transition: opacity, transform var(--transition-normal);
 
-                &.pinned {
+                &.is-pinned {
                     opacity: 1;
                     margin-left: var(--spacing-1);
                     flex-shrink: 0;

@@ -499,7 +499,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   if (isEditable === true) {
     imageDropzone = (
       <div
-        className={`notes-editor-image-dropzone ${isDraggingOver ? "dragover" : ""}`}
+        className={`notes-editor-image-dropzone ${isDraggingOver ? "is-dragging-over" : ""}`}
         onDrop={handleImageDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}

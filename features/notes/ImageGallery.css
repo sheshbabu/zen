@@ -18,7 +18,7 @@
             opacity: 0;
             cursor: pointer;
 
-            &.loaded {
+            &.is-loaded {
                 opacity: 1;
             }
 

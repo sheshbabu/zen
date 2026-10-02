@@ -18,7 +18,7 @@
             border-color: var(--neutral-600);
         }
 
-        &.error {
+        &.has-error {
             border: 1px solid var(--red-600);
             color: var(--neutral-900);
 

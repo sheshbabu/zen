@@ -22,7 +22,7 @@ export default function Input({ id, label, type, placeholder, value, hint, error
         id={id}
         name={id}
         placeholder={placeholder}
-        className={error ? "error" : ""}
+        className={error ? "has-error" : ""}
         disabled={isDisabled}
         value={value || ""}
         onChange={onChange}
