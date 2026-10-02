@@ -7,7 +7,7 @@ import { useAppContext } from "../../commons/contexts/AppContext.jsx";
 import TagItem from "./TagItem.jsx";
 
 export default function SidebarTagsList() {
-  const { tags, refreshTags } = useAppContext();
+  const { tags, refreshTags, refreshFocusModes } = useAppContext();
 
   if (tags.length === 0) {
     return null;
@@ -31,7 +31,7 @@ export default function SidebarTagsList() {
   function handleEditClick(e, tag) {
     e.stopPropagation();
     e.preventDefault();
-    openModal(<TagDetailModal tag={tag} refreshTags={refreshTags} />);
+    openModal(<TagDetailModal tag={tag} refreshTags={refreshTags} refreshFocusModes={refreshFocusModes} />);
   }
 
   return (

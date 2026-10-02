@@ -30,7 +30,7 @@ func GetAllFocusModes() ([]FocusMode, error) {
 					'tagId', t.tag_id,
 					'name', t.name,
 					'color', t.color
-				)), '[]'
+				)) FILTER (WHERE t.tag_id IS NOT NULL), '[]'
             ) as tags_json,
 			fm.last_used_at
 		FROM
@@ -83,7 +83,7 @@ func GetFocusModeByID(focusModeID int) (FocusMode, error) {
 					'tagId', t.tag_id,
 					'name', t.name,
 					'color', t.color
-				)), '[]'
+				)) FILTER (WHERE t.tag_id IS NOT NULL), '[]'
             ) as tags_json,
 			fm.last_used_at
 		FROM

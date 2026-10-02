@@ -8,7 +8,7 @@ import navigateTo from "../../commons/utils/navigateTo.js";
 import TagColorPicker from "./TagColorPicker.jsx";
 import "./TagDetailModal.css";
 
-export default function TagDetailModal({ tag, refreshTags }) {
+export default function TagDetailModal({ tag, refreshTags, refreshFocusModes }) {
   const [name, setName] = useState(tag.name);
   const [color, setColor] = useState(tag.color);
 
@@ -30,6 +30,7 @@ export default function TagDetailModal({ tag, refreshTags }) {
     ApiClient.updateTag(payload)
       .then(() => {
         refreshTags();
+        refreshFocusModes();
         closeModal();
       })
       .catch(() => { });
@@ -39,6 +40,7 @@ export default function TagDetailModal({ tag, refreshTags }) {
     ApiClient.deleteTag(tag.tagId)
       .then(() => {
         refreshTags();
+        refreshFocusModes();
         closeModal();
         navigateTo("/notes/");
       })

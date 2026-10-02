@@ -186,6 +186,12 @@ func DeleteTag(tagID int) error {
 		return err
 	}
 
+	_, err = tx.Exec("DELETE FROM focus_mode_tags WHERE tag_id = ?", tagID)
+	if err != nil {
+		err = fmt.Errorf("error deleting from focus_mode_tags: %w", err)
+		return err
+	}
+
 	_, err = tx.Exec("DELETE FROM tags WHERE tag_id = ?", tagID)
 	if err != nil {
 		err = fmt.Errorf("error deleting from tags: %w", err)
