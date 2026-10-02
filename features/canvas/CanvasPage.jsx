@@ -787,6 +787,11 @@ export default function CanvasPage({ canvasId }) {
     );
   }
 
+  let notePicker = null;
+  if (isSidebarOpen) {
+    notePicker = <CanvasNotePicker onAddNote={handleAddNote} addedItems={items} />;
+  }
+
   return (
     <div className="canvas-page">
       <CanvasToolbar
@@ -802,7 +807,7 @@ export default function CanvasPage({ canvasId }) {
         onAddStickyNote={handleAddStickyNote}
       />
       {content}
-      {isSidebarOpen && <CanvasNotePicker onAddNote={handleAddNote} addedItems={items} />}
+      {notePicker}
       <div className="note-modal-root"></div>
       <div className="modal-root"></div>
     </div>

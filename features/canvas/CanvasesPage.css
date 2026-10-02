@@ -48,7 +48,7 @@
         background: var(--bg-primary);
         border-radius: var(--radius-1);
 
-        &.canvas-card-preview-empty {
+        &.is-empty {
             width: 200px;
             height: 150px;
         }

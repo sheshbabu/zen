@@ -34,12 +34,14 @@ export default function CanvasNotePicker({ onAddNote, addedItems }) {
       .then(response => {
         setBrowseNotes(response.notes || []);
         setNotesTotal(response.total);
-      });
+      })
+      .catch(() => { });
 
     ApiClient.getImages(tagId, null, 1)
       .then(response => {
         setBrowseImages(response.images || []);
-      });
+      })
+      .catch(() => { });
   }, [filterTag]);
 
   function loadMoreNotes() {
@@ -51,7 +53,8 @@ export default function CanvasNotePicker({ onAddNote, addedItems }) {
         setBrowseNotes(prev => [...prev, ...(response.notes || [])]);
         setNotesTotal(response.total);
         setNotesPage(nextPage);
-      });
+      })
+      .catch(() => { });
   }
 
   function handleChange(e) {
@@ -75,7 +78,8 @@ export default function CanvasNotePicker({ onAddNote, addedItems }) {
             semanticNotes: searchResults.semanticNotes || [],
             semanticImages: searchResults.semanticImages || [],
           });
-        });
+        })
+        .catch(() => { });
     }, 200);
   }
 

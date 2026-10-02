@@ -2,7 +2,7 @@ import { h, useState, useEffect, useRef } from '../../assets/preact.esm.js';
 import ApiClient from '../../commons/http/ApiClient.js';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import { toggleTaskAtLine } from '../../commons/utils/toggleTaskLine.js';
-import handleCodeCopyClick from '../../commons/utils/copyCodeBlock.js';
+import handleCodeCopyClick from '../../commons/utils/handleCodeCopyClick.js';
 import { closeModal, openModal } from '../../commons/components/Modal.jsx';
 import Lightbox from '../../commons/components/Lightbox.jsx';
 import { useCollapsibleHeadings } from './useCollapsibleHeadings.js';

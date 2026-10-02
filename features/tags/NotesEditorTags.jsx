@@ -88,7 +88,8 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, placeh
 
         setSuggestions(filteredTags);
         setSelectedTag(filteredTags[0]);
-      });
+      })
+      .catch(() => { });
   }
 
   function handleSuggestionClick(tag) {

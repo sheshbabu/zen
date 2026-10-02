@@ -31,7 +31,8 @@ export default function TagDetailModal({ tag, refreshTags }) {
       .then(() => {
         refreshTags();
         closeModal();
-      });
+      })
+      .catch(() => { });
   }
 
   function handleDeleteClick() {
@@ -40,7 +41,8 @@ export default function TagDetailModal({ tag, refreshTags }) {
         refreshTags();
         closeModal();
         navigateTo("/notes/");
-      });
+      })
+      .catch(() => { });
   }
 
   function handleCancelClick() {

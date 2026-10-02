@@ -153,7 +153,7 @@ function CanvasCard({ canvas, onClick, onDelete }) {
   }
 
   if (preview === null) {
-    preview = <div className="canvas-card-preview canvas-card-preview-empty" />;
+    preview = <div className="canvas-card-preview is-empty" />;
   }
 
   const updatedAt = formatDate(new Date(canvas.updatedAt));

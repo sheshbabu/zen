@@ -22,7 +22,7 @@ export default function renderMarkdown(text, { hasCodeCopyButton = false, hasCli
   .use(tasks, { enabled: hasClickableTasks });
 
   // https://github.com/markdown-it/markdown-it/blob/master/docs/architecture.md#renderer
-  var defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
+  const defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
     return self.renderToken(tokens, idx, options);
   };
   md.renderer.rules.link_open = function (tokens, idx, options, env, self) {

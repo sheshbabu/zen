@@ -93,15 +93,15 @@ async function logout() {
 // Focus Modes
 
 async function getFocusModes() {
-  return await request('GET', '/api/v1/focus');
+  return await request('GET', '/api/v1/focus/');
 }
 
 async function createFocusMode(focusMode) {
-  return await request('POST', '/api/v1/focus/new', focusMode);
+  return await request('POST', '/api/v1/focus/', focusMode);
 }
 
 async function updateFocusMode(focusMode) {
-  return await request('PUT', `/api/v1/focus/${focusMode.focusId}`, focusMode);
+  return await request('PUT', `/api/v1/focus/${focusMode.focusId}/`, focusMode);
 }
 
 async function deleteFocusMode(focusId) {

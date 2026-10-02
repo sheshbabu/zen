@@ -70,11 +70,6 @@
                     stroke: var(--neutral-900);
                 }
             }
-
-            &.notes-editor-toolbar-button-hide {
-                width: 24px;
-                height: 24px;
-            }
         }
     }
 }

@@ -36,7 +36,7 @@ export default function useEditorKeyboardShortcuts({
   onFormatText
 }) {
   const handleKeyDown = useCallback(e => {
-    const isTextAreaFocused = document.activeElement.className == "notes-editor-textarea";
+    const isTextAreaFocused = document.activeElement.classList.contains("notes-editor-textarea");
 
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault();

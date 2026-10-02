@@ -1,4 +1,4 @@
-export default function navigateTo(path, shouldPreserveSearchParams) {
+export default function navigateTo(path, shouldPreserveSearchParams, shouldReplace) {
   if (shouldPreserveSearchParams) {
     const currentUrl = new URL(window.location.href);
     const newUrl = new URL(path, currentUrl.origin);
@@ -11,6 +11,10 @@ export default function navigateTo(path, shouldPreserveSearchParams) {
     path = newUrl.pathname + newUrl.search;
   }
 
-  window.history.pushState({}, "", path);
+  if (shouldReplace) {
+    window.history.replaceState({}, "", path);
+  } else {
+    window.history.pushState({}, "", path);
+  }
   window.dispatchEvent(new PopStateEvent("navigate"));
 }

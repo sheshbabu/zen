@@ -7,22 +7,19 @@ import Button from "../../commons/components/Button.jsx";
 export default function ExportPane() {
   const [isExporting, setIsExporting] = useState(false);
 
-  async function handleExportClick() {
-    if (isExporting) {
-      return;
-    }
-
+  function handleExportClick() {
     setIsExporting(true);
 
-    try {
-      await ApiClient.exportNotes();
-      showToast("Notes exported successfully!");
-    } catch (error) {
-      console.error('Export error:', error);
-      showToast("Failed to export notes. Please try again.");
-    } finally {
-      setIsExporting(false);
-    }
+    ApiClient.exportNotes()
+      .then(() => {
+        showToast("Notes exported successfully!");
+      })
+      .catch(() => {
+        showToast("Failed to export notes. Please try again.");
+      })
+      .finally(() => {
+        setIsExporting(false);
+      });
   }
 
   return (
@@ -55,7 +52,7 @@ export default function ExportPane() {
 
       <div className="export-actions">
         <Button 
-          variant={`primary ${isExporting ? 'disabled' : ''}`}
+          variant="primary"
           onClick={handleExportClick}
           isDisabled={isExporting}
         >

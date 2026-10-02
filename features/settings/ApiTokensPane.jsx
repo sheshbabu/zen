@@ -13,10 +13,6 @@ const ACCESS_OPTIONS = [
   { value: "write", label: "Read and write" },
 ];
 
-function newScope() {
-  return { tagId: ALL_TAGS, canRead: true, canWrite: false };
-}
-
 export default function ApiTokensPane() {
   const [tokens, setTokens] = useState([]);
   const [tags, setTags] = useState([]);
@@ -32,24 +28,23 @@ export default function ApiTokensPane() {
     loadTags();
   }, []);
 
-  async function loadTokens() {
-    try {
-      const response = await ApiClient.getTokens();
-      setTokens(response);
-    } catch (err) {
-      console.error('Load token error:', err);
-    } finally {
-      setIsTokensLoading(false);
-    }
+  function loadTokens() {
+    ApiClient.getTokens()
+      .then(response => {
+        setTokens(response);
+      })
+      .catch(() => { })
+      .finally(() => {
+        setIsTokensLoading(false);
+      });
   }
 
-  async function loadTags() {
-    try {
-      const response = await ApiClient.getTags();
-      setTags(response);
-    } catch (err) {
-      console.error('Load tags error:', err);
-    }
+  function loadTags() {
+    ApiClient.getTags()
+      .then(response => {
+        setTags(response);
+      })
+      .catch(() => { });
   }
 
   function handleNameChange(e) {
@@ -66,15 +61,15 @@ export default function ApiTokensPane() {
     setScopes(scopes.map((scope, i) => i === index ? { ...scope, canWrite } : scope));
   }
 
-  function addScope() {
+  function handleAddScopeClick() {
     setScopes([...scopes, newScope()]);
   }
 
-  function removeScope(index) {
+  function handleRemoveScopeClick(index) {
     setScopes(scopes.filter((_, i) => i !== index));
   }
 
-  async function handleCreateToken() {
+  function handleCreateTokenClick() {
     if (!newTokenName.trim()) {
       setError("Token name is required");
       return;
@@ -83,30 +78,25 @@ export default function ApiTokensPane() {
     setIsCreating(true);
     setError("");
 
-    try {
-      const response = await ApiClient.createToken({
-        name: newTokenName.trim(),
-        scopes: scopes
+    ApiClient.createToken({ name: newTokenName.trim(), scopes: scopes })
+      .then(response => {
+        setNewlyCreatedToken(response.token);
+        setNewTokenName("");
+        setScopes([newScope()]);
+        setTokens(prevTokens => [response.tokenInfo, ...prevTokens]);
+      })
+      .catch(() => { })
+      .finally(() => {
+        setIsCreating(false);
       });
-
-      setNewlyCreatedToken(response.token);
-      setNewTokenName("");
-      setScopes([newScope()]);
-      setTokens([response.tokenInfo, ...tokens]);
-    } catch (err) {
-      console.error('Create token error:', err);
-    } finally {
-      setIsCreating(false);
-    }
   }
 
-  async function revokeToken(tokenId) {
-    try {
-      await ApiClient.deleteToken(tokenId);
-      setTokens(tokens.filter(token => token.tokenId !== tokenId));
-    } catch (err) {
-      console.error('Revoke token error:', err);
-    }
+  function handleRevokeClick(tokenId) {
+    ApiClient.deleteToken(tokenId)
+      .then(() => {
+        setTokens(prevTokens => prevTokens.filter(token => token.tokenId !== tokenId));
+      })
+      .catch(() => { });
   }
 
   function tagNameFor(tagId) {
@@ -155,7 +145,7 @@ export default function ApiTokensPane() {
           isDisabled={isCreating}
           onChange={value => handleScopeAccessChange(index, value)}
         />
-        <Button variant="ghost" onClick={() => removeScope(index)} title="Remove">
+        <Button variant="ghost" onClick={() => handleRemoveScopeClick(index)} title="Remove">
           <CloseIcon />
         </Button>
       </div>
@@ -171,7 +161,7 @@ export default function ApiTokensPane() {
           {formatDate(new Date(token.createdAt))}
         </div>
       </div>
-      <Button variant="danger" onClick={() => revokeToken(token.tokenId)}>
+      <Button variant="danger" onClick={() => handleRevokeClick(token.tokenId)}>
         Revoke
       </Button>
     </div>
@@ -230,12 +220,12 @@ export default function ApiTokensPane() {
           <label className="api-token-field-label">Access</label>
           {scopeRows}
           {scopeWarning}
-          <Button variant="secondary" onClick={addScope} isDisabled={isCreating}>
+          <Button variant="secondary" onClick={handleAddScopeClick} isDisabled={isCreating}>
             Add tag
           </Button>
         </div>
 
-        <Button variant="primary" onClick={handleCreateToken} isDisabled={isCreating || !isFormValid}>
+        <Button variant="primary" onClick={handleCreateTokenClick} isDisabled={isCreating || !isFormValid}>
           {buttonText}
         </Button>
       </div>
@@ -250,6 +240,10 @@ export default function ApiTokensPane() {
       </div>
     </div>
   );
+}
+
+function newScope() {
+  return { tagId: ALL_TAGS, canRead: true, canWrite: false };
 }
 
 function ScopeTagDropdown({ options, value, onChange }) {

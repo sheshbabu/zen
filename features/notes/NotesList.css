@@ -64,7 +64,7 @@
             width: 20px;
             height: 20px;
             flex-shrink: 0;
-            animation: checkbox-appear 0.3s ease-out;
+            animation: notes-list-checkbox-appear 0.3s ease-out;
             /* to align with toolbar icons */
             margin-left: -2px;
 
@@ -321,7 +321,7 @@
     }
 }
 
-@keyframes checkbox-appear {
+@keyframes notes-list-checkbox-appear {
     from {
         opacity: 0;
         transform: scale(0.5);

@@ -122,7 +122,7 @@ export default function SecurityPane() {
           onChange={(e) => setConfirmPassword(e.target.value)}
         />
 
-        <Button type="submit" variant={`primary ${isPasswordLoading ? 'disabled' : ''}`} isDisabled={isPasswordLoading}>
+        <Button type="submit" variant="primary" isDisabled={isPasswordLoading}>
           {isPasswordLoading ? 'Updating...' : 'Update Password'}
         </Button>
       </form>

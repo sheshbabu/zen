@@ -75,7 +75,7 @@
 }
 
 
-@media (max-width: 768px) {
+@media screen and (max-width: 948px) {
     .templates-picker {
         .templates-picker-list {
             flex-direction: column;

@@ -6,7 +6,7 @@ import TableOfContents from './TableOfContents.jsx';
 import TemplatePicker from '../templates/TemplatePicker.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
 import { toggleTaskAtLine } from '../../commons/utils/toggleTaskLine.js';
-import handleCodeCopyClick from '../../commons/utils/copyCodeBlock.js';
+import handleCodeCopyClick from '../../commons/utils/handleCodeCopyClick.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import isMobile from '../../commons/utils/isMobile.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
@@ -147,11 +147,12 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
         resetAttachments();
 
         if (isNewNote && !onClose) {
-          navigateTo(`/notes/${note.noteId}`, true);
+          navigateTo(`/notes/${note.noteId}`, true, true);
         }
 
         handleNoteChange();
       })
+      .catch(() => { })
       .finally(() => {
         setIsSaveLoading(false);
       });
@@ -194,7 +195,8 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     openModal(<TableEditorModal isEditing={isEditing} selectedText={selectedText} beforeText={beforeText} afterText={afterText} onConfirm={handleConfirm} onCloseClick={() => closeModal()} />);
   }
 
-  function handleContentInput() {
+  function handleContentInput(e) {
+    setContent(e.target.value);
     handleTextAreaHeight();
     scheduleAutoSave();
   }
@@ -222,7 +224,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
       if (onClose) {
         onClose();
       } else {
-        navigateTo("/", true);
+        navigateTo("/", true, true);
       }
     } else {
       // Reset current edits
@@ -253,7 +255,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     if (onClose) {
       onClose();
     } else {
-      navigateTo("/", true);
+      navigateTo("/", true, isNewNote);
     }
   }
 
@@ -277,7 +279,8 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
           navigateTo("/", true);
         }
         handleNoteChange();
-      });
+      })
+      .catch(() => { });
   }
 
   function handleDeleteCloseClick() {
@@ -289,7 +292,8 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
       .then(() => {
         showToast("Note archived.");
         handleNoteChange();
-      });
+      })
+      .catch(() => { });
   }
 
   function handleUnarchiveClick() {
@@ -297,14 +301,16 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
       .then(() => {
         showToast("Note unarchived.");
         handleNoteChange();
-      });
+      })
+      .catch(() => { });
   }
 
   function handleRestoreClick() {
     ApiClient.restoreNote(selectedNote.noteId)
       .then(() => {
         handleNoteChange();
-      });
+      })
+      .catch(() => { });
   }
 
   function buildNoteMarkdown() {
@@ -373,7 +379,8 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     ApiClient.updateNote(selectedNote.noteId, note)
       .then(() => {
         handleNoteChange();
-      });
+      })
+      .catch(() => { });
   }
 
   function handleRenderedContentClick(e) {
@@ -463,7 +470,6 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
         ref={textareaRef}
         value={content}
         onInput={handleContentInput}
-        onBlur={e => setContent(e.target.value)}
       />
     );
   } else if (title === "" && content === "") {

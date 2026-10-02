@@ -79,7 +79,8 @@ export default function SearchMenu() {
         if (allItems.length > 0) {
           setSelectedItem(allItems[0]);
         }
-      });
+      })
+      .catch(() => { });
   }
 
   function handleSortChange(sort) {

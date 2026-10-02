@@ -10,7 +10,7 @@
 - Main exported function/component should always be the top function unless there are hoisting issues
 - Early returns for conditional rendering
 - Sub-components defined in same file after main component
-- Default exports for components, named exports for utilities
+- Default export when a file has one main function (components, hooks, utilities); named exports when it has several
 
 ## Rendering Logic
 - Extract logic from components into separate if-else conditions

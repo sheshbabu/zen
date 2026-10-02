@@ -17,6 +17,7 @@ Zen is a self-hosted notes app: Go backend with SQLite (FTS5), Preact frontend b
 - `make build` - Build production binary with frontend assets bundled
 - `make dev` - Build and run development server with `DEV_MODE=true`
 - `make watch` - Run development server with file watching
+- `make test` - Run Go and JS unit tests (`go test` and `node --test`, no extra dependencies)
 
 For watch mode, install:
 ```bash
