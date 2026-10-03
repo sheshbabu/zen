@@ -25,6 +25,7 @@ import useImageUpload from "./useImageUpload.js";
 import useMarkdownFormatter from "./useMarkdownFormatter.js";
 import useAutoSave from "./useAutoSave.js";
 import useNoteVersions from "./useNoteVersions.js";
+import useRefreshOnTabFocus from "./useRefreshOnTabFocus.js";
 import SpellcheckPreferences from "../../commons/preferences/SpellcheckPreferences.js";
 import "./NotesEditor.css";
 import { SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
@@ -59,16 +60,16 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   const tagsRef = useRef(tags);
   tagsRef.current = tags;
 
-  function handleVersionRestored(restoredNote) {
-    setTitle(restoredNote.title);
-    setContent(restoredNote.content);
-    setTags(restoredNote.tags || []);
-    setSelectedNote(restoredNote);
+  function replaceNote(newNote) {
+    setTitle(newNote.title);
+    setContent(newNote.content);
+    setTags(newNote.tags || []);
+    setSelectedNote(newNote);
   }
 
   const { handleVersionsClick } = useNoteVersions({
     note: selectedNote,
-    onRestored: handleVersionRestored,
+    onRestored: replaceNote,
     // Wrapped because useAutoSave is initialised below this call
     cancelAutoSave: () => cancelAutoSave()
   });
@@ -79,6 +80,12 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     titleRef,
     textareaRef,
     tagsRef
+  });
+
+  useRefreshOnTabFocus({
+    note: selectedNote,
+    isEditable,
+    onRefresh: replaceNote
   });
 
   const {
