@@ -26,6 +26,7 @@ import useMarkdownFormatter from "./useMarkdownFormatter.js";
 import useAutoSave from "./useAutoSave.js";
 import useNoteVersions from "./useNoteVersions.js";
 import useRefreshOnTabFocus from "./useRefreshOnTabFocus.js";
+import useNewNoteTag from "./useNewNoteTag.js";
 import SpellcheckPreferences from "../../commons/preferences/SpellcheckPreferences.js";
 import "./NotesEditor.css";
 import { SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
@@ -56,6 +57,8 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     textareaRef,
     setContent
   });
+
+  useNewNoteTag({ isNewNote, setTags });
 
   const tagsRef = useRef(tags);
   tagsRef.current = tags;

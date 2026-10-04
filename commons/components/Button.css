@@ -107,6 +107,10 @@
     background: none;
     border-radius: var(--radius-1);
 
+    &:has(> svg:only-child) {
+        padding: var(--spacing-1);
+    }
+
     &:hover {
         background-color: var(--neutral-100);
     }
