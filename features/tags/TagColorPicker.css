@@ -12,6 +12,7 @@
         display: flex;
         flex-wrap: wrap;
         gap: var(--spacing-3);
+        padding-left: var(--spacing-1);
     }
 
     .tag-color-swatch {
