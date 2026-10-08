@@ -452,13 +452,16 @@ func UpdateNote(access auth.Access, note Note) (Note, error) {
 	}
 
 	// Only snapshot when the text actually changes and every 5 mins
+	// The version is dated by when its content was last edited, not when it was replaced.
+	// datetime() normalises imported timestamps so string comparisons against datetime('now', ...) stay correct.
 	query := `
 		INSERT INTO
-			note_versions (note_id, title, content)
+			note_versions (note_id, title, content, created_at)
 		SELECT
 			note_id,
 			title,
-			content
+			content,
+			datetime(updated_at)
 		FROM
 			notes
 		WHERE
