@@ -371,7 +371,9 @@
             .api-token-creator {
                 margin-top: var(--spacing-4);
                 margin-bottom: 48px;
+            }
 
+            .api-token-fields {
                 .input-container {
                     margin-bottom: var(--spacing-1);
                 }
@@ -426,14 +428,13 @@
                 }
 
                 .api-token-value {
-                    display: flex;
-                    align-items: center;
-                    gap: var(--spacing-3);
+                    position: relative;
                     margin-bottom: var(--spacing-3);
 
                     code {
-                        flex: 1;
+                        display: block;
                         padding: var(--spacing-3);
+                        padding-right: calc(var(--spacing-3) + 24px + var(--spacing-2));
                         background-color: var(--neutral-100);
                         border: 1px solid var(--neutral-200);
                         border-radius: var(--radius-1);
@@ -442,6 +443,39 @@
                         border-style: dashed;
                     }
 
+                    .api-token-copy-button {
+                        position: absolute;
+                        top: 10px;
+                        right: 10px;
+                        display: grid;
+                        place-items: center;
+                        width: 24px;
+                        height: 24px;
+                        padding: 0;
+                        border: none;
+                        border-radius: var(--radius-1);
+                        background-color: var(--neutral-100);
+                        color: var(--text-secondary);
+                        cursor: pointer;
+
+                        &:hover {
+                            color: var(--text-primary);
+                        }
+
+                        &.is-copied {
+                            color: var(--green-600);
+                        }
+
+                        svg.lucide {
+                            width: var(--icon-sm);
+                            height: var(--icon-sm);
+                        }
+                    }
+                }
+
+                .api-token-display-hint {
+                    font: var(--xs);
+                    color: var(--text-secondary);
                 }
             }
 
@@ -464,7 +498,8 @@
                     .api-token-item {
                         display: flex;
                         justify-content: space-between;
-                        align-items: center;
+                        align-items: flex-start;
+                        gap: var(--spacing-4);
                         padding: 10px 0;
                         margin-bottom: var(--spacing-2);
                         border-bottom: 1px solid var(--bg-tertiary);
@@ -490,6 +525,25 @@
                             .api-token-date {
                                 font: var(--xs);
                                 color: var(--neutral-400);
+                            }
+                        }
+
+                        .api-token-actions {
+                            display: flex;
+                            gap: var(--spacing-2);
+
+                            .button {
+                                margin-top: 0;
+                            }
+                        }
+
+                        .api-token-editor {
+                            flex: 1;
+
+                            .api-token-editor-actions {
+                                display: flex;
+                                justify-content: flex-end;
+                                gap: var(--spacing-2);
                             }
                         }
 

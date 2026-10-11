@@ -125,6 +125,7 @@ func newRouter() *http.ServeMux {
 
 	addSessionRoute(mux, "GET /api/v1/tokens/", tokens.HandleGetAPITokens)
 	addSessionRoute(mux, "POST /api/v1/tokens/", tokens.HandleCreateAPIToken)
+	addSessionRoute(mux, "PUT /api/v1/tokens/{tokenId}/", tokens.HandleUpdateAPIToken)
 	addSessionRoute(mux, "DELETE /api/v1/tokens/{tokenId}/", tokens.HandleRevokeAPIToken)
 
 	addAuthenticatedRoute(mux, "GET /api/v1/search/", search.HandleSearch)

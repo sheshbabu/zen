@@ -131,19 +131,9 @@ func CreateAPIToken(name string, scopes []Scope) (string, APIToken, error) {
 		return "", APIToken{}, err
 	}
 
-	scopeQuery := `
-		INSERT INTO
-			api_token_scopes (token_id, tag_id, can_read, can_write)
-		VALUES
-			(?, ?, ?, ?)
-	`
-
-	for _, scope := range scopes {
-		_, err = tx.Exec(scopeQuery, token.TokenID, scope.TagID, scope.CanRead, scope.CanWrite)
-		if err != nil {
-			err = fmt.Errorf("error creating API token scope: %w", err)
-			return "", APIToken{}, err
-		}
+	err = insertScopes(tx, token.TokenID, scopes)
+	if err != nil {
+		return "", APIToken{}, err
 	}
 	token.Scopes = scopes
 
@@ -154,6 +144,65 @@ func CreateAPIToken(name string, scopes []Scope) (string, APIToken, error) {
 	}
 
 	return plainToken, token, nil
+}
+
+func UpdateAPIToken(tokenID int, name string, scopes []Scope) (APIToken, error) {
+	tx, err := sqlite.DB.Begin()
+	if err != nil {
+		err = fmt.Errorf("error beginning transaction: %w", err)
+		return APIToken{}, err
+	}
+	defer tx.Rollback()
+
+	var token APIToken
+	query := `
+		UPDATE
+			api_tokens
+		SET
+			name = ?
+		WHERE
+			token_id = ?
+		RETURNING
+			token_id, name, created_at
+	`
+
+	row := tx.QueryRow(query, name, tokenID)
+	err = row.Scan(&token.TokenID, &token.Name, &token.CreatedAt)
+	if errors.Is(err, sql.ErrNoRows) {
+		err = fmt.Errorf("API token %d: %w", tokenID, utils.ErrNotFound)
+		return APIToken{}, err
+	}
+	if err != nil {
+		err = fmt.Errorf("error updating API token: %w", err)
+		return APIToken{}, err
+	}
+
+	deleteQuery := `
+		DELETE FROM
+			api_token_scopes
+		WHERE
+			token_id = ?
+	`
+
+	_, err = tx.Exec(deleteQuery, tokenID)
+	if err != nil {
+		err = fmt.Errorf("error deleting API token scopes: %w", err)
+		return APIToken{}, err
+	}
+
+	err = insertScopes(tx, tokenID, scopes)
+	if err != nil {
+		return APIToken{}, err
+	}
+	token.Scopes = scopes
+
+	err = tx.Commit()
+	if err != nil {
+		err = fmt.Errorf("error committing API token: %w", err)
+		return APIToken{}, err
+	}
+
+	return token, nil
 }
 
 func RevokeAPIToken(tokenID int) error {
@@ -263,6 +312,25 @@ func HasTag(tagID int) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func insertScopes(tx *sql.Tx, tokenID int, scopes []Scope) error {
+	query := `
+		INSERT INTO
+			api_token_scopes (token_id, tag_id, can_read, can_write)
+		VALUES
+			(?, ?, ?, ?)
+	`
+
+	for _, scope := range scopes {
+		_, err := tx.Exec(query, tokenID, scope.TagID, scope.CanRead, scope.CanWrite)
+		if err != nil {
+			err = fmt.Errorf("error creating API token scope: %w", err)
+			return err
+		}
+	}
+
+	return nil
 }
 
 func hashToken(plainToken string) string {

@@ -2,11 +2,12 @@ import { h, useState, useEffect, useRef } from "../../assets/preact.esm.js";
 import Input from "../../commons/components/Input.jsx";
 import Button from "../../commons/components/Button.jsx";
 import SegmentedControl from "../../commons/components/SegmentedControl.jsx";
-import { ArrowDownIcon, CloseIcon } from "../../commons/components/Icon.jsx";
+import { ArrowDownIcon, CheckIcon, CloseIcon, CopyIcon } from "../../commons/components/Icon.jsx";
+import { showToast } from "../../commons/components/Toast.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
-import formatDate from "../../commons/utils/formatDate.js";
 
 const ALL_TAGS = 0;
+const COPIED_DURATION = 2000;
 
 const ACCESS_OPTIONS = [
   { value: "read", label: "Read" },
@@ -21,7 +22,8 @@ export default function ApiTokensPane() {
   const [scopes, setScopes] = useState([newScope()]);
   const [newlyCreatedToken, setNewlyCreatedToken] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
-  const [error, setError] = useState("");
+  const [isTokenCopied, setIsTokenCopied] = useState(false);
+  const [editingTokenId, setEditingTokenId] = useState(null);
 
   useEffect(() => {
     loadTokens();
@@ -49,34 +51,10 @@ export default function ApiTokensPane() {
 
   function handleNameChange(e) {
     setNewTokenName(e.target.value);
-    setError("");
-  }
-
-  function handleScopeTagChange(index, tagId) {
-    setScopes(scopes.map((scope, i) => i === index ? { ...scope, tagId } : scope));
-  }
-
-  function handleScopeAccessChange(index, value) {
-    const canWrite = value === "write";
-    setScopes(scopes.map((scope, i) => i === index ? { ...scope, canWrite } : scope));
-  }
-
-  function handleAddScopeClick() {
-    setScopes([...scopes, newScope()]);
-  }
-
-  function handleRemoveScopeClick(index) {
-    setScopes(scopes.filter((_, i) => i !== index));
   }
 
   function handleCreateTokenClick() {
-    if (!newTokenName.trim()) {
-      setError("Token name is required");
-      return;
-    }
-
     setIsCreating(true);
-    setError("");
 
     ApiClient.createToken({ name: newTokenName.trim(), scopes: scopes })
       .then(response => {
@@ -89,6 +67,30 @@ export default function ApiTokensPane() {
       .finally(() => {
         setIsCreating(false);
       });
+  }
+
+  function handleCopyTokenClick() {
+    navigator.clipboard.writeText(newlyCreatedToken)
+      .then(() => {
+        setIsTokenCopied(true);
+        setTimeout(() => setIsTokenCopied(false), COPIED_DURATION);
+      })
+      .catch(() => {
+        showToast("Couldn't copy token.");
+      });
+  }
+
+  function handleEditClick(tokenId) {
+    setEditingTokenId(tokenId);
+  }
+
+  function handleEditCancel() {
+    setEditingTokenId(null);
+  }
+
+  function handleEditSave(updatedToken) {
+    setTokens(prevTokens => prevTokens.map(token => token.tokenId === updatedToken.tokenId ? updatedToken : token));
+    setEditingTokenId(null);
   }
 
   function handleRevokeClick(tokenId) {
@@ -114,60 +116,78 @@ export default function ApiTokensPane() {
 
   function grantsSummary(tokenScopes) {
     if (!tokenScopes || tokenScopes.length === 0) {
-      return "No access";
+      return ["No access"];
     }
 
-    return tokenScopes.map(scope => {
-      const access = scope.canWrite ? "read and write" : "read";
-      return `${tagNameFor(scope.tagId)}: ${access}`;
-    }).join(" · ");
-  }
+    const writeTagNames = [];
+    const readTagNames = [];
+    for (const scope of tokenScopes) {
+      if (scope.canWrite) {
+        writeTagNames.push(tagNameFor(scope.tagId));
+      } else {
+        readTagNames.push(tagNameFor(scope.tagId));
+      }
+    }
 
-  const hasDuplicateTags = new Set(scopes.map(scope => scope.tagId)).size !== scopes.length;
-  const isFormValid = newTokenName.trim() !== "" && scopes.length > 0 && !hasDuplicateTags;
+    const lines = [];
+    if (writeTagNames.length > 0) {
+      lines.push(`Read and write: ${writeTagNames.join(", ")}`);
+    }
+    if (readTagNames.length > 0) {
+      lines.push(`Read: ${readTagNames.join(", ")}`);
+    }
+    return lines;
+  }
 
   const tagOptions = [
     { value: ALL_TAGS, label: "All tags" },
     ...tags.map(tag => ({ value: tag.tagId, label: tag.name }))
   ];
 
-  const scopeRows = scopes.map((scope, index) => {
+  const tokenItems = tokens.map(token => {
+    if (token.tokenId === editingTokenId) {
+      return (
+        <div key={token.tokenId} className="api-token-item">
+          <TokenEditor token={token} tagOptions={tagOptions} onSave={handleEditSave} onCancel={handleEditCancel} />
+        </div>
+      );
+    }
+
+    const grantLines = grantsSummary(token.scopes).map(line => (
+      <div key={line} className="api-token-grants">{line}</div>
+    ));
+
     return (
-      <div key={index} className="api-token-scope-row">
-        <ScopeTagDropdown
-          options={tagOptions}
-          value={scope.tagId}
-          onChange={tagId => handleScopeTagChange(index, tagId)}
-        />
-        <SegmentedControl
-          options={ACCESS_OPTIONS}
-          value={scope.canWrite ? "write" : "read"}
-          isDisabled={isCreating}
-          onChange={value => handleScopeAccessChange(index, value)}
-        />
-        <Button variant="ghost" onClick={() => handleRemoveScopeClick(index)} title="Remove">
-          <CloseIcon />
-        </Button>
+      <div key={token.tokenId} className="api-token-item">
+        <div className="api-token-info">
+          <div className="api-token-name">{token.name}</div>
+          {grantLines}
+          <div className="api-token-date" title={token.createdAt}>
+            Created {formatCreatedDate(token.createdAt)}
+          </div>
+        </div>
+        <div className="api-token-actions">
+          <Button variant="secondary" onClick={() => handleEditClick(token.tokenId)}>
+            Edit
+          </Button>
+          <Button variant="danger" onClick={() => handleRevokeClick(token.tokenId)}>
+            Revoke
+          </Button>
+        </div>
       </div>
     );
   });
 
-  const tokenItems = tokens.map(token => (
-    <div key={token.tokenId} className="api-token-item">
-      <div className="api-token-info">
-        <div className="api-token-name">{token.name}</div>
-        <div className="api-token-grants">{grantsSummary(token.scopes)}</div>
-        <div className="api-token-date" title={token.createdAt}>
-          {formatDate(new Date(token.createdAt))}
-        </div>
-      </div>
-      <Button variant="danger" onClick={() => handleRevokeClick(token.tokenId)}>
-        Revoke
-      </Button>
-    </div>
-  ));
-
   const buttonText = isCreating ? "Generating..." : "Generate Token";
+
+  let copyButton = null;
+  if (typeof navigator.clipboard !== "undefined") {
+    copyButton = (
+      <button type="button" className={`api-token-copy-button ${isTokenCopied ? "is-copied" : ""}`} onClick={handleCopyTokenClick}>
+        {isTokenCopied ? <CheckIcon /> : <CopyIcon />}
+      </button>
+    );
+  }
 
   let tokenDisplay = null;
   if (newlyCreatedToken) {
@@ -178,14 +198,11 @@ export default function ApiTokensPane() {
         </div>
         <div className="api-token-value">
           <code>{newlyCreatedToken}</code>
+          {copyButton}
         </div>
+        <p className="api-token-display-hint">Copy it now. You won't be able to see it again.</p>
       </div>
     );
-  }
-
-  let scopeWarning = null;
-  if (hasDuplicateTags) {
-    scopeWarning = <p className="api-token-scope-warning">Each tag can only be granted once.</p>;
   }
 
   let tokensContent = null;
@@ -205,34 +222,24 @@ export default function ApiTokensPane() {
       <p>Create tokens for agents and scripts to access your notes over the API. Each token is limited to the tags and permissions you grant it.</p>
 
       <div className="api-token-creator">
-        <Input
+        <TokenFields
           id="api-token-name"
-          label="Token Name"
-          type="text"
-          placeholder="e.g., Ingest agent, Quick capture, etc."
-          value={newTokenName}
-          error={error}
+          name={newTokenName}
+          scopes={scopes}
+          tagOptions={tagOptions}
           isDisabled={isCreating}
-          onChange={handleNameChange}
+          onNameChange={handleNameChange}
+          onScopesChange={setScopes}
         />
 
-        <div className="api-token-scopes">
-          <label className="api-token-field-label">Access</label>
-          {scopeRows}
-          {scopeWarning}
-          <Button variant="secondary" onClick={handleAddScopeClick} isDisabled={isCreating}>
-            Add tag
-          </Button>
-        </div>
-
-        <Button variant="primary" onClick={handleCreateTokenClick} isDisabled={isCreating || !isFormValid}>
+        <Button variant="primary" onClick={handleCreateTokenClick} isDisabled={isCreating || !isTokenFormValid(newTokenName, scopes)}>
           {buttonText}
         </Button>
       </div>
 
       {tokenDisplay}
 
-      <hr/>
+      <hr />
 
       <div className="api-tokens-section">
         <h4>Active Tokens</h4>
@@ -240,6 +247,132 @@ export default function ApiTokensPane() {
       </div>
     </div>
   );
+}
+
+function TokenEditor({ token, tagOptions, onSave, onCancel }) {
+  const [name, setName] = useState(token.name);
+  const [scopes, setScopes] = useState(token.scopes);
+  const [isSaving, setIsSaving] = useState(false);
+
+  function handleNameChange(e) {
+    setName(e.target.value);
+  }
+
+  function handleSaveClick() {
+    setIsSaving(true);
+
+    ApiClient.updateToken(token.tokenId, { name: name.trim(), scopes: scopes })
+      .then(response => {
+        onSave(response);
+      })
+      .catch(() => {
+        setIsSaving(false);
+      });
+  }
+
+  const saveButtonText = isSaving ? "Saving..." : "Save";
+
+  return (
+    <div className="api-token-editor">
+      <TokenFields
+        id={`api-token-name-${token.tokenId}`}
+        name={name}
+        scopes={scopes}
+        tagOptions={tagOptions}
+        isDisabled={isSaving}
+        onNameChange={handleNameChange}
+        onScopesChange={setScopes}
+      />
+      <div className="api-token-editor-actions">
+        <Button variant="secondary" onClick={onCancel} isDisabled={isSaving}>
+          Cancel
+        </Button>
+        <Button variant="primary" onClick={handleSaveClick} isDisabled={isSaving || !isTokenFormValid(name, scopes)}>
+          {saveButtonText}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function TokenFields({ id, name, scopes, tagOptions, isDisabled, onNameChange, onScopesChange }) {
+  function handleScopeTagChange(index, tagId) {
+    onScopesChange(scopes.map((scope, i) => i === index ? { ...scope, tagId } : scope));
+  }
+
+  function handleScopeAccessChange(index, value) {
+    const canWrite = value === "write";
+    onScopesChange(scopes.map((scope, i) => i === index ? { ...scope, canWrite } : scope));
+  }
+
+  function handleAddScopeClick() {
+    onScopesChange([...scopes, newScope()]);
+  }
+
+  function handleRemoveScopeClick(index) {
+    onScopesChange(scopes.filter((_, i) => i !== index));
+  }
+
+  const scopeRows = scopes.map((scope, index) => {
+    return (
+      <div key={index} className="api-token-scope-row">
+        <ScopeTagDropdown
+          options={tagOptions}
+          value={scope.tagId}
+          onChange={tagId => handleScopeTagChange(index, tagId)}
+        />
+        <SegmentedControl
+          options={ACCESS_OPTIONS}
+          value={scope.canWrite ? "write" : "read"}
+          isDisabled={isDisabled}
+          onChange={value => handleScopeAccessChange(index, value)}
+        />
+        <Button variant="ghost" onClick={() => handleRemoveScopeClick(index)} title="Remove">
+          <CloseIcon />
+        </Button>
+      </div>
+    );
+  });
+
+  let scopeWarning = null;
+  if (hasDuplicateTags(scopes)) {
+    scopeWarning = <p className="api-token-scope-warning">Each tag can only be granted once.</p>;
+  }
+
+  return (
+    <div className="api-token-fields">
+      <Input
+        id={id}
+        label="Token Name"
+        type="text"
+        placeholder="e.g., Ingest agent, Quick capture, etc."
+        value={name}
+        isDisabled={isDisabled}
+        onChange={onNameChange}
+      />
+
+      <div className="api-token-scopes">
+        <label className="api-token-field-label">Access</label>
+        {scopeRows}
+        {scopeWarning}
+        <Button variant="secondary" onClick={handleAddScopeClick} isDisabled={isDisabled}>
+          Add tag
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function hasDuplicateTags(scopes) {
+  return new Set(scopes.map(scope => scope.tagId)).size !== scopes.length;
+}
+
+function isTokenFormValid(name, scopes) {
+  return name.trim() !== "" && scopes.length > 0 && !hasDuplicateTags(scopes);
+}
+
+function formatCreatedDate(createdAt) {
+  return new Date(createdAt).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
 }
 
 function newScope() {
