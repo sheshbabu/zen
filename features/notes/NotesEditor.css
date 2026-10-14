@@ -476,10 +476,15 @@
         margin-bottom: 0;
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
+    .table-block {
+        overflow-x: auto;
         margin: var(--spacing-4) 0;
+    }
+
+    table {
+        width: max-content;
+        border-collapse: collapse;
+        margin: 0;
     }
 
     table,
@@ -487,7 +492,6 @@
     td {
         border: 1px solid var(--neutral-200);
         padding: var(--spacing-2) var(--spacing-3);
-        width: max-content;
     }
 
     th {

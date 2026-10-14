@@ -36,6 +36,14 @@ export default function renderMarkdown(text, { hasCodeCopyButton = false, hasCli
     return defaultRender(tokens, idx, options, env, self);
   };
 
+  // A table can't scroll on its own without squeezing its columns, so a wrapper scrolls it instead.
+  md.renderer.rules.table_open = function (tokens, idx, options, env, self) {
+    return `<div class="table-block">${self.renderToken(tokens, idx, options)}`;
+  };
+  md.renderer.rules.table_close = function (tokens, idx, options, env, self) {
+    return `${self.renderToken(tokens, idx, options)}</div>`;
+  };
+
   const isClipboardAvailable = typeof navigator.clipboard !== 'undefined';
 
   if (hasCodeCopyButton === true && isClipboardAvailable === true) {
