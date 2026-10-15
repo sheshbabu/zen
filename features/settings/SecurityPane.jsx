@@ -3,6 +3,9 @@ import Button from "../../commons/components/Button.jsx";
 import Input from "../../commons/components/Input.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import { showToast } from "../../commons/components/Toast.jsx";
+import SettingsRow from "./SettingsRow.jsx";
+import SettingsSection from "./SettingsSection.jsx";
+import { LogOutIcon } from "../../commons/components/Icon.jsx";
 
 export default function SecurityPane() {
   const [oldPassword, setOldPassword] = useState("");
@@ -85,56 +88,56 @@ export default function SecurityPane() {
 
   return (
     <div className="settings-tab-content">
-      <h3>Change Password</h3>
-      <p>Update your account password. You'll need to provide your current password.</p>
+      <SettingsSection title="Change Password" description="Update your account password. You'll need to provide your current password.">
+        <form className="settings-form" onSubmit={handlePasswordSubmit}>
+          <Input
+            id="current-password"
+            label="Current Password"
+            type="password"
+            placeholder="Enter current password"
+            value={oldPassword}
+            error={oldPasswordError}
+            isDisabled={isPasswordLoading}
+            onChange={(e) => setOldPassword(e.target.value)}
+          />
 
-      <form className="settings-form" onSubmit={handlePasswordSubmit}>
-        <Input
-          id="current-password"
-          label="Current Password"
-          type="password"
-          placeholder="Enter current password"
-          value={oldPassword}
-          error={oldPasswordError}
-          isDisabled={isPasswordLoading}
-          onChange={(e) => setOldPassword(e.target.value)}
-        />
+          <Input
+            id="new-password"
+            label="New Password"
+            type="password"
+            placeholder="Enter new password"
+            value={newPassword}
+            error={newPasswordError}
+            isDisabled={isPasswordLoading}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
 
-        <Input
-          id="new-password"
-          label="New Password"
-          type="password"
-          placeholder="Enter new password"
-          value={newPassword}
-          error={newPasswordError}
-          isDisabled={isPasswordLoading}
-          onChange={(e) => setNewPassword(e.target.value)}
-        />
+          <Input
+            id="confirm-password"
+            label="Confirm New Password"
+            type="password"
+            placeholder="Confirm new password"
+            value={confirmPassword}
+            error={confirmPasswordError}
+            isDisabled={isPasswordLoading}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
 
-        <Input
-          id="confirm-password"
-          label="Confirm New Password"
-          type="password"
-          placeholder="Confirm new password"
-          value={confirmPassword}
-          error={confirmPasswordError}
-          isDisabled={isPasswordLoading}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
+          <Button type="submit" variant="primary" isDisabled={isPasswordLoading}>
+            {isPasswordLoading ? 'Updating...' : 'Update Password'}
+          </Button>
+        </form>
+      </SettingsSection>
 
-        <Button type="submit" variant="primary" isDisabled={isPasswordLoading}>
-          {isPasswordLoading ? 'Updating...' : 'Update Password'}
-        </Button>
-      </form>
-
-      <hr/>
-
-      <h3>Session Management</h3>
-      <p>Log out of your account. You'll need to sign in again.</p>
-
-      <Button onClick={handleLogout} isDisabled={isLogoutLoading}>
-        {isLogoutLoading ? 'Logging out...' : 'Log out'}
-      </Button>
+      <SettingsSection title="Session" description="Manage how you're signed in on this device.">
+        <div className="settings-card">
+          <SettingsRow icon={<LogOutIcon />} label="Current session" description="Logging out means you'll need to sign in again.">
+            <Button onClick={handleLogout} isDisabled={isLogoutLoading}>
+              {isLogoutLoading ? 'Logging out...' : 'Log out'}
+            </Button>
+          </SettingsRow>
+        </div>
+      </SettingsSection>
     </div>
   );
 }

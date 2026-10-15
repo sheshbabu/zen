@@ -3,6 +3,7 @@ import { UploadIcon, SuccessIcon, WarnIcon, ErrorIcon } from "../../commons/comp
 import { showToast } from "../../commons/components/Toast.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import pluralize from "../../commons/utils/pluralize.js";
+import SettingsSection from "./SettingsSection.jsx";
 
 export default function ImportPane() {
   const [isUploading, setIsUploading] = useState(false);
@@ -100,34 +101,35 @@ export default function ImportPane() {
 
   return (
     <div className="settings-tab-content">
-      <h3>Import Files</h3>
-      <p>Import .md or .txt files.</p>
-      <p>For .md files, you can optionally include a YAML frontmatter block with title, tags (comma-separated), created, and updated fields.</p>
-      <pre className="code-block">{`---\ntitle: My Note Title\ntags: work, ideas, project\ncreated: 2023-04-15T10:30:00Z\nupdated: 2023-06-20T14:45:00Z\n---\n\nNote content here...`}</pre>
+      <SettingsSection title="Import Notes" description="Import a folder of .md or .txt files.">
+        <div className="file-upload-container">
+          <input
+            type="file"
+            id="folder-upload"
+            webkitdirectory
+            directory
+            multiple
+            onChange={handleFileUpload}
+            disabled={isUploading}
+          />
+          <label htmlFor="folder-upload" className={`file-upload-label ${isUploading ? 'is-disabled' : ''}`}>
+            <UploadIcon />
+            {isUploading ? 'Importing...' : 'Choose folder'}
+          </label>
 
-      <div className="file-upload-container">
-        <input
-          type="file"
-          id="folder-upload"
-          webkitdirectory
-          directory
-          multiple
-          onChange={handleFileUpload}
-          disabled={isUploading}
-        />
-        <label htmlFor="folder-upload" className={`file-upload-label ${isUploading ? 'is-disabled' : ''}`}>
-          <UploadIcon />
-          {isUploading ? 'Importing...' : 'Choose folder'}
-        </label>
+          <UploadProgress isUploading={isUploading} uploadProgress={uploadProgress} />
+          <UploadSummary
+            summaryMessage={summaryMessage}
+            uploadedFiles={uploadedFiles}
+            skippedFiles={skippedFiles}
+            erroredFiles={erroredFiles}
+          />
+        </div>
+      </SettingsSection>
 
-        <UploadProgress isUploading={isUploading} uploadProgress={uploadProgress} />
-        <UploadSummary
-          summaryMessage={summaryMessage}
-          uploadedFiles={uploadedFiles}
-          skippedFiles={skippedFiles}
-          erroredFiles={erroredFiles}
-        />
-      </div>
+      <SettingsSection title="Frontmatter" description="For .md files, you can optionally include a YAML frontmatter block with title, tags (comma-separated), created, and updated fields.">
+        <pre className="code-block">{`---\ntitle: My Note Title\ntags: work, ideas, project\ncreated: 2023-04-15T10:30:00Z\nupdated: 2023-06-20T14:45:00Z\n---\n\nNote content here...`}</pre>
+      </SettingsSection>
     </div>
   )
 }

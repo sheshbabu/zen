@@ -2,9 +2,11 @@ import { h, useState, useEffect, useRef } from "../../assets/preact.esm.js";
 import Input from "../../commons/components/Input.jsx";
 import Button from "../../commons/components/Button.jsx";
 import SegmentedControl from "../../commons/components/SegmentedControl.jsx";
-import { ArrowDownIcon, CheckIcon, CloseIcon, CopyIcon } from "../../commons/components/Icon.jsx";
+import { ArrowDownIcon, BracesIcon, CheckIcon, CloseIcon, CopyIcon } from "../../commons/components/Icon.jsx";
 import { showToast } from "../../commons/components/Toast.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
+import SettingsRow from "./SettingsRow.jsx";
+import SettingsSection from "./SettingsSection.jsx";
 
 const ALL_TAGS = 0;
 const COPIED_DURATION = 2000;
@@ -146,26 +148,22 @@ export default function ApiTokensPane() {
 
   const tokenItems = tokens.map(token => {
     if (token.tokenId === editingTokenId) {
-      return (
-        <div key={token.tokenId} className="api-token-item">
-          <TokenEditor token={token} tagOptions={tagOptions} onSave={handleEditSave} onCancel={handleEditCancel} />
-        </div>
-      );
+      return <TokenEditor key={token.tokenId} token={token} tagOptions={tagOptions} onSave={handleEditSave} onCancel={handleEditCancel} />;
     }
 
     const grantLines = grantsSummary(token.scopes).map(line => (
       <div key={line} className="api-token-grants">{line}</div>
     ));
 
+    const description = [
+      ...grantLines,
+      <div key="created" className="api-token-date" title={token.createdAt}>
+        Created {formatCreatedDate(token.createdAt)}
+      </div>
+    ];
+
     return (
-      <div key={token.tokenId} className="api-token-item">
-        <div className="api-token-info">
-          <div className="api-token-name">{token.name}</div>
-          {grantLines}
-          <div className="api-token-date" title={token.createdAt}>
-            Created {formatCreatedDate(token.createdAt)}
-          </div>
-        </div>
+      <SettingsRow key={token.tokenId} icon={<BracesIcon />} label={token.name} description={description}>
         <div className="api-token-actions">
           <Button variant="secondary" onClick={() => handleEditClick(token.tokenId)}>
             Edit
@@ -174,7 +172,7 @@ export default function ApiTokensPane() {
             Revoke
           </Button>
         </div>
-      </div>
+      </SettingsRow>
     );
   });
 
@@ -210,7 +208,7 @@ export default function ApiTokensPane() {
     tokensContent = <p className="api-no-tokens">No tokens created yet. Create your first token above.</p>;
   } else {
     tokensContent = (
-      <div className="api-tokens-list">
+      <div className="api-tokens-list settings-card">
         {tokenItems}
       </div>
     );
@@ -218,33 +216,29 @@ export default function ApiTokensPane() {
 
   return (
     <div className="settings-tab-content">
-      <h3>API Tokens</h3>
-      <p>Create tokens for agents and scripts to access your notes over the API. Each token is limited to the tags and permissions you grant it.</p>
+      <SettingsSection title="Create Token" description="Create tokens for agents and scripts to access your notes over the API. Each token is limited to the tags and permissions you grant it.">
+        <div className="api-token-creator">
+          <TokenFields
+            id="api-token-name"
+            name={newTokenName}
+            scopes={scopes}
+            tagOptions={tagOptions}
+            isDisabled={isCreating}
+            onNameChange={handleNameChange}
+            onScopesChange={setScopes}
+          />
 
-      <div className="api-token-creator">
-        <TokenFields
-          id="api-token-name"
-          name={newTokenName}
-          scopes={scopes}
-          tagOptions={tagOptions}
-          isDisabled={isCreating}
-          onNameChange={handleNameChange}
-          onScopesChange={setScopes}
-        />
+          <Button variant="primary" onClick={handleCreateTokenClick} isDisabled={isCreating || !isTokenFormValid(newTokenName, scopes)}>
+            {buttonText}
+          </Button>
+        </div>
 
-        <Button variant="primary" onClick={handleCreateTokenClick} isDisabled={isCreating || !isTokenFormValid(newTokenName, scopes)}>
-          {buttonText}
-        </Button>
-      </div>
+        {tokenDisplay}
+      </SettingsSection>
 
-      {tokenDisplay}
-
-      <hr />
-
-      <div className="api-tokens-section">
-        <h4>Active Tokens</h4>
+      <SettingsSection title="Active Tokens">
         {tokensContent}
-      </div>
+      </SettingsSection>
     </div>
   );
 }
