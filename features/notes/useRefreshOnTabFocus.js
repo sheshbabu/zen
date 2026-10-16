@@ -9,7 +9,7 @@ export default function useRefreshOnTabFocus({ note, isEditable, onRefresh }) {
   isEditableRef.current = isEditable;
 
   useEffect(() => {
-    function handleVisibilityChange() {
+    function handleRefresh() {
       if (document.visibilityState !== "visible" || isEditable || !note || !navigator.onLine) {
         return;
       }
@@ -31,10 +31,13 @@ export default function useRefreshOnTabFocus({ note, isEditable, onRefresh }) {
         .catch(() => { });
     }
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    // A window left visible beside another app never becomes hidden, so only focus tells us the user came back.
+    document.addEventListener("visibilitychange", handleRefresh);
+    window.addEventListener("focus", handleRefresh);
 
     return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleRefresh);
+      window.removeEventListener("focus", handleRefresh);
     };
   }, [note, isEditable, onRefresh]);
 }
