@@ -5,8 +5,8 @@ import { toggleTaskAtLine } from '../../commons/utils/toggleTaskLine.js';
 import handleCodeCopyClick from '../../commons/utils/handleCodeCopyClick.js';
 import { closeModal, openModal } from '../../commons/components/Modal.jsx';
 import Lightbox from '../../commons/components/Lightbox.jsx';
+import NotesEditorTags from '../tags/NotesEditorTags.jsx';
 import { useCollapsibleHeadings } from './useCollapsibleHeadings.js';
-import './NotePreview.css';
 import './NotesEditor.css';
 
 
@@ -101,8 +101,13 @@ export default function NotePreview({ noteId, onOpenLink, onNavigateLink, onNote
 
   return (
     <div className="note-preview">
-      <div className="notes-editor-title">{titleText}</div>
-      <div className="notes-editor-rendered has-foldable-headings" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(note.content, { hasCodeCopyButton: true, hasClickableTasks: true }) }} onClick={handleContentClick} />
+      <div className="notes-editor-header">
+        <div className="notes-editor-title">{titleText}</div>
+      </div>
+      <NotesEditorTags tags={note.tags} isEditable={false} />
+      <div className="notes-editor-content">
+        <div className="notes-editor-rendered has-foldable-headings" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(note.content, { hasCodeCopyButton: true, hasClickableTasks: true }) }} onClick={handleContentClick} />
+      </div>
     </div>
   );
 }
