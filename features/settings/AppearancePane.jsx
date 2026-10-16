@@ -54,12 +54,7 @@ const themes = [
 ];
 
 export default function AppearancePane() {
-  const [selectedThemeId, setSelectedThemeId] = useState("system");
-
-  useEffect(() => {
-    const savedThemeId = ThemePreferences.getPreference();
-    setSelectedThemeId(savedThemeId);
-  }, []);
+  const [selectedThemeId, setSelectedThemeId] = useState(() => ThemePreferences.getPreference());
 
   useEffect(() => {
     ThemePreferences.setPreference(selectedThemeId);
