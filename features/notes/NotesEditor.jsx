@@ -107,6 +107,10 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   let contentArea = null;
 
   useEffect(() => {
+    titleRef.current.textContent = title;
+  }, [title]);
+
+  useEffect(() => {
     if (isNewNote === true || (isEditable === true && titleRef.current?.textContent === "")) {
       titleRef.current?.focus();
     }
@@ -555,7 +559,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
         onVersionsClick={handleVersionsClick}
       />
       <div className="notes-editor-header">
-        <div className="notes-editor-title" contentEditable={isEditable} spellCheck={spellcheckValue} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
+        <div className="notes-editor-title" contentEditable={isEditable} spellCheck={spellcheckValue} ref={titleRef} onBlur={handleTitleChange} />
       </div>
       <NotesEditorTags tags={tags} isEditable={isEditable} canCreateTag onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
       {imageDropzone}

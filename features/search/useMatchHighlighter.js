@@ -1,4 +1,5 @@
 import { useState, useEffect } from "../../assets/preact.esm.js";
+import { splitHighlights, getMatchedTerms } from "./highlights.js";
 
 const HIGHLIGHT_CLASS = "find-match";
 const CURRENT_CLASS = "is-current";
@@ -17,7 +18,7 @@ export default function useMatchHighlighter({ containerRef, noteId, displayedCon
     }
 
     clearHighlights(contentElement);
-    const terms = getMarkedTerms(highlightedText);
+    const terms = getMatchedTerms(splitHighlights(highlightedText));
     const newMarks = highlightMatches(contentElement, terms);
     setMarks(newMarks);
 
@@ -44,17 +45,6 @@ export default function useMatchHighlighter({ containerRef, noteId, displayedCon
   }
 
   return { matchCount: marks.length, currentMatchIndex, goToNextMatch, goToPreviousMatch };
-}
-
-function getMarkedTerms(highlightedText) {
-  const terms = [];
-  for (const match of highlightedText.matchAll(/<mark>(.*?)<\/mark>/gs)) {
-    const term = match[1].toLowerCase();
-    if (term !== "" && !terms.includes(term)) {
-      terms.push(term);
-    }
-  }
-  return terms;
 }
 
 function highlightMatches(rootElement, terms) {

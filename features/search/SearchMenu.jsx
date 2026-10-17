@@ -8,6 +8,7 @@ import SearchHistory from "../../commons/preferences/SearchHistory.js";
 import SearchPreviewPreferences from "../../commons/preferences/SearchPreviewPreferences.js";
 import Tabs from "../../commons/components/Tabs.jsx";
 import SearchPreview from "./SearchPreview.jsx";
+import { splitHighlights, getHighlightedSnippet } from "./highlights.js";
 import SearchSortDropdown, { SORT_OPTIONS } from "./SearchSortDropdown.jsx";
 import RecentSearchQuery from "./RecentSearchQuery.js";
 import "./SearchMenu.css";
@@ -378,27 +379,36 @@ function SearchResultItem({ item, isSelected, onClick, onMouseEnter }) {
     icon = <TrashIcon />
   }
 
-  const displayTitle = item.highlightedTitle || title || ""
+  const titleSegments = splitHighlights(item.highlightedTitle || title || "")
 
-  let displaySubtitle = subtitle
+  let subtitleSegments = splitHighlights(subtitle)
   if (item.highlightedContent) {
-    displaySubtitle = getHighlightedSnippet(item.highlightedContent)
+    subtitleSegments = getHighlightedSnippet(splitHighlights(item.highlightedContent))
   } else if (item.content) {
-    displaySubtitle = item.content
+    subtitleSegments = splitHighlights(item.content)
   } else if (item.matchText) {
     // For semantic note results
-    displaySubtitle = item.matchText
+    subtitleSegments = splitHighlights(item.matchText)
   }
 
   return (
     <div className={`search-result-item ${isSelected ? "is-selected" : ""}`} onClick={onClick} onMouseEnter={onMouseEnter}>
       {icon}
       <div className="search-result-item-content">
-        <p className="title" dangerouslySetInnerHTML={{ __html: displayTitle }}></p>
-        <p className="subtitle" dangerouslySetInnerHTML={{ __html: displaySubtitle }}></p>
+        <p className="title"><HighlightedText segments={titleSegments} /></p>
+        <p className="subtitle"><HighlightedText segments={subtitleSegments} /></p>
       </div>
     </div>
   );
+}
+
+function HighlightedText({ segments }) {
+  return segments.map((segment, index) => {
+    if (segment.isMatch) {
+      return <mark key={index}>{segment.text}</mark>;
+    }
+    return segment.text;
+  });
 }
 
 function SearchResultImages({ items, onClick, onMouseEnter }) {
@@ -409,37 +419,4 @@ function SearchResultImages({ items, onClick, onMouseEnter }) {
       {images}
     </div>
   );
-}
-
-function getHighlightedSnippet(highlightedContent) {
-  if (!highlightedContent || !highlightedContent.includes('<mark>')) {
-    return highlightedContent;
-  }
-
-  const maxLength = 100;
-  const leftOffset = 10;
-  const markStart = highlightedContent.indexOf('<mark>');
-  const startPos = Math.max(0, markStart - leftOffset);
-
-  let snippet = highlightedContent.substring(startPos, startPos + maxLength);
-
-  const lastMarkStart = snippet.lastIndexOf('<mark>');
-  const lastMarkEnd = snippet.lastIndexOf('</mark>');
-
-  if (lastMarkStart > lastMarkEnd) {
-    const remainingContent = highlightedContent.substring(startPos + maxLength);
-    const nextMarkEnd = remainingContent.indexOf('</mark>');
-    if (nextMarkEnd !== -1) {
-      snippet += remainingContent.substring(0, nextMarkEnd + 7);
-    }
-  }
-
-  if (startPos > 0) {
-    snippet = '...' + snippet;
-  }
-  if (startPos + snippet.length < highlightedContent.length) {
-    snippet += '...';
-  }
-
-  return snippet;
 }
