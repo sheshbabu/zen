@@ -600,6 +600,15 @@
     >h2,
     >h3 {
         cursor: pointer;
+        transition: color var(--transition-fast) ease;
+    }
+
+    @media (hover: hover) {
+        >h1:hover,
+        >h2:hover,
+        >h3:hover {
+            color: var(--neutral-600);
+        }
     }
 
     /* Balanced wrapping pushes the fold pill onto its own line. */
