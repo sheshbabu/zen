@@ -1,108 +1,112 @@
-.toc-sidebar {
+.toc {
+    --toc-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
     position: fixed;
     left: 8px;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: var(--spacing-2);
+    max-height: calc(100vh - 240px);
+    overflow-y: auto;
+    border-radius: var(--radius-2);
     cursor: pointer;
     z-index: var(--z-base);
+    transition: gap 450ms var(--toc-ease);
 
-    .toc-bars {
+    .toc-item {
+        position: relative;
         display: flex;
-        flex-direction: column;
-        gap: 2px;
-        padding: var(--spacing-4) var(--spacing-2);
+        align-items: center;
+        height: 8px;
+        padding: 0 var(--spacing-2);
+        border-radius: var(--radius-1);
+        overflow: hidden;
+        transition: height 300ms var(--toc-ease), background-color 200ms ease-out;
+    }
+
+    .toc-bar {
+        height: 2px;
+        border-radius: 1px;
+        background: var(--neutral-300);
+        transform-origin: left;
+        transition: opacity 250ms ease, scale 300ms var(--toc-ease), background-color 200ms ease-out;
+    }
+
+    .toc-bar-level-1 {
+        width: 10px;
+    }
+
+    .toc-bar-level-2 {
+        width: 8px;
+    }
+
+    .toc-bar-level-3 {
+        width: 6px;
+    }
+
+    .toc-label {
+        position: absolute;
+        left: calc(var(--spacing-2) + var(--toc-indent));
+        right: var(--spacing-2);
+        top: 50%;
+        font: var(--xs);
+        color: var(--text-secondary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        opacity: 0;
+        translate: -4px -50%;
+        transition: opacity 150ms ease, translate 300ms var(--toc-ease), color 200ms ease-out;
+        /* Keeps the labels on their own layer, so the text isn't re-rendered differently when the animation ends. */
+        will-change: opacity, translate;
+    }
+
+    .is-visible {
+        .toc-bar {
+            background: var(--neutral-600);
+        }
+
+        .toc-label {
+            color: var(--text-primary);
+        }
+    }
+
+    &:hover {
+        width: 260px;
+        gap: var(--spacing-1);
+        background: var(--bg-primary);
+
+        .toc-item {
+            height: 24px;
+            transition-delay: calc(var(--toc-reveal-step) * 50ms), 0s;
+
+            &:hover {
+                background-color: var(--neutral-100);
+
+                .toc-label {
+                    color: var(--text-primary);
+                }
+            }
+        }
 
         .toc-bar {
-            height: 2px;
-            background: var(--neutral-300);
-            transition: background var(--transition-fast) ease;
-            margin-bottom: var(--spacing-1);
+            opacity: 0;
+            scale: 0.15 1;
         }
 
-        .toc-bar-level-1 {
-            width: 10px;
+        .toc-label {
+            opacity: 1;
+            translate: 0 -50%;
+            transition: opacity 400ms ease, translate 550ms var(--toc-ease), color 200ms ease-out;
+            transition-delay: calc(var(--toc-reveal-step) * 50ms), calc(var(--toc-reveal-step) * 50ms), 0s;
         }
-
-        .toc-bar-level-2 {
-            width: 8px;
-        }
-
-        .toc-bar-level-3 {
-            width: 6px;
-        }
-
-        .is-visible {
-            background: var(--neutral-400);
-        }
-
-        &:hover {
-            .toc-bar {
-                background: var(--neutral-200);
-            }
-        }
-    }
-}
-
-.toc-popover {
-    position: fixed;
-    left: 30px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: var(--z-base);
-    animation: toc-slide-right 300ms ease-out;
-
-    .toc-popover-content {
-        background: var(--neutral-800);
-        border-radius: var(--radius-1);
-        box-shadow: var(--shadow-4);
-        padding: var(--spacing-1);
-        min-width: 100px;
-        max-width: 280px;
-        max-height: 400px;
-        overflow-y: auto;
-
-        .toc-items {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-1);
-
-            .toc-item {
-                padding: var(--spacing-1) var(--spacing-1);
-                cursor: pointer;
-                border-radius: var(--radius-1);
-                font: var(--xs);
-                color: var(--neutral-200);
-                transition: background-color var(--transition-fast) ease, color var(--transition-fast) ease;
-
-                &:hover {
-                    background-color: var(--neutral-700);
-                    color: var(--neutral-100);
-                }
-
-                &.is-visible {
-                    font-weight: 600;
-                }
-            }
-        }
-    }
-}
-
-@keyframes toc-slide-right {
-    from {
-        opacity: 0;
-        transform: translateY(-50%) translateX(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(-50%) translateX(0);
     }
 }
 
 @media screen and (max-width: 948px) {
-
-    .toc-sidebar,
-    .toc-popover {
+    .toc {
         display: none;
     }
 }
