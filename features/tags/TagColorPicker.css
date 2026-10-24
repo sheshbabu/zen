@@ -1,0 +1,99 @@
+.tag-color-picker {
+    margin-top: var(--spacing-6);
+
+    .tag-color-picker-label {
+        display: block;
+        margin-bottom: var(--spacing-2);
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .tag-color-swatches {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-3);
+        padding-left: var(--spacing-1);
+    }
+
+    .tag-color-swatch {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition-property: transform, outline-color;
+        transition-duration: var(--transition-fast);
+        transition-timing-function: ease-out;
+
+        svg.lucide {
+            height: 12px;
+            width: 12px;
+
+            line,
+            circle,
+            rect,
+            path {
+                stroke: white;
+                stroke-width: 3;
+            }
+        }
+
+        &:hover {
+            transform: scale(1.1);
+        }
+
+        &:active {
+            transform: scale(0.95);
+        }
+
+        &.is-selected {
+            outline: 2px solid var(--neutral-500);
+            outline-offset: 2px;
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--neutral-600);
+            outline-offset: 2px;
+        }
+
+        &.color-gray {
+            background-color: var(--neutral-400);
+        }
+
+        &.color-red {
+            background-color: var(--red-500);
+        }
+
+        &.color-orange {
+            background-color: var(--orange-500);
+        }
+
+        &.color-yellow {
+            background-color: var(--yellow-500);
+        }
+
+        &.color-green {
+            background-color: var(--green-500);
+        }
+
+        &.color-teal {
+            background-color: var(--teal-500);
+        }
+
+        &.color-blue {
+            background-color: var(--blue-500);
+        }
+
+        &.color-purple {
+            background-color: var(--purple-500);
+        }
+
+        &.color-pink {
+            background-color: var(--pink-500);
+        }
+    }
+}

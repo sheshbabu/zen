@@ -51,7 +51,7 @@
             white-space: nowrap;
             overflow: hidden;
 
-            &.untitled {
+            &.is-untitled {
                 color: var(--neutral-300);
             }
         }
@@ -64,13 +64,13 @@
             width: 20px;
             height: 20px;
             flex-shrink: 0;
-            animation: checkbox-appear 0.3s ease-out;
+            animation: notes-list-checkbox-appear 0.3s ease-out;
             /* to align with toolbar icons */
             margin-left: -2px;
 
             svg {
-                width: 20px;
-                height: 20px;
+                width: var(--icon-md);
+                height: var(--icon-md);
 
                 circle,
                 path {
@@ -97,7 +97,7 @@
         &:has(.notes-list-item-body) {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: var(--spacing-3);
         }
 
         .notes-list-item-pin {
@@ -105,11 +105,11 @@
             width: 16px;
             height: 16px;
             transform: translateY(-5px);
-            transition: opacity, transform 300ms;
+            transition: opacity, transform var(--transition-normal);
 
-            &.pinned {
+            &.is-pinned {
                 opacity: 1;
-                margin-left: 4px;
+                margin-left: var(--spacing-1);
                 flex-shrink: 0;
                 transform: translateY(0);
 
@@ -129,21 +129,28 @@
             justify-content: space-between;
             width: 100%;
             overflow: hidden;
-            margin-top: 4px;
+            margin-top: var(--spacing-1);
 
             .notes-list-item-subtext,
             .notes-list-item-tag {
                 font: var(--sm);
-                color: var(--neutral-400);
                 align-content: end;
                 white-space: nowrap;
                 flex-shrink: 0;
             }
 
+            .notes-list-item-subtext {
+                color: var(--neutral-400);
+            }
+
+            .notes-list-item-tag {
+                color: var(--tag-text, var(--neutral-400));
+            }
+
             .notes-list-item-tags {
                 display: flex;
-                gap: 4px;
-                margin-right: 24px;
+                gap: var(--spacing-1);
+                margin-right: var(--spacing-6);
                 flex: 1;
                 overflow: hidden;
                 white-space: nowrap;
@@ -154,8 +161,8 @@
     .notes-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 20px;
-        padding: 20px;
+        gap: var(--spacing-5);
+        padding: var(--spacing-5);
         padding-top: 0;
         padding-left: 10px;
 
@@ -174,8 +181,8 @@
             transition-property: box-shadow;
             transition-duration: var(--transition-normal);
             box-shadow: var(--shadow-2);
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: var(--radius-2);
+            padding: var(--spacing-5);
             border: 1px solid var(--neutral-100);
             background-color: var(--bg-primary);
             display: block;
@@ -184,7 +191,7 @@
             cursor: pointer;
             zoom: 0.6;
 
-            &.reveal-animate {
+            &.has-reveal-animation {
                 opacity: 0;
                 transform: translateY(20px);
                 animation: notes-grid-reveal 0.4s ease-out forwards;
@@ -195,13 +202,13 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin-bottom: 12px;
+                margin-bottom: var(--spacing-3);
             }
 
             .notes-grid-item-title {
                 font: var(--h4);
 
-                &.untitled {
+                &.is-untitled {
                     color: var(--neutral-400);
                 }
             }
@@ -211,11 +218,11 @@
                 width: 24px;
                 height: 24px;
                 transform: translateY(-10px);
-                transition: opacity, transform 300ms;
+                transition: opacity, transform var(--transition-normal);
 
-                &.pinned {
+                &.is-pinned {
                     opacity: 1;
-                    margin-left: 4px;
+                    margin-left: var(--spacing-1);
                     flex-shrink: 0;
                     transform: translateY(0);
 
@@ -249,7 +256,7 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
-                padding: 20px;
+                padding: var(--spacing-5);
                 background: linear-gradient(180deg, transparent 0%, var(--bg-primary) 20%);
             }
 
@@ -264,7 +271,7 @@
                 -moz-user-select: all;
                 -ms-user-select: all;
                 cursor: move;
-                transition: transform 0.1s;
+                transition: transform var(--transition-fast);
 
                 * {
                     user-select: none;
@@ -298,7 +305,7 @@
         justify-content: center;
         padding: 36px 0;
         cursor: pointer;
-        transition: color 0.5s;
+        transition: color var(--transition-normal);
 
         &:hover {
             color: var(--neutral-600);
@@ -314,7 +321,7 @@
     }
 }
 
-@keyframes checkbox-appear {
+@keyframes notes-list-checkbox-appear {
     from {
         opacity: 0;
         transform: scale(0.5);

@@ -157,14 +157,16 @@ function NotesPageContent({ noteId }) {
   const isEditorExpandable = selectedView === "list";
   const isPageExpanded = isEditorExpanded === true && isEditorExpandable === true;
 
+  const allNoteIds = notes.map(n => n.noteId);
+
   let editorContent = <NotesEditor isNewNote={noteId === "new"} isExpandable={isEditorExpandable} key={selectedNote?.noteId} />;
   if (isMultiSelect === true) {
-    editorContent = <BulkActionsPanel selectedIds={selectedIds} allIds={notes.map(n => n.noteId)} onClose={handleClearSelection} onSelectAll={() => setSelectedIds(notes.map(n => n.noteId))} />;
+    editorContent = <BulkActionsPanel selectedIds={selectedIds} allIds={allNoteIds} onClose={handleClearSelection} onSelectAll={() => setSelectedIds(allNoteIds)} />;
   }
 
   let bulkToolbar = null;
   if (isMultiSelect === true) {
-    bulkToolbar = <BulkActionsToolbar selectedIds={selectedIds} allIds={notes.map(n => n.noteId)} onClose={handleClearSelection} onSelectAll={() => setSelectedIds(notes.map(n => n.noteId))} />;
+    bulkToolbar = <BulkActionsToolbar selectedIds={selectedIds} allIds={allNoteIds} onClose={handleClearSelection} onSelectAll={() => setSelectedIds(allNoteIds)} />;
   }
 
   if (selectedView === "list") {

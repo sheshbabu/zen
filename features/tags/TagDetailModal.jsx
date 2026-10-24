@@ -5,35 +5,46 @@ import ButtonGroup from "../../commons/components/ButtonGroup.jsx";
 import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent, ModalFooter, closeModal } from "../../commons/components/Modal.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
+import TagColorPicker from "./TagColorPicker.jsx";
 import "./TagDetailModal.css";
 
-export default function TagDetailModal({ tag, refreshTags }) {
+export default function TagDetailModal({ tag, refreshTags, refreshFocusModes }) {
   const [name, setName] = useState(tag.name);
+  const [color, setColor] = useState(tag.color);
 
   function handleNameChange(e) {
     setName(e.target.value);
   }
 
+  function handleColorChange(nextColor) {
+    setColor(nextColor);
+  }
+
   function handleUpdateClick() {
     const payload = {
       tagId: tag.tagId,
-      name: name
+      name: name,
+      color: color
     };
 
     ApiClient.updateTag(payload)
       .then(() => {
         refreshTags();
+        refreshFocusModes();
         closeModal();
-      });
+      })
+      .catch(() => { });
   }
 
   function handleDeleteClick() {
     ApiClient.deleteTag(tag.tagId)
       .then(() => {
         refreshTags();
+        refreshFocusModes();
         closeModal();
         navigateTo("/notes/");
-      });
+      })
+      .catch(() => { });
   }
 
   function handleCancelClick() {
@@ -48,6 +59,7 @@ export default function TagDetailModal({ tag, refreshTags }) {
         <ModalContent>
           <p className="modal-description">Edit the tag name or <b>permanently delete</b> this tag. Deleting the tag will remove it from all notes.</p>
           <Input id="tag-name" label="Tag Name" type="text" placeholder="Name your Tag" value={name} hint="" error="" isDisabled={false} onChange={handleNameChange} />
+          <TagColorPicker selectedColor={color} onColorChange={handleColorChange} />
         </ModalContent>
         <ModalFooter>
           <Button variant="danger" onClick={handleDeleteClick}>Delete</Button>

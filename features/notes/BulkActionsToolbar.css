@@ -15,7 +15,7 @@
         padding: 0 var(--spacing-2);
         background-color: var(--bg-primary);
         box-shadow: var(--shadow-6);
-        z-index: 3;
+        z-index: var(--z-popover);
 
         .bulk-actions-toolbar-left {
             display: flex;
@@ -35,7 +35,7 @@
             justify-content: center;
             width: 36px;
             height: 36px;
-            border-radius: 4px;
+            border-radius: var(--radius-1);
             cursor: pointer;
             color: var(--neutral-500);
 

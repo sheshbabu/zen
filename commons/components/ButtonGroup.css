@@ -9,9 +9,9 @@
     /* Icon button styling within groups */
     .icon-button {
         padding: var(--spacing-2);
-        border-radius: 4px;
+        border-radius: var(--radius-1);
         cursor: pointer;
-        transition: background-color 500ms;
+        transition: background-color var(--transition-normal);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -21,10 +21,10 @@
         }
 
         svg.lucide {
-            width: 20px;
-            height: 20px;
+            width: var(--icon-md);
+            height: var(--icon-md);
             transition-property: stroke;
-            transition-duration: 500ms;
+            transition-duration: var(--transition-normal);
 
             line,
             circle,

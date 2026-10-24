@@ -5,11 +5,11 @@ import NotesEditorFormattingToolbar from './NotesEditorFormattingToolbar.jsx';
 import TableOfContents from './TableOfContents.jsx';
 import TemplatePicker from '../templates/TemplatePicker.jsx';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
-import handleCodeCopyClick from '../../commons/utils/copyCodeBlock.js';
+import { toggleTaskAtLine } from '../../commons/utils/toggleTaskLine.js';
+import handleCodeCopyClick from '../../commons/utils/handleCodeCopyClick.js';
 import navigateTo from '../../commons/utils/navigateTo.js';
 import isMobile from '../../commons/utils/isMobile.js';
 import NoteDeleteModal from './NoteDeleteModal.jsx';
-import NotePreviewModal from './NotePreviewModal.jsx';
 import TableEditorModal from './TableEditorModal.jsx';
 import Lightbox from '../../commons/components/Lightbox.jsx';
 import NotesEditorMenu from './NotesEditorMenu.jsx';
@@ -18,19 +18,22 @@ import { showToast } from '../../commons/components/Toast.jsx';
 import { closeModal, openModal } from '../../commons/components/Modal.jsx';
 import { useNotes } from "../../commons/contexts/NotesContext.jsx";
 import { useLayout } from "../../commons/contexts/LayoutContext.jsx";
-import NotePreview from './NotePreview.jsx';
 import { useVisibleHeadings } from "./useVisibleHeadings.js";
+import { useCollapsibleHeadings } from "./useCollapsibleHeadings.js";
 import useEditorKeyboardShortcuts from "./useEditorKeyboardShortcuts.js";
 import useImageUpload from "./useImageUpload.js";
 import useMarkdownFormatter from "./useMarkdownFormatter.js";
 import useAutoSave from "./useAutoSave.js";
+import useNoteVersions from "./useNoteVersions.js";
+import useRefreshOnTabFocus from "./useRefreshOnTabFocus.js";
+import useNewNoteTag from "./useNewNoteTag.js";
 import SpellcheckPreferences from "../../commons/preferences/SpellcheckPreferences.js";
 import "./NotesEditor.css";
 import { SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
 
 export default function NotesEditor({ isNewNote, isModal, isExpandable = false, onClose }) {
-  const { selectedNote, handleNoteChange, handlePinToggle } = useNotes();
-  const { isEditorExpanded, toggleEditorExpanded, setSidePanelContent } = useLayout();
+  const { selectedNote, setSelectedNote, handleNoteChange, handlePinToggle } = useNotes();
+  const { isEditorExpanded, toggleEditorExpanded, openSidePanelNote } = useLayout();
 
   if (!isNewNote && selectedNote === null) {
     return null;
@@ -45,16 +48,34 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   const titleRef = useRef(null);
   const textareaRef = useRef(null);
   const contentRef = useRef(null);
+  const editorRef = useRef(null);
 
   const visibleHeadings = useVisibleHeadings(contentRef, content, isEditable, isEditorExpanded);
+  const { handleHeadingClick } = useCollapsibleHeadings(contentRef, selectedNote?.noteId);
 
   const { insertAtCursor, applyMarkdownFormat } = useMarkdownFormatter({
     textareaRef,
     setContent
   });
 
+  useNewNoteTag({ isNewNote, setTags });
+
   const tagsRef = useRef(tags);
   tagsRef.current = tags;
+
+  function replaceNote(newNote) {
+    setTitle(newNote.title);
+    setContent(newNote.content);
+    setTags(newNote.tags || []);
+    setSelectedNote(newNote);
+  }
+
+  const { handleVersionsClick } = useNoteVersions({
+    note: selectedNote,
+    onRestored: replaceNote,
+    // Wrapped because useAutoSave is initialised below this call
+    cancelAutoSave: () => cancelAutoSave()
+  });
 
   const { scheduleAutoSave, cancelAutoSave } = useAutoSave({
     isNewNote,
@@ -62,6 +83,12 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     titleRef,
     textareaRef,
     tagsRef
+  });
+
+  useRefreshOnTabFocus({
+    note: selectedNote,
+    isEditable,
+    onRefresh: replaceNote
   });
 
   const {
@@ -80,12 +107,24 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   let contentArea = null;
 
   useEffect(() => {
+    titleRef.current.textContent = title;
+  }, [title]);
+
+  useEffect(() => {
     if (isNewNote === true || (isEditable === true && titleRef.current?.textContent === "")) {
       titleRef.current?.focus();
     }
 
     if (isNewNote !== true) {
       document.title = title === "" ? "Zen" : title;
+    }
+  }, []);
+
+  useEffect(() => {
+    // The scrolling container belongs to the page and outlives this remount
+    const scrollContainer = editorRef.current?.closest(".notes-editor-container");
+    if (scrollContainer !== null && scrollContainer !== undefined) {
+      scrollContainer.scrollTop = 0;
     }
   }, []);
 
@@ -122,11 +161,12 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
         resetAttachments();
 
         if (isNewNote && !onClose) {
-          navigateTo(`/notes/${note.noteId}`, true);
+          navigateTo(`/notes/${note.noteId}`, true, true);
         }
 
         handleNoteChange();
       })
+      .catch(() => { })
       .finally(() => {
         setIsSaveLoading(false);
       });
@@ -169,7 +209,8 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     openModal(<TableEditorModal isEditing={isEditing} selectedText={selectedText} beforeText={beforeText} afterText={afterText} onConfirm={handleConfirm} onCloseClick={() => closeModal()} />);
   }
 
-  function handleContentInput() {
+  function handleContentInput(e) {
+    setContent(e.target.value);
     handleTextAreaHeight();
     scheduleAutoSave();
   }
@@ -197,7 +238,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
       if (onClose) {
         onClose();
       } else {
-        navigateTo("/", true);
+        navigateTo("/", true, true);
       }
     } else {
       // Reset current edits
@@ -228,7 +269,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     if (onClose) {
       onClose();
     } else {
-      navigateTo("/", true);
+      navigateTo("/", true, isNewNote);
     }
   }
 
@@ -252,7 +293,8 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
           navigateTo("/", true);
         }
         handleNoteChange();
-      });
+      })
+      .catch(() => { });
   }
 
   function handleDeleteCloseClick() {
@@ -264,7 +306,8 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
       .then(() => {
         showToast("Note archived.");
         handleNoteChange();
-      });
+      })
+      .catch(() => { });
   }
 
   function handleUnarchiveClick() {
@@ -272,14 +315,16 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
       .then(() => {
         showToast("Note unarchived.");
         handleNoteChange();
-      });
+      })
+      .catch(() => { });
   }
 
   function handleRestoreClick() {
     ApiClient.restoreNote(selectedNote.noteId)
       .then(() => {
         handleNoteChange();
-      });
+      })
+      .catch(() => { });
   }
 
   function buildNoteMarkdown() {
@@ -326,8 +371,44 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     closeModal();
   }
 
+  function handleTaskCheckboxClick(checkbox) {
+    const lineIndex = parseInt(checkbox.getAttribute('data-line'), 10);
+    const newContent = toggleTaskAtLine(content, lineIndex);
+    if (newContent === null) {
+      return;
+    }
+
+    setContent(newContent);
+
+    if (isNewNote === true) {
+      return;
+    }
+
+    const note = {
+      title: title,
+      content: newContent,
+      tags: tags,
+    };
+
+    ApiClient.updateNote(selectedNote.noteId, note)
+      .then(() => {
+        handleNoteChange();
+      })
+      .catch(() => { });
+  }
+
   function handleRenderedContentClick(e) {
     if (handleCodeCopyClick(e) === true) {
+      return;
+    }
+
+    if (handleHeadingClick(e) === true) {
+      return;
+    }
+
+    const checkbox = e.target.closest('.task-list-item-checkbox[data-line]');
+    if (checkbox !== null) {
+      handleTaskCheckboxClick(checkbox);
       return;
     }
 
@@ -350,14 +431,13 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     e.preventDefault();
     const noteId = parseInt(link.getAttribute('data-note-id'), 10);
 
-    if (isMobile()) {
-      openModal(
-        <NotePreviewModal noteId={noteId} />,
-        '.note-modal-root'
-      );
-    } else {
-      setSidePanelContent(<NotePreview noteId={noteId} />);
+    // Shift opens the side panel; Cmd/Ctrl stays the browser's new-tab gesture.
+    if (e.shiftKey === true) {
+      openSidePanelNote(noteId);
+      return;
     }
+
+    navigateTo(`/notes/${noteId}`);
   }
 
   function handlePinClick() {
@@ -404,7 +484,6 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
         ref={textareaRef}
         value={content}
         onInput={handleContentInput}
-        onBlur={e => setContent(e.target.value)}
       />
     );
   } else if (title === "" && content === "") {
@@ -413,7 +492,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     );
   } else {
     contentArea = (
-      <div className="notes-editor-rendered" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(content, { hasCodeCopyButton: true }) }} onClick={handleRenderedContentClick} />
+      <div className="notes-editor-rendered has-foldable-headings" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(content, { hasCodeCopyButton: true, hasClickableTasks: true }) }} onClick={handleRenderedContentClick} />
     );
   }
 
@@ -434,7 +513,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   if (isEditable === true) {
     imageDropzone = (
       <div
-        className={`notes-editor-image-dropzone ${isDraggingOver ? "dragover" : ""}`}
+        className={`notes-editor-image-dropzone ${isDraggingOver ? "is-dragging-over" : ""}`}
         onDrop={handleImageDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -456,7 +535,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   }
 
   return (
-    <div className="notes-editor" tabIndex="0" onPaste={handlePaste}>
+    <div className="notes-editor" tabIndex="0" onPaste={handlePaste} ref={editorRef}>
       <Toolbar
         note={selectedNote}
         isNewNote={isNewNote}
@@ -477,9 +556,10 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
         onUnpinClick={handleUnpinClick}
         onCopyClick={handleCopyClick}
         onShareClick={handleShareClick}
+        onVersionsClick={handleVersionsClick}
       />
       <div className="notes-editor-header">
-        <div className="notes-editor-title" contentEditable={isEditable} spellCheck={spellcheckValue} ref={titleRef} onBlur={handleTitleChange} dangerouslySetInnerHTML={{ __html: title }} />
+        <div className="notes-editor-title" contentEditable={isEditable} spellCheck={spellcheckValue} ref={titleRef} onBlur={handleTitleChange} />
       </div>
       <NotesEditorTags tags={tags} isEditable={isEditable} canCreateTag onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
       {imageDropzone}
@@ -489,12 +569,12 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
         {contentArea}
       </div>
       {templatePicker}
-      <TableOfContents content={content} isExpanded={isEditorExpanded} isEditable={isEditable} isNewNote={isNewNote} visibleHeadings={visibleHeadings} />
+      <TableOfContents noteId={selectedNote?.noteId} content={content} isExpanded={isEditorExpanded} isEditable={isEditable} isNewNote={isNewNote} visibleHeadings={visibleHeadings} />
     </div>
   );
 }
 
-function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpanded, isExpandable, onSaveClick, onEditClick, onEditCancelClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick, onPinClick, onUnpinClick, onCopyClick, onShareClick }) {
+function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpanded, isExpandable, onSaveClick, onEditClick, onEditCancelClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick, onPinClick, onUnpinClick, onCopyClick, onShareClick, onVersionsClick }) {
   const saveButtonText = isSaveLoading ? "Saving..." : "Save";
 
   function handleClick(e) {
@@ -566,6 +646,8 @@ function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpand
           onDeleteClick={onDeleteClick}
           onCopyClick={onCopyClick}
           onShareClick={onShareClick}
+          onVersionsClick={onVersionsClick}
+          isModal={isModal}
         />
       </div>
     </div>

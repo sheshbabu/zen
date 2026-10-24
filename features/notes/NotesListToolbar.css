@@ -1,8 +1,8 @@
 .notes-list-toolbar {
     display: flex;
     justify-content: space-between;
-    padding: 14px 0 8px 0;
-    margin: 0 12px 0 4px;
+    padding: 14px 0 var(--spacing-2) 0;
+    margin: 0 var(--spacing-3) 0 var(--spacing-1);
     background: var(--bg-primary);
     z-index: var(--z-base);
     position: sticky;
@@ -22,14 +22,14 @@
 
     svg.lucide {
         cursor: pointer;
-        width: 20px;
-        height: 20px;
+        width: var(--icon-md);
+        height: var(--icon-md);
         margin: var(--spacing-2);
         margin-right: 0;
         /* align with text in listview */
         margin-left: 10px;
         transition-property: stroke;
-        transition-duration: 500ms;
+        transition-duration: var(--transition-normal);
 
         &:hover {
 

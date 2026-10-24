@@ -6,9 +6,9 @@
         display: flex;
         align-items: center;
         gap: 2px;
-        padding: 4px 10px;
+        padding: var(--spacing-1) 10px;
         border: 0;
-        border-radius: 4px;
+        border-radius: var(--radius-1);
         cursor: pointer;
         white-space: nowrap;
         background-color: transparent;
@@ -30,8 +30,8 @@
         svg.lucide {
             display: block;
             flex-shrink: 0;
-            width: 16px;
-            height: 16px;
+            width: var(--icon-sm);
+            height: var(--icon-sm);
             padding: 0;
 
             path {
@@ -43,7 +43,7 @@
     .search-sort-dropdown-menu {
         list-style: none;
         margin: 0;
-        margin-top: 4px;
+        margin-top: var(--spacing-1);
         padding: 0;
         position: absolute;
         top: 100%;
@@ -51,13 +51,13 @@
         min-width: 140px;
         background-color: var(--bg-secondary);
         border: 1px solid var(--neutral-100);
-        border-radius: 4px;
+        border-radius: var(--radius-1);
         box-shadow: var(--shadow-4);
         z-index: var(--z-popover);
         opacity: 0;
         visibility: hidden;
         transform: translateY(-4px);
-        transition: opacity 0.15s ease-out, transform 0.15s ease-out, visibility 0.15s ease-out;
+        transition: opacity var(--transition-fast) ease-out, transform var(--transition-fast) ease-out, visibility var(--transition-fast) ease-out;
         pointer-events: none;
     }
 
@@ -65,13 +65,12 @@
         display: flex;
         align-items: center;
         height: 32px;
-        padding-left: 12px;
-        margin: 4px;
-        border-radius: 4px;
+        padding-left: var(--spacing-3);
+        margin: var(--spacing-1);
+        border-radius: var(--radius-1);
         white-space: nowrap;
         cursor: pointer;
-        font: var(--sm);
-        font-size: 13px;
+        font: var(--xs);
         color: var(--text-primary);
         transition: background-color var(--transition-fast) ease;
 

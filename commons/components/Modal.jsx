@@ -37,13 +37,21 @@ export function ModalContainer({ children, className = '' }) {
 }
 
 export function ModalHeader({ title, onClose, showCloseButton = true, children }) {
+  let titleElement = null;
+  if (title) {
+    titleElement = <h3 className="modal-title">{title}</h3>;
+  }
+
+  let closeButton = null;
+  if (showCloseButton && onClose) {
+    closeButton = <CloseIcon className="modal-close-button" onClick={onClose} />;
+  }
+
   return (
     <div className="modal-header">
-      {title && <h3 className="modal-title">{title}</h3>}
+      {titleElement}
       {children}
-      {showCloseButton && onClose && (
-        <CloseIcon className="modal-close-button" onClick={onClose} />
-      )}
+      {closeButton}
     </div>
   );
 }

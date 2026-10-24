@@ -3,6 +3,7 @@ package intelligence
 import (
 	"fmt"
 	"log/slog"
+	"zen/commons/auth"
 	"zen/commons/queue"
 	"zen/features/images"
 	"zen/features/notes"
@@ -15,7 +16,7 @@ func indexAllNotes() (int, error) {
 
 	for {
 		filter := notes.NewNotesFilter(page, 0, 0, false, false) // Non-deleted, non-archived notes
-		pageNotes, total, err := notes.GetAllNotes(filter)
+		pageNotes, total, err := notes.GetAllNotes(auth.Unrestricted, filter)
 		if err != nil {
 			return 0, fmt.Errorf("failed to get notes page %d: %w", page, err)
 		}

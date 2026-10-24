@@ -1,6 +1,5 @@
 package intelligence
 
-
 func isIntelligenceAvailable() bool {
 	if !isIntelligenceEnabled {
 		return false

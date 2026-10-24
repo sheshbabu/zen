@@ -55,10 +55,10 @@
 
     .table-editor-actions {
         display: flex;
-        gap: 4px;
+        gap: var(--spacing-1);
         margin-bottom: var(--spacing-5);
         border: 1px solid var(--neutral-200);
-        padding: 4px;
+        padding: var(--spacing-1);
         border-radius: 5px;
     }
 }

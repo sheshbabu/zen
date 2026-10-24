@@ -3,7 +3,7 @@
 
     .notes-editor-menu-dropdown {
         top: 100%;
-        margin-top: 4px;
+        margin-top: var(--spacing-1);
         position: absolute;
         left: 0;
         min-width: 180px;
@@ -11,11 +11,11 @@
         background-color: var(--bg-secondary);
         z-index: var(--z-base);
         border: 1px solid var(--neutral-100);
-        border-radius: 4px;
+        border-radius: var(--radius-1);
         opacity: 0;
         visibility: hidden;
         transform: translateY(-4px);
-        transition: opacity 0.15s ease-out, transform 0.15s ease-out, visibility 0.15s ease-out;
+        transition: opacity var(--transition-fast) ease-out, transform var(--transition-fast) ease-out, visibility var(--transition-fast) ease-out;
         pointer-events: none;
     }
 
@@ -23,7 +23,6 @@
         list-style: none;
         margin: 0;
         padding: 0;
-        max-height: 198px;
         overflow: auto;
 
         &::-webkit-scrollbar {
@@ -35,26 +34,26 @@
         display: flex;
         align-items: center;
         gap: var(--spacing-2);
-        padding-left: 12px;
+        padding-left: var(--spacing-2);
         height: 36px;
-        margin: 4px;
-        border-radius: 4px;
+        margin: var(--spacing-1);
+        border-radius: var(--radius-1);
         white-space: nowrap;
         overflow: hidden;
         font: var(--sm);
         font-weight: 500;
         cursor: pointer;
-        transition: background-color 500ms;
+        transition: background-color var(--transition-normal);
 
         svg.lucide {
-            width: 16px;
-            height: 16px;
+            width: var(--icon-sm);
+            height: var(--icon-sm);
 
             line,
             circle,
             rect,
             path {
-                stroke: var(--neutral-400);
+                stroke: var(--neutral-500);
             }
         }
 
@@ -64,7 +63,7 @@
 
         &:active {
             transform: scale(0.98);
-            transition: transform 150ms ease-out;
+            transition: transform var(--transition-fast) ease-out;
         }
 
         &.is-destructive {
@@ -86,6 +85,7 @@
         border-top: 1px solid var(--neutral-100);
         font: var(--sm);
         white-space: nowrap;
+        margin-top: var(--spacing-2);
 
         div {
             display: flex;

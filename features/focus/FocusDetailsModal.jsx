@@ -62,7 +62,8 @@ export default function FocusDetailsModal({ mode, focusMode, refreshFocusModes, 
         if (mode === "create") {
           navigateTo(`/notes/?focusId=${newFocusMode.focusId}`);
         }
-      });
+      })
+      .catch(() => { });
   }
 
   function handleDeleteClick() {
@@ -71,7 +72,8 @@ export default function FocusDetailsModal({ mode, focusMode, refreshFocusModes, 
         refreshFocusModes();
         closeModal();
         navigateTo("/notes/");
-      });
+      })
+      .catch(() => { });
   }
 
   return (

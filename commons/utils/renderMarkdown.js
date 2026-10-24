@@ -5,7 +5,7 @@ const COPY_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height
 
 const CHECK_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check code-copied-icon"><path d="M20 6 9 17l-5-5"/></svg>';
 
-export default function renderMarkdown(text, { hasCodeCopyButton = false } = {}) {
+export default function renderMarkdown(text, { hasCodeCopyButton = false, hasClickableTasks = false } = {}) {
   const md = window.markdownit({
     linkify: true,
     breaks: true,
@@ -19,10 +19,10 @@ export default function renderMarkdown(text, { hasCodeCopyButton = false } = {})
     }
   })
   .use(mark)
-  .use(tasks);
+  .use(tasks, { enabled: hasClickableTasks });
 
   // https://github.com/markdown-it/markdown-it/blob/master/docs/architecture.md#renderer
-  var defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
+  const defaultRender = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
     return self.renderToken(tokens, idx, options);
   };
   md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
@@ -34,6 +34,14 @@ export default function renderMarkdown(text, { hasCodeCopyButton = false } = {})
       tokens[idx].attrSet('target', '_blank');
     }
     return defaultRender(tokens, idx, options, env, self);
+  };
+
+  // A table can't scroll on its own without squeezing its columns, so a wrapper scrolls it instead.
+  md.renderer.rules.table_open = function (tokens, idx, options, env, self) {
+    return `<div class="table-block">${self.renderToken(tokens, idx, options)}`;
+  };
+  md.renderer.rules.table_close = function (tokens, idx, options, env, self) {
+    return `${self.renderToken(tokens, idx, options)}</div>`;
   };
 
   const isClipboardAvailable = typeof navigator.clipboard !== 'undefined';

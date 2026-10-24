@@ -9,7 +9,7 @@
     left: calc(50% - 75px);
     width: 150px;
     padding: var(--spacing-1);
-    border-radius: 4px;
+    border-radius: var(--radius-1);
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }

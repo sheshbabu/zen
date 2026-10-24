@@ -4,7 +4,7 @@
     padding-top: 0;
     border-left: 1px solid var(--neutral-100);
     transition-property: opacity, transform;
-    transition-duration: 300ms;
+    transition-duration: var(--transition-normal);
     transition-timing-function: ease-in-out;
     opacity: 1;
     transform: translateY(0);
@@ -57,8 +57,8 @@
 
         svg.lucide {
             cursor: pointer;
-            width: 20px;
-            height: 20px;
+            width: var(--icon-md);
+            height: var(--icon-md);
             margin-right: 0;
             transition-property: stroke;
             transition-duration: var(--transition-normal);
@@ -69,11 +69,6 @@
                 path {
                     stroke: var(--neutral-900);
                 }
-            }
-
-            &.notes-editor-toolbar-button-hide {
-                width: 24px;
-                height: 24px;
             }
         }
     }
@@ -130,7 +125,7 @@
     &[contenteditable="true"] {
         outline: none;
         border-bottom: 1px solid var(--neutral-200);
-        padding-bottom: 4px;
+        padding-bottom: var(--spacing-1);
         width: 100%;
         margin-right: var(--spacing-4);
     }
@@ -147,12 +142,12 @@
 .notes-editor-tags-input {
     padding: 2px var(--spacing-2);
     outline: none;
-    font-weight: 500;
     color: var(--neutral-400);
-    font-size: 14px;
+    font: var(--sm);
+    font-weight: 500;
     border: 1px dashed var(--neutral-300);
     background-color: var(--bg-primary);
-    border-radius: 4px;
+    border-radius: var(--radius-1);
     width: 100px;
 }
 
@@ -161,11 +156,11 @@
     border: 1px dashed var(--neutral-300);
     padding: var(--spacing-4);
     margin: var(--spacing-2) 0;
-    border-radius: 4px;
+    border-radius: var(--radius-1);
     text-align: left;
-    font-weight: 500;
     color: var(--neutral-400);
-    font-size: 14px;
+    font: var(--sm);
+    font-weight: 500;
     cursor: pointer;
     transition-property: background-color, border-color;
     transition-duration: var(--transition-normal);
@@ -175,7 +170,7 @@
         border-color: var(--neutral-400);
     }
 
-    &.dragover {
+    &.is-dragging-over {
         background-color: var(--neutral-50);
     }
 }
@@ -189,8 +184,8 @@
         box-shadow: var(--shadow-2);
         box-sizing: border-box;
         object-fit: cover;
-        margin: 16px 16px 16px 0;
-        border-radius: 4px;
+        margin: var(--spacing-4) var(--spacing-4) var(--spacing-4) 0;
+        border-radius: var(--radius-1);
     }
 
     &::-webkit-scrollbar {
@@ -210,7 +205,7 @@
     background-color: var(--bg-primary);
     color: var(--text-primary);
     padding: var(--spacing-4);
-    border-radius: 4px;
+    border-radius: var(--radius-1);
 }
 
 .notes-grid-item-content,
@@ -250,12 +245,12 @@
     ol,
     table {
         font: var(--p1);
-        margin: 0 0 16px 0;
+        margin: 0 0 var(--spacing-4) 0;
     }
 
     li {
         font: var(--p1);
-        margin-bottom: 4px;
+        margin-bottom: var(--spacing-1);
 
         p {
             margin: 0;
@@ -280,8 +275,8 @@
     h4,
     h5,
     h6 {
-        margin-top: 32px;
-        margin-bottom: 12px;
+        margin-top: var(--spacing-8);
+        margin-bottom: var(--spacing-3);
         font-weight: 600;
         line-height: 1.3;
     }
@@ -298,13 +293,13 @@
     code {
         font: var(--code);
         background-color: var(--neutral-50);
-        border-radius: 4px;
+        border-radius: var(--radius-1);
         padding: var(--spacing-1) var(--spacing-2);
     }
 
     .code-block {
         position: relative;
-        margin: 16px 0;
+        margin: var(--spacing-4) 0;
 
         pre {
             margin: 0;
@@ -321,7 +316,7 @@
             height: 24px;
             padding: 0;
             border: none;
-            border-radius: 4px;
+            border-radius: var(--radius-1);
             background-color: var(--neutral-50);
             color: var(--text-secondary);
             cursor: pointer;
@@ -331,8 +326,8 @@
             }
 
             svg.lucide {
-                width: 16px;
-                height: 16px;
+                width: var(--icon-sm);
+                height: var(--icon-sm);
             }
 
             .code-copied-icon {
@@ -370,10 +365,10 @@
     }
 
     pre {
-        margin: 16px 0;
+        margin: var(--spacing-4) 0;
         padding: var(--spacing-3);
         background-color: var(--neutral-50);
-        border-radius: 4px;
+        border-radius: var(--radius-1);
         overflow: scroll;
 
         &::-webkit-scrollbar {
@@ -393,12 +388,12 @@
 
     blockquote {
         border-left: 3px solid var(--neutral-700);
-        padding-left: 12px;
-        margin: 16px 0;
+        padding-left: var(--spacing-3);
+        margin: var(--spacing-4) 0;
     }
 
     ul {
-        padding-left: 24px;
+        padding-left: var(--spacing-6);
     }
 
     ol {
@@ -424,7 +419,7 @@
 
     li>ul,
     li>ol {
-        margin: 4px 0 0 0;
+        margin: var(--spacing-1) 0 0 0;
     }
 
     li>ul>li:last-child,
@@ -435,7 +430,7 @@
     .task-list-container {
         list-style: none;
         padding: 0;
-        margin: 4px 0 16px 0;
+        margin: var(--spacing-1) 0 var(--spacing-4) 0;
     }
 
     .task-list-item {
@@ -455,16 +450,15 @@
 
     .task-list-item-checkbox {
         flex-shrink: 0;
-        cursor: pointer;
+        cursor: default;
         color: var(--neutral-400);
-        transition: color 0.2s ease;
+        transition: color var(--transition-fast) ease;
 
         &:hover {
             color: var(--neutral-600);
-            cursor: not-allowed;
         }
 
-        &.checked {
+        &.is-checked {
             color: var(--neutral-700);
 
             &:hover {
@@ -473,23 +467,31 @@
         }
     }
 
+    .task-list-item.enabled>.task-item-content>.task-list-item-checkbox {
+        cursor: pointer;
+    }
+
     .task-list-item>.task-list-container {
-        padding-left: 24px;
+        padding-left: var(--spacing-6);
         margin-bottom: 0;
     }
 
+    .table-block {
+        overflow-x: auto;
+        margin: var(--spacing-4) 0;
+    }
+
     table {
-        width: 100%;
+        width: max-content;
         border-collapse: collapse;
-        margin: 16px 0;
+        margin: 0;
     }
 
     table,
     th,
     td {
         border: 1px solid var(--neutral-200);
-        padding: 8px 12px;
-        width: max-content;
+        padding: var(--spacing-2) var(--spacing-3);
     }
 
     th {
@@ -497,7 +499,7 @@
     }
 
     hr {
-        margin: 32px 0;
+        margin: var(--spacing-8) 0;
         border: 0;
         border-top: 1px solid var(--neutral-100);
     }
@@ -509,7 +511,7 @@
     mark {
         background: rgb(from var(--yellow-400) r g b / 0.1);
         color: var(--yellow-500);
-        border-radius: 4px;
+        border-radius: var(--radius-1);
         padding: 2px;
     }
 }
@@ -520,7 +522,7 @@
     gap: var(--spacing-2);
     margin: var(--spacing-3) 0;
     border: 1px solid var(--neutral-300);
-    border-radius: 4px;
+    border-radius: var(--radius-1);
     align-items: center;
 
     .formatting-toolbar-group {
@@ -535,20 +537,20 @@
         .formatting-button {
             background: none;
             border: none;
-            border-radius: 4px;
+            border-radius: var(--radius-1);
             padding: 6px var(--spacing-2);
             cursor: pointer;
-            font-size: 12px;
+            font: var(--xs);
             font-weight: 500;
             color: var(--text-primary);
-            transition: all 0.2s ease;
+            transition: background-color var(--transition-fast) ease;
             min-width: 32px;
             height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
             white-space: nowrap;
-            margin: 4px;
+            margin: var(--spacing-1);
 
             &:hover {
                 background-color: var(--neutral-200);
@@ -571,7 +573,7 @@
             s,
             mark,
             code {
-                font-size: 12px;
+                font: var(--xs);
                 font-weight: 600;
                 margin: 0;
                 padding: 0;
@@ -590,6 +592,45 @@
                 font-family: var(--font-family-code);
             }
         }
+    }
+}
+
+.has-foldable-headings {
+    >h1,
+    >h2,
+    >h3 {
+        cursor: pointer;
+        transition: color var(--transition-fast) ease;
+    }
+
+    @media (hover: hover) {
+        >h1:hover,
+        >h2:hover,
+        >h3:hover {
+            color: var(--neutral-600);
+        }
+    }
+
+    /* Balanced wrapping pushes the fold pill onto its own line. */
+    >h1.is-folded,
+    >h2.is-folded,
+    >h3.is-folded {
+        text-wrap: wrap;
+    }
+
+    >h1.is-folded::after,
+    >h2.is-folded::after,
+    >h3.is-folded::after {
+        content: "\22EF";
+        display: inline-block;
+        margin-left: var(--spacing-2);
+        padding: 0 var(--spacing-2);
+        border-radius: var(--radius-full);
+        background-color: var(--neutral-100);
+        color: var(--neutral-500);
+        font: var(--sm);
+        font-weight: 600;
+        vertical-align: middle;
     }
 }
 

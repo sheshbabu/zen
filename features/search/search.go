@@ -1,8 +1,9 @@
 package search
 
 import (
-	"encoding/json"
+	"log/slog"
 	"net/http"
+	"zen/commons/auth"
 	"zen/commons/utils"
 	"zen/features/intelligence"
 	"zen/features/notes"
@@ -12,9 +13,9 @@ import (
 const LIMIT = 20
 
 type SearchResults struct {
-	LexicalNotes   []notes.Note                       `json:"lexical_notes"`
-	SemanticNotes  []intelligence.SemanticNoteResult  `json:"semantic_notes"`
-	SemanticImages []intelligence.SemanticImageResult `json:"semantic_images"`
+	LexicalNotes   []notes.Note                       `json:"lexicalNotes"`
+	SemanticNotes  []intelligence.SemanticNoteResult  `json:"semanticNotes"`
+	SemanticImages []intelligence.SemanticImageResult `json:"semanticImages"`
 	Tags           []tags.Tag                         `json:"tags"`
 }
 
@@ -38,6 +39,8 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 	// Sorting applies to lexical notes only
 	sort := r.URL.Query().Get("sort")
 
+	access := auth.GetAccess(r.Context())
+
 	lexicalNotesChan := make(chan LexicalNoteSearchResults, 1)
 	tagsChan := make(chan TagSearchResults, 1)
 	semanticNotesChan := make(chan []intelligence.SemanticNoteResult, 1)
@@ -45,22 +48,37 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 
 	// Run all searches in parallel
 	go func() {
-		searchNotes, err := notes.SearchNotes(query, LIMIT, sort)
+		searchNotes, err := notes.SearchNotes(access, query, LIMIT, sort)
 		lexicalNotesChan <- LexicalNoteSearchResults{Notes: searchNotes, Err: err}
 	}()
 
 	go func() {
-		searchTags, err := tags.SearchTags(query)
+		searchTags, err := tags.SearchTags(access, query)
 		tagsChan <- TagSearchResults{Tags: searchTags, Err: err}
 	}()
 
+	// Images carry no tags, so like untagged notes only an all-tags grant reaches semantic results.
 	go func() {
-		semanticNotes, _ := intelligence.SemanticNoteSearch(query, LIMIT)
+		if !auth.CanReadAllTags(access) {
+			semanticNotesChan <- []intelligence.SemanticNoteResult{}
+			return
+		}
+		semanticNotes, err := intelligence.SemanticNoteSearch(query, LIMIT)
+		if err != nil {
+			slog.Error(err.Error())
+		}
 		semanticNotesChan <- semanticNotes
 	}()
 
 	go func() {
-		semanticImages, _ := intelligence.SemanticImageSearch(query, LIMIT)
+		if !auth.CanReadAllTags(access) {
+			semanticImagesChan <- []intelligence.SemanticImageResult{}
+			return
+		}
+		semanticImages, err := intelligence.SemanticImageSearch(query, LIMIT)
+		if err != nil {
+			slog.Error(err.Error())
+		}
 		semanticImagesChan <- semanticImages
 	}()
 
@@ -100,7 +118,5 @@ func HandleSearch(w http.ResponseWriter, r *http.Request) {
 		Tags:           tagsResult.Tags,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(results)
+	utils.SendJSON(w, http.StatusOK, results)
 }

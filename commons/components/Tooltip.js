@@ -99,7 +99,7 @@ function showTooltip(element) {
     activeTooltip = tooltip;
 
     requestAnimationFrame(() => {
-      tooltip.classList.add('visible');
+      tooltip.classList.add('is-visible');
     });
   }, 400);
 }
@@ -110,7 +110,7 @@ function hideTooltip() {
   if (activeTooltip) {
     const tooltip = activeTooltip;
     activeTooltip = null;
-    tooltip.classList.remove('visible');
+    tooltip.classList.remove('is-visible');
 
     hideTimeout = setTimeout(() => {
       removeTooltip(tooltip);

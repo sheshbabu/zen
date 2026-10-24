@@ -14,9 +14,11 @@ import OfflineIndicator from './commons/components/OfflineIndicator.jsx';
 import Tooltip from './commons/components/Tooltip.js';
 import { AppProvider } from './commons/contexts/AppContext.jsx';
 import ThemePreferences from './commons/preferences/ThemePreferences.js';
+import SidePanelWidthPreferences from './commons/preferences/SidePanelWidthPreferences.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   ThemePreferences.applyTheme();
+  SidePanelWidthPreferences.applySavedWidth();
   Tooltip.init();
   render(
     <App />,

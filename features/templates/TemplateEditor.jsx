@@ -115,21 +115,17 @@ export default function TemplateEditor({ selectedTemplate, isNewTemplate, onChan
         navigateTo("/templates/");
         onChange();
         onClose();
-      });
+      })
+      .catch(() => { });
   }
 
   function handleDeleteCloseClick() {
     closeModal();
   }
 
-  function getMenuActions() {
-    if (isNewTemplate) {
-      return [];
-    }
-
-    return [
-      <div onClick={handleDeleteClick}>Delete</div>
-    ];
+  let dropdownMenu = null;
+  if (!isNewTemplate) {
+    dropdownMenu = <DropdownMenu actions={[<div onClick={handleDeleteClick}>Delete</div>]} />;
   }
 
   return (
@@ -144,7 +140,7 @@ export default function TemplateEditor({ selectedTemplate, isNewTemplate, onChan
         <div className="templates-editor-header-right">
           <Button variant="ghost" onClick={handleSaveClick}>{isSaveLoading ? "Saving..." : "Save"}</Button>
           <Button variant="ghost" onClick={onClose}>Close</Button>
-          {!isNewTemplate && <DropdownMenu actions={getMenuActions()} />}
+          {dropdownMenu}
         </div>
       </div>
 

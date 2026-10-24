@@ -4,10 +4,10 @@
     border: 2px solid var(--neutral-300);
     border-top-color: var(--neutral-500);
     border-radius: 20px;
-    animation: spin 1s linear infinite;
+    animation: spinner-spin 1s linear infinite;
 }
 
-@keyframes spin {
+@keyframes spinner-spin {
     0% {
         transform: rotate(0deg);
     }

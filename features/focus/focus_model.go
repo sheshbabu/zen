@@ -28,8 +28,9 @@ func GetAllFocusModes() ([]FocusMode, error) {
             COALESCE(
                 JSON_GROUP_ARRAY(JSON_OBJECT(
 					'tagId', t.tag_id,
-					'name', t.name
-				)), '[]'
+					'name', t.name,
+					'color', t.color
+				)) FILTER (WHERE t.tag_id IS NOT NULL), '[]'
             ) as tags_json,
 			fm.last_used_at
 		FROM
@@ -45,7 +46,6 @@ func GetAllFocusModes() ([]FocusMode, error) {
 	rows, err := sqlite.DB.Query(query)
 	if err != nil {
 		err = fmt.Errorf("error retrieving focus modes: %w", err)
-		slog.Error(err.Error())
 		return focusModes, err
 	}
 	defer rows.Close()
@@ -56,7 +56,6 @@ func GetAllFocusModes() ([]FocusMode, error) {
 		err = rows.Scan(&focusMode.FocusModeID, &focusMode.Name, &tagsJSON, &focusMode.LastUsedAt)
 		if err != nil {
 			err = fmt.Errorf("error scanning focus mode: %w", err)
-			slog.Error(err.Error())
 			return focusModes, err
 		}
 		err = json.Unmarshal([]byte(tagsJSON), &focusMode.Tags)
@@ -82,8 +81,9 @@ func GetFocusModeByID(focusModeID int) (FocusMode, error) {
             COALESCE(
                 JSON_GROUP_ARRAY(JSON_OBJECT(
 					'tagId', t.tag_id,
-					'name', t.name
-				)), '[]'
+					'name', t.name,
+					'color', t.color
+				)) FILTER (WHERE t.tag_id IS NOT NULL), '[]'
             ) as tags_json,
 			fm.last_used_at
 		FROM
@@ -101,7 +101,6 @@ func GetFocusModeByID(focusModeID int) (FocusMode, error) {
 	err := sqlite.DB.QueryRow(query, focusModeID).Scan(&focusMode.FocusModeID, &focusMode.Name, &tagsJSON, &focusMode.LastUsedAt)
 	if err != nil {
 		err = fmt.Errorf("error retrieving focus mode: %w", err)
-		slog.Error(err.Error())
 		return focusMode, err
 	}
 
@@ -120,7 +119,6 @@ func UpdateFocusMode(focusMode *FocusMode) error {
 
 	if err != nil {
 		err = fmt.Errorf("error starting transaction: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -139,7 +137,6 @@ func UpdateFocusMode(focusMode *FocusMode) error {
 	_, err = tx.Exec(query, focusMode.Name, focusMode.FocusModeID)
 	if err != nil {
 		err = fmt.Errorf("error updating focus mode: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -153,7 +150,6 @@ func UpdateFocusMode(focusMode *FocusMode) error {
 	_, err = tx.Exec(query, focusMode.FocusModeID)
 	if err != nil {
 		err = fmt.Errorf("error deleting old tags for focus mode: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -168,7 +164,6 @@ func UpdateFocusMode(focusMode *FocusMode) error {
 		_, err = tx.Exec(query, focusMode.FocusModeID, tag.TagID)
 		if err != nil {
 			err = fmt.Errorf("error associating tag with focus mode: %w", err)
-			slog.Error(err.Error())
 			return err
 		}
 	}
@@ -176,7 +171,6 @@ func UpdateFocusMode(focusMode *FocusMode) error {
 	err = tx.Commit()
 	if err != nil {
 		err = fmt.Errorf("error committing transaction: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -188,7 +182,6 @@ func CreateFocusMode(focusMode *FocusMode) error {
 
 	if err != nil {
 		err = fmt.Errorf("error starting transaction: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -207,7 +200,6 @@ func CreateFocusMode(focusMode *FocusMode) error {
 	err = row.Scan(&focusMode.FocusModeID)
 	if err != nil {
 		err = fmt.Errorf("error creating focus mode: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -222,7 +214,6 @@ func CreateFocusMode(focusMode *FocusMode) error {
 		_, err = tx.Exec(query, focusMode.FocusModeID, tag.TagID)
 		if err != nil {
 			err = fmt.Errorf("error associating tag with focus mode: %w", err)
-			slog.Error(err.Error())
 			return err
 		}
 	}
@@ -230,7 +221,6 @@ func CreateFocusMode(focusMode *FocusMode) error {
 	err = tx.Commit()
 	if err != nil {
 		err = fmt.Errorf("error committing transaction: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -242,7 +232,6 @@ func DeleteFocusMode(focusID int) error {
 
 	if err != nil {
 		err = fmt.Errorf("error starting transaction: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -258,7 +247,6 @@ func DeleteFocusMode(focusID int) error {
 	_, err = tx.Exec(query, focusID)
 	if err != nil {
 		err = fmt.Errorf("error deleting focus mode tags: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -272,14 +260,12 @@ func DeleteFocusMode(focusID int) error {
 	_, err = tx.Exec(query, focusID)
 	if err != nil {
 		err = fmt.Errorf("error deleting focus mode: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
 	err = tx.Commit()
 	if err != nil {
 		err = fmt.Errorf("error committing transaction: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 

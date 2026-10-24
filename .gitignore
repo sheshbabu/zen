@@ -2,7 +2,9 @@
 *.db-shm
 *.db-wal
 *.bak
+zen
 /tmp
+/notes
 /images
 /assets/bundle.js
 /assets/bundle.js.map

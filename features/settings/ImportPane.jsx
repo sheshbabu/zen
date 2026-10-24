@@ -3,6 +3,7 @@ import { UploadIcon, SuccessIcon, WarnIcon, ErrorIcon } from "../../commons/comp
 import { showToast } from "../../commons/components/Toast.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import pluralize from "../../commons/utils/pluralize.js";
+import SettingsSection from "./SettingsSection.jsx";
 
 export default function ImportPane() {
   const [isUploading, setIsUploading] = useState(false);
@@ -100,34 +101,35 @@ export default function ImportPane() {
 
   return (
     <div className="settings-tab-content">
-      <h3>Import Files</h3>
-      <p>Import .md or .txt files.</p>
-      <p>For .md files, you can optionally include a YAML frontmatter block with title, tags (comma-separated), created, and updated fields.</p>
-      <pre className="code-block">{`---\ntitle: My Note Title\ntags: work, ideas, project\ncreated: 2023-04-15T10:30:00Z\nupdated: 2023-06-20T14:45:00Z\n---\n\nNote content here...`}</pre>
+      <SettingsSection title="Import Notes" description="Import a folder of .md or .txt files.">
+        <div className="file-upload-container">
+          <input
+            type="file"
+            id="folder-upload"
+            webkitdirectory
+            directory
+            multiple
+            onChange={handleFileUpload}
+            disabled={isUploading}
+          />
+          <label htmlFor="folder-upload" className={`file-upload-label ${isUploading ? 'is-disabled' : ''}`}>
+            <UploadIcon />
+            {isUploading ? 'Importing...' : 'Choose folder'}
+          </label>
 
-      <div className="file-upload-container">
-        <input
-          type="file"
-          id="folder-upload"
-          webkitdirectory
-          directory
-          multiple
-          onChange={handleFileUpload}
-          disabled={isUploading}
-        />
-        <label htmlFor="folder-upload" className={`file-upload-label ${isUploading ? 'disabled' : ''}`}>
-          <UploadIcon />
-          {isUploading ? 'Importing...' : 'Choose folder'}
-        </label>
+          <UploadProgress isUploading={isUploading} uploadProgress={uploadProgress} />
+          <UploadSummary
+            summaryMessage={summaryMessage}
+            uploadedFiles={uploadedFiles}
+            skippedFiles={skippedFiles}
+            erroredFiles={erroredFiles}
+          />
+        </div>
+      </SettingsSection>
 
-        <UploadProgress isUploading={isUploading} uploadProgress={uploadProgress} />
-        <UploadSummary
-          summaryMessage={summaryMessage}
-          uploadedFiles={uploadedFiles}
-          skippedFiles={skippedFiles}
-          erroredFiles={erroredFiles}
-        />
-      </div>
+      <SettingsSection title="Frontmatter" description="For .md files, you can optionally include a YAML frontmatter block with title, tags (comma-separated), created, and updated fields.">
+        <pre className="code-block">{`---\ntitle: My Note Title\ntags: work, ideas, project\ncreated: 2023-04-15T10:30:00Z\nupdated: 2023-06-20T14:45:00Z\n---\n\nNote content here...`}</pre>
+      </SettingsSection>
     </div>
   )
 }
@@ -171,11 +173,11 @@ function UploadSummary({ summaryMessage, uploadedFiles, skippedFiles, erroredFil
 
   if (uploadedFiles.length > 0) {
     const uploadedFileItems = uploadedFiles.map((fileName, index) => (
-      <li key={index} className="file-item uploaded">{fileName}</li>
+      <li key={index} className="file-item is-uploaded">{fileName}</li>
     ));
 
     uploadedSection = (
-      <div className="upload-summary-section uploaded">
+      <div className="upload-summary-section is-uploaded">
         <h5><SuccessIcon /> Imported ({uploadedFiles.length})</h5>
         <ul className="file-list">
           {uploadedFileItems}
@@ -186,11 +188,11 @@ function UploadSummary({ summaryMessage, uploadedFiles, skippedFiles, erroredFil
 
   if (skippedFiles.length > 0) {
     const skippedFileItems = skippedFiles.map((fileName, index) => (
-      <li key={index} className="file-item skipped">{fileName}</li>
+      <li key={index} className="file-item is-skipped">{fileName}</li>
     ));
 
     skippedSection = (
-      <div className="upload-summary-section skipped">
+      <div className="upload-summary-section is-skipped">
         <h5><WarnIcon /> Skipped ({skippedFiles.length})</h5>
         <ul className="file-list">
           {skippedFileItems}
@@ -201,11 +203,11 @@ function UploadSummary({ summaryMessage, uploadedFiles, skippedFiles, erroredFil
 
   if (erroredFiles.length > 0) {
     const erroredFileItems = erroredFiles.map((fileName, index) => (
-      <li key={index} className="file-item errored">{fileName}</li>
+      <li key={index} className="file-item is-errored">{fileName}</li>
     ));
 
     erroredSection = (
-      <div className="upload-summary-section errored">
+      <div className="upload-summary-section is-errored">
         <h5><ErrorIcon /> Errors ({erroredFiles.length})</h5>
         <ul className="file-list">
           {erroredFileItems}

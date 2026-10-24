@@ -8,12 +8,12 @@
     }
 
     .login-subtitle {
-        margin-top: 4px;
+        margin-top: var(--spacing-1);
         color: var(--neutral-400);
     }
 
     .button {
-        margin-top: 24px;
+        margin-top: var(--spacing-6);
         align-self: flex-start;
     }
 }

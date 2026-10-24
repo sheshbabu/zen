@@ -11,14 +11,14 @@
             margin: 0;
             box-sizing: border-box;
             object-fit: cover;
-            border-radius: 4px;
+            border-radius: var(--radius-1);
             transition-property: box-shadow, opacity;
-            transition-duration: 500ms;
+            transition-duration: var(--transition-normal);
             box-shadow: var(--shadow-2);
             opacity: 0;
             cursor: pointer;
 
-            &.loaded {
+            &.is-loaded {
                 opacity: 1;
             }
 
@@ -28,13 +28,13 @@
 
             &:active {
                 transform: scale(0.98);
-                transition: transform 150ms ease-out;
+                transition: transform var(--transition-fast) ease-out;
             }
         }
 
         .image-gallery-empty-text {
             font: var(--sm);
-            padding: 16px;
+            padding: var(--spacing-4);
             color: var(--neutral-400);
             display: flex;
             justify-content: center;

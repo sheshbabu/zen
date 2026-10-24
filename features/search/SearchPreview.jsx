@@ -3,7 +3,9 @@ import ApiClient from "../../commons/http/ApiClient.js";
 import renderMarkdown from "../../commons/utils/renderMarkdown.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import Spinner from "../../commons/components/Spinner.jsx";
+import { ArrowUpIcon, ArrowDownIcon } from "../../commons/components/Icon.jsx";
 import { closeModal } from "../../commons/components/Modal.jsx";
+import useMatchHighlighter from "./useMatchHighlighter.js";
 import "../notes/NotesEditor.css";
 import "./SearchPreview.css";
 
@@ -16,6 +18,7 @@ export default function SearchPreview({ item, hasInlineContent }) {
   const [hasFailed, setHasFailed] = useState(false);
   const noteCacheRef = useRef(new Map());
   const htmlCacheRef = useRef(new Map());
+  const previewRef = useRef(null);
 
   let noteId = null;
   if (item !== null && item !== undefined && item.noteId !== undefined) {
@@ -71,6 +74,27 @@ export default function SearchPreview({ item, hasInlineContent }) {
     };
   }, [noteId, shouldFetch]);
 
+  let displayedContent = null;
+  let highlightedText = "";
+  if (canRenderInline === true) {
+    displayedContent = item.content;
+    highlightedText = `${item.highlightedTitle}\n${item.highlightedContent}`;
+  } else if (fetchedNote !== null) {
+    displayedContent = fetchedNote.content;
+  }
+
+  const { matchCount, currentMatchIndex, goToNextMatch, goToPreviousMatch } = useMatchHighlighter({
+    containerRef: previewRef,
+    noteId,
+    displayedContent,
+    highlightedText,
+  });
+
+  function handleStepButtonMouseDown(e) {
+    // Keep focus in the search input so keyboard navigation keeps working
+    e.preventDefault();
+  }
+
   function handleInternalNoteLinkClick(e) {
     const link = e.target.closest("a[data-note-id]");
     if (link === null) {
@@ -102,9 +126,27 @@ export default function SearchPreview({ item, hasInlineContent }) {
     previewBody = <div className="search-preview-empty">Select a note to preview</div>;
   }
 
+  let matchStepper = null;
+  if (matchCount > 0) {
+    matchStepper = (
+      <div className="search-preview-find">
+        <span className="search-preview-find-count">{currentMatchIndex + 1} of {matchCount}</span>
+        <button type="button" title="Previous match" onMouseDown={handleStepButtonMouseDown} onClick={goToPreviousMatch}>
+          <ArrowUpIcon />
+        </button>
+        <button type="button" title="Next match" onMouseDown={handleStepButtonMouseDown} onClick={goToNextMatch}>
+          <ArrowDownIcon />
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="search-preview" onClick={handleInternalNoteLinkClick}>
-      {previewBody}
+    <div className={`search-preview-wrapper ${matchCount > 0 ? "has-matches" : ""}`}>
+      <div className="search-preview" ref={previewRef} onClick={handleInternalNoteLinkClick}>
+        {previewBody}
+      </div>
+      {matchStepper}
     </div>
   );
 }
@@ -131,7 +173,7 @@ function renderNoteContent(title, content, htmlCache, noteId) {
   }
 
   return (
-    <div className="search-preview-content">
+    <div className="search-preview-content" key={noteId}>
       <div className="search-preview-title">{titleText}</div>
       <div className="notes-editor-rendered" dangerouslySetInnerHTML={{ __html: html }} />
     </div>

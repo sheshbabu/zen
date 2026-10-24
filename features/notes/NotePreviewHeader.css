@@ -1,0 +1,12 @@
+.note-preview-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    .note-preview-header-actions {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+}

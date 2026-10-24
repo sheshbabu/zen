@@ -31,8 +31,7 @@ func HandleGetTemplates(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(allTemplates)
+	utils.SendJSON(w, http.StatusOK, allTemplates)
 }
 
 func HandleGetTemplate(w http.ResponseWriter, r *http.Request) {
@@ -45,12 +44,11 @@ func HandleGetTemplate(w http.ResponseWriter, r *http.Request) {
 
 	template, err := GetTemplateByID(templateID)
 	if err != nil {
-		utils.SendErrorResponse(w, "TEMPLATE_READ_FAILED", "Error fetching template.", err, http.StatusNotFound)
+		utils.SendErrorResponse(w, "TEMPLATE_READ_FAILED", "Error fetching template.", err, http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(template)
+	utils.SendJSON(w, http.StatusOK, template)
 }
 
 func HandleCreateTemplate(w http.ResponseWriter, r *http.Request) {
@@ -70,9 +68,7 @@ func HandleCreateTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(template)
+	utils.SendJSON(w, http.StatusCreated, template)
 }
 
 func HandleUpdateTemplate(w http.ResponseWriter, r *http.Request) {
@@ -101,8 +97,7 @@ func HandleUpdateTemplate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(template)
+	utils.SendJSON(w, http.StatusOK, template)
 }
 
 func HandleDeleteTemplate(w http.ResponseWriter, r *http.Request) {
@@ -135,8 +130,7 @@ func HandleGetRecommendedTemplates(w http.ResponseWriter, r *http.Request) {
 		templates[i].Content = processTemplatePlaceholders(templates[i].Content)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(templates)
+	utils.SendJSON(w, http.StatusOK, templates)
 }
 
 func HandleIncrementTemplateUsage(w http.ResponseWriter, r *http.Request) {

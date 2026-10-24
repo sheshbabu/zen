@@ -7,26 +7,45 @@
  */
 
 :root {
+    color-scheme: light dark;
+
     /* https://tailwindcss.com/docs/colors */
     /* https://gist.github.com/guvener/d8952570d5a8be430580b93800519439 */
-    --neutral-50: #FAFAFA;
-    --neutral-100: #F5F5F5;
-    --neutral-200: #E5E5E5;
-    --neutral-300: #D4D4D4;
-    --neutral-400: #A3A3A3;
-    --neutral-500: #737373;
-    --neutral-600: #525252;
-    --neutral-700: #404040;
-    --neutral-800: #262626;
-    --neutral-900: #171717;
+    --neutral-50: light-dark(#FAFAFA, #171717);
+    --neutral-100: light-dark(#F5F5F5, #262626);
+    --neutral-200: light-dark(#E5E5E5, #404040);
+    --neutral-300: light-dark(#D4D4D4, #525252);
+    --neutral-400: light-dark(#A3A3A3, #737373);
+    --neutral-500: light-dark(#737373, #A3A3A3);
+    --neutral-600: light-dark(#525252, #D4D4D4);
+    --neutral-700: light-dark(#404040, #E5E5E5);
+    --neutral-800: light-dark(#262626, #F5F5F5);
+    --neutral-900: light-dark(#171717, #FAFAFA);
+    --red-100: light-dark(#FEE2E2, #450A0A);
     --red-500: #EF4444;
-    --red-600: #DC2626;
+    --red-600: light-dark(#DC2626, #991B1B);
     --red-700: #B91C1C;
-    --yellow-100: #FEF9C3;
-    --yellow-400: #FACC15;
+    --orange-100: light-dark(#FFEDD5, #431407);
+    --orange-500: #F97316;
+    --orange-600: light-dark(#EA580C, #C2410C);
+    --yellow-100: light-dark(#FEF9C3, #A16207);
+    --yellow-400: #CA8A04;
     --yellow-500: #EAB308;
+    --green-100: light-dark(#DCFCE7, #052E16);
     --green-500: #22C55E;
-    --green-600: #16A34A;
+    --green-600: light-dark(#16A34A, #15803D);
+    --teal-100: light-dark(#CCFBF1, #042F2E);
+    --teal-500: #14B8A6;
+    --teal-600: light-dark(#0D9488, #0F766E);
+    --blue-100: light-dark(#DBEAFE, #172554);
+    --blue-500: #3B82F6;
+    --blue-600: light-dark(#2563EB, #1D4ED8);
+    --purple-100: light-dark(#EDE9FE, #2E1065);
+    --purple-500: #8B5CF6;
+    --purple-600: light-dark(#7C3AED, #6D28D9);
+    --pink-100: light-dark(#FCE7F3, #500724);
+    --pink-500: #EC4899;
+    --pink-600: light-dark(#DB2777, #BE185D);
 
     /* typography */
     /* Major Second */
@@ -49,7 +68,11 @@
     --p1: normal 1rem/1.5 var(--font-family);
     /* 1rem / var(--font-scale) */
     --sm: normal 0.889rem/1.4 var(--font-family);
+    /* 1rem / pow(var(--font-scale), 2) */
+    --xs: normal 0.79rem/1.4 var(--font-family);
     --code: normal 0.889rem/1.4 var(--font-family-code);
+    --xs-code: normal 0.79rem/1.4 var(--font-family-code);
+    --p1-code: normal 1rem/1.5 var(--font-family-code);
 
     /* spacing - 4px-based system */
     /* https://medium.com/dwarves-design/the-principle-of-spacing-in-ui-design-part-1-3354d0d65e51 */
@@ -69,8 +92,14 @@
     /* tailwind #38 https://getcssscan.com/css-box-shadow-examples */
     --shadow-4: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
     /* tailwind #40 https://getcssscan.com/css-box-shadow-examples */
-    --shadow-5: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
-    --shadow-6: rgba(0, 0, 0, 0.1) 0px -10px 15px -3px;
+    --shadow-5: light-dark(
+        rgba(0, 0, 0, 0.25) 0px 25px 50px -12px,
+        rgba(0, 0, 0, 0.5) 0px 25px 50px -12px
+    );
+    --shadow-6: light-dark(
+        rgba(0, 0, 0, 0.1) 0px -10px 15px -3px,
+        rgba(0, 0, 0, 0.3) 0px -10px 15px -3px
+    );
 
     /* globals */
     --mobile-navbar-height: 60px;
@@ -81,6 +110,15 @@
     --z-modal: 2;
     --z-popover: 3;
     --z-critical: 4;
+
+    /* border radius */
+    --radius-1: 4px;
+    --radius-2: 8px;
+    --radius-full: 9999px;
+
+    /* icon sizing - svg.lucide */
+    --icon-sm: 16px;
+    --icon-md: 20px;
 
     /* layout dimensions */
     --sidebar-width: 220px;
@@ -95,110 +133,203 @@
     /* text colors */
     --text-primary: var(--neutral-700);
     --text-secondary: var(--neutral-400);
-    --bg-primary: #FFF;
+    --bg-primary: light-dark(#FFF, #121212);
     --bg-secondary: var(--neutral-50);
     --bg-tertiary: var(--neutral-100);
+
+    /*
+     * Tag colors, derived from the Tailwind 500 of each hue: saturation is
+     * scaled down and lightness pinned per role, so a colored tag carries hue
+     * without reading louder than a plain one. To add a color, add its
+     * --<name>-500 above and copy one of these five-line groups.
+     */
+    --tag-red-text: light-dark(
+        hsl(from var(--red-500) h calc(s * 0.53) 64.0%),
+        hsl(from var(--red-500) h calc(s * 0.48) 44.0%)
+    );
+    --tag-red-text-hover: light-dark(
+        hsl(from var(--red-500) h calc(s * 0.48) 44.0%),
+        hsl(from var(--red-500) h calc(s * 0.53) 64.0%)
+    );
+    --tag-red-bg: light-dark(
+        hsl(from var(--red-500) h s 95.5%),
+        hsl(from var(--red-500) h calc(s * 0.44) 14.8%)
+    );
+    --tag-red-bg-hover: light-dark(
+        hsl(from var(--red-500) h calc(s * 0.62) 90.3%),
+        hsl(from var(--red-500) h calc(s * 0.26) 25.3%)
+    );
+    --tag-red-remove-hover: light-dark(
+        hsl(from var(--red-500) h calc(s * 0.35) 83.7%),
+        hsl(from var(--red-500) h calc(s * 0.21) 32.4%)
+    );
+    --tag-orange-text: light-dark(
+        hsl(from var(--orange-500) h calc(s * 0.53) 64.0%),
+        hsl(from var(--orange-500) h calc(s * 0.48) 44.0%)
+    );
+    --tag-orange-text-hover: light-dark(
+        hsl(from var(--orange-500) h calc(s * 0.48) 44.0%),
+        hsl(from var(--orange-500) h calc(s * 0.53) 64.0%)
+    );
+    --tag-orange-bg: light-dark(
+        hsl(from var(--orange-500) h s 95.5%),
+        hsl(from var(--orange-500) h calc(s * 0.44) 14.8%)
+    );
+    --tag-orange-bg-hover: light-dark(
+        hsl(from var(--orange-500) h calc(s * 0.62) 90.3%),
+        hsl(from var(--orange-500) h calc(s * 0.26) 25.3%)
+    );
+    --tag-orange-remove-hover: light-dark(
+        hsl(from var(--orange-500) h calc(s * 0.35) 83.7%),
+        hsl(from var(--orange-500) h calc(s * 0.21) 32.4%)
+    );
+    --tag-yellow-text: light-dark(
+        hsl(from var(--yellow-500) h calc(s * 0.53) 64.0%),
+        hsl(from var(--yellow-500) h calc(s * 0.48) 44.0%)
+    );
+    --tag-yellow-text-hover: light-dark(
+        hsl(from var(--yellow-500) h calc(s * 0.48) 44.0%),
+        hsl(from var(--yellow-500) h calc(s * 0.53) 64.0%)
+    );
+    --tag-yellow-bg: light-dark(
+        hsl(from var(--yellow-500) h s 95.5%),
+        hsl(from var(--yellow-500) h calc(s * 0.44) 14.8%)
+    );
+    --tag-yellow-bg-hover: light-dark(
+        hsl(from var(--yellow-500) h calc(s * 0.62) 90.3%),
+        hsl(from var(--yellow-500) h calc(s * 0.26) 25.3%)
+    );
+    --tag-yellow-remove-hover: light-dark(
+        hsl(from var(--yellow-500) h calc(s * 0.35) 83.7%),
+        hsl(from var(--yellow-500) h calc(s * 0.21) 32.4%)
+    );
+    --tag-green-text: light-dark(
+        hsl(from var(--green-500) h calc(s * 0.53) 64.0%),
+        hsl(from var(--green-500) h calc(s * 0.48) 44.0%)
+    );
+    --tag-green-text-hover: light-dark(
+        hsl(from var(--green-500) h calc(s * 0.48) 44.0%),
+        hsl(from var(--green-500) h calc(s * 0.53) 64.0%)
+    );
+    --tag-green-bg: light-dark(
+        hsl(from var(--green-500) h s 95.5%),
+        hsl(from var(--green-500) h calc(s * 0.44) 14.8%)
+    );
+    --tag-green-bg-hover: light-dark(
+        hsl(from var(--green-500) h calc(s * 0.62) 90.3%),
+        hsl(from var(--green-500) h calc(s * 0.26) 25.3%)
+    );
+    --tag-green-remove-hover: light-dark(
+        hsl(from var(--green-500) h calc(s * 0.35) 83.7%),
+        hsl(from var(--green-500) h calc(s * 0.21) 32.4%)
+    );
+    --tag-teal-text: light-dark(
+        hsl(from var(--teal-500) h calc(s * 0.53) 64.0%),
+        hsl(from var(--teal-500) h calc(s * 0.48) 44.0%)
+    );
+    --tag-teal-text-hover: light-dark(
+        hsl(from var(--teal-500) h calc(s * 0.48) 44.0%),
+        hsl(from var(--teal-500) h calc(s * 0.53) 64.0%)
+    );
+    --tag-teal-bg: light-dark(
+        hsl(from var(--teal-500) h s 95.5%),
+        hsl(from var(--teal-500) h calc(s * 0.44) 14.8%)
+    );
+    --tag-teal-bg-hover: light-dark(
+        hsl(from var(--teal-500) h calc(s * 0.62) 90.3%),
+        hsl(from var(--teal-500) h calc(s * 0.26) 25.3%)
+    );
+    --tag-teal-remove-hover: light-dark(
+        hsl(from var(--teal-500) h calc(s * 0.35) 83.7%),
+        hsl(from var(--teal-500) h calc(s * 0.21) 32.4%)
+    );
+    --tag-blue-text: light-dark(
+        hsl(from var(--blue-500) h calc(s * 0.53) 64.0%),
+        hsl(from var(--blue-500) h calc(s * 0.48) 44.0%)
+    );
+    --tag-blue-text-hover: light-dark(
+        hsl(from var(--blue-500) h calc(s * 0.48) 44.0%),
+        hsl(from var(--blue-500) h calc(s * 0.53) 64.0%)
+    );
+    --tag-blue-bg: light-dark(
+        hsl(from var(--blue-500) h s 95.5%),
+        hsl(from var(--blue-500) h calc(s * 0.44) 14.8%)
+    );
+    --tag-blue-bg-hover: light-dark(
+        hsl(from var(--blue-500) h calc(s * 0.62) 90.3%),
+        hsl(from var(--blue-500) h calc(s * 0.26) 25.3%)
+    );
+    --tag-blue-remove-hover: light-dark(
+        hsl(from var(--blue-500) h calc(s * 0.35) 83.7%),
+        hsl(from var(--blue-500) h calc(s * 0.21) 32.4%)
+    );
+    --tag-purple-text: light-dark(
+        hsl(from var(--purple-500) h calc(s * 0.53) 64.0%),
+        hsl(from var(--purple-500) h calc(s * 0.48) 44.0%)
+    );
+    --tag-purple-text-hover: light-dark(
+        hsl(from var(--purple-500) h calc(s * 0.48) 44.0%),
+        hsl(from var(--purple-500) h calc(s * 0.53) 64.0%)
+    );
+    --tag-purple-bg: light-dark(
+        hsl(from var(--purple-500) h s 95.5%),
+        hsl(from var(--purple-500) h calc(s * 0.44) 14.8%)
+    );
+    --tag-purple-bg-hover: light-dark(
+        hsl(from var(--purple-500) h calc(s * 0.62) 90.3%),
+        hsl(from var(--purple-500) h calc(s * 0.26) 25.3%)
+    );
+    --tag-purple-remove-hover: light-dark(
+        hsl(from var(--purple-500) h calc(s * 0.35) 83.7%),
+        hsl(from var(--purple-500) h calc(s * 0.21) 32.4%)
+    );
+    --tag-pink-text: light-dark(
+        hsl(from var(--pink-500) h calc(s * 0.53) 64.0%),
+        hsl(from var(--pink-500) h calc(s * 0.48) 44.0%)
+    );
+    --tag-pink-text-hover: light-dark(
+        hsl(from var(--pink-500) h calc(s * 0.48) 44.0%),
+        hsl(from var(--pink-500) h calc(s * 0.53) 64.0%)
+    );
+    --tag-pink-bg: light-dark(
+        hsl(from var(--pink-500) h s 95.5%),
+        hsl(from var(--pink-500) h calc(s * 0.44) 14.8%)
+    );
+    --tag-pink-bg-hover: light-dark(
+        hsl(from var(--pink-500) h calc(s * 0.62) 90.3%),
+        hsl(from var(--pink-500) h calc(s * 0.26) 25.3%)
+    );
+    --tag-pink-remove-hover: light-dark(
+        hsl(from var(--pink-500) h calc(s * 0.35) 83.7%),
+        hsl(from var(--pink-500) h calc(s * 0.21) 32.4%)
+    );
 }
 
+/*
+ * light-dark() takes exactly two arguments, so the four shadows whose value is itself
+ * a comma-separated list of two shadows cannot use it. They keep per-theme blocks.
+ */
 @media (prefers-color-scheme: dark) {
-    :root {
-        --neutral-50: #171717;
-        --neutral-100: #262626;
-        --neutral-200: #404040;
-        --neutral-300: #525252;
-        --neutral-400: #737373;
-        --neutral-500: #A3A3A3;
-        --neutral-600: #D4D4D4;
-        --neutral-700: #E5E5E5;
-        --neutral-800: #F5F5F5;
-        --neutral-900: #FAFAFA;
-        --red-600: #991B1B;
-        --red-700: #B91C1C;
-        --yellow-100: #A16207;
-
-        /* elevation - darker shadows for dark mode */
+    :root:not([data-theme="light"]) {
         --shadow-1: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.3) 0px 1px 3px 0px;
         --shadow-2: rgba(0, 0, 0, 0.3) 0px 1px 3px 0px, rgba(0, 0, 0, 0.3) 0px 1px 3px 0px;
         --shadow-3: rgba(0, 0, 0, 0.3) 0px 4px 6px -1px, rgba(0, 0, 0, 0.2) 0px 2px 4px -1px;
         --shadow-4: rgba(0, 0, 0, 0.3) 0px 10px 15px -3px, rgba(0, 0, 0, 0.2) 0px 4px 6px -2px;
-        --shadow-5: rgba(0, 0, 0, 0.5) 0px 25px 50px -12px;
-        --shadow-6: rgba(0, 0, 0, 0.3) 0px -10px 15px -3px;
-
-        /* text and background colors for dark mode */
-        --text-primary: var(--neutral-700);
-        --text-secondary: var(--neutral-400);
-        --bg-primary: #121212;
-        --bg-secondary: var(--neutral-50);
-        --bg-tertiary: var(--neutral-100);
     }
 }
 
-/* Explicit theme overrides */
-[data-theme="dark"] {
-    --neutral-50: #171717;
-    --neutral-100: #262626;
-    --neutral-200: #404040;
-    --neutral-300: #525252;
-    --neutral-400: #737373;
-    --neutral-500: #A3A3A3;
-    --neutral-600: #D4D4D4;
-    --neutral-700: #E5E5E5;
-    --neutral-800: #F5F5F5;
-    --neutral-900: #FAFAFA;
-    --red-600: #991B1B;
-    --red-700: #B91C1C;
-    --yellow-100: #A16207;
+/* Explicit theme overrides — light-dark() resolves off color-scheme */
+[data-theme="light"] {
+    color-scheme: light;
+}
 
-    /* elevation - darker shadows for dark mode */
+[data-theme="dark"] {
+    color-scheme: dark;
+
     --shadow-1: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.3) 0px 1px 3px 0px;
     --shadow-2: rgba(0, 0, 0, 0.3) 0px 1px 3px 0px, rgba(0, 0, 0, 0.3) 0px 1px 3px 0px;
     --shadow-3: rgba(0, 0, 0, 0.3) 0px 4px 6px -1px, rgba(0, 0, 0, 0.2) 0px 2px 4px -1px;
     --shadow-4: rgba(0, 0, 0, 0.3) 0px 10px 15px -3px, rgba(0, 0, 0, 0.2) 0px 4px 6px -2px;
-    --shadow-5: rgba(0, 0, 0, 0.5) 0px 25px 50px -12px;
-    --shadow-6: rgba(0, 0, 0, 0.3) 0px -10px 15px -3px;
-
-    /* text and background colors for dark mode */
-    --text-primary: var(--neutral-700);
-    --text-secondary: var(--neutral-400);
-    --bg-primary: #121212;
-    --bg-secondary: var(--neutral-50);
-    --bg-tertiary: var(--neutral-100);
-}
-
-[data-theme="light"] {
-    --neutral-50: #FAFAFA;
-    --neutral-100: #F5F5F5;
-    --neutral-200: #E5E5E5;
-    --neutral-300: #D4D4D4;
-    --neutral-400: #A3A3A3;
-    --neutral-500: #737373;
-    --neutral-600: #525252;
-    --neutral-700: #404040;
-    --neutral-800: #262626;
-    --neutral-900: #171717;
-    --red-500: #EF4444;
-    --red-600: #DC2626;
-    --red-700: #B91C1C;
-    --yellow-100: #FEF9C3;
-    --yellow-400: #CA8A04;
-    --yellow-500: #EAB308;
-    --green-500: #22C55E;
-    --green-600: #16A34A;
-
-    /* elevation */
-    --shadow-1: rgba(0, 0, 0, 0.01) 0px 1px 3px 0px, rgba(0, 0, 0, 0.10) 0px 1px 3px 0px;
-    --shadow-2: rgba(0, 0, 0, 0.10) 0px 1px 3px 0px, rgba(0, 0, 0, 0.10) 0px 1px 3px 0px;
-    --shadow-3: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
-    --shadow-4: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
-    --shadow-5: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
-    --shadow-6: rgba(0, 0, 0, 0.1) 0px -10px 15px -3px;
-
-    /* text colors */
-    --text-primary: var(--neutral-700);
-    --text-secondary: var(--neutral-400);
-    --bg-primary: #FFF;
-    --bg-secondary: var(--neutral-50);
-    --bg-tertiary: var(--neutral-100);
 }
 
 * {
@@ -209,6 +340,8 @@
 html {
     /* 1rem */
     font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     height: 100%;
     overflow: hidden;
     margin: 0;
@@ -277,42 +410,144 @@ svg.lucide {
 }
 
 .tag {
+    --tag-remove-bg-hover: var(--neutral-300);
+
     display: inline-flex;
-    align-items: center;
-    padding: var(--spacing-1) var(--spacing-2);
+    align-items: stretch;
     margin-right: var(--spacing-1);
     margin-bottom: var(--spacing-1);
-    border-radius: 4px;
+    border-radius: var(--radius-1);
+    color: var(--tag-text, var(--neutral-400));
+    background-color: var(--tag-bg, var(--neutral-100));
+    font: var(--sm);
     font-weight: 500;
-    color: var(--neutral-400);
-    background-color: var(--neutral-100);
-    font-size: 14px;
     transition-property: color, background-color;
     transition-duration: var(--transition-normal);
     cursor: pointer;
     text-decoration: none;
     user-select: none;
 
-    svg.lucide {
-        height: 14px;
-        width: 14px;
-        margin-left: var(--spacing-1);
-
-        line,
-        circle,
-        rect,
-        path {
-            stroke: var(--neutral-400);
-        }
-    }
-
     &:hover {
-        color: var(--neutral-500);
-        background-color: var(--neutral-200);
+        color: var(--tag-text-hover, var(--neutral-500));
+        background-color: var(--tag-bg-hover, var(--neutral-200));
     }
 
     &:active {
         transform: scale(0.97);
         transition: transform var(--transition-fast) ease-out;
     }
+
+    &:not(.is-editable) {
+        padding: var(--spacing-1) var(--spacing-2);
+        align-items: center;
+    }
+
+    &.is-editable {
+        cursor: default;
+
+        .tag-label {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-1) var(--spacing-2);
+        }
+
+        .tag-remove {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            border-radius: var(--radius-1);
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            cursor: pointer;
+            transition: background-color var(--transition-normal);
+
+            svg.lucide {
+                height: 16px;
+                width: 16px;
+
+                line,
+                circle,
+                rect,
+                path {
+                    stroke: currentColor;
+                }
+            }
+
+            &:hover {
+                background-color: var(--tag-remove-bg-hover);
+            }
+
+            &:active {
+                transform: scale(0.97);
+                transition: transform var(--transition-fast) ease-out;
+            }
+        }
+    }
 }
+
+/* Maps each palette color onto generic names that tag consumers read. */
+.color-red {
+    --tag-text: var(--tag-red-text);
+    --tag-text-hover: var(--tag-red-text-hover);
+    --tag-bg: var(--tag-red-bg);
+    --tag-bg-hover: var(--tag-red-bg-hover);
+    --tag-remove-bg-hover: var(--tag-red-remove-hover);
+}
+
+.color-orange {
+    --tag-text: var(--tag-orange-text);
+    --tag-text-hover: var(--tag-orange-text-hover);
+    --tag-bg: var(--tag-orange-bg);
+    --tag-bg-hover: var(--tag-orange-bg-hover);
+    --tag-remove-bg-hover: var(--tag-orange-remove-hover);
+}
+
+.color-yellow {
+    --tag-text: var(--tag-yellow-text);
+    --tag-text-hover: var(--tag-yellow-text-hover);
+    --tag-bg: var(--tag-yellow-bg);
+    --tag-bg-hover: var(--tag-yellow-bg-hover);
+    --tag-remove-bg-hover: var(--tag-yellow-remove-hover);
+}
+
+.color-green {
+    --tag-text: var(--tag-green-text);
+    --tag-text-hover: var(--tag-green-text-hover);
+    --tag-bg: var(--tag-green-bg);
+    --tag-bg-hover: var(--tag-green-bg-hover);
+    --tag-remove-bg-hover: var(--tag-green-remove-hover);
+}
+
+.color-teal {
+    --tag-text: var(--tag-teal-text);
+    --tag-text-hover: var(--tag-teal-text-hover);
+    --tag-bg: var(--tag-teal-bg);
+    --tag-bg-hover: var(--tag-teal-bg-hover);
+    --tag-remove-bg-hover: var(--tag-teal-remove-hover);
+}
+
+.color-blue {
+    --tag-text: var(--tag-blue-text);
+    --tag-text-hover: var(--tag-blue-text-hover);
+    --tag-bg: var(--tag-blue-bg);
+    --tag-bg-hover: var(--tag-blue-bg-hover);
+    --tag-remove-bg-hover: var(--tag-blue-remove-hover);
+}
+
+.color-purple {
+    --tag-text: var(--tag-purple-text);
+    --tag-text-hover: var(--tag-purple-text-hover);
+    --tag-bg: var(--tag-purple-bg);
+    --tag-bg-hover: var(--tag-purple-bg-hover);
+    --tag-remove-bg-hover: var(--tag-purple-remove-hover);
+}
+
+.color-pink {
+    --tag-text: var(--tag-pink-text);
+    --tag-text-hover: var(--tag-pink-text-hover);
+    --tag-bg: var(--tag-pink-bg);
+    --tag-bg-hover: var(--tag-pink-bg-hover);
+    --tag-remove-bg-hover: var(--tag-pink-remove-hover);
+}
+

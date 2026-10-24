@@ -2,7 +2,7 @@
     display: flex;
     justify-content: space-between;
     padding: var(--spacing-2) 0;
-    margin: 6px var(--spacing-3) 0 4px;
+    margin: 6px var(--spacing-3) 0 var(--spacing-1);
 
     .canvases-list-toolbar-left {
         display: flex;
@@ -19,12 +19,12 @@
 
         svg.lucide {
             cursor: pointer;
-            width: 20px;
-            height: 20px;
+            width: var(--icon-md);
+            height: var(--icon-md);
             margin: var(--spacing-2);
             margin-right: 0;
             transition-property: stroke;
-            transition-duration: 500ms;
+            transition-duration: var(--transition-normal);
 
             &:hover {
 

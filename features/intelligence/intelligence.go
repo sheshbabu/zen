@@ -1,7 +1,6 @@
 package intelligence
 
 import (
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -13,8 +12,8 @@ import (
 var isIntelligenceEnabled bool
 
 type HealthStatus struct {
-	IsEnabled   bool `json:"is_enabled"`
-	IsAvailable bool `json:"is_available"`
+	IsEnabled   bool `json:"isEnabled"`
+	IsAvailable bool `json:"isAvailable"`
 }
 
 func init() {
@@ -33,9 +32,7 @@ func HandleAvailability(w http.ResponseWriter, r *http.Request) {
 		IsAvailable: isIntelligenceServiceAvailable,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(status)
+	utils.SendJSON(w, http.StatusOK, status)
 }
 
 func HandleQueueStats(w http.ResponseWriter, r *http.Request) {
@@ -50,9 +47,7 @@ func HandleQueueStats(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(stats)
+	utils.SendJSON(w, http.StatusOK, stats)
 }
 
 func HandleIndexAllContent(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +86,5 @@ func HandleIndexAllContent(w http.ResponseWriter, r *http.Request) {
 
 	ProcessQueues()
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
+	utils.SendJSON(w, http.StatusOK, response)
 }

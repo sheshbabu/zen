@@ -97,7 +97,7 @@ export default function CanvasToolbar({ onBack, title, onTitleChange, onZoom, zo
           <ZoomInIcon />
         </button>
         <div className="canvas-toolbar-divider"></div>
-        <button className={`canvas-toolbar-button ${isSidebarOpen ? 'active' : ''}`} onClick={onToggleSidebar} title="Sidebar">
+        <button className={`canvas-toolbar-button ${isSidebarOpen ? 'is-active' : ''}`} onClick={onToggleSidebar} title="Sidebar">
           {isSidebarOpen ? <SidebarCloseIcon /> : <SidebarOpenIcon />}
         </button>
       </div>

@@ -16,14 +16,14 @@
     .canvases-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 20px;
+        gap: var(--spacing-5);
         padding: var(--spacing-3);
     }
 }
 
 .canvas-card {
     border: 1px solid var(--neutral-100);
-    border-radius: 8px;
+    border-radius: var(--radius-2);
     overflow: hidden;
     cursor: pointer;
     box-shadow: var(--shadow-2);
@@ -44,11 +44,11 @@
 
     .canvas-card-preview {
         position: relative;
-        margin: 16px auto;
+        margin: var(--spacing-4) auto;
         background: var(--bg-primary);
-        border-radius: 4px;
+        border-radius: var(--radius-1);
 
-        &.canvas-card-preview-empty {
+        &.is-empty {
             width: 200px;
             height: 150px;
         }
@@ -61,11 +61,11 @@
     }
 
     .canvas-card-info {
-        padding: 12px 10px 12px 16px;
+        padding: var(--spacing-3) 10px var(--spacing-3) var(--spacing-4);
         border-top: 1px solid var(--neutral-100);
 
         .canvas-card-title {
-            font-size: 14px;
+            font: var(--sm);
             font-weight: 500;
             color: var(--text-primary);
             overflow: hidden;
@@ -77,10 +77,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 4px;
+            margin-top: var(--spacing-1);
 
             .canvas-card-date {
-                font-size: 12px;
+                font: var(--xs);
                 color: var(--text-secondary);
             }
 
@@ -94,7 +94,7 @@
                 border: none;
                 background: transparent;
                 color: var(--text-secondary);
-                border-radius: 4px;
+                border-radius: var(--radius-1);
                 cursor: pointer;
                 opacity: 0;
                 transition: opacity var(--transition-fast), color var(--transition-fast);
@@ -104,8 +104,8 @@
                 }
 
                 svg.lucide {
-                    width: 16px;
-                    height: 16px;
+                    width: var(--icon-sm);
+                    height: var(--icon-sm);
                 }
             }
         }

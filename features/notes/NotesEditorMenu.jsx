@@ -1,9 +1,10 @@
 import { h, useState, useRef, useEffect } from "../../assets/preact.esm.js"
 import Button from "../../commons/components/Button.jsx";
-import { EllipsisIcon, PinIcon, ArchiveIcon, TrashIcon, CopyIcon, ShareIcon } from "../../commons/components/Icon.jsx";
+import { EllipsisIcon, PinIcon, ArchiveIcon, TrashIcon, CopyIcon, ShareIcon, HistoryIcon } from "../../commons/components/Icon.jsx";
+import isMobile from "../../commons/utils/isMobile.js";
 import "./NotesEditorMenu.css";
 
-export default function NotesEditorMenu({ note, isNewNote, onPinClick, onUnpinClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onDeleteClick, onCopyClick, onShareClick }) {
+export default function NotesEditorMenu({ note, isNewNote, isModal, onPinClick, onUnpinClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onDeleteClick, onCopyClick, onShareClick, onVersionsClick }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const dropdownRef = useRef(null);
@@ -59,6 +60,15 @@ export default function NotesEditorMenu({ note, isNewNote, onPinClick, onUnpinCl
       <li key="restore" className="notes-editor-menu-option" onClick={() => handleItemClick(onRestoreClick)}>
         <ArchiveIcon />
         <span>Restore</span>
+      </li>
+    );
+  }
+
+  if (isNewNote !== true && note?.isDeleted !== true && isModal !== true && !isMobile()) {
+    items.push(
+      <li key="versions" className="notes-editor-menu-option" onClick={() => handleItemClick(onVersionsClick)}>
+        <HistoryIcon />
+        <span>Versions</span>
       </li>
     );
   }

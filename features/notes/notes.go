@@ -2,9 +2,12 @@ package notes
 
 import (
 	"encoding/json"
+	"errors"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
+	"zen/commons/auth"
 	"zen/commons/queue"
 	"zen/commons/utils"
 	"zen/features/tags"
@@ -28,6 +31,19 @@ type Note struct {
 	IsArchived         bool       `json:"isArchived"`
 	IsDeleted          bool       `json:"isDeleted"`
 	IsPinned           bool       `json:"isPinned"`
+}
+
+type NoteVersion struct {
+	VersionID int       `json:"versionId"`
+	NoteID    int       `json:"noteId"`
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
+type VersionsResponseEnvelope struct {
+	Versions []NoteVersion `json:"versions"`
+	Total    int           `json:"total"`
 }
 
 type BulkRequest struct {
@@ -99,7 +115,7 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 		isArchived:  isArchived == "true",
 	}
 
-	allNotes, total, err = GetAllNotes(filter)
+	allNotes, total, err = GetAllNotes(auth.GetAccess(r.Context()), filter)
 
 	if err != nil {
 		utils.SendErrorResponse(w, "NOTES_READ_FAILED", "Error fetching notes.", err, http.StatusInternalServerError)
@@ -111,8 +127,7 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request) {
 		Total: total,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	utils.SendJSON(w, http.StatusOK, response)
 }
 
 func HandleGetNote(w http.ResponseWriter, r *http.Request) {
@@ -123,14 +138,13 @@ func HandleGetNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	note, err := GetNoteByID(noteID)
+	note, err := GetNoteByID(auth.GetAccess(r.Context()), noteID)
 	if err != nil {
 		utils.SendErrorResponse(w, "NOTES_READ_FAILED", "Error fetching note.", err, http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(note)
+	utils.SendJSON(w, http.StatusOK, note)
 }
 
 func HandleCreateNote(w http.ResponseWriter, r *http.Request) {
@@ -140,16 +154,20 @@ func HandleCreateNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	note, err := CreateNote(noteInput)
+	note, err := CreateNote(auth.GetAccess(r.Context()), noteInput)
 	if err != nil {
+		if errors.Is(err, auth.ErrForbidden) {
+			utils.SendErrorResponse(w, "FORBIDDEN_SCOPE", "This token does not have write access to those tags.", err, http.StatusForbidden)
+			return
+		}
+
 		utils.SendErrorResponse(w, "NOTES_CREATE_FAILED", "Error saving note.", err, http.StatusInternalServerError)
 		return
 	}
 
-	queue.AddNoteTask(note.NoteID, queue.QUEUE_NOTE_PROCESS, "process")
+	requeueNote(note.NoteID, queue.QUEUE_NOTE_PROCESS, "process")
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(note)
+	utils.SendJSON(w, http.StatusOK, note)
 }
 
 func HandleUpdateNote(w http.ResponseWriter, r *http.Request) {
@@ -167,17 +185,20 @@ func HandleUpdateNote(w http.ResponseWriter, r *http.Request) {
 	}
 	noteInput.NoteID = noteID
 
-	note, err := UpdateNote(noteInput)
+	note, err := UpdateNote(auth.GetAccess(r.Context()), noteInput)
 	if err != nil {
+		if errors.Is(err, auth.ErrForbidden) {
+			utils.SendErrorResponse(w, "FORBIDDEN_SCOPE", "This token does not have write access to that note.", err, http.StatusForbidden)
+			return
+		}
+
 		utils.SendErrorResponse(w, "NOTES_UPDATE_FAILED", "Error saving note.", err, http.StatusInternalServerError)
 		return
 	}
 
-	queue.RemoveAllNoteTasks(noteID)
-	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_PROCESS, "process")
+	requeueNote(noteID, queue.QUEUE_NOTE_PROCESS, "process")
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(note)
+	utils.SendJSON(w, http.StatusOK, note)
 }
 
 func HandleForceDeleteNote(w http.ResponseWriter, r *http.Request) {
@@ -211,8 +232,7 @@ func HandleSoftDeleteNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	queue.RemoveAllNoteTasks(noteID)
-	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_DELETE, "delete")
+	requeueNote(noteID, queue.QUEUE_NOTE_DELETE, "delete")
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -230,8 +250,7 @@ func HandleBulkSoftDeleteNotes(w http.ResponseWriter, r *http.Request) {
 			utils.SendErrorResponse(w, "NOTES_BULK_SOFT_DELETE_FAILED", "Error deleting notes.", err, http.StatusInternalServerError)
 			return
 		}
-		queue.RemoveAllNoteTasks(noteID)
-		queue.AddNoteTask(noteID, queue.QUEUE_NOTE_DELETE, "delete")
+		requeueNote(noteID, queue.QUEUE_NOTE_DELETE, "delete")
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -251,8 +270,7 @@ func HandleRestoreDeletedNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	queue.RemoveAllNoteTasks(noteID)
-	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_PROCESS, "process")
+	requeueNote(noteID, queue.QUEUE_NOTE_PROCESS, "process")
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -271,8 +289,7 @@ func HandleArchiveNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	queue.RemoveAllNoteTasks(noteID)
-	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_DELETE, "delete")
+	requeueNote(noteID, queue.QUEUE_NOTE_DELETE, "delete")
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -290,8 +307,7 @@ func HandleBulkArchiveNotes(w http.ResponseWriter, r *http.Request) {
 			utils.SendErrorResponse(w, "NOTES_BULK_ARCHIVE_FAILED", "Error archiving notes.", err, http.StatusInternalServerError)
 			return
 		}
-		queue.RemoveAllNoteTasks(noteID)
-		queue.AddNoteTask(noteID, queue.QUEUE_NOTE_DELETE, "delete")
+		requeueNote(noteID, queue.QUEUE_NOTE_DELETE, "delete")
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -311,8 +327,7 @@ func HandleUnarchiveNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	queue.RemoveAllNoteTasks(noteID)
-	queue.AddNoteTask(noteID, queue.QUEUE_NOTE_PROCESS, "process")
+	requeueNote(noteID, queue.QUEUE_NOTE_PROCESS, "process")
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -388,6 +403,74 @@ func HandleGetRelatedNotes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(relatedNotes)
+	utils.SendJSON(w, http.StatusOK, relatedNotes)
+}
+
+func HandleGetNoteVersions(w http.ResponseWriter, r *http.Request) {
+	noteIDStr := r.PathValue("noteId")
+	noteID, err := strconv.Atoi(noteIDStr)
+	if err != nil {
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", "Invalid note ID", err, http.StatusBadRequest)
+		return
+	}
+
+	page := 1
+	pageStr := r.URL.Query().Get("page")
+	if pageStr != "" {
+		page, err = strconv.Atoi(pageStr)
+		if err != nil {
+			utils.SendErrorResponse(w, "INVALID_PAGE_NUMBER", "Invalid page number", err, http.StatusBadRequest)
+			return
+		}
+	}
+
+	versions, total, err := GetNoteVersions(noteID, page)
+	if err != nil {
+		utils.SendErrorResponse(w, "NOTE_VERSIONS_READ_FAILED", "Error fetching note versions.", err, http.StatusInternalServerError)
+		return
+	}
+
+	response := VersionsResponseEnvelope{
+		Versions: versions,
+		Total:    total,
+	}
+
+	utils.SendJSON(w, http.StatusOK, response)
+}
+
+func HandleRestoreNoteVersion(w http.ResponseWriter, r *http.Request) {
+	noteIDStr := r.PathValue("noteId")
+	noteID, err := strconv.Atoi(noteIDStr)
+	if err != nil {
+		utils.SendErrorResponse(w, "INVALID_NOTE_ID", "Invalid note ID", err, http.StatusBadRequest)
+		return
+	}
+
+	versionIDStr := r.PathValue("versionId")
+	versionID, err := strconv.Atoi(versionIDStr)
+	if err != nil {
+		utils.SendErrorResponse(w, "INVALID_VERSION_ID", "Invalid version ID", err, http.StatusBadRequest)
+		return
+	}
+
+	note, err := RestoreNoteVersion(noteID, versionID)
+	if err != nil {
+		utils.SendErrorResponse(w, "NOTE_VERSION_RESTORE_FAILED", "Error restoring note version.", err, http.StatusInternalServerError)
+		return
+	}
+
+	requeueNote(noteID, queue.QUEUE_NOTE_PROCESS, "process")
+
+	utils.SendJSON(w, http.StatusOK, note)
+}
+
+// Indexing is best-effort, so a queue failure is logged instead of failing the request.
+func requeueNote(noteID int, queueName string, action string) {
+	err := queue.RemoveAllNoteTasks(noteID)
+	if err == nil {
+		_, err = queue.AddNoteTask(noteID, queueName, action)
+	}
+	if err != nil {
+		slog.Error(err.Error())
+	}
 }

@@ -67,10 +67,9 @@ func getMigration(resources embed.FS, path string, name string) migration {
 		panic(err)
 	}
 
-	version, err := strconv.Atoi(strings.Split(name, "_")[0])
+	version, err := parseMigrationVersion(name)
 
 	if err != nil {
-		err = fmt.Errorf("error parsing migration file version: %w", err)
 		panic(err)
 	}
 
@@ -80,6 +79,17 @@ func getMigration(resources embed.FS, path string, name string) migration {
 		content:   string(content),
 		isApplied: false,
 	}
+}
+
+func parseMigrationVersion(name string) (int, error) {
+	version, err := strconv.Atoi(strings.Split(name, "_")[0])
+
+	if err != nil {
+		err = fmt.Errorf("error parsing migration file version: %w", err)
+		return 0, err
+	}
+
+	return version, nil
 }
 
 func getUnAppliedMigrations(migrations []migration) []migration {

@@ -1,7 +1,6 @@
 import { h, Fragment, useState, useEffect, useRef } from "../../assets/preact.esm.js"
 import ApiClient from '../../commons/http/ApiClient.js';
-import { RemoveIcon } from "../../commons/components/Icon.jsx";
-import Link from "../../commons/components/Link.jsx";
+import TagItem from "./TagItem.jsx";
 
 export default function NotesEditorTags({ tags, isEditable, canCreateTag, placeholder = "Add Tags...", onAddTag, onRemoveTag }) {
   const [query, setQuery] = useState("");
@@ -89,7 +88,8 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, placeh
 
         setSuggestions(filteredTags);
         setSelectedTag(filteredTags[0]);
-      });
+      })
+      .catch(() => { });
   }
 
   function handleSuggestionClick(tag) {
@@ -152,19 +152,3 @@ export default function NotesEditorTags({ tags, isEditable, canCreateTag, placeh
   );
 }
 
-function TagItem({ tag, isEditable, onRemoveTag }) {
-  if (isEditable) {
-    return (
-      <div className="tag" key={tag.tagId}>
-        {tag.name}
-        <RemoveIcon onClick={onRemoveTag} />
-      </div>
-    );
-  }
-
-  return (
-    <Link className="tag" key={tag.tagId} to={`/notes/?tagId=${tag.tagId}`} shouldPreserveSearchParams>
-      {tag.name}
-    </Link>
-  );
-}

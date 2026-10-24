@@ -1,7 +1,7 @@
 package intelligence
 
 import (
-	"fmt"
+	"errors"
 	"time"
 )
 
@@ -51,7 +51,7 @@ func SemanticNoteSearch(query string, limit int) ([]SemanticNoteResult, error) {
 	case err := <-errorChan:
 		return []SemanticNoteResult{}, err
 	case <-time.After(SEARCH_TIMEOUT):
-		return []SemanticNoteResult{}, fmt.Errorf("note semantic search timeout")
+		return []SemanticNoteResult{}, errors.New("note semantic search timeout")
 	}
 }
 
@@ -78,6 +78,6 @@ func SemanticImageSearch(query string, limit int) ([]SemanticImageResult, error)
 	case err := <-errorChan:
 		return []SemanticImageResult{}, err
 	case <-time.After(SEARCH_TIMEOUT):
-		return []SemanticImageResult{}, fmt.Errorf("image semantic search timeout")
+		return []SemanticImageResult{}, errors.New("image semantic search timeout")
 	}
 }

@@ -3,7 +3,7 @@
     height: 36px;
     align-items: center;
     justify-content: space-between;
-    padding: 0 8px;
+    padding: 0 var(--spacing-2);
     border-radius: 6px;
     border: 1px solid var(--neutral-100);
     overflow: hidden;
@@ -25,9 +25,9 @@
 
     svg.lucide {
         cursor: pointer;
-        width: 20px;
-        height: 20px;
-        margin: 8px;
+        width: var(--icon-md);
+        height: var(--icon-md);
+        margin: var(--spacing-2);
         margin-right: 0;
         transition-property: stroke;
         transition-duration: var(--transition-normal);
@@ -76,7 +76,8 @@
 
     &.danger {
         background-color: var(--red-600);
-        color: var(--neutral-50);
+        /* stays light in both themes; the red background does not invert */
+        color: #FAFAFA;
 
         &:hover {
             background-color: var(--red-700);
@@ -104,7 +105,11 @@
     transition: background-color var(--transition-normal);
     border: none;
     background: none;
-    border-radius: 4px;
+    border-radius: var(--radius-1);
+
+    &:has(> svg:only-child) {
+        padding: var(--spacing-1);
+    }
 
     &:hover {
         background-color: var(--neutral-100);
@@ -118,21 +123,5 @@
     &[disabled] {
         opacity: 0.5;
         cursor: not-allowed;
-    }
-}
-
-@media (prefers-color-scheme: dark) {
-    .button {
-        &.danger {
-            color: var(--text-primary);
-        }
-    }
-}
-
-[data-theme="dark"] {
-    .button {
-        &.danger {
-            color: var(--text-primary);
-        }
     }
 }

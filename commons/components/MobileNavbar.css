@@ -6,14 +6,14 @@
     right: 0;
     width: 100%;
     height: calc(var(--mobile-navbar-height) + var(--safe-area-bottom));
-    z-index: 2;
+    z-index: var(--z-modal);
     background-color: var(--bg-primary);
     padding-bottom: var(--safe-area-bottom);
 
     .mobile-navbar {
         display: flex;
         justify-content: space-around;
-        padding: 8px;
+        padding: var(--spacing-2);
         height: var(--mobile-navbar-height);
         background-color: var(--bg-primary);
         box-shadow: var(--shadow-6);
@@ -27,7 +27,7 @@
             font: var(--sm);
 
             svg.lucide {
-                padding: 8px;
+                padding: var(--spacing-2);
 
                 line,
                 circle,

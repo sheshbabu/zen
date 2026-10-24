@@ -2,7 +2,6 @@ package images
 
 import (
 	"fmt"
-	"log/slog"
 	"zen/commons/sqlite"
 )
 
@@ -103,7 +102,6 @@ func GetAllImages(filter ImagesFilter) ([]Image, int, error) {
 	rows, err := sqlite.DB.Query(query, queryArgs...)
 	if err != nil {
 		err = fmt.Errorf("error retrieving images: %w", err)
-		slog.Error(err.Error())
 		return images, total, err
 	}
 	defer rows.Close()
@@ -123,7 +121,6 @@ func GetAllImages(filter ImagesFilter) ([]Image, int, error) {
 		)
 		if err != nil {
 			err = fmt.Errorf("error scanning image: %w", err)
-			slog.Error(err.Error())
 			return images, total, err
 		}
 		images = append(images, image)
@@ -158,7 +155,6 @@ func CreateImage(imageRecord ImageRecord) (Image, error) {
 
 	if err != nil {
 		err = fmt.Errorf("error inserting image: %w", err)
-		slog.Error(err.Error())
 		return Image{}, err
 	}
 
@@ -191,7 +187,6 @@ func CreateImage(imageRecord ImageRecord) (Image, error) {
 
 	if err != nil {
 		err = fmt.Errorf("error retrieving created image: %w", err)
-		slog.Error(err.Error())
 		return Image{}, err
 	}
 
@@ -204,7 +199,6 @@ func DeleteImage(filename string) error {
 	_, err := sqlite.DB.Exec(query, filename)
 	if err != nil {
 		err = fmt.Errorf("error deleting image: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -220,7 +214,6 @@ func LinkImageToNote(noteID int, filename string) error {
 	_, err := sqlite.DB.Exec(query, noteID, filename)
 	if err != nil {
 		err = fmt.Errorf("error linking image to note: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -233,7 +226,6 @@ func UnlinkImageFromNote(noteID int, filename string) error {
 	_, err := sqlite.DB.Exec(query, noteID, filename)
 	if err != nil {
 		err = fmt.Errorf("error unlinking image from note: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -263,7 +255,6 @@ func GetOrphanedImages() ([]Image, error) {
 	rows, err := sqlite.DB.Query(query)
 	if err != nil {
 		err = fmt.Errorf("error retrieving orphaned images: %w", err)
-		slog.Error(err.Error())
 		return images, err
 	}
 	defer rows.Close()
@@ -282,7 +273,6 @@ func GetOrphanedImages() ([]Image, error) {
 		)
 		if err != nil {
 			err = fmt.Errorf("error scanning orphaned image: %w", err)
-			slog.Error(err.Error())
 			return images, err
 		}
 		images = append(images, image)
@@ -298,7 +288,6 @@ func GetLinkedNotesByImage(filename string) ([]int, error) {
 	rows, err := sqlite.DB.Query(query, filename)
 	if err != nil {
 		err = fmt.Errorf("error querying note_images: %w", err)
-		slog.Error(err.Error())
 		return nil, err
 	}
 	defer rows.Close()
@@ -308,7 +297,6 @@ func GetLinkedNotesByImage(filename string) ([]int, error) {
 		err = rows.Scan(&noteID)
 		if err != nil {
 			err = fmt.Errorf("error scanning note_id: %w", err)
-			slog.Error(err.Error())
 			return nil, err
 		}
 		noteIDs = append(noteIDs, noteID)
@@ -348,7 +336,6 @@ func GetImageByFilename(filename string) (Image, error) {
 
 	if err != nil {
 		err = fmt.Errorf("error retrieving image: %w", err)
-		slog.Error(err.Error())
 		return image, err
 	}
 
@@ -362,7 +349,6 @@ func GetImagesCount() (int, error) {
 	err := sqlite.DB.QueryRow(query).Scan(&count)
 	if err != nil {
 		err = fmt.Errorf("error getting images count: %w", err)
-		slog.Error(err.Error())
 		return 0, err
 	}
 

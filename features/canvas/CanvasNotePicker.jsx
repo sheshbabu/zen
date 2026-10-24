@@ -8,7 +8,7 @@ import "./CanvasNotePicker.css";
 export default function CanvasNotePicker({ onAddNote, addedItems }) {
   const [query, setQuery] = useState("");
   const [filterTag, setFilterTag] = useState(null);
-  const [results, setResults] = useState({ lexical_notes: [], semantic_notes: [], semantic_images: [] });
+  const [results, setResults] = useState({ lexicalNotes: [], semanticNotes: [], semanticImages: [] });
   const [browseNotes, setBrowseNotes] = useState([]);
   const [browseImages, setBrowseImages] = useState([]);
   const [notesPage, setNotesPage] = useState(1);
@@ -34,12 +34,14 @@ export default function CanvasNotePicker({ onAddNote, addedItems }) {
       .then(response => {
         setBrowseNotes(response.notes || []);
         setNotesTotal(response.total);
-      });
+      })
+      .catch(() => { });
 
     ApiClient.getImages(tagId, null, 1)
       .then(response => {
         setBrowseImages(response.images || []);
-      });
+      })
+      .catch(() => { });
   }, [filterTag]);
 
   function loadMoreNotes() {
@@ -51,7 +53,8 @@ export default function CanvasNotePicker({ onAddNote, addedItems }) {
         setBrowseNotes(prev => [...prev, ...(response.notes || [])]);
         setNotesTotal(response.total);
         setNotesPage(nextPage);
-      });
+      })
+      .catch(() => { });
   }
 
   function handleChange(e) {
@@ -63,7 +66,7 @@ export default function CanvasNotePicker({ onAddNote, addedItems }) {
     }
 
     if (value.trim() === "") {
-      setResults({ lexical_notes: [], semantic_notes: [], semantic_images: [] });
+      setResults({ lexicalNotes: [], semanticNotes: [], semanticImages: [] });
       return;
     }
 
@@ -71,11 +74,12 @@ export default function CanvasNotePicker({ onAddNote, addedItems }) {
       ApiClient.search(value)
         .then(searchResults => {
           setResults({
-            lexical_notes: searchResults.lexical_notes || [],
-            semantic_notes: searchResults.semantic_notes || [],
-            semantic_images: searchResults.semantic_images || [],
+            lexicalNotes: searchResults.lexicalNotes || [],
+            semanticNotes: searchResults.semanticNotes || [],
+            semanticImages: searchResults.semanticImages || [],
           });
-        });
+        })
+        .catch(() => { });
     }, 200);
   }
 
@@ -105,9 +109,9 @@ export default function CanvasNotePicker({ onAddNote, addedItems }) {
 
   if (isSearching) {
     // Search results carry no tags, so a tag filter can only be applied to notes
-    const lexicalNotes = results.lexical_notes.filter(item => !addedItems.has(item.noteId) && hasTag(item));
-    const semanticNotes = results.semantic_notes.filter(item => !addedItems.has(item.noteId) && hasTag(item));
-    const semanticImages = results.semantic_images.filter(item => !addedItems.has(item.filename));
+    const lexicalNotes = results.lexicalNotes.filter(item => !addedItems.has(item.noteId) && hasTag(item));
+    const semanticNotes = results.semanticNotes.filter(item => !addedItems.has(item.noteId) && hasTag(item));
+    const semanticImages = results.semanticImages.filter(item => !addedItems.has(item.filename));
 
     if (lexicalNotes.length > 0) {
       sections.push(<NotesSection key="lexical" title="Notes" notes={lexicalNotes} keyPrefix="lexical" onResultClick={handleResultClick} />);
@@ -230,7 +234,7 @@ function NoteCard({ note, onClick }) {
     if (preview.startsWith("![](/images/")) {
       preview = "Image";
     }
-    title = <div className="notes-list-item-title untitled">{preview}</div>;
+    title = <div className="notes-list-item-title is-untitled">{preview}</div>;
   }
 
   const tags = note.tags?.map(tag => <div className="notes-list-item-tag" key={tag.tagId}>{tag.name}</div>);

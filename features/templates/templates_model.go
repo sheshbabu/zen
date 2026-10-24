@@ -1,11 +1,14 @@
 package templates
 
 import (
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
 	"zen/commons/sqlite"
+	"zen/commons/utils"
 	"zen/features/tags"
 )
 
@@ -27,7 +30,8 @@ func GetAllTemplates() ([]Template, error) {
 					CASE 
 						WHEN tag.tag_id IS NOT NULL THEN JSON_OBJECT(
 							'tagId', tag.tag_id,
-							'name', tag.name
+							'name', tag.name,
+							'color', tag.color
 						)
 						ELSE NULL
 					END
@@ -46,7 +50,6 @@ func GetAllTemplates() ([]Template, error) {
 	rows, err := sqlite.DB.Query(query)
 	if err != nil {
 		err = fmt.Errorf("error retrieving templates: %w", err)
-		slog.Error(err.Error())
 		return templates, err
 	}
 	defer rows.Close()
@@ -58,7 +61,6 @@ func GetAllTemplates() ([]Template, error) {
 		err = rows.Scan(&template.TemplateID, &template.Name, &template.Title, &template.Content, &template.CreatedAt, &template.UpdatedAt, &template.UsageCount, &lastUsedAt, &tagsJSON)
 		if err != nil {
 			err = fmt.Errorf("error scanning template: %w", err)
-			slog.Error(err.Error())
 			return templates, err
 		}
 		template.LastUsedAt = lastUsedAt
@@ -95,7 +97,8 @@ func GetTemplateByID(templateID int) (Template, error) {
 					CASE 
 						WHEN tag.tag_id IS NOT NULL THEN JSON_OBJECT(
 							'tagId', tag.tag_id,
-							'name', tag.name
+							'name', tag.name,
+							'color', tag.color
 						)
 						ELSE NULL
 					END
@@ -112,9 +115,12 @@ func GetTemplateByID(templateID int) (Template, error) {
 	`
 
 	err := sqlite.DB.QueryRow(query, templateID).Scan(&template.TemplateID, &template.Name, &template.Title, &template.Content, &template.CreatedAt, &template.UpdatedAt, &template.UsageCount, &lastUsedAt, &tagsJSON)
+	if errors.Is(err, sql.ErrNoRows) {
+		err = fmt.Errorf("template %d: %w", templateID, utils.ErrNotFound)
+		return template, err
+	}
 	if err != nil {
 		err = fmt.Errorf("error retrieving template: %w", err)
-		slog.Error(err.Error())
 		return template, err
 	}
 	template.LastUsedAt = lastUsedAt
@@ -133,7 +139,6 @@ func CreateTemplate(template *Template) error {
 	tx, err := sqlite.DB.Begin()
 	if err != nil {
 		err = fmt.Errorf("error starting transaction: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 	defer tx.Rollback()
@@ -151,7 +156,6 @@ func CreateTemplate(template *Template) error {
 	err = row.Scan(&template.TemplateID, &template.CreatedAt, &template.UpdatedAt)
 	if err != nil {
 		err = fmt.Errorf("error creating template: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -166,7 +170,6 @@ func CreateTemplate(template *Template) error {
 		_, err = tx.Exec(query, template.TemplateID, tag.TagID)
 		if err != nil {
 			err = fmt.Errorf("error associating tag with template: %w", err)
-			slog.Error(err.Error())
 			return err
 		}
 	}
@@ -174,7 +177,6 @@ func CreateTemplate(template *Template) error {
 	err = tx.Commit()
 	if err != nil {
 		err = fmt.Errorf("error committing transaction: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -185,7 +187,6 @@ func UpdateTemplate(template *Template) error {
 	tx, err := sqlite.DB.Begin()
 	if err != nil {
 		err = fmt.Errorf("error starting transaction: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 	defer tx.Rollback()
@@ -207,7 +208,6 @@ func UpdateTemplate(template *Template) error {
 	err = tx.QueryRow(query, template.Name, template.Title, template.Content, template.TemplateID).Scan(&template.UpdatedAt)
 	if err != nil {
 		err = fmt.Errorf("error updating template: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -221,7 +221,6 @@ func UpdateTemplate(template *Template) error {
 	_, err = tx.Exec(query, template.TemplateID)
 	if err != nil {
 		err = fmt.Errorf("error deleting old tags for template: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -236,7 +235,6 @@ func UpdateTemplate(template *Template) error {
 		_, err = tx.Exec(query, template.TemplateID, tag.TagID)
 		if err != nil {
 			err = fmt.Errorf("error associating tag with template: %w", err)
-			slog.Error(err.Error())
 			return err
 		}
 	}
@@ -244,7 +242,6 @@ func UpdateTemplate(template *Template) error {
 	err = tx.Commit()
 	if err != nil {
 		err = fmt.Errorf("error committing transaction: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -262,19 +259,17 @@ func DeleteTemplate(templateID int) error {
 	result, err := sqlite.DB.Exec(query, templateID)
 	if err != nil {
 		err = fmt.Errorf("error deleting template: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		err = fmt.Errorf("error getting rows affected: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
 	if rowsAffected == 0 {
-		err = fmt.Errorf("template not found")
+		err = fmt.Errorf("template %d: %w", templateID, utils.ErrNotFound)
 		return err
 	}
 
@@ -295,7 +290,6 @@ func IncrementTemplateUsage(templateID int) error {
 	_, err := sqlite.DB.Exec(query, templateID)
 	if err != nil {
 		err = fmt.Errorf("error incrementing template usage: %w", err)
-		slog.Error(err.Error())
 		return err
 	}
 
@@ -320,7 +314,8 @@ func GetRecommendedTemplates(limit int) ([]Template, error) {
 					CASE 
 						WHEN tag.tag_id IS NOT NULL THEN JSON_OBJECT(
 							'tagId', tag.tag_id,
-							'name', tag.name
+							'name', tag.name,
+							'color', tag.color
 						)
 						ELSE NULL
 					END
@@ -349,7 +344,6 @@ func GetRecommendedTemplates(limit int) ([]Template, error) {
 	rows, err := sqlite.DB.Query(query, limit)
 	if err != nil {
 		err = fmt.Errorf("error retrieving recommended templates: %w", err)
-		slog.Error(err.Error())
 		return templates, err
 	}
 	defer rows.Close()
@@ -363,7 +357,6 @@ func GetRecommendedTemplates(limit int) ([]Template, error) {
 		err = rows.Scan(&template.TemplateID, &template.Name, &template.Title, &template.Content, &template.CreatedAt, &template.UpdatedAt, &template.UsageCount, &lastUsedAt, &tagsJSON, &recencyScore, &totalScore)
 		if err != nil {
 			err = fmt.Errorf("error scanning template: %w", err)
-			slog.Error(err.Error())
 			return templates, err
 		}
 		template.LastUsedAt = lastUsedAt

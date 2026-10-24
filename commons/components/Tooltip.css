@@ -3,17 +3,17 @@
     z-index: var(--z-popover);
     display: flex;
     align-items: center;
-    padding: 2px 8px;
+    padding: 2px var(--spacing-2);
     background-color: var(--neutral-800);
     color: var(--neutral-50);
-    border-radius: 4px;
-    font-size: 12px;
+    border-radius: var(--radius-1);
+    font: var(--xs);
     max-width: 300px;
     word-wrap: break-word;
     box-shadow: var(--shadow-4);
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+    transition: opacity var(--transition-fast) ease-in-out, transform var(--transition-fast) ease-in-out;
     will-change: transform, opacity;
 
     &.top {
@@ -32,14 +32,14 @@
         transform: translateX(-4px);
     }
 
-    &.visible {
+    &.is-visible {
         opacity: 1;
         transform: translate(0);
     }
 
     div {
         color: var(--neutral-400);
-        font-size: 12px;
+        font: var(--xs);
         margin-left: 10px;
     }
 }

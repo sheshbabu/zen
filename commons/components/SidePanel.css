@@ -1,7 +1,7 @@
 .sidepanel-container {
+    position: relative;
     width: 0;
     overflow: hidden;
-    border-left: 1px solid var(--neutral-100);
     display: flex;
     flex-direction: column;
     transition: width var(--transition-fast) ease;
@@ -12,8 +12,18 @@
         transition: opacity var(--transition-fast) ease;
     }
 
+    &.is-resizing {
+        transition: none;
+
+        .sidepanel-resize-handle::after {
+            opacity: 1;
+        }
+    }
+
     &.is-open {
         width: var(--sidepanel-width);
+        /* Matches the drag limit in SidePanelWidthPreferences, and keeps the editor usable when the window shrinks later. */
+        max-width: 40vw;
 
         .sidepanel-toolbar,
         .sidepanel-content {
@@ -22,12 +32,51 @@
         }
     }
 
+    /* The handle draws the panel's divider so the grip can sit centred on it, since the panel clips anything outside its own box. */
+    .sidepanel-resize-handle {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 9px;
+        height: 100%;
+        cursor: col-resize;
+        touch-action: none;
+        z-index: var(--z-base);
+
+        &::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 4px;
+            width: 1px;
+            height: 100%;
+            background: var(--neutral-100);
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 2px;
+            width: 5px;
+            height: 32px;
+            transform: translateY(-50%);
+            border-radius: var(--radius-full);
+            background: var(--neutral-200);
+            opacity: 0;
+            transition: opacity var(--transition-fast) ease;
+        }
+
+        &:hover::after {
+            opacity: 1;
+        }
+    }
+
     .sidepanel-toolbar {
         display: flex;
-        justify-content: flex-end;
         padding-top: 18px;
         padding-bottom: 18px;
-        padding-right: var(--spacing-4);
+        padding-right: var(--spacing-6);
         position: sticky;
         top: 0;
         background: var(--bg-primary);
@@ -35,8 +84,8 @@
 
         svg.lucide {
             cursor: pointer;
-            width: 20px;
-            height: 20px;
+            width: var(--icon-md);
+            height: var(--icon-md);
             margin-right: 0;
             transition-property: stroke;
             transition-duration: var(--transition-normal);

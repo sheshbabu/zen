@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"zen/commons/auth"
 	"zen/commons/queue"
 	"zen/features/images"
 	"zen/features/notes"
@@ -24,7 +25,9 @@ func ProcessQueues() {
 	defer processingMutex.Unlock()
 
 	if !isIntelligenceEnabled {
-		queue.Clear()
+		if err := queue.Clear(); err != nil {
+			slog.Error(err.Error())
+		}
 	}
 
 	// Process queues in priority order: deletions first, then additions
@@ -47,11 +50,17 @@ func ProcessQueues() {
 			}
 
 			task, err := queue.GetNextTask(queueType, queue.STATUS_QUEUED)
+			if errors.Is(err, sql.ErrNoRows) {
+				break
+			}
 			if err != nil {
-				break // No more tasks
+				slog.Error(err.Error())
+				break
 			}
 
-			queue.UpdateTaskStatus(task.ID, queue.STATUS_PROCESSING)
+			if err := queue.UpdateTaskStatus(task.ID, queue.STATUS_PROCESSING); err != nil {
+				slog.Error(err.Error())
+			}
 
 			entityID, ok := queue.ParseTaskPayload(task)
 			if !ok {
@@ -81,7 +90,9 @@ func ProcessQueues() {
 				}
 			} else {
 				slog.Info("processed task", "queueType", queueType, "taskID", task.ID, "entityID", entityID)
-				queue.RemoveTask(task.ID)
+				if err := queue.RemoveTask(task.ID); err != nil {
+					slog.Error(err.Error())
+				}
 			}
 		}
 	}
@@ -93,7 +104,7 @@ func embedNote(noteIDStr string) error {
 		return fmt.Errorf("invalid note ID: %w", err)
 	}
 
-	note, err := notes.GetNoteByID(noteID)
+	note, err := notes.GetNoteByID(auth.Unrestricted, noteID)
 	if err != nil {
 		return fmt.Errorf("failed to get note: %w", err)
 	}

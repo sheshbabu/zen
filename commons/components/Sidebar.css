@@ -25,8 +25,8 @@
     }
 
     .sidebar-focus-switcher {
-        margin: 0 8px;
-        padding-bottom: 8px;
+        margin: 0 var(--spacing-2);
+        padding-bottom: var(--spacing-2);
 
         .dropdown-button {
             width: 100%;
@@ -37,7 +37,7 @@
         display: flex;
         align-items: center;
         cursor: pointer;
-        padding: 0 8px;
+        padding: 0 var(--spacing-2);
         text-decoration: none;
         color: var(--neutral-500);
         transition: color var(--transition-normal), stroke var(--transition-normal);
@@ -63,20 +63,19 @@
         }
 
         svg.lucide {
-            padding: 8px;
+            padding: var(--spacing-2);
         }
     }
 
     .sidebar-section {
         cursor: pointer;
-        padding: 0 8px;
+        padding: 0 var(--spacing-2);
         margin-top: var(--spacing-6);
-        margin-left: 8px;
+        margin-left: var(--spacing-2);
 
         .sidebar-section-title {
-            font: var(--sm);
+            font: var(--xs);
             color: var(--neutral-500);
-            font-size: 12px;
             font-weight: 600;
             margin-bottom: var(--spacing-1);
         }
@@ -87,14 +86,23 @@
             padding: var(--spacing-1) 0;
             cursor: pointer;
             text-decoration: none;
-            font-size: 14px;
+            font: var(--sm);
             font-weight: 500;
             color: var(--neutral-400);
             transition: color var(--transition-normal);
 
+            .sidebar-tag-name {
+                color: var(--tag-text, inherit);
+                transition: color var(--transition-normal);
+            }
+
             &:hover,
             &.is-active {
                 color: var(--neutral-600);
+
+                .sidebar-tag-name {
+                    color: var(--tag-text-hover, inherit);
+                }
             }
 
             &:active {
@@ -104,14 +112,15 @@
 
             &:hover {
                 svg.lucide {
-                    display: block;
+                    visibility: visible;
                 }
             }
 
             svg.lucide {
-                display: none;
-                width: 20px;
-                height: 20px;
+                visibility: hidden;
+                flex-shrink: 0;
+                width: var(--icon-md);
+                height: var(--icon-md);
                 padding: var(--spacing-1);
                 transition: background-color var(--transition-normal);
 
@@ -124,7 +133,7 @@
 
                 &:hover {
                     background-color: var(--neutral-200);
-                    border-radius: 4px;
+                    border-radius: var(--radius-1);
                 }
 
                 &:active {
@@ -139,7 +148,7 @@
 @media screen and (max-width: 948px) {
     .sidebar-backdrop-container {
         background-color: none;
-        transition: background-color 300ms ease-in-out;
+        transition: background-color var(--transition-normal) ease-in-out;
 
         &.is-open {
             display: block;
@@ -160,7 +169,7 @@
         width: 0;
         z-index: var(--z-popover);
         transform: translateX(-100%);
-        transition: transform 300ms ease-in-out, opacity 100ms ease-in-out;
+        transition: transform var(--transition-normal) ease-in-out, opacity var(--transition-fast) ease-in-out;
 
         &.is-open {
             width: 80vw;
@@ -185,7 +194,7 @@
             }
 
             .sidebar-button {
-                padding: 2px 8px;
+                padding: 2px var(--spacing-2);
 
                 &.new,
                 &.search,
@@ -201,7 +210,7 @@
 
                 a.sidebar-tag-link {
                     font: var(--p1);
-                    padding: 8px 0;
+                    padding: var(--spacing-2) 0;
 
                     &:hover {
                         svg.lucide {

@@ -8,7 +8,7 @@
     background-color: var(--neutral-300);
     cursor: pointer;
     transition-property: background-color;
-    transition-duration: 200ms;
+    transition-duration: var(--transition-fast);
 
     &.is-enabled {
         background-color: var(--green-500);
@@ -32,6 +32,6 @@
         background-color: white;
         box-shadow: var(--shadow-2);
         transition-property: transform;
-        transition-duration: 200ms;
+        transition-duration: var(--transition-fast);
     }
 }

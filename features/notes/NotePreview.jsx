@@ -1,15 +1,19 @@
-import { h, useState, useEffect } from '../../assets/preact.esm.js';
+import { h, useState, useEffect, useRef } from '../../assets/preact.esm.js';
 import ApiClient from '../../commons/http/ApiClient.js';
 import renderMarkdown from '../../commons/utils/renderMarkdown.js';
-import handleCodeCopyClick from '../../commons/utils/copyCodeBlock.js';
+import { toggleTaskAtLine } from '../../commons/utils/toggleTaskLine.js';
+import handleCodeCopyClick from '../../commons/utils/handleCodeCopyClick.js';
 import { closeModal, openModal } from '../../commons/components/Modal.jsx';
 import Lightbox from '../../commons/components/Lightbox.jsx';
-import './NotePreview.css';
+import NotesEditorTags from '../tags/NotesEditorTags.jsx';
+import { useCollapsibleHeadings } from './useCollapsibleHeadings.js';
 import './NotesEditor.css';
 
 
-export default function NotePreview({ noteId }) {
+export default function NotePreview({ noteId, onOpenLink, onNavigateLink, onNoteChange }) {
   const [note, setNote] = useState(null);
+  const contentRef = useRef(null);
+  const { handleHeadingClick } = useCollapsibleHeadings(contentRef, note?.noteId);
 
   useEffect(() => {
     ApiClient.getNoteById(noteId)
@@ -27,8 +31,58 @@ export default function NotePreview({ noteId }) {
     closeModal();
   }
 
+  function handleTaskCheckboxClick(checkbox) {
+    const lineIndex = parseInt(checkbox.getAttribute('data-line'), 10);
+    const newContent = toggleTaskAtLine(note.content, lineIndex);
+    if (newContent === null) {
+      return;
+    }
+
+    const updatedNote = { ...note, content: newContent };
+    setNote(updatedNote);
+
+    ApiClient.updateNote(note.noteId, {
+      title: note.title,
+      content: newContent,
+      tags: note.tags,
+    }).then(() => {
+      if (onNoteChange) {
+        onNoteChange();
+      }
+    }).catch(() => {
+      setNote(note);
+    });
+  }
+
   function handleContentClick(e) {
     if (handleCodeCopyClick(e) === true) {
+      return;
+    }
+
+    if (handleHeadingClick(e) === true) {
+      return;
+    }
+
+    const checkbox = e.target.closest('.task-list-item-checkbox[data-line]');
+    if (checkbox !== null) {
+      handleTaskCheckboxClick(checkbox);
+      return;
+    }
+
+    const link = e.target.closest('a[data-note-id]');
+    if (link !== null) {
+      e.preventDefault();
+      const linkedNoteId = parseInt(link.getAttribute('data-note-id'), 10);
+
+      // Shift keeps the note in the preview; a plain click navigates, as it does in the editor.
+      if (e.shiftKey === true && onOpenLink) {
+        onOpenLink(linkedNoteId);
+        return;
+      }
+
+      if (onNavigateLink) {
+        onNavigateLink(linkedNoteId);
+      }
       return;
     }
 
@@ -47,10 +101,13 @@ export default function NotePreview({ noteId }) {
 
   return (
     <div className="note-preview">
-      <div className="note-preview-header">
+      <div className="notes-editor-header">
         <div className="notes-editor-title">{titleText}</div>
       </div>
-      <div className="notes-editor-rendered" dangerouslySetInnerHTML={{ __html: renderMarkdown(note.content, { hasCodeCopyButton: true }) }} onClick={handleContentClick} />
+      <NotesEditorTags tags={note.tags} isEditable={false} />
+      <div className="notes-editor-content">
+        <div className="notes-editor-rendered has-foldable-headings" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(note.content, { hasCodeCopyButton: true, hasClickableTasks: true }) }} onClick={handleContentClick} />
+      </div>
     </div>
   );
 }

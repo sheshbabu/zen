@@ -1,5 +1,39 @@
 import { h, useState, useEffect } from "../../assets/preact.esm.js";
 import ThemePreferences from "../../commons/preferences/ThemePreferences.js";
+import SettingsSection from "./SettingsSection.jsx";
+
+const SIDEBAR_ROW_WIDTHS = [28, 22, 30, 18];
+const NOTE_CARD_WIDTHS = [38, 30, 36, 26];
+const EDITOR_LINES = [
+  { y: 48, width: 100 },
+  { y: 58, width: 84 },
+  { y: 68, width: 94 },
+  { y: 78, width: 60 },
+  { y: 98, width: 96 },
+  { y: 108, width: 72 },
+  { y: 118, width: 88 },
+  { y: 128, width: 50 }
+];
+
+const LIGHT_PREVIEW_COLORS = {
+  background: "#FFFFFF",
+  chrome: "#E5E5E5",
+  sidebar: "#FAFAFA",
+  selected: "#F4F4F5",
+  border: "#D4D4D8",
+  block: "#E5E5E5",
+  blockStrong: "#D4D4D4"
+};
+
+const DARK_PREVIEW_COLORS = {
+  background: "#0A0A0A",
+  chrome: "#262626",
+  sidebar: "#171717",
+  selected: "#1F1F1F",
+  border: "#404040",
+  block: "#2E2E2E",
+  blockStrong: "#404040"
+};
 
 const themes = [
   {
@@ -20,12 +54,7 @@ const themes = [
 ];
 
 export default function AppearancePane() {
-  const [selectedThemeId, setSelectedThemeId] = useState("system");
-
-  useEffect(() => {
-    const savedThemeId = ThemePreferences.getPreference();
-    setSelectedThemeId(savedThemeId);
-  }, []);
+  const [selectedThemeId, setSelectedThemeId] = useState(() => ThemePreferences.getPreference());
 
   useEffect(() => {
     ThemePreferences.setPreference(selectedThemeId);
@@ -57,11 +86,11 @@ export default function AppearancePane() {
 
   return (
     <div className="settings-tab-content">
-      <h3>Appearance</h3>
-      <p>Choose between light, dark, or system themes to match your preferences.</p>
-      <div className="theme-selector">
-        {themeOptions}
-      </div>
+      <SettingsSection title="Theme" description="Choose between light, dark, or system themes to match your preferences.">
+        <div className="theme-selector">
+          {themeOptions}
+        </div>
+      </SettingsSection>
     </div>
   ); 
 }
@@ -79,89 +108,61 @@ function SystemThemePreview() {
   );
 }
 
-function DarkThemePreview() {
-  return (
-    <svg width="456" height="316" viewBox="0 0 456 316" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="1" y="1" width="454" height="314" rx="7" fill="black" stroke="#525252" strokeWidth="2" />
-      <path d="M8 1H92C95.866 1 99 4.13401 99 8V315H8C4.13401 315 1 311.866 1 308V8C1 4.25486 3.94112 1.19633 7.63965 1.00879L8 1Z" fill="#171717" stroke="#525252" strokeWidth="2" />
-      <path d="M100 1H191C194.866 1 198 4.13401 198 8V315H93V8C93 4.25486 95.9411 1.19633 99.6396 1.00879L100 1Z" fill="black" stroke="#525252" strokeWidth="2" />
-      <path d="M8 1H448C451.866 1 455 4.13401 455 8V31H1V8C1 4.25486 3.94111 1.19633 7.63965 1.00879L8 1Z" fill="#404040" stroke="#525252" strokeWidth="2" />
-      <circle cx="16" cy="16" r="6" fill="#EF4444" />
-      <circle cx="36" cy="16" r="6" fill="#FBBF24" />
-      <circle cx="56" cy="16" r="6" fill="#84CC16" />
-      <rect x="107" y="39" width="70" height="8" rx="2" fill="#404040" />
-      <rect x="10" y="39" width="75" height="12" rx="2" fill="#404040" />
-      <rect x="10" y="63" width="63" height="8" rx="2" fill="#404040" />
-      <rect x="10" y="81" width="63" height="8" rx="2" fill="#404040" />
-      <rect x="10" y="99" width="63" height="8" rx="2" fill="#404040" />
-      <rect x="10" y="117" width="63" height="8" rx="2" fill="#404040" />
-      <rect x="10" y="135" width="63" height="8" rx="2" fill="#404040" />
-      <rect x="211" y="39" width="100" height="16" rx="2" fill="#404040" />
-      <rect x="107" y="125" width="70" height="8" rx="2" fill="#404040" />
-      <rect x="107" y="212" width="70" height="8" rx="2" fill="#404040" />
-      <rect x="107" y="82" width="70" height="8" rx="2" fill="#404040" />
-      <rect x="211" y="71" width="226" height="6" rx="2" fill="#404040" />
-      <rect x="211" y="93" width="154" height="6" rx="2" fill="#404040" />
-      <rect x="211" y="115" width="189" height="6" rx="2" fill="#404040" />
-      <rect x="211" y="247" width="189" height="6" rx="2" fill="#404040" />
-      <rect x="211" y="137" width="89" height="6" rx="2" fill="#404040" />
-      <rect x="211" y="269" width="89" height="6" rx="2" fill="#404040" />
-      <rect x="211" y="159" width="117" height="6" rx="2" fill="#404040" />
-      <rect x="211" y="181" width="70" height="6" rx="2" fill="#404040" />
-      <rect x="211" y="203" width="154" height="6" rx="2" fill="#404040" />
-      <rect x="211" y="225" width="117" height="6" rx="2" fill="#404040" />
-      <rect x="107" y="168" width="70" height="8" rx="2" fill="#404040" />
-      <rect x="107" y="255" width="70" height="8" rx="2" fill="#404040" />
-      <rect x="107" y="57" width="50" height="6" rx="2" fill="#404040" />
-      <rect x="107" y="143" width="50" height="6" rx="2" fill="#404040" />
-      <rect x="107" y="229" width="50" height="6" rx="2" fill="#404040" />
-      <rect x="107" y="100" width="50" height="6" rx="2" fill="#404040" />
-      <rect x="107" y="186" width="50" height="6" rx="2" fill="#404040" />
-      <rect x="107" y="272" width="50" height="6" rx="2" fill="#404040" />
-    </svg>
-
-  );
+function LightThemePreview() {
+  return <ThemePreview colors={LIGHT_PREVIEW_COLORS} />;
 }
 
-function LightThemePreview() {
+function DarkThemePreview() {
+  return <ThemePreview colors={DARK_PREVIEW_COLORS} />;
+}
+
+function ThemePreview({ colors }) {
+  const sidebarRows = SIDEBAR_ROW_WIDTHS.map((width, index) => {
+    const y = 42 + index * 12;
+    return (
+      <g key={index}>
+        <circle cx="11" cy={y + 2} r="2.5" fill={colors.block} />
+        <rect x="17" y={y} width={width} height="4" rx="2" fill={colors.block} />
+      </g>
+    );
+  });
+
+  const noteCards = NOTE_CARD_WIDTHS.map((width, index) => {
+    const y = 24 + index * 30;
+
+    let highlight = null;
+    if (index === 0) {
+      highlight = <rect x="60" y={y} width="52" height="24" rx="3" fill={colors.selected} />;
+    }
+
+    return (
+      <g key={index}>
+        {highlight}
+        <rect x="65" y={y + 6} width={width} height="4" rx="2" fill={colors.blockStrong} />
+        <rect x="65" y={y + 14} width={width - 10} height="3" rx="1.5" fill={colors.block} />
+      </g>
+    );
+  });
+
+  const editorLines = EDITOR_LINES.map(line => (
+    <rect key={line.y} x="126" y={line.y} width={line.width} height="3" rx="1.5" fill={colors.block} />
+  ));
+
   return (
-    <svg width="456" height="316" viewBox="0 0 456 316" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="1" y="1" width="454" height="314" rx="7" fill="white" stroke="#D4D4D8" strokeWidth="2" />
-      <path d="M8 1H92C95.866 1 99 4.13401 99 8V315H8C4.13401 315 1 311.866 1 308V8C1 4.25486 3.94112 1.19633 7.63965 1.00879L8 1Z" fill="#FAFAFA" stroke="#D4D4D8" strokeWidth="2" />
-      <path d="M100 1H191C194.866 1 198 4.13401 198 8V315H93V8C93 4.25486 95.9411 1.19633 99.6396 1.00879L100 1Z" fill="white" stroke="#D4D4D8" strokeWidth="2" />
-      <path d="M8 1H448C451.866 1 455 4.13401 455 8V31H1V8C1 4.25486 3.94111 1.19633 7.63965 1.00879L8 1Z" fill="#E5E5E5" stroke="#D4D4D8" strokeWidth="2" />
-      <circle cx="16" cy="16" r="6" fill="#EF4444" />
-      <circle cx="36" cy="16" r="6" fill="#FBBF24" />
-      <circle cx="56" cy="16" r="6" fill="#84CC16" />
-      <rect x="107" y="39" width="70" height="8" rx="2" fill="#E5E5E5" />
-      <rect x="10" y="39" width="75" height="12" rx="2" fill="#E5E5E5" />
-      <rect x="10" y="63" width="63" height="8" rx="2" fill="#E5E5E5" />
-      <rect x="10" y="81" width="63" height="8" rx="2" fill="#E5E5E5" />
-      <rect x="10" y="99" width="63" height="8" rx="2" fill="#E5E5E5" />
-      <rect x="10" y="117" width="63" height="8" rx="2" fill="#E5E5E5" />
-      <rect x="10" y="135" width="63" height="8" rx="2" fill="#E5E5E5" />
-      <rect x="211" y="39" width="100" height="16" rx="2" fill="#E5E5E5" />
-      <rect x="107" y="125" width="70" height="8" rx="2" fill="#E5E5E5" />
-      <rect x="107" y="212" width="70" height="8" rx="2" fill="#E5E5E5" />
-      <rect x="107" y="82" width="70" height="8" rx="2" fill="#E5E5E5" />
-      <rect x="211" y="71" width="226" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="211" y="93" width="154" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="211" y="115" width="189" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="211" y="247" width="189" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="211" y="137" width="89" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="211" y="269" width="89" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="211" y="159" width="117" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="211" y="181" width="70" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="211" y="203" width="154" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="211" y="225" width="117" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="107" y="168" width="70" height="8" rx="2" fill="#E5E5E5" />
-      <rect x="107" y="255" width="70" height="8" rx="2" fill="#E5E5E5" />
-      <rect x="107" y="57" width="50" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="107" y="143" width="50" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="107" y="229" width="50" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="107" y="100" width="50" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="107" y="186" width="50" height="6" rx="2" fill="#E5E5E5" />
-      <rect x="107" y="272" width="50" height="6" rx="2" fill="#E5E5E5" />
+    <svg width="240" height="160" viewBox="0 0 240 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0.5" y="0.5" width="239" height="159" rx="6" fill={colors.background} />
+      <path d="M0.5 18V6.5a6 6 0 0 1 6-6h227a6 6 0 0 1 6 6V18Z" fill={colors.chrome} />
+      <path d="M0.5 18H56V159.5H6.5a6 6 0 0 1-6-6Z" fill={colors.sidebar} />
+      <circle cx="10" cy="9" r="3" fill="#EF4444" />
+      <circle cx="20" cy="9" r="3" fill="#FBBF24" />
+      <circle cx="30" cy="9" r="3" fill="#84CC16" />
+      <path d="M0.5 18H239.5M56 18V159.5M116 18V159.5" stroke={colors.border} />
+      <rect x="8" y="27" width="40" height="6" rx="2" fill={colors.blockStrong} />
+      {sidebarRows}
+      {noteCards}
+      <rect x="126" y="28" width="64" height="8" rx="2" fill={colors.blockStrong} />
+      {editorLines}
+      <rect x="0.5" y="0.5" width="239" height="159" rx="6" stroke={colors.border} />
     </svg>
   );
 }

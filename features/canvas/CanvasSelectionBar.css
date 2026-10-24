@@ -7,7 +7,7 @@
     gap: var(--spacing-2);
     padding: var(--spacing-2);
     border: 1px solid var(--neutral-200);
-    border-radius: 8px;
+    border-radius: var(--radius-2);
     background-color: var(--bg-primary);
     box-shadow: var(--shadow-3);
 
@@ -41,7 +41,7 @@
         height: 32px;
         padding: 0;
         border: none;
-        border-radius: 4px;
+        border-radius: var(--radius-1);
         background: none;
         color: var(--text-primary);
         cursor: pointer;
@@ -62,8 +62,8 @@
         }
 
         svg.lucide {
-            width: 16px;
-            height: 16px;
+            width: var(--icon-sm);
+            height: var(--icon-sm);
         }
     }
 }

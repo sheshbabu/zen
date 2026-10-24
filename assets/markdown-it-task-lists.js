@@ -20,7 +20,7 @@ module.exports = function(md, options) {
 		var tokens = state.tokens;
 		for (var i = 2; i < tokens.length; i++) {
 			if (isTodoItem(tokens, i)) {
-				todoify(tokens[i], state.Token);
+				todoify(tokens[i], state.Token, tokens[i-1].map);
 				attrSet(tokens[i-2], 'class', 'task-list-item' + (!disableCheckboxes ? ' enabled' : ''));
 				attrSet(tokens[parentToken(tokens, i-2)], 'class', 'task-list-container');
 			}
@@ -64,7 +64,7 @@ function isTodoItem(tokens, index) {
 		startsWithTodoMarkdown(tokens[index]);
 }
 
-function todoify(token, TokenConstructor) {
+function todoify(token, TokenConstructor, lineMap) {
     var wrapperOpen = new TokenConstructor('html_inline', '', 0);
     wrapperOpen.content = '<div class="task-item-content">';
     wrapperOpen.block = true;
@@ -73,7 +73,7 @@ function todoify(token, TokenConstructor) {
     wrapperClose.content = '</div>';
     wrapperClose.block = true;
 
-    var checkbox = makeCheckbox(token, TokenConstructor);
+    var checkbox = makeCheckbox(token, TokenConstructor, lineMap);
 
     var newChildren = [];
 
@@ -127,14 +127,15 @@ function todoify(token, TokenConstructor) {
     }
 }
 
-function makeCheckbox(token, TokenConstructor) {
+function makeCheckbox(token, TokenConstructor, lineMap) {
 	var checkbox = new TokenConstructor('html_inline', '', 0);
+	var lineAttr = lineMap ? ' data-line="' + lineMap[0] + '"' : '';
 	if (token.content.indexOf('[ ] ') === 0) {
-		checkbox.content = '<svg class="task-list-item-checkbox unchecked" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+		checkbox.content = '<svg class="task-list-item-checkbox unchecked"' + lineAttr + ' xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
 			'<circle cx="12" cy="12" r="10" />' +
 			'</svg>';
 	} else if (token.content.indexOf('[x] ') === 0 || token.content.indexOf('[X] ') === 0) {
-		checkbox.content = '<svg class="task-list-item-checkbox checked" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+		checkbox.content = '<svg class="task-list-item-checkbox is-checked"' + lineAttr + ' xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
 			'<circle cx="12" cy="12" r="10" />' +
 			'<path d="m9 12 2 2 4-4" />' +
 			'</svg>';

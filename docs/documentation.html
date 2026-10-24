@@ -540,6 +540,14 @@
                         </ul>
                     </li>
                     <li>
+                        <a href="#api-tokens" class="sidebar-nav-item">API Tokens</a>
+                        <ul class="sidebar-nav-sub">
+                            <li><a href="#api-tokens-create" class="sidebar-nav-item">Create a Token</a></li>
+                            <li><a href="#api-tokens-access" class="sidebar-nav-item">Access</a></li>
+                            <li><a href="#api-tokens-usage" class="sidebar-nav-item">Using the API</a></li>
+                        </ul>
+                    </li>
+                    <li>
                         <a href="#mcp-integration" class="sidebar-nav-item">MCP Integration</a>
                         <ul class="sidebar-nav-sub">
                             <li><a href="#mcp-generate-token" class="sidebar-nav-item">Generate Token</a></li>
@@ -781,27 +789,87 @@ docker compose restart
 </code></pre>
             </section>
 
+            <section id="api-tokens">
+                <h1>API Tokens</h1>
+
+                <p>
+                    API tokens let scripts and AI assistants work with your notes. Each token only reaches
+                    the tags you choose, so you can, for example, let an assistant read your journal while
+                    only writing to a separate set of notes.
+                </p>
+
+                <h3 id="api-tokens-create">Create a Token</h3>
+                <ol>
+                    <li>Open Zen in your browser</li>
+                    <li>Click on <strong>Settings</strong> in the sidebar</li>
+                    <li>Click on the <strong>API Tokens</strong> tab</li>
+                    <li>Enter a name, then add a row for each tag the token should reach</li>
+                    <li>Click <strong>Generate Token</strong> and copy it. It is only shown once.</li>
+                </ol>
+
+                <p>To stop a token from working, click <strong>Revoke</strong> next to it.</p>
+
+                <h3 id="api-tokens-access">Access</h3>
+                <p>Each row gives the token one of two levels on a tag, or on <strong>All tags</strong>:</p>
+
+                <ul>
+                    <li><strong>Read</strong>: list, search and read notes carrying the tag</li>
+                    <li><strong>Read and write</strong>: also create notes with the tag and edit notes carrying it</li>
+                </ul>
+
+                <p>A few rules keep tokens from reaching further than intended:</p>
+
+                <ul>
+                    <li>A note is readable if the token can read any one of its tags</li>
+                    <li>A note is editable only if the token can write to every one of its tags, so a read-only tag protects every note carrying it</li>
+                    <li>New notes must use tags the token can write to. Notes without tags, and new tags, need write access on <strong>All tags</strong>.</li>
+                    <li>Editing a note through a token keeps the note's existing tags</li>
+                    <li>Deleting notes, pinning, archiving, version history, tag management and settings need you to be logged in</li>
+                </ul>
+
+                <h3 id="api-tokens-usage">Using the API</h3>
+                <p>Send the token in the <code>Authorization</code> header:</p>
+
+                <pre><code class="language-bash">$ curl http://&lt;ZEN_URL&gt;/api/v1/notes/ -H "Authorization: Bearer &lt;TOKEN&gt;"</code></pre>
+
+                <p>Tokens can use these endpoints:</p>
+
+                <ul>
+                    <li><code>GET /api/v1/notes/</code> lists notes</li>
+                    <li><code>GET /api/v1/notes/{noteId}/</code> reads a note</li>
+                    <li><code>POST /api/v1/notes/</code> creates a note</li>
+                    <li><code>PUT /api/v1/notes/{noteId}/</code> updates a note</li>
+                    <li><code>GET /api/v1/search/?query=...</code> searches notes</li>
+                    <li><code>GET /api/v1/tags/</code> lists tags</li>
+                </ul>
+
+                <p>To create a note:</p>
+
+                <pre><code class="language-bash">$ curl -X POST http://&lt;ZEN_URL&gt;/api/v1/notes/ \
+    -H "Authorization: Bearer &lt;TOKEN&gt;" \
+    -d '{"title": "Memories", "content": "- Prefers tea over coffee", "tags": [{"tagId": 3}]}'</code></pre>
+
+                <blockquote>
+                    <p><strong>Note:</strong> An update replaces the note's title and content with what you send,
+                        so send both, even if only one changed.
+                    </p>
+                </blockquote>
+            </section>
+
             <section id="mcp-integration">
                 <h1>MCP Integration</h1>
 
                 <p>
                     Zen provides Model Context Protocol (MCP) integration, allowing you to connect with
-                    external tools and services like Claude Code. This enables you to search, read,
-                    and manage your notes directly from supported applications.
+                    external tools and services like Claude Code. This enables you to search, list
+                    and read your notes directly from supported applications.
                 </p>
 
                 <h3 id="mcp-generate-token">Generate Token</h3>
                 <p>
-                    Before you can use MCP integration, you need to generate an access token:
+                    MCP uses an API token. <a href="#api-tokens-create">Create a token</a> with <strong>Read</strong>
+                    access on the tags you want to share, or on <strong>All tags</strong>, and copy it for the next step.
                 </p>
-
-                <ol>
-                    <li>Open Zen in your browser</li>
-                    <li>Click on <strong>Settings</strong> in the sidebar</li>
-                    <li>Click on the <strong>MCP</strong> tab</li>
-                    <li>Click <strong>Generate Token</strong> to create a new access token</li>
-                    <li>Copy the generated token - you'll need this for the next step</li>
-                </ol>
 
                 <h3 id="mcp-claude-code">Claude Code</h3>
                 <p>

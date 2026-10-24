@@ -3,10 +3,12 @@ package settings
 import (
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"path/filepath"
 	"strings"
 	"time"
+	"zen/commons/auth"
 	"zen/commons/utils"
 	"zen/features/notes"
 	"zen/features/tags"
@@ -81,16 +83,14 @@ func HandleImport(w http.ResponseWriter, r *http.Request) {
 		note.UpdatedAt = *fm.updatedAt
 	}
 
-	_, err = notes.CreateNote(note)
+	_, err = notes.CreateNote(auth.Unrestricted, note)
 	if err != nil {
 		err = fmt.Errorf("error creating note: %w", err)
 		utils.SendErrorResponse(w, "NOTES_IMPORT_FAILED", "Error importing note", err, http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "File uploaded successfully"}`))
+	utils.SendJSON(w, http.StatusOK, map[string]string{"message": "File uploaded successfully"})
 }
 
 func extractFrontmatter(content string) (string, frontmatter) {
@@ -160,8 +160,10 @@ func splitTags(value string) []string {
 func resolveTags(names []string) []tags.Tag {
 	var result []tags.Tag
 	for _, name := range names {
-		existingTags, err := tags.SearchTags(name)
-		if err == nil {
+		existingTags, err := tags.SearchTags(auth.Unrestricted, name)
+		if err != nil {
+			slog.Error(err.Error())
+		} else {
 			for _, t := range existingTags {
 				if t.Name == name {
 					result = append(result, t)

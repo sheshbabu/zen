@@ -1,10 +1,9 @@
-import { h, render, useRef } from "../../assets/preact.esm.js"
-import { closeModal, openModal } from "../../commons/components/Modal.jsx";
+import { h, render } from "../../assets/preact.esm.js"
+import { unfoldToHeading } from "./useCollapsibleHeadings.js";
 import "./TableOfContents.css";
 
-export default function TableOfContents({ content, isExpanded, isEditable, isNewNote, visibleHeadings = [] }) {
+export default function TableOfContents({ noteId, content, isExpanded, isEditable, isNewNote, visibleHeadings = [] }) {
   const headings = extractHeadings(content);
-  const hideTimeoutRef = useRef(null);
 
   if (isExpanded !== true || isEditable === true || isNewNote === true || headings.length < 4) {
     const tocRoot = document.querySelector('.toc-root');
@@ -14,71 +13,6 @@ export default function TableOfContents({ content, isExpanded, isEditable, isNew
     return null;
   }
 
-  function showPopover() {
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current);
-      hideTimeoutRef.current = null;
-    }
-    openModal(<TableOfContentsPopover headings={headings} visibleHeadings={visibleHeadings} onMouseEnter={handlePopoverMouseEnter} onMouseLeave={handlePopoverMouseLeave} />);
-  }
-
-  function hidePopover() {
-    closeModal();
-  }
-
-  function handleMouseEnter() {
-    showPopover();
-  }
-
-  function handleMouseLeave() {
-    hideTimeoutRef.current = setTimeout(() => {
-      hidePopover();
-    }, 100);
-  }
-
-  function handlePopoverMouseEnter() {
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current);
-      hideTimeoutRef.current = null;
-    }
-  }
-
-  function handlePopoverMouseLeave() {
-    hideTimeoutRef.current = setTimeout(() => {
-      hidePopover();
-    }, 100);
-  }
-
-  function isHeadingVisible(heading) {
-    return visibleHeadings.some(visible => visible.index === heading.index);
-  }
-
-  const bars = headings.map((item) => {
-    const isVisible = isHeadingVisible(item);
-    return (
-      <div
-        key={`heading-${item.index}`}
-        className={`toc-bar toc-bar-level-${item.level} ${isVisible ? 'is-visible' : ''}`}
-      />
-    );
-  });
-
-  const sidebarElement = (
-    <div className="toc-sidebar" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-      <div className="toc-bars">
-        {bars}
-      </div>
-    </div>
-  );
-
-  const tocRoot = document.querySelector('.toc-root');
-  if (tocRoot) {
-    render(sidebarElement, tocRoot);
-  }
-  return null;
-}
-
-function TableOfContentsPopover({ headings, visibleHeadings = [], onMouseEnter, onMouseLeave }) {
   function handleItemClick(heading) {
     const headingElements = document.querySelectorAll(`h${heading.level}`);
     let targetElement = null;
@@ -91,41 +25,45 @@ function TableOfContentsPopover({ headings, visibleHeadings = [], onMouseEnter, 
     }
 
     if (targetElement !== null) {
+      unfoldToHeading(targetElement.parentElement, targetElement, noteId);
       targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-
-    closeModal();
   }
-
-  const minLevel = Math.min(...headings.map(h => h.level));
 
   function isHeadingVisible(heading) {
     return visibleHeadings.some(visible => visible.index === heading.index);
   }
 
+  const minLevel = Math.min(...headings.map(h => h.level));
+
   const items = headings.map((heading) => {
     const isVisible = isHeadingVisible(heading);
+    // Staggers the reveal for the first few rows only, so long lists don't take ages to appear.
+    const revealStep = Math.min(heading.index, 4);
     return (
       <div
         key={`heading-${heading.index}`}
         className={`toc-item ${isVisible ? 'is-visible' : ''}`}
-        style={{ marginLeft: `${(heading.level - minLevel) * 8}px` }}
+        style={{ '--toc-reveal-step': revealStep, '--toc-indent': `${(heading.level - minLevel) * 8}px` }}
         onClick={() => handleItemClick(heading)}
       >
-        {heading.text}
+        <span className={`toc-bar toc-bar-level-${heading.level}`}></span>
+        <span className="toc-label">{heading.text}</span>
       </div>
     );
   });
 
-  return (
-    <div className="toc-popover" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-      <div className="toc-popover-content">
-        <div className="toc-items">
-          {items}
-        </div>
-      </div>
+  const tocElement = (
+    <div className="toc">
+      {items}
     </div>
   );
+
+  const tocRoot = document.querySelector('.toc-root');
+  if (tocRoot) {
+    render(tocElement, tocRoot);
+  }
+  return null;
 }
 
 function extractHeadings(content) {
