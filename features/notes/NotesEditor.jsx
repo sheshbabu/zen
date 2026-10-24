@@ -1,4 +1,4 @@
-import { h, useState, useRef, useEffect, useCallback } from "../../assets/preact.esm.js"
+import { h, useState, useRef, useEffect, useLayoutEffect, useCallback } from "../../assets/preact.esm.js"
 import ApiClient from '../../commons/http/ApiClient.js';
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import NotesEditorFormattingToolbar from './NotesEditorFormattingToolbar.jsx';
@@ -106,7 +106,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
 
   let contentArea = null;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     titleRef.current.textContent = title;
   }, [title]);
 
