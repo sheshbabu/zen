@@ -41,4 +41,5 @@ Defaults observed in the user's history:
 ## 4. Output
 
 Print the message in a fenced code block so it can be copied as is.
+Also copy it to the clipboard with `pbcopy` so it can be pasted into VS Code's commit box.
 If the changes look like they belong in separate commits, say so in one line after the block and suggest a message for each.

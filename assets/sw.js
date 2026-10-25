@@ -14,6 +14,16 @@ const STATIC_ASSETS = [
     '/assets/apple-touch-icon.png'
 ];
 
+// Only these GET routes are cached for offline reading; everything else is network only.
+const CACHEABLE_API_ROUTES = [
+    /^\/api\/v1\/users\/me$/,
+    /^\/api\/v1\/notes\/$/,
+    /^\/api\/v1\/notes\/\d+\/$/,
+    /^\/api\/v1\/tags\/$/,
+    /^\/api\/v1\/focus\/$/,
+    /^\/api\/v1\/images\/$/
+];
+
 self.addEventListener('install', event => {
     event.waitUntil(handleInstall());
 });
@@ -64,16 +74,26 @@ async function handleFetch(event) {
     }
 
     if (path.startsWith('/api/')) {
-        return handleApiFetch(request);
+        return handleApiFetch(event, request, path);
     }
 
     return handleAssetFetch(event, request);
 }
 
 // Network first
-async function handleApiFetch(request) {
+async function handleApiFetch(event, request, path) {
+    const isCacheable = CACHEABLE_API_ROUTES.some(route => route.test(path));
+
+    if (!isCacheable) {
+        return fetch(request);
+    }
+
     try {
-        return await fetch(request);
+        const res = await fetch(request);
+        if (res.ok && res.redirected !== true) {
+            event.waitUntil(cacheResponse(request, res.clone()));
+        }
+        return res;
     } catch (error) {
         const cached = await caches.match(request);
         if (cached) {

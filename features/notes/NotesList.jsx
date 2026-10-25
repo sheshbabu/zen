@@ -15,6 +15,7 @@ import { AppProvider } from '../../commons/contexts/AppContext.jsx';
 import { openModal } from '../../commons/components/Modal.jsx';
 import EmptyState from '../../commons/components/EmptyState.jsx';
 import TagItem from "../tags/TagItem.jsx";
+import useUncachedNoteIds from "./useUncachedNoteIds.js";
 import "./NotesList.css";
 
 const NOTES_PER_PAGE = 100;
@@ -26,8 +27,9 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
   let currentTotal = total;
   let currentItems = notes;
   let isCurrentLoading = isLoading;
+  const uncachedNoteIds = useUncachedNoteIds(notes);
 
-  let items = notes.map(note => <NotesListItem note={note} key={note.noteId} isMultiSelect={isMultiSelect} isSelected={selectedIds.includes(note.noteId)} onMultiSelectStart={onMultiSelectStart} onToggleSelect={onToggleSelect} />);
+  let items = notes.map(note => <NotesListItem note={note} key={note.noteId} isUnavailableOffline={uncachedNoteIds.has(note.noteId)} isMultiSelect={isMultiSelect} isSelected={selectedIds.includes(note.noteId)} onMultiSelectStart={onMultiSelectStart} onToggleSelect={onToggleSelect} />);
 
   if (view === "card") {
     listClassName = "";
@@ -64,7 +66,7 @@ export default function NotesList({ notes = [], total, isLoading, images = [], i
   );
 }
 
-function NotesListItem({ note, isMultiSelect, isSelected, onMultiSelectStart, onToggleSelect }) {
+function NotesListItem({ note, isUnavailableOffline, isMultiSelect, isSelected, onMultiSelectStart, onToggleSelect }) {
   const link = `/notes/${note.noteId}`;
   const updatedAtDate = new Date(note.updatedAt);
   const shortUpdatedAt = formatDate(updatedAtDate);
@@ -113,7 +115,7 @@ function NotesListItem({ note, isMultiSelect, isSelected, onMultiSelectStart, on
 
   return (
     <div {...longPress} onClickCapture={handleCmdClick}>
-      <Link to={link} className={`notes-list-item ${note.isPinned ? 'is-pinned' : ''}`} activeClassName="is-active" shouldPreserveSearchParams>
+      <Link to={link} className={`notes-list-item ${note.isPinned ? 'is-pinned' : ''} ${isUnavailableOffline ? 'is-unavailable-offline' : ''}`} activeClassName="is-active" shouldPreserveSearchParams>
         <div className="notes-list-item-header">
           {title}
           <PinIcon isPinned={note.isPinned} className="notes-list-item-pin" />

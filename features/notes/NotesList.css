@@ -60,6 +60,10 @@
             background-color: var(--bg-secondary);
         }
 
+        &.is-unavailable-offline {
+            opacity: 0.4;
+        }
+
         .notes-list-item-checkbox {
             width: 20px;
             height: 20px;
