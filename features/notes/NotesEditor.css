@@ -51,8 +51,9 @@
             right: 0;
         }
 
+        /* The icon sits on the content edge, so the 4px hover box hangs outside it. */
         .left-toolbar {
-            margin-left: -12px;
+            margin-left: calc(-1 * var(--spacing-1));
         }
 
         svg.lucide {
@@ -62,14 +63,6 @@
             margin-right: 0;
             transition-property: stroke;
             transition-duration: var(--transition-normal);
-
-            &:hover {
-
-                rect,
-                path {
-                    stroke: var(--neutral-900);
-                }
-            }
         }
     }
 }
@@ -77,6 +70,11 @@
 @media screen and (max-width: 948px) {
 
     .notes-editor-container {
+        /* The back chevron's point sits 7px inside its icon, so the button hangs further out to line the point up with the title. */
+        .notes-editor-toolbar .left-toolbar {
+            margin-left: -12px;
+        }
+
         &.is-visible {
             width: 100%;
             padding: var(--spacing-4);
@@ -127,7 +125,6 @@
         border-bottom: 1px solid var(--neutral-200);
         padding-bottom: var(--spacing-1);
         width: 100%;
-        margin-right: var(--spacing-4);
     }
 }
 
@@ -140,7 +137,8 @@
 }
 
 .notes-editor-tags-input {
-    padding: 2px var(--spacing-2);
+    height: 28px;
+    padding: 0 var(--spacing-2);
     outline: none;
     color: var(--neutral-400);
     font: var(--sm);
@@ -538,14 +536,14 @@
             background: none;
             border: none;
             border-radius: var(--radius-1);
-            padding: 6px var(--spacing-2);
+            padding: var(--spacing-1);
             cursor: pointer;
             font: var(--xs);
             font-weight: 500;
             color: var(--text-primary);
             transition: background-color var(--transition-fast) ease;
-            min-width: 32px;
-            height: 32px;
+            min-width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;

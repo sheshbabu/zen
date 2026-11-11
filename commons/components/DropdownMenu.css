@@ -103,7 +103,7 @@
         }
 
         .dropdown-button {
-            border-radius: 6px 6px 0 0;
+            border-radius: var(--radius-1) var(--radius-1) 0 0;
         }
     }
 }

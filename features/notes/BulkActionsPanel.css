@@ -17,13 +17,22 @@
         align-items: center;
         gap: var(--spacing-3);
         padding: var(--spacing-2);
-        border-radius: 6px;
+        border-radius: var(--radius-1);
         cursor: pointer;
         color: var(--text-primary);
         transition: background-color var(--transition-normal);
 
         &:hover {
             background-color: var(--neutral-100);
+
+            svg.lucide {
+                line,
+                circle,
+                rect,
+                path {
+                    stroke: var(--neutral-900);
+                }
+            }
         }
 
         &.cancel {

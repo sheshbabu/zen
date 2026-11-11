@@ -4,8 +4,8 @@ import Lightbox from "../../commons/components/Lightbox.jsx";
 import "./ImageGallery.css";
 
 const MIN_COLUMN_WIDTH = 300;
-const GUTTER_WIDTH = 20;
-const GUTTER_HEIGHT = 20;
+const GUTTER_WIDTH = 16;
+const GUTTER_HEIGHT = 16;
 
 export default function ImageGallery({ images }) {
   const [imageDetails, setImageDetails] = useState([]);

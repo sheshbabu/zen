@@ -20,9 +20,10 @@
 
             &:hover {
 
+                line,
+                circle,
                 rect,
-                path,
-                circle {
+                path {
                     stroke: var(--neutral-900);
                 }
             }

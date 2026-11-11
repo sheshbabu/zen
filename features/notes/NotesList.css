@@ -50,9 +50,10 @@
             font-weight: 500;
             white-space: nowrap;
             overflow: hidden;
+            text-overflow: ellipsis;
 
             &.is-untitled {
-                color: var(--neutral-300);
+                color: var(--neutral-400);
             }
         }
 
@@ -165,10 +166,8 @@
     .notes-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: var(--spacing-5);
-        padding: var(--spacing-5);
-        padding-top: 0;
-        padding-left: 10px;
+        gap: var(--spacing-4);
+        padding: 0 var(--spacing-4) var(--spacing-4);
 
         &.board {
             display: block;

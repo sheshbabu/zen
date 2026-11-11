@@ -3,13 +3,12 @@
 
     input,
     textarea {
-        height: 44px;
+        height: 36px;
         border-radius: var(--radius-1);
         border: 1px solid var(--neutral-200);
         background-color: var(--bg-primary);
         color: var(--text-primary);
         padding: var(--spacing-2);
-        margin-top: var(--spacing-1);
         min-width: 320px;
         outline: none;
         transition: border-color var(--transition-fast);
@@ -49,6 +48,10 @@
 }
 
 .form-field-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-1);
     margin-top: var(--spacing-6);
 
     label {

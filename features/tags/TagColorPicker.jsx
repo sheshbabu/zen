@@ -26,8 +26,8 @@ export default function TagColorPicker({ selectedColor, onColorChange }) {
   });
 
   return (
-    <div className="tag-color-picker">
-      <label className="tag-color-picker-label">Color</label>
+    <div className="tag-color-picker form-field-container">
+      <label>Color</label>
       <div className="tag-color-swatches">
         {swatches}
       </div>

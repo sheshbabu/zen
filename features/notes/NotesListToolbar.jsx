@@ -7,6 +7,7 @@ import { NotesProvider, useNotes } from "../../commons/contexts/NotesContext.jsx
 import { useLayout } from "../../commons/contexts/LayoutContext.jsx";
 import { HamburgerIcon } from '../../commons/components/Icon.jsx';
 import ButtonGroup from '../../commons/components/ButtonGroup.jsx';
+import Button from '../../commons/components/Button.jsx';
 import navigateTo from "../../commons/utils/navigateTo.js";
 import isMobile from "../../commons/utils/isMobile.js";
 import TrashClearModal from "./TrashClearModal.jsx"
@@ -95,9 +96,9 @@ export default function NotesListToolbar({ onViewChange }) {
 function Toolbar({ actions, listName, className }) {
   const { toggleSidebar } = useLayout();
   const buttons = actions.map(action => (
-    <div key={action.title} {...action}>
+    <Button key={action.title} variant="ghost" title={action.title} onClick={action.onClick}>
       <action.icon />
-    </div>
+    </Button>
   ));
 
   let title = null;
@@ -108,9 +109,9 @@ function Toolbar({ actions, listName, className }) {
   return (
     <div className={className}>
       <ButtonGroup isMobile={true}>
-        <div onClick={toggleSidebar} title="Toggle Sidebar">
+        <Button variant="ghost" onClick={toggleSidebar} title="Toggle Sidebar">
           <HamburgerIcon />
-        </div>
+        </Button>
       </ButtonGroup>
       {title}
       <ButtonGroup>

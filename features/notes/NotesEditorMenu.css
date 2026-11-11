@@ -59,6 +59,15 @@
 
         &:hover {
             background-color: var(--neutral-200);
+
+            svg.lucide {
+                line,
+                circle,
+                rect,
+                path {
+                    stroke: var(--neutral-900);
+                }
+            }
         }
 
         &:active {

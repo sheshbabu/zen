@@ -28,5 +28,5 @@ Non-obvious rules the token list does not tell you:
 - For a translucent variant of a token color use relative color syntax: `rgb(from var(--yellow-400) r g b / 0.1)`, not a hardcoded rgba
 - Theming: every themed token is declared once in `:root` as `light-dark(<light>, <dark>)`; `[data-theme]` only sets `color-scheme`. Never add a second block redefining tokens
 - Use `50%` for circles, not `--radius-full` — `50%` follows the aspect ratio and stays correct if the element is not square
-- z-index layers are semantic: `--z-base` overlays, `--z-modal` backdrops and mobile navbar, `--z-popover` toasts and tooltips, `--z-critical` offline indicator
+- z-index layers are semantic: `--z-base` overlays, `--z-modal` modal backdrops and mobile navbar, `--z-popover` toasts, tooltips, and the mobile sidebar with its backdrop (so it covers the navbar), `--z-critical` offline indicator
 - No `rem`/`em` outside `assets/index.css`; use `px` for one-off sizes no token covers

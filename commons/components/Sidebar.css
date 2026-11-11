@@ -157,7 +157,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: var(--z-modal);
+            /* Shares the open sidebar's layer so it also covers the bottom navbar, which sits on the modal layer. */
+            z-index: var(--z-popover);
             backdrop-filter: blur(2px);
             background-color: rgba(0, 0, 0, 0.8);
         }

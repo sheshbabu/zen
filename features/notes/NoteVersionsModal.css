@@ -106,7 +106,7 @@
             justify-content: space-between;
             gap: var(--spacing-4);
             padding: var(--spacing-2);
-            padding-left: var(--spacing-4);
+            padding-left: var(--spacing-6);
             border-bottom: 1px solid var(--neutral-200);
 
             .note-versions-close-button {
@@ -124,6 +124,13 @@
                 rect,
                 path {
                     stroke: var(--text-secondary);
+                }
+
+                &:hover line,
+                &:hover circle,
+                &:hover rect,
+                &:hover path {
+                    stroke: var(--neutral-900);
                 }
             }
         }

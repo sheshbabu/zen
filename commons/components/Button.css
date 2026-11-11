@@ -4,7 +4,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 var(--spacing-2);
-    border-radius: 6px;
+    border-radius: var(--radius-1);
     border: 1px solid var(--neutral-100);
     overflow: hidden;
     font: var(--sm);
@@ -21,6 +21,15 @@
     &:hover {
         background-color: var(--neutral-100);
         cursor: pointer;
+
+        svg.lucide {
+            line,
+            circle,
+            rect,
+            path {
+                stroke: var(--neutral-900);
+            }
+        }
     }
 
     svg.lucide {
@@ -31,14 +40,6 @@
         margin-right: 0;
         transition-property: stroke;
         transition-duration: var(--transition-normal);
-
-        &:hover {
-
-            rect,
-            path {
-                stroke: var(--neutral-900);
-            }
-        }
     }
 
     &:active {
@@ -85,7 +86,7 @@
     }
 
     &[disabled] {
-        opacity: 0.8;
+        opacity: 0.5;
         cursor: not-allowed;
     }
 
@@ -113,6 +114,15 @@
 
     &:hover {
         background-color: var(--neutral-100);
+
+        svg.lucide {
+            line,
+            circle,
+            rect,
+            path {
+                stroke: var(--neutral-900);
+            }
+        }
     }
 
     &:active {

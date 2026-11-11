@@ -151,15 +151,12 @@ export default function TemplateEditor({ selectedTemplate, isNewTemplate, onChan
 
         <div className="form-field-container">
           <label>Tags</label>
-          <br />
           <NotesEditorTags tags={tags} isEditable canCreateTag={false} onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
         </div>
 
         <div className="input-container form-field-container">
           <label htmlFor="template-content">Content</label>
-          <br />
           <textarea id="template-content" className="templates-editor-textarea" value={content} onChange={handleContentChange} placeholder="Enter note content" required />
-          <br />
         </div>
 
         <div className="templates-editor-help">

@@ -345,9 +345,11 @@ function TokenFields({ id, name, scopes, tagOptions, isDisabled, onNameChange, o
         onChange={onNameChange}
       />
 
-      <div className="api-token-scopes">
-        <label className="api-token-field-label">Access</label>
-        {scopeRows}
+      <div className="api-token-scopes form-field-container">
+        <label>Access</label>
+        <div className="api-token-scope-rows">
+          {scopeRows}
+        </div>
         {scopeWarning}
         <Button variant="secondary" onClick={handleAddScopeClick} isDisabled={isDisabled}>
           Add tag

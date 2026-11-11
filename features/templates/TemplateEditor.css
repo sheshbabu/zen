@@ -47,13 +47,6 @@
                 margin-right: 0;
                 transition-property: stroke;
                 transition-duration: var(--transition-normal);
-
-                &:hover {
-                    rect,
-                    path {
-                        stroke: var(--neutral-900);
-                    }
-                }
             }
         }
     }
@@ -64,10 +57,6 @@
 
         .input-container {
             margin-bottom: var(--spacing-6);
-        }
-
-        .form-field-container .notes-editor-tags {
-            margin-top: var(--spacing-1);
         }
 
         .templates-editor-field {
@@ -103,7 +92,7 @@
             pre {
                 background-color: var(--neutral-50);
                 border: 1px solid var(--neutral-200);
-                border-radius: 6px;
+                border-radius: var(--radius-1);
                 padding: var(--spacing-3);
                 font: var(--xs-code);
                 color: var(--neutral-600);

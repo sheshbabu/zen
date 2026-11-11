@@ -1,8 +1,9 @@
 .notes-list-toolbar {
     display: flex;
     justify-content: space-between;
-    padding: 14px 0 var(--spacing-2) 0;
-    margin: 0 var(--spacing-3) 0 var(--spacing-1);
+    align-items: center;
+    /* The icons sit on the list rows' 16px text edge, so the 4px hover boxes hang outside it. */
+    padding: 18px var(--spacing-3) var(--spacing-3);
     background: var(--bg-primary);
     z-index: var(--z-base);
     position: sticky;
@@ -21,23 +22,10 @@
     }
 
     svg.lucide {
-        cursor: pointer;
         width: var(--icon-md);
         height: var(--icon-md);
-        margin: var(--spacing-2);
-        margin-right: 0;
-        /* align with text in listview */
-        margin-left: 10px;
         transition-property: stroke;
         transition-duration: var(--transition-normal);
-
-        &:hover {
-
-            rect,
-            path {
-                stroke: var(--neutral-900);
-            }
-        }
     }
 }
 
@@ -52,8 +40,7 @@
             flex: 1;
             font-weight: 600;
             line-height: 20px;
-            padding: var(--spacing-2);
-            padding-left: var(--spacing-3);
+            padding: var(--spacing-1) var(--spacing-2);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;

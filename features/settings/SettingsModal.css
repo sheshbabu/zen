@@ -92,7 +92,7 @@
             cursor: pointer;
             font: var(--sm);
             margin: 2px 0;
-            border-radius: var(--radius-2);
+            border-radius: var(--radius-1);
             color: var(--neutral-900);
             transition-property: background-color;
             transition-duration: var(--transition-normal);
@@ -100,6 +100,15 @@
             &:hover,
             &.is-active {
                 background-color: var(--neutral-100);
+
+                svg.lucide {
+                    line,
+                    circle,
+                    rect,
+                    path {
+                        stroke: var(--neutral-900);
+                    }
+                }
             }
 
             svg.lucide {
@@ -127,7 +136,7 @@
             .code-block {
                 background-color: var(--neutral-50);
                 border: 1px solid var(--neutral-200);
-                border-radius: 6px;
+                border-radius: var(--radius-1);
                 padding: var(--spacing-3);
                 font: var(--xs-code);
                 color: var(--neutral-600);
@@ -405,25 +414,24 @@
                     margin-bottom: var(--spacing-1);
                 }
 
-                .api-token-field-label {
-                    display: block;
-                    font-weight: 600;
-                    margin-top: var(--spacing-6);
-                    margin-bottom: var(--spacing-1);
-                }
-
                 .api-token-scopes {
                     margin-bottom: var(--spacing-4);
 
+                    /* Adds to the field's 4px gap so Add tag sits 16px from the rows, the same as Generate Token below it. */
                     >.button {
-                        margin-top: var(--spacing-4);
+                        margin-top: var(--spacing-3);
+                    }
+
+                    .api-token-scope-rows {
+                        display: flex;
+                        flex-direction: column;
+                        gap: var(--spacing-2);
                     }
 
                     .api-token-scope-row {
                         display: flex;
                         align-items: center;
                         gap: var(--spacing-3);
-                        margin-bottom: var(--spacing-2);
 
                         .api-token-scope-tag .dropdown-button {
                             width: 180px;
@@ -438,7 +446,7 @@
                     .api-token-scope-warning {
                         font: var(--xs);
                         color: var(--red-500);
-                        margin-bottom: var(--spacing-2);
+                        margin: 0;
                     }
                 }
             }

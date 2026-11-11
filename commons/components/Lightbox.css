@@ -163,7 +163,7 @@
                 height: 300px;
                 width: 100%;
                 object-fit: cover;
-                border-radius: 6px;
+                border-radius: var(--radius-1);
                 cursor: pointer;
                 transition: transform var(--transition-normal) cubic-bezier(0.16, 1, 0.3, 1);
 

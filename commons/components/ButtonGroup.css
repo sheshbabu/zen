@@ -5,44 +5,6 @@
     &.is-mobile {
         display: none;
     }
-
-    /* Icon button styling within groups */
-    .icon-button {
-        padding: var(--spacing-2);
-        border-radius: var(--radius-1);
-        cursor: pointer;
-        transition: background-color var(--transition-normal);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        &:hover {
-            background-color: var(--neutral-100);
-        }
-
-        svg.lucide {
-            width: var(--icon-md);
-            height: var(--icon-md);
-            transition-property: stroke;
-            transition-duration: var(--transition-normal);
-
-            line,
-            circle,
-            rect,
-            path {
-                stroke: var(--neutral-500);
-            }
-
-            &:hover {
-                line,
-                circle,
-                rect,
-                path {
-                    stroke: var(--neutral-900);
-                }
-            }
-        }
-    }
 }
 
 @media screen and (max-width: 948px) {

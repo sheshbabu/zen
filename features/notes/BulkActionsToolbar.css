@@ -61,7 +61,7 @@
             font: var(--sm);
             font-weight: 600;
             padding: 6px 10px;
-            border-radius: 6px;
+            border-radius: var(--radius-1);
             cursor: pointer;
             color: var(--neutral-500);
 

@@ -53,8 +53,10 @@
         &.is-destructive:hover {
             svg.lucide {
 
-                path,
-                line {
+                line,
+                circle,
+                rect,
+                path {
                     stroke: var(--red-500);
                 }
             }

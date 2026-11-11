@@ -18,7 +18,7 @@
 .modal-content-container {
     background-color: var(--bg-primary);
     border: 1px solid var(--neutral-100);
-    border-radius: var(--radius-1);
+    border-radius: var(--radius-2);
     box-shadow: var(--shadow-5);
     animation: modal-slide-down 0.3s ease-out;
     will-change: transform, opacity;
@@ -54,6 +54,13 @@
 
         &:hover {
             background-color: var(--neutral-100);
+
+            line,
+            circle,
+            rect,
+            path {
+                stroke: var(--neutral-900);
+            }
         }
 
         line,
@@ -73,6 +80,9 @@
     padding-left: var(--spacing-2);
     background-color: var(--neutral-50);
     box-shadow: inset var(--shadow-2);
+    /* The footer is the container's last child, so its background follows the container's rounded corners. */
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
 
     &.right-aligned {
         justify-content: flex-end;

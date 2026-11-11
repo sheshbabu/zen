@@ -92,6 +92,13 @@
                 padding: 0;
                 width: var(--icon-sm);
                 height: var(--icon-sm);
+
+                line,
+                circle,
+                rect,
+                path {
+                    stroke: currentColor;
+                }
             }
         }
     }

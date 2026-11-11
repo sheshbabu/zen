@@ -15,7 +15,6 @@ export default function Input({ id, label, type, placeholder, value, hint, error
   return (
     <div className="input-container form-field-container">
       <label htmlFor={id}>{label}</label>
-      <br />
       {hintElement}
       <input
         type={type}
@@ -27,7 +26,6 @@ export default function Input({ id, label, type, placeholder, value, hint, error
         value={value || ""}
         onChange={onChange}
       />
-      <br />
       {errorElement}
     </div>
   );

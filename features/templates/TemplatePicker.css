@@ -29,7 +29,7 @@
             width: 200px;
             padding: var(--spacing-3);
             border: 1px dashed var(--neutral-300);
-            border-radius: 6px;
+            border-radius: var(--radius-1);
             text-align: left;
             cursor: pointer;
             transition-property: border-color;
