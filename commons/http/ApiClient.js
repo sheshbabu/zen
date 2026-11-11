@@ -165,8 +165,16 @@ async function bulkDeleteNotes(ids) {
   return await request('DELETE', '/api/v1/notes/bulk/', { ids });
 }
 
+async function bulkForceDeleteNotes(ids) {
+  return await request('DELETE', '/api/v1/notes/bulk/?isDeleted=true', { ids });
+}
+
 async function restoreNote(noteId) {
   return await request('PUT', `/api/v1/notes/${noteId}/restore/`);
+}
+
+async function bulkRestoreNotes(ids) {
+  return await request('PUT', '/api/v1/notes/bulk/restore/', { ids });
 }
 
 async function archiveNote(noteId) {
@@ -179,6 +187,10 @@ async function bulkArchiveNotes(ids) {
 
 async function unarchiveNote(noteId) {
   return await request('PUT', `/api/v1/notes/${noteId}/unarchive/`);
+}
+
+async function bulkUnarchiveNotes(ids) {
+  return await request('PUT', '/api/v1/notes/bulk/unarchive/', { ids });
 }
 
 async function pinNote(noteId) {
@@ -393,10 +405,13 @@ export default {
   updateNote,
   deleteNote,
   bulkDeleteNotes,
+  bulkForceDeleteNotes,
   restoreNote,
+  bulkRestoreNotes,
   archiveNote,
   bulkArchiveNotes,
   unarchiveNote,
+  bulkUnarchiveNotes,
   pinNote,
   unpinNote,
   clearTrash,

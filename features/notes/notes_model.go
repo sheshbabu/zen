@@ -15,6 +15,9 @@ import (
 
 const NOTES_LIMIT = 100
 
+var ErrNoteTrashed = errors.New("note is in the trash")
+var ErrNoteNotTrashed = errors.New("note is not in the trash")
+
 func GetAllNotes(access auth.Access, filter NotesFilter) ([]Note, int, error) {
 	notes := []Note{}
 	total := 0
@@ -126,7 +129,7 @@ func GetAllNotes(access auth.Access, filter NotesFilter) ([]Note, int, error) {
 		if filter.isDeleted {
 			whereCondition = "WHERE n.deleted_at IS NOT NULL"
 		} else if filter.isArchived {
-			whereCondition = "WHERE n.archived_at IS NOT NULL"
+			whereCondition = "WHERE n.archived_at IS NOT NULL AND n.deleted_at IS NULL"
 		} else {
 			whereCondition = "WHERE n.deleted_at IS NULL AND n.archived_at IS NULL"
 		}
@@ -435,6 +438,15 @@ func UpdateNote(access auth.Access, note Note) (Note, error) {
 
 	defer tx.Rollback()
 
+	isDeleted, err := isNoteDeleted(tx, note.NoteID)
+	if err != nil {
+		return note, err
+	}
+
+	if isDeleted {
+		return note, fmt.Errorf("note %d: %w", note.NoteID, ErrNoteTrashed)
+	}
+
 	existingTagIDs, err := getTagIDsForNote(tx, note.NoteID)
 	if err != nil {
 		return note, err
@@ -611,6 +623,18 @@ func ForceDeleteNote(noteID int) error {
 
 	defer tx.Rollback()
 
+	isDeleted, err := isNoteDeleted(tx, noteID)
+	if errors.Is(err, utils.ErrNotFound) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
+	if !isDeleted {
+		return fmt.Errorf("note %d: %w", noteID, ErrNoteNotTrashed)
+	}
+
 	query := `
 		DELETE FROM
 			note_tags
@@ -713,6 +737,23 @@ func RestoreDeletedNote(noteID int) error {
 }
 
 func ArchiveNote(noteID int) error {
+	tx, err := sqlite.DB.Begin()
+	if err != nil {
+		err = fmt.Errorf("error starting transaction: %w", err)
+		return err
+	}
+
+	defer tx.Rollback()
+
+	isDeleted, err := isNoteDeleted(tx, noteID)
+	if err != nil {
+		return err
+	}
+
+	if isDeleted {
+		return fmt.Errorf("note %d: %w", noteID, ErrNoteTrashed)
+	}
+
 	query := `
 		UPDATE
 			notes
@@ -722,7 +763,13 @@ func ArchiveNote(noteID int) error {
 			note_id = ?
 	`
 
-	_, err := sqlite.DB.Exec(query, noteID)
+	_, err = tx.Exec(query, noteID)
+	if err != nil {
+		err = fmt.Errorf("error archiving note: %w", err)
+		return err
+	}
+
+	err = tx.Commit()
 	if err != nil {
 		err = fmt.Errorf("error archiving note: %w", err)
 		return err
@@ -875,6 +922,9 @@ func EmptyTrash(shouldOnlyClearExpired bool) error {
 
 	for _, noteID := range noteIDs {
 		err = ForceDeleteNote(noteID)
+		if errors.Is(err, ErrNoteNotTrashed) {
+			continue
+		}
 		if err != nil {
 			err = fmt.Errorf("error deleting trashed note %d: %w", noteID, err)
 			return err
@@ -978,7 +1028,7 @@ func GetNotesCount(isDeleted, isArchived bool) (int, error) {
 	if isDeleted {
 		query = "SELECT COUNT(*) FROM notes WHERE deleted_at IS NOT NULL"
 	} else if isArchived {
-		query = "SELECT COUNT(*) FROM notes WHERE archived_at IS NOT NULL"
+		query = "SELECT COUNT(*) FROM notes WHERE archived_at IS NOT NULL AND deleted_at IS NULL"
 	} else {
 		query = "SELECT COUNT(*) FROM notes WHERE deleted_at IS NULL AND archived_at IS NULL"
 	}
@@ -1248,6 +1298,31 @@ func PruneNoteVersions() error {
 	}
 
 	return nil
+}
+
+func isNoteDeleted(tx *sql.Tx, noteID int) (bool, error) {
+	var isDeleted bool
+
+	query := `
+		SELECT
+			deleted_at IS NOT NULL
+		FROM
+			notes
+		WHERE
+			note_id = ?
+	`
+
+	err := tx.QueryRow(query, noteID).Scan(&isDeleted)
+	if errors.Is(err, sql.ErrNoRows) {
+		err = fmt.Errorf("note %d: %w", noteID, utils.ErrNotFound)
+		return false, err
+	}
+	if err != nil {
+		err = fmt.Errorf("error retrieving note state: %w", err)
+		return false, err
+	}
+
+	return isDeleted, nil
 }
 
 func getTagIDsForNote(tx *sql.Tx, noteID int) ([]int, error) {

@@ -1,6 +1,6 @@
 import { h, useState, useRef, useEffect } from "../../assets/preact.esm.js"
 import Button from "../../commons/components/Button.jsx";
-import { EllipsisIcon, PinIcon, ArchiveIcon, TrashIcon, CopyIcon, ShareIcon, HistoryIcon } from "../../commons/components/Icon.jsx";
+import { EllipsisIcon, PinIcon, ArchiveIcon, UnarchiveIcon, RestoreIcon, TrashIcon, CopyIcon, ShareIcon, HistoryIcon } from "../../commons/components/Icon.jsx";
 import isMobile from "../../commons/utils/isMobile.js";
 import "./NotesEditorMenu.css";
 
@@ -47,9 +47,10 @@ export default function NotesEditorMenu({ note, isNewNote, isModal, onPinClick, 
   if (isNewNote !== true && note?.isDeleted !== true) {
     const archiveLabel = note?.isArchived === true ? "Unarchive" : "Archive";
     const archiveAction = note?.isArchived === true ? onUnarchiveClick : onArchiveClick;
+    const archiveIcon = note?.isArchived === true ? <UnarchiveIcon /> : <ArchiveIcon />;
     items.push(
       <li key="archive" className="notes-editor-menu-option" onClick={() => handleItemClick(archiveAction)}>
-        <ArchiveIcon />
+        {archiveIcon}
         <span>{archiveLabel}</span>
       </li>
     );
@@ -58,7 +59,7 @@ export default function NotesEditorMenu({ note, isNewNote, isModal, onPinClick, 
   if (isNewNote !== true && note?.isDeleted === true) {
     items.push(
       <li key="restore" className="notes-editor-menu-option" onClick={() => handleItemClick(onRestoreClick)}>
-        <ArchiveIcon />
+        <RestoreIcon />
         <span>Restore</span>
       </li>
     );

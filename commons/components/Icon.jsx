@@ -74,6 +74,27 @@ export function ArchiveIcon() {
   );
 }
 
+export function UnarchiveIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-archive-arrow-up">
+      <rect width="20" height="5" x="2" y="3" rx="1" />
+      <path d="M4 8v11a2 2 0 0 0 2 2h2" />
+      <path d="M20 8v11a2 2 0 0 1-2 2h-2" />
+      <path d="m9 15 3-3 3 3" />
+      <path d="M12 12v9" />
+    </svg>
+  );
+}
+
+export function RestoreIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-undo-2">
+      <path d="M9 14 4 9l5-5" />
+      <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" />
+    </svg>
+  );
+}
+
 export function TrashIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="lucide lucide-trash2-icon lucide-trash-2">

@@ -192,6 +192,11 @@ func HandleUpdateNote(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		if errors.Is(err, ErrNoteTrashed) {
+			utils.SendErrorResponse(w, "NOTE_TRASHED", "Restore this note from the Trash to edit it.", err, http.StatusConflict)
+			return
+		}
+
 		utils.SendErrorResponse(w, "NOTES_UPDATE_FAILED", "Error saving note.", err, http.StatusInternalServerError)
 		return
 	}
@@ -201,7 +206,7 @@ func HandleUpdateNote(w http.ResponseWriter, r *http.Request) {
 	utils.SendJSON(w, http.StatusOK, note)
 }
 
-func HandleForceDeleteNote(w http.ResponseWriter, r *http.Request) {
+func HandleDeleteNote(w http.ResponseWriter, r *http.Request) {
 	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
 	if err != nil {
@@ -209,20 +214,18 @@ func HandleForceDeleteNote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ForceDeleteNote(noteID)
-	if err != nil {
-		utils.SendErrorResponse(w, "NOTES_FORCE_DELETE_FAILED", "Error deleting note.", err, http.StatusInternalServerError)
-		return
-	}
+	if r.URL.Query().Get("isDeleted") == "true" {
+		err = ForceDeleteNote(noteID)
+		if errors.Is(err, ErrNoteNotTrashed) {
+			utils.SendErrorResponse(w, "NOTE_NOT_TRASHED", "Only notes in the Trash can be deleted permanently.", err, http.StatusConflict)
+			return
+		}
+		if err != nil {
+			utils.SendErrorResponse(w, "NOTES_FORCE_DELETE_FAILED", "Error deleting note.", err, http.StatusInternalServerError)
+			return
+		}
 
-	w.WriteHeader(http.StatusOK)
-}
-
-func HandleSoftDeleteNote(w http.ResponseWriter, r *http.Request) {
-	noteIDStr := r.PathValue("noteId")
-	noteID, err := strconv.Atoi(noteIDStr)
-	if err != nil {
-		utils.SendErrorResponse(w, "INVALID_NOTE_ID", "Invalid note ID", err, http.StatusBadRequest)
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 
@@ -237,10 +240,27 @@ func HandleSoftDeleteNote(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func HandleBulkSoftDeleteNotes(w http.ResponseWriter, r *http.Request) {
+func HandleBulkDeleteNotes(w http.ResponseWriter, r *http.Request) {
 	var input BulkRequest
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", "Invalid request data", err, http.StatusBadRequest)
+		return
+	}
+
+	if r.URL.Query().Get("isDeleted") == "true" {
+		for _, noteID := range input.IDs {
+			err := ForceDeleteNote(noteID)
+			if errors.Is(err, ErrNoteNotTrashed) {
+				utils.SendErrorResponse(w, "NOTE_NOT_TRASHED", "Only notes in the Trash can be deleted permanently.", err, http.StatusConflict)
+				return
+			}
+			if err != nil {
+				utils.SendErrorResponse(w, "NOTES_BULK_FORCE_DELETE_FAILED", "Error deleting notes.", err, http.StatusInternalServerError)
+				return
+			}
+		}
+
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 
@@ -275,6 +295,25 @@ func HandleRestoreDeletedNote(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func HandleBulkRestoreDeletedNotes(w http.ResponseWriter, r *http.Request) {
+	var input BulkRequest
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", "Invalid request data", err, http.StatusBadRequest)
+		return
+	}
+
+	for _, noteID := range input.IDs {
+		err := RestoreDeletedNote(noteID)
+		if err != nil {
+			utils.SendErrorResponse(w, "NOTES_BULK_RESTORE_FAILED", "Error restoring notes.", err, http.StatusInternalServerError)
+			return
+		}
+		requeueNote(noteID, queue.QUEUE_NOTE_PROCESS, "process")
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
 func HandleArchiveNote(w http.ResponseWriter, r *http.Request) {
 	noteIDStr := r.PathValue("noteId")
 	noteID, err := strconv.Atoi(noteIDStr)
@@ -284,6 +323,10 @@ func HandleArchiveNote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = ArchiveNote(noteID)
+	if errors.Is(err, ErrNoteTrashed) {
+		utils.SendErrorResponse(w, "NOTE_TRASHED", "Notes in the Trash can't be archived.", err, http.StatusConflict)
+		return
+	}
 	if err != nil {
 		utils.SendErrorResponse(w, "NOTES_ARCHIVE_FAILED", "Error archiving note.", err, http.StatusInternalServerError)
 		return
@@ -303,6 +346,10 @@ func HandleBulkArchiveNotes(w http.ResponseWriter, r *http.Request) {
 
 	for _, noteID := range input.IDs {
 		err := ArchiveNote(noteID)
+		if errors.Is(err, ErrNoteTrashed) {
+			utils.SendErrorResponse(w, "NOTE_TRASHED", "Notes in the Trash can't be archived.", err, http.StatusConflict)
+			return
+		}
 		if err != nil {
 			utils.SendErrorResponse(w, "NOTES_BULK_ARCHIVE_FAILED", "Error archiving notes.", err, http.StatusInternalServerError)
 			return
@@ -328,6 +375,25 @@ func HandleUnarchiveNote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requeueNote(noteID, queue.QUEUE_NOTE_PROCESS, "process")
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func HandleBulkUnarchiveNotes(w http.ResponseWriter, r *http.Request) {
+	var input BulkRequest
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		utils.SendErrorResponse(w, "INVALID_REQUEST_BODY", "Invalid request data", err, http.StatusBadRequest)
+		return
+	}
+
+	for _, noteID := range input.IDs {
+		err := UnarchiveNote(noteID)
+		if err != nil {
+			utils.SendErrorResponse(w, "NOTES_BULK_UNARCHIVE_FAILED", "Error unarchiving notes.", err, http.StatusInternalServerError)
+			return
+		}
+		requeueNote(noteID, queue.QUEUE_NOTE_PROCESS, "process")
+	}
 
 	w.WriteHeader(http.StatusOK)
 }

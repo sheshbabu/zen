@@ -228,6 +228,11 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   }
 
   function handleEditClick() {
+    // Trashed notes are read-only until restored.
+    if (selectedNote?.isDeleted === true) {
+      return;
+    }
+
     setIsEditable(true);
   }
 
@@ -372,6 +377,10 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   }
 
   function handleTaskCheckboxClick(checkbox) {
+    if (selectedNote?.isDeleted === true) {
+      return;
+    }
+
     const lineIndex = parseInt(checkbox.getAttribute('data-line'), 10);
     const newContent = toggleTaskAtLine(content, lineIndex);
     if (newContent === null) {
@@ -492,7 +501,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
     );
   } else {
     contentArea = (
-      <div className="notes-editor-rendered has-foldable-headings" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(content, { hasCodeCopyButton: true, hasClickableTasks: true }) }} onClick={handleRenderedContentClick} />
+      <div className="notes-editor-rendered has-foldable-headings" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(content, { hasCodeCopyButton: true, hasClickableTasks: selectedNote?.isDeleted !== true }) }} onClick={handleRenderedContentClick} />
     );
   }
 
@@ -614,7 +623,7 @@ function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpand
       },
       {
         key: 'edit',
-        condition: !isEditable,
+        condition: !isEditable && note?.isDeleted !== true,
         component: <Button variant="ghost" onClick={onEditClick}>Edit</Button>
       }
     ]

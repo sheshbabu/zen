@@ -32,6 +32,10 @@ export default function NotePreview({ noteId, onOpenLink, onNavigateLink, onNote
   }
 
   function handleTaskCheckboxClick(checkbox) {
+    if (note.isDeleted) {
+      return;
+    }
+
     const lineIndex = parseInt(checkbox.getAttribute('data-line'), 10);
     const newContent = toggleTaskAtLine(note.content, lineIndex);
     if (newContent === null) {
@@ -106,7 +110,7 @@ export default function NotePreview({ noteId, onOpenLink, onNavigateLink, onNote
       </div>
       <NotesEditorTags tags={note.tags} isEditable={false} />
       <div className="notes-editor-content">
-        <div className="notes-editor-rendered has-foldable-headings" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(note.content, { hasCodeCopyButton: true, hasClickableTasks: true }) }} onClick={handleContentClick} />
+        <div className="notes-editor-rendered has-foldable-headings" ref={contentRef} dangerouslySetInnerHTML={{ __html: renderMarkdown(note.content, { hasCodeCopyButton: true, hasClickableTasks: !note.isDeleted }) }} onClick={handleContentClick} />
       </div>
     </div>
   );
