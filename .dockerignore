@@ -1,0 +1,14 @@
+# Keeps local data out of the build context; the builder only needs the source.
+# .git stays in because Go stamps the commit into the binary from it.
+
+*.db
+*.db-shm
+*.db-wal
+*.bak
+zen
+tmp
+notes
+images
+.claude
+.vscode
+.DS_Store
