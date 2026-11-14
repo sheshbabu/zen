@@ -9,6 +9,7 @@
         background-color: var(--bg-primary);
         color: var(--text-primary);
         padding: var(--spacing-2);
+        font: var(--sm);
         min-width: 320px;
         outline: none;
         transition: border-color var(--transition-fast);
