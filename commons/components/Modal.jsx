@@ -1,16 +1,54 @@
-import { h, render } from '../../assets/preact.esm.js';
+import { h, render, Fragment, useEffect, useRef } from '../../assets/preact.esm.js';
 import { CloseIcon } from './Icon.jsx';
 import './Modal.css';
 
-export function closeModal(selector = '.modal-root') {
-  render(null, document.querySelector(selector));
+let modalStack = [];
+let nextModalId = 1;
+
+export function openModal(component) {
+  modalStack = [...modalStack, { id: nextModalId++, component }];
+  renderModals();
 }
 
-export function openModal(component, selector = '.modal-root') {
-  render(component, document.querySelector(selector));
+export function closeModal() {
+  modalStack = modalStack.slice(0, -1);
+  renderModals();
+}
+
+export function closeAllModals() {
+  modalStack = [];
+  renderModals();
+}
+
+export function isModalOpen() {
+  return modalStack.length > 0;
+}
+
+function renderModals() {
+  const modals = modalStack.map(modal => <Fragment key={modal.id}>{modal.component}</Fragment>);
+  render(<>{modals}</>, document.querySelector('.modal-root'));
 }
 
 export function ModalBackdrop({ children, onClose, isCentered = true }) {
+  const backdropRef = useRef(null);
+
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key !== 'Escape' || e.defaultPrevented) {
+        return;
+      }
+      // Only the top modal closes, so Escape on a stacked modal leaves the ones underneath open.
+      const backdrops = document.querySelectorAll('.modal-backdrop-container');
+      if (backdrops[backdrops.length - 1] === backdropRef.current) {
+        e.preventDefault();
+        onClose();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   function handleBackdropClick(e) {
     if (e.target.classList.contains("modal-backdrop-container")) {
       onClose();
@@ -20,7 +58,7 @@ export function ModalBackdrop({ children, onClose, isCentered = true }) {
   const backdropClasses = `modal-backdrop-container ${isCentered ? 'is-centered' : ''}`;
 
   return (
-    <div className={backdropClasses} onClick={handleBackdropClick}>
+    <div ref={backdropRef} className={backdropClasses} onClick={handleBackdropClick}>
       {children}
     </div>
   );

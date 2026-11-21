@@ -102,7 +102,6 @@ export default function CanvasesPage() {
           {content}
         </div>
 
-        <div className="modal-root"></div>
         <div className="toast-root"></div>
       </div>
     </LayoutProvider>

@@ -1,10 +1,12 @@
 import { h, useEffect, useState } from '../../assets/preact.esm.js';
+import { closeAllModals } from './Modal.jsx';
 
 export default function Router({ children }) {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
   useEffect(() => {
     function handleLocationChange() {
+      closeAllModals();
       setCurrentPath(window.location.pathname);
     }
 

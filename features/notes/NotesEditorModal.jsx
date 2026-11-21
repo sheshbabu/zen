@@ -9,7 +9,7 @@ export default function NotesEditorModal({ note, isNewNote, onModalClose }) {
 
   function handleCloseModal() {
     document.title = "Zen";
-    closeModal('.note-modal-root');
+    closeModal();
     if (onModalClose) {
       onModalClose();
     }
@@ -23,7 +23,7 @@ export default function NotesEditorModal({ note, isNewNote, onModalClose }) {
     <ModalBackdrop onClose={handleCloseModal} isCentered={true}>
       <ModalContainer className="notes-editor-modal">
         <ModalContent className="notes-editor-container">
-          <NotesEditor isNewNote={isNewNote === true} isModal={true} onClose={handleCloseModal} />
+          <NotesEditor isNewNote={isNewNote === true} onClose={handleCloseModal} />
         </ModalContent>
       </ModalContainer>
     </ModalBackdrop>

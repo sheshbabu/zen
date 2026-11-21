@@ -4,7 +4,6 @@ import renderMarkdown from "../../commons/utils/renderMarkdown.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import Spinner from "../../commons/components/Spinner.jsx";
 import { ArrowUpIcon, ArrowDownIcon } from "../../commons/components/Icon.jsx";
-import { closeModal } from "../../commons/components/Modal.jsx";
 import useMatchHighlighter from "./useMatchHighlighter.js";
 import "../notes/NotesEditor.css";
 import "./SearchPreview.css";
@@ -103,7 +102,6 @@ export default function SearchPreview({ item, hasInlineContent }) {
     e.preventDefault();
     const linkedNoteId = parseInt(link.getAttribute("data-note-id"), 10);
     navigateTo(`/notes/${linkedNoteId}`);
-    closeModal();
   }
 
   let previewBody = null;

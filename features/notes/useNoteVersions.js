@@ -9,7 +9,7 @@ export default function useNoteVersions({ note, onRestored, cancelAutoSave }) {
   const { handleNoteChange } = useNotes();
 
   function handleVersionsCloseClick() {
-    closeModal('.note-modal-root');
+    closeModal();
   }
 
   function handleVersionRestoreClick(versionId) {
@@ -35,8 +35,7 @@ export default function useNoteVersions({ note, onRestored, cancelAutoSave }) {
         note={note}
         onRestoreClick={handleVersionRestoreClick}
         onCloseClick={handleVersionsCloseClick}
-      />,
-      '.note-modal-root'
+      />
     );
   }
 

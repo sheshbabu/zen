@@ -4,7 +4,7 @@ import { EllipsisIcon, PinIcon, ArchiveIcon, UnarchiveIcon, RestoreIcon, TrashIc
 import isMobile from "../../commons/utils/isMobile.js";
 import "./NotesEditorMenu.css";
 
-export default function NotesEditorMenu({ note, isNewNote, isModal, onPinClick, onUnpinClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onDeleteClick, onCopyClick, onShareClick, onVersionsClick }) {
+export default function NotesEditorMenu({ note, isNewNote, onPinClick, onUnpinClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onDeleteClick, onCopyClick, onShareClick, onVersionsClick }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const dropdownRef = useRef(null);
@@ -65,7 +65,7 @@ export default function NotesEditorMenu({ note, isNewNote, isModal, onPinClick, 
     );
   }
 
-  if (isNewNote !== true && note?.isDeleted !== true && isModal !== true && !isMobile()) {
+  if (isNewNote !== true && note?.isDeleted !== true && !isMobile()) {
     items.push(
       <li key="versions" className="notes-editor-menu-option" onClick={() => handleItemClick(onVersionsClick)}>
         <HistoryIcon />

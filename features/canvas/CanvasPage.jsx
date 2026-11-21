@@ -727,8 +727,7 @@ export default function CanvasPage({ canvasId }) {
             <NotesProvider>
               <NotesEditorModal note={note} onModalClose={handleModalClose} />
             </NotesProvider>
-          </AppProvider>,
-          '.note-modal-root'
+          </AppProvider>
         );
       })
       .catch(() => { });
@@ -808,8 +807,6 @@ export default function CanvasPage({ canvasId }) {
       />
       {content}
       {notePicker}
-      <div className="note-modal-root"></div>
-      <div className="modal-root"></div>
     </div>
   );
 }

@@ -110,7 +110,6 @@ export default function TemplateEditor({ selectedTemplate, isNewTemplate, onChan
   function handleDeleteConfirmClick() {
     ApiClient.deleteTemplate(selectedTemplate.templateId)
       .then(() => {
-        handleDeleteCloseClick();
         showToast("Template deleted");
         navigateTo("/templates/");
         onChange();

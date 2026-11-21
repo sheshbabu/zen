@@ -84,7 +84,6 @@ export default function TemplatesPage({ templateId }) {
           <TemplateEditor selectedTemplate={selectedTemplate} isNewTemplate={templateId === "new"} key={selectedTemplate?.templateId || "new"} onChange={handleTemplateChange} onClose={handleCloseEditor} />
         </div>
 
-        <div className="modal-root"></div>
         <div className="toast-root"></div>
       </div>
     </LayoutProvider>

@@ -3,9 +3,10 @@ import Input from "../../commons/components/Input.jsx";
 import NotesEditorTags from "../tags/NotesEditorTags.jsx";
 import Button from "../../commons/components/Button.jsx";
 import ButtonGroup from "../../commons/components/ButtonGroup.jsx";
-import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent, ModalFooter, closeModal } from "../../commons/components/Modal.jsx";
+import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent, ModalFooter, openModal, closeModal } from "../../commons/components/Modal.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
+import FocusDeleteModal from "./FocusDeleteModal.jsx";
 import "./FocusDetailsModal.css";
 
 export default function FocusDetailsModal({ mode, focusMode, refreshFocusModes, refreshTags }) {
@@ -67,10 +68,13 @@ export default function FocusDetailsModal({ mode, focusMode, refreshFocusModes, 
   }
 
   function handleDeleteClick() {
+    openModal(<FocusDeleteModal onDeleteClick={handleDeleteConfirmClick} onCloseClick={closeModal} />);
+  }
+
+  function handleDeleteConfirmClick() {
     ApiClient.deleteFocusMode(focusMode.focusId)
       .then(() => {
         refreshFocusModes();
-        closeModal();
         navigateTo("/notes/");
       })
       .catch(() => { });

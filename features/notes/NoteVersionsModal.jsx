@@ -1,11 +1,12 @@
 import { h, useState, useEffect } from "../../assets/preact.esm.js";
-import { ModalBackdrop, ModalContainer } from "../../commons/components/Modal.jsx";
+import { ModalBackdrop, ModalContainer, openModal, closeModal } from "../../commons/components/Modal.jsx";
 import { CloseIcon, HistoryIcon } from "../../commons/components/Icon.jsx";
 import Button from "../../commons/components/Button.jsx";
 import Spinner from "../../commons/components/Spinner.jsx";
 import EmptyState from "../../commons/components/EmptyState.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import renderMarkdown from "../../commons/utils/renderMarkdown.js";
+import NoteRestoreModal from "./NoteRestoreModal.jsx";
 import "./NoteVersionsModal.css";
 
 const CURRENT_VERSION_ID = -1;
@@ -38,23 +39,16 @@ export default function NoteVersionsModal({ note, onRestoreClick, onCloseClick }
       });
   }, [note.noteId, pageNumber]);
 
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onCloseClick();
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onCloseClick]);
-
   function handleLoadMoreClick() {
     setPageNumber(prevPageNumber => prevPageNumber + 1);
   }
 
   function handleRestoreClick() {
+    openModal(<NoteRestoreModal onRestoreClick={handleRestoreConfirmClick} onCloseClick={closeModal} />);
+  }
+
+  function handleRestoreConfirmClick() {
+    closeModal();
     setIsRestoreLoading(true);
     onRestoreClick(selectedVersionId).finally(() => {
       setIsRestoreLoading(false);

@@ -180,11 +180,9 @@ export default function SearchMenu() {
     if (item.noteId) {
       SearchHistory.saveItem(item);
       navigateTo(`/notes/${item.noteId}`);
-      closeModal();
     } else if (item.tagId) {
       SearchHistory.saveItem(item);
       navigateTo(`/?tagId=${item.tagId}`);
-      closeModal();
     } else if (item.filename) {
       const imageDetails = results.semanticImages.map(image => ({
         url: `/images/${image.filename}`,

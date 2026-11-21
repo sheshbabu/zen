@@ -144,8 +144,7 @@ function NotesGridItem({ note, index }) {
         <NotesProvider>
           <NotesEditorModal note={note} />
         </NotesProvider>
-      </AppProvider>,
-      '.note-modal-root'
+      </AppProvider>
     );
   }
 

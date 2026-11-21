@@ -89,14 +89,16 @@ function NotesPageContent({ noteId }) {
   useEffect(() => {
     if (noteId === "new") {
       if (!isMobile() && (selectedView === "card" || selectedView === "gallery")) {
-        openModal(
-          <AppProvider>
-            <NotesProvider>
-              <NotesEditorModal isNewNote />
-            </NotesProvider>
-          </AppProvider>,
-          '.note-modal-root'
-        );
+        // Going back closes all modals, so the new note modal opens once the back navigation lands.
+        window.addEventListener("popstate", () => {
+          openModal(
+            <AppProvider>
+              <NotesProvider>
+                <NotesEditorModal isNewNote />
+              </NotesProvider>
+            </AppProvider>
+          );
+        }, { once: true });
         window.history.back();
         return;
       }
@@ -222,8 +224,6 @@ function NotesPageContent({ noteId }) {
         <SidePanel />
 
         <MobileNavbar />
-        <div className="note-modal-root"></div>
-        <div className="modal-root"></div>
         <div className="toast-root"></div>
         <div className="toc-root"></div>
       </div>

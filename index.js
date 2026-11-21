@@ -10,6 +10,7 @@ import CanvasesPage from "./features/canvas/CanvasesPage.jsx";
 import LoginPage from './features/users/LoginPage.jsx';
 import navigateTo from './commons/utils/navigateTo.js';
 import SearchMenu from './features/search/SearchMenu.jsx';
+import { openModal } from './commons/components/Modal.jsx';
 import OfflineIndicator from './commons/components/OfflineIndicator.jsx';
 import Tooltip from './commons/components/Tooltip.js';
 import { AppProvider } from './commons/contexts/AppContext.jsx';
@@ -35,13 +36,8 @@ document.addEventListener("keydown", e => {
 
   if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
     e.preventDefault();
-    render(<SearchMenu />, document.querySelector('.modal-root'));
-  }
-
-  if (e.key === 'Escape') {
-    if (document.querySelector('.modal-root').firstChild) {
-      e.preventDefault();
-      render(null, document.querySelector('.modal-root'));
+    if (document.querySelector('.search-modal') === null) {
+      openModal(<SearchMenu />);
     }
   }
 });
@@ -73,6 +69,7 @@ function App() {
         <Route path="/canvases/" component={CanvasesPage} />
         <Route path="/canvases/:canvasId" component={CanvasPage} />
       </Router>
+      <div className="modal-root"></div>
     </AppProvider>
   );
 }

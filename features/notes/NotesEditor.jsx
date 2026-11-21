@@ -31,7 +31,7 @@ import SpellcheckPreferences from "../../commons/preferences/SpellcheckPreferenc
 import "./NotesEditor.css";
 import { SidebarCloseIcon, SidebarOpenIcon, BackIcon } from "../../commons/components/Icon.jsx";
 
-export default function NotesEditor({ isNewNote, isModal, isExpandable = false, onClose }) {
+export default function NotesEditor({ isNewNote, isExpandable = false, onClose }) {
   const { selectedNote, setSelectedNote, handleNoteChange, handlePinToggle } = useNotes();
   const { isEditorExpanded, toggleEditorExpanded, openSidePanelNote } = useLayout();
 
@@ -174,13 +174,11 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
 
   const { handleKeyDown } = useEditorKeyboardShortcuts({
     isEditable,
-    isModal,
     isExpanded: isEditorExpanded,
     isExpandable,
     textareaRef,
     onSave: handleSaveClick,
     onEdit: handleEditClick,
-    onClose: handleCloseClick,
     onExpandToggle: handleExpandToggleClick,
     onInsertAtCursor: insertAtCursor,
     onFormatText: applyMarkdownFormat
@@ -549,7 +547,6 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
         note={selectedNote}
         isNewNote={isNewNote}
         isEditable={isEditable}
-        isModal={isModal}
         isSaveLoading={isSaveLoading}
         isExpanded={isEditorExpanded}
         isExpandable={isExpandable}
@@ -583,7 +580,7 @@ export default function NotesEditor({ isNewNote, isModal, isExpandable = false, 
   );
 }
 
-function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpanded, isExpandable, onSaveClick, onEditClick, onEditCancelClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick, onPinClick, onUnpinClick, onCopyClick, onShareClick, onVersionsClick }) {
+function Toolbar({ note, isNewNote, isEditable, isSaveLoading, isExpanded, isExpandable, onSaveClick, onEditClick, onEditCancelClick, onDeleteClick, onArchiveClick, onUnarchiveClick, onRestoreClick, onExpandToggleClick, onPinClick, onUnpinClick, onCopyClick, onShareClick, onVersionsClick }) {
   const saveButtonText = isSaveLoading ? "Saving..." : "Save";
 
   function handleClick(e) {
@@ -656,7 +653,6 @@ function Toolbar({ note, isNewNote, isEditable, isModal, isSaveLoading, isExpand
           onCopyClick={onCopyClick}
           onShareClick={onShareClick}
           onVersionsClick={onVersionsClick}
-          isModal={isModal}
         />
       </div>
     </div>

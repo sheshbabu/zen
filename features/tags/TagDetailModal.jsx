@@ -2,10 +2,11 @@ import { h, useState } from "../../assets/preact.esm.js"
 import Input from "../../commons/components/Input.jsx";
 import Button from "../../commons/components/Button.jsx";
 import ButtonGroup from "../../commons/components/ButtonGroup.jsx";
-import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent, ModalFooter, closeModal } from "../../commons/components/Modal.jsx";
+import { ModalBackdrop, ModalContainer, ModalHeader, ModalContent, ModalFooter, openModal, closeModal } from "../../commons/components/Modal.jsx";
 import ApiClient from "../../commons/http/ApiClient.js";
 import navigateTo from "../../commons/utils/navigateTo.js";
 import TagColorPicker from "./TagColorPicker.jsx";
+import TagDeleteModal from "./TagDeleteModal.jsx";
 import "./TagDetailModal.css";
 
 export default function TagDetailModal({ tag, refreshTags, refreshFocusModes }) {
@@ -37,11 +38,14 @@ export default function TagDetailModal({ tag, refreshTags, refreshFocusModes }) 
   }
 
   function handleDeleteClick() {
+    openModal(<TagDeleteModal onDeleteClick={handleDeleteConfirmClick} onCloseClick={closeModal} />);
+  }
+
+  function handleDeleteConfirmClick() {
     ApiClient.deleteTag(tag.tagId)
       .then(() => {
         refreshTags();
         refreshFocusModes();
-        closeModal();
         navigateTo("/notes/");
       })
       .catch(() => { });

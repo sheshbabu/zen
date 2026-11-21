@@ -40,9 +40,6 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
       const currentIndex = imageDetails.findIndex(img => img.filename === currentImage.filename);
 
       switch (e.key) {
-        case 'Escape':
-          onClose();
-          break;
         case 'ArrowLeft':
           e.preventDefault();
           if (currentIndex > 0) {
@@ -60,7 +57,7 @@ export default function Lightbox({ selectedImage, imageDetails, onClose }) {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [currentImage, imageDetails, onClose]);
+  }, [currentImage, imageDetails]);
 
 
   function handleImageClick() {

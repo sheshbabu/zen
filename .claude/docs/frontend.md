@@ -74,6 +74,7 @@ if (name) { ... }
 - Click outside patterns for modals using refs and event listeners
 
 ## Modal Patterns
-- Render to `.modal-root` using `render()` function
-- Backdrop click handling with `classList.contains("modal-backdrop-container")`
+- Open with `openModal(component)` and close the top one with `closeModal()`; modals stack in the single `.modal-root`, so the one underneath stays mounted
+- Navigation closes all modals, so don't call `closeModal()` before `navigateTo()`
+- `ModalBackdrop` closes the top modal on backdrop click and Escape via its `onClose`; don't add Escape handlers inside modals
 - Consistent modal structure with header, content, and close button

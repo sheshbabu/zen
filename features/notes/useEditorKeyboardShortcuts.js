@@ -24,13 +24,11 @@ function updateLine(textarea, lineStart, newLine, newCursorPos) {
 
 export default function useEditorKeyboardShortcuts({
   isEditable,
-  isModal,
   isExpanded,
   isExpandable,
   textareaRef,
   onSave,
   onEdit,
-  onClose,
   onExpandToggle,
   onInsertAtCursor,
   onFormatText
@@ -44,13 +42,6 @@ export default function useEditorKeyboardShortcuts({
         onSave();
       } else {
         onEdit();
-      }
-    }
-
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      if (isModal === true) {
-        onClose();
       }
     }
 
@@ -149,7 +140,7 @@ export default function useEditorKeyboardShortcuts({
         }
       }
     }
-  }, [isEditable, isModal, isExpanded, isExpandable, textareaRef, onSave, onEdit, onClose, onExpandToggle, onInsertAtCursor, onFormatText]);
+  }, [isEditable, isExpanded, isExpandable, textareaRef, onSave, onEdit, onExpandToggle, onInsertAtCursor, onFormatText]);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
