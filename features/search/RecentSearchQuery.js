@@ -1,4 +1,4 @@
-const TTL_MS = 5 * 60 * 1000;
+const TTL_MS = 10 * 1000;
 
 let query = "";
 let savedAt = 0;
