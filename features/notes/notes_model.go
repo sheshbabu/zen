@@ -500,7 +500,7 @@ func UpdateNote(access auth.Access, note Note) (Note, error) {
 		SET
 			title = ?,
 			content = ?,
-			updated_at = CURRENT_TIMESTAMP
+			updated_at = CASE WHEN title != ? OR content != ? THEN CURRENT_TIMESTAMP ELSE updated_at END
 		WHERE
 			note_id = ?
 		RETURNING
@@ -511,7 +511,7 @@ func UpdateNote(access auth.Access, note Note) (Note, error) {
 			updated_at
 	`
 
-	row := tx.QueryRow(query, note.Title, note.Content, note.NoteID)
+	row := tx.QueryRow(query, note.Title, note.Content, note.Title, note.Content, note.NoteID)
 	err = row.Scan(&note.NoteID, &note.Title, &note.Content, &note.Snippet, &note.UpdatedAt)
 	if err != nil {
 		err = fmt.Errorf("error updating note: %w", err)
